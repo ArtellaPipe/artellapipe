@@ -26,12 +26,15 @@ from artellapipe.core import defines, artellalib
 
 class ArtellaProject(object):
 
+    PROJECT_RESOURCE = None
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
+    PROJECT_SHELF_FILE_PATH = artellapipe.get_shelf_path()
 
-    def __init__(self):
+    def __init__(self, resource=None):
         super(ArtellaProject, self).__init__()
 
         self._name = None
+        self._project_env_var = None
         self._logger = None
         self._tray = None
         self._config = None
@@ -42,6 +45,8 @@ class ArtellaProject(object):
         self._asset_must_files = list()
         self._wip_status = None
         self._publish_status = None
+        self._shelf_icon = None
+        self._resource = resource
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
@@ -55,6 +60,15 @@ class ArtellaProject(object):
         """
 
         return self._name
+
+    @property
+    def project_environment_variable(self):
+        """
+        Returns name used to store path to the current project
+        :return: str
+        """
+
+        return self._project_env_var
 
     @property
     def logger(self):
@@ -119,6 +133,15 @@ class ArtellaProject(object):
 
         return self._publish_status
 
+    @property
+    def resource(self):
+        """
+        Returns the class used by the project to load resources (icons, images, fonts, etc)
+        :return: Resource
+        """
+
+        return self._resource
+
     def init(self, force_skip_hello=False):
         """
         This function initializes Artella project
@@ -131,6 +154,7 @@ class ArtellaProject(object):
         self.update_paths()
         self.set_environment_variables()
         self.create_shelf()
+        self.update_project()
 
     def init_config(self):
         """
@@ -149,6 +173,7 @@ class ArtellaProject(object):
             return
 
         self._name = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NAME, defines.ARTELLA_DEFAULT_PROJECT_NAME)
+        self._project_env_var = project_config_data.get(defines.ARTELLA_CONFIG_ENVIRONMENT_VARIABLE, defines.ARTELLA_DEFAULT_ENVIRONMENT_VARIABLE)
         self._id_number = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NUMBER, -1)
         self._id = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_ID, -1)
         self._asset_types = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_TYPES, list())
@@ -156,6 +181,7 @@ class ArtellaProject(object):
         self._asset_must_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_MUST_FILES, list())
         self._wip_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_WIP_STATUS, None)
         self._publish_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_PUBLISH_STATUS, None)
+        self._shelf_icon = project_config_data.get(defines.ARTELLA_CONFIG_SHELF_ICON, None)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -226,11 +252,22 @@ class ArtellaProject(object):
 
         try:
             artellalib.update_local_artella_root()
-            artella_var = os.environ.get('ART_LOCAL_ROOT', None)
+            artella_var = os.environ.get(defines.ARTELLA_ROOT_PREFIX, None)
             self.logger.debug('Artella environment variable is set to: {}'.format(artella_var))
+            if artella_var and os.path.exists(artella_var):
+                os.environ[self._project_env_var] = '{}_art/production/{}/{}/'.format(artella_var, self._id_number, self._id)
+            else:
+                self.logger.warning('Impossible to set Artella environment variable!')
         except Exception as e:
             self.logger.debug('Error while setting Solstice Environment Variables. Solstice Tools may not work properly!')
             self.logger.error('{} | {}'.format(e, traceback.format_exc()))
+
+        self.logger.debug('=' * 100)
+        self.logger.debug("{} Pipeline initialization completed!".format(self.name))
+        self.logger.debug('=' * 100)
+        self.logger.debug('*' * 100)
+        self.logger.debug('-' * 100)
+        self.logger.debug('\n')
 
     def create_shelf(self):
         """
@@ -238,6 +275,37 @@ class ArtellaProject(object):
         """
 
         self.logger.debug('Building {} Tool Shelf'.format(self.name))
+
+        shelf_category_icon = None
+        if self.resource and self._shelf_icon:
+            shelf_category_icon = self.resource.icon(self._shelf_icon, theme=None)
+        project_shelf = tp.Shelf(name=self._name.replace(' ', ''), category_icon=shelf_category_icon)
+        project_shelf.create(delete_if_exists=True)
+        shelf_file = self.PROJECT_SHELF_FILE_PATH
+        if not shelf_file or not os.path.isfile(shelf_file):
+            self.logger.warning('Shelf File for Project {} is not valid: {}'.format(self._name, shelf_file))
+            return
+
+        project_shelf.build(shelf_file=shelf_file)
+        project_shelf.set_as_active()
+
+    def update_project(self):
+        """
+        Sets the current Maya project to the path where Artella project is located inside Artella folder
+        """
+
+        try:
+            if tp.is_maya():
+                import tpMayaLib as maya
+                self.logger.debug('Setting {} Project ...'.format(self.name))
+                project_folder = os.environ.get(self._project_env_var, 'folder-not-defined')
+                if project_folder and os.path.exists(project_folder):
+                    maya.cmds.workspace(project_folder, openWorkspace=True)
+                    self.logger.debug('{} Project setup successfully! => {}'.format(self.name, project_folder))
+                else:
+                    self.logger.warning('Unable to set {} Project! => {}'.format(self.name, project_folder))
+        except Exception as e:
+            self.logger.error('{} | {}'.format(str(e), traceback.format_exc()))
 
     def message(self, msg, title=None):
         """

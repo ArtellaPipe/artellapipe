@@ -17,6 +17,9 @@ import os
 # Defines the name of the configuration file used by artellapipe to setup project
 ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.json'
 
+# Defines the name of the shelf file used by artellapipe to setup project shelf
+ARTELLA_PROJECT_SHELF_FILE_NAME = 'shelf.json'
+
 # Defines the name of the attribute that defines the Artella project name
 ARTELLA_CONFIG_PROJECT_NAME = 'PROJECT_NAME'
 
@@ -39,11 +42,20 @@ ARTELLA_CONFIG_ASSET_WIP_STATUS = 'ASSET_WIP_STATUS'
 # Defines the name of the attributes that defines the working status of an asset
 ARTELLA_CONFIG_ASSET_PUBLISH_STATUS = 'ASSET_PUBLISH_STATUS'
 
+# Defines the name of the attribute that defines the name of the icon used by shelf category button
+ARTELLA_CONFIG_SHELF_ICON = 'SHELF_ICON'
+
 # Defines the name of the attribute that defines the Artella project id
 ARTELLA_CONFIG_PROJECT_ID = 'PROJECT_ID'
 
+# Defines the name of the attribute that defines the environemtn variable used to store Artella project path
+ARTELLA_CONFIG_ENVIRONMENT_VARIABLE = 'PROJECT_ID'
+
 # Defines the default name used by Artella projects
 ARTELLA_DEFAULT_PROJECT_NAME = 'Artella'
+
+# Defines the default name used for set environment variable for Artella Project
+ARTELLA_DEFAULT_ENVIRONMENT_VARIABLE = 'ARTELLA_PROJECT'
 
 # Defines the name of the Artella plugin
 ARTELLA_MAYA_PLUGIN_NAME = 'Artella.py'
@@ -52,7 +64,7 @@ ARTELLA_MAYA_PLUGIN_NAME = 'Artella.py'
 ARTELLA_APP_NAME = 'lifecycler'
 
 # Defines the environment variable used by Artella to reference to user local installation folder
-ARTELLA_ROOT_PREFIX = '$ART_LOCAL_ROOT'
+ARTELLA_ROOT_PREFIX = 'ART_LOCAL_ROOT'
 
 # Defines path to Artella webpage
 ARTELLA_WEB = 'https://www.artella.com'

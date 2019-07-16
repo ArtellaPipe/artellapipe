@@ -13,12 +13,12 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-import sys
 import collections
 
 from tpPyUtils import path as path_utils
 
 import artellapipe
+from artellapipe.core import defines
 
 
 class ArtellaHeaderMetaData(object):
@@ -334,7 +334,7 @@ class ArtellaAppMetaData(object):
         """
 
         artellapipe.logger.debug('Updating Artella Local Root to {0}'.format(self._local_root))
-        os.environ['ART_LOCAL_ROOT'] = self._local_root
+        os.environ[defines.ARTELLA_ROOT_PREFIX] = self._local_root
 
 
 class ArtellaFileVerionMetaData(object):

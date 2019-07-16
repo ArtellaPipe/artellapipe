@@ -75,14 +75,15 @@ def init(do_reload=False):
     artella_importer.import_modules()
 
 
-def set_project(project_class):
+def set_project(project_class, project_resource):
     """
     This functions sets the given class instance as the current Artella project used
     :param project_class: ArtellaProject
+    :param project_resource: Resource
     """
 
     global project
-    project = project_class()
+    project = project_class(resource=project_resource)
     project.init()
 
 
@@ -93,3 +94,12 @@ def get_project_config_path():
     """
 
     return path_utils.clean_path(os.path.join(os.path.dirname(__file__), defines.ARTELLA_PROJECT_CONFIG_FILE_NAME))
+
+
+def get_shelf_path():
+    """
+    Returns path where default Artella shelf file is located
+    :return: str
+    """
+
+    return path_utils.clean_path(os.path.join(os.path.dirname(__file__), defines.ARTELLA_PROJECT_SHELF_FILE_NAME))

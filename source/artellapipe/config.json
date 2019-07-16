@@ -1,5 +1,7 @@
 {
   "PROJECT_NAME": "Artella",
+  "PROJECT_ENV_VARIABLE": "ARTELLA_PROJECT",
+  "SHELF_ICON": "",
   "PROJECT_NUMBER": "",
   "PROJECT_ID": "",
   "ASSET_TYPES": [],
