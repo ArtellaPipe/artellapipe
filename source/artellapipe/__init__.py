@@ -15,13 +15,16 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import inspect
 
-from tpPyUtils import importer
+from tpPyUtils import importer, path as path_utils
 from tpQtLib.core import resource as resource_utils
+
+from artellapipe.core import defines
 
 # =================================================================================
 
 logger = None
 resource = None
+project = None
 
 # =================================================================================
 
@@ -30,7 +33,7 @@ class ArtellaResource(resource_utils.Resource, object):
     RESOURCES_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
 
 
-class ArtellaPipe(importer.SimpleImporter, object):
+class ArtellaPipe(importer.Importer, object):
     def __init__(self):
         super(ArtellaPipe, self).__init__(module_name='artellapipe')
 
@@ -65,7 +68,28 @@ def init(do_reload=False):
 
     global logger
     global resource
+
     logger = artella_importer.logger
     resource = ArtellaResource
 
-    # artella_importer.import_modules()
+    artella_importer.import_modules()
+
+
+def set_project(project_class):
+    """
+    This functions sets the given class instance as the current Artella project used
+    :param project_class: ArtellaProject
+    """
+
+    global project
+    project = project_class()
+    project.init()
+
+
+def get_project_config_path():
+    """
+    Returns path where default Artella project config is located
+    :return: str
+    """
+
+    return path_utils.clean_path(os.path.join(os.path.dirname(__file__), defines.ARTELLA_PROJECT_CONFIG_FILE_NAME))

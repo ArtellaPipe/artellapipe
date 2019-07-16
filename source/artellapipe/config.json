@@ -1,4 +1,10 @@
 {
+  "PROJECT_NAME": "Artella",
   "PROJECT_NUMBER": "",
-  "PROJECT_ID": ""
+  "PROJECT_ID": "",
+  "ASSET_TYPES": [],
+  "ASSET_FILES": [],
+  "ASSET_MUST_FILES": [],
+  "ASSET_WIP_STATUS": "working",
+  "ASSET_PUBLISH_STATUS": "published"
 }
