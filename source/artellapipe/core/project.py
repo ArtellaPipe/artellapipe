@@ -189,7 +189,7 @@ class ArtellaProject(object):
 
     def get_clean_name(self):
         """
-        Returns a clenaed version of the project name (without spaces and in lowercase)
+        Returns a cleaned version of the project name (without spaces and in lowercase)
         :return: str
         """
 
