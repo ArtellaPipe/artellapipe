@@ -87,19 +87,37 @@ def set_project(project_class, project_resource):
     project.init()
 
 
+def get_project_path():
+    """
+    Returns path where default Artella project is located
+    :return: str
+    """
+
+    return path_utils.clean_path(os.path.dirname(__file__))
+
+
 def get_project_config_path():
     """
     Returns path where default Artella project config is located
     :return: str
     """
 
-    return path_utils.clean_path(os.path.join(os.path.dirname(__file__), defines.ARTELLA_PROJECT_CONFIG_FILE_NAME))
+    return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_CONFIG_FILE_NAME))
 
 
-def get_shelf_path():
+def get_project_shelf_path():
     """
     Returns path where default Artella shelf file is located
     :return: str
     """
 
-    return path_utils.clean_path(os.path.join(os.path.dirname(__file__), defines.ARTELLA_PROJECT_SHELF_FILE_NAME))
+    return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_SHELF_FILE_NAME))
+
+
+def get_project_version_relative_path():
+    """
+    Returns path where version file is located
+    :return: str
+    """
+
+    return ''

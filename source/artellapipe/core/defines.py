@@ -20,11 +20,17 @@ ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.json'
 # Defines the name of the shelf file used by artellapipe to setup project shelf
 ARTELLA_PROJECT_SHELF_FILE_NAME = 'shelf.json'
 
+# Defines the name of the version file used by artellapipe to check current tools version
+ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME = 'version.json'
+
 # Defines the name of the attribute that defines the Artella project name
 ARTELLA_CONFIG_PROJECT_NAME = 'PROJECT_NAME'
 
 # Defines the name of the attribute that defines the Artella project number
 ARTELLA_CONFIG_PROJECT_NUMBER = 'PROJECT_NUMBER'
+
+# Defines the name of the attribute that defines the Artella version file name
+ARTELLA_VERSION_FILE_NAME_ATTRIBUTE_NAME = 'PROJECT_VERSION_FILE'
 
 # Defines the name of the attributes that defines the asset types in the Artella project
 ARTELLA_CONFIG_ASSET_TYPES = 'ASSET_TYPES'
@@ -50,6 +56,9 @@ ARTELLA_CONFIG_PROJECT_ID = 'PROJECT_ID'
 
 # Defines the name of the attribute that defines the environemtn variable used to store Artella project path
 ARTELLA_CONFIG_ENVIRONMENT_VARIABLE = 'PROJECT_ID'
+
+# Defines the name of the attribute that defines the paths that need to be registered in Python path
+ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME = 'PATHS_TO_REGISTER'
 
 # Defines the default name used by Artella projects
 ARTELLA_DEFAULT_PROJECT_NAME = 'Artella'
@@ -80,3 +89,12 @@ ARTELLA_WINDOWS_INSTALL_PATH = os.path.join(os.getenv('PROGRAMDATA'), 'Artella')
 
 # Defines path where Artella is located in Windows
 ARTELLA_MAC_INSTALL_PATH = os.path.join(os.path.expanduser('~/Library/Application Support/'), 'Artella')
+
+# Defines default pipeline folder name
+ARTELLA_PIPELINE_DEFAULT_FOLDER_NAME = 'pipeline'
+
+# Defines default externals folder name
+ARTELLA_PIPELINE_EXTERNALS_DEFAULT_FOLDER_NAME = 'externals'
+
+# Defines default to register
+ARTELLA_CONFIG_DEFAULT_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME = ["pipeline", "pipeline/externals"]

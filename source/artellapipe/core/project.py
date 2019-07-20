@@ -18,7 +18,7 @@ import json
 import traceback
 
 import tpDccLib as tp
-from tpPyUtils import osplatform
+from tpPyUtils import osplatform, path as path_utils
 
 import artellapipe
 from artellapipe.core import defines, artellalib
@@ -27,8 +27,9 @@ from artellapipe.core import defines, artellalib
 class ArtellaProject(object):
 
     PROJECT_RESOURCE = None
+    PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
-    PROJECT_SHELF_FILE_PATH = artellapipe.get_shelf_path()
+    PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
 
     def __init__(self, resource=None):
         super(ArtellaProject, self).__init__()
@@ -46,6 +47,8 @@ class ArtellaProject(object):
         self._wip_status = None
         self._publish_status = None
         self._shelf_icon = None
+        self._version_file = None
+        self._folders_to_register = list()
         self._resource = resource
 
         # To make sure that all variables are properly initialized we must call init_config first
@@ -60,6 +63,24 @@ class ArtellaProject(object):
         """
 
         return self._name
+
+    @property
+    def version_file_path(self):
+        """
+        Returns version file path
+        :return: str
+        """
+
+        return path_utils.clean_path(os.path.join(self.get_clean_name(), self._folders_to_register[0], self._version_file))
+
+    @property
+    def id_path(self):
+        """
+        Returns ID path of this Artella project
+        :return: str
+        """
+
+        return '{}{}{}'.format(self._id_number, os.sep, self._id)
 
     @property
     def project_environment_variable(self):
@@ -151,10 +172,11 @@ class ArtellaProject(object):
         if force_skip_hello:
             os.environ['ARTELLA_PIPELINE_SHOW'] = ''
 
-        self.update_paths()
-        self.set_environment_variables()
-        self.create_shelf()
-        self.update_project()
+        if tp.Dcc.get_name() != tp.Dccs.Unknown:
+            self.update_paths()
+            self.set_environment_variables()
+            self.create_shelf()
+            self.update_project()
 
     def init_config(self):
         """
@@ -176,12 +198,14 @@ class ArtellaProject(object):
         self._project_env_var = project_config_data.get(defines.ARTELLA_CONFIG_ENVIRONMENT_VARIABLE, defines.ARTELLA_DEFAULT_ENVIRONMENT_VARIABLE)
         self._id_number = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NUMBER, -1)
         self._id = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_ID, -1)
+        self._version_file = project_config_data.get(defines.ARTELLA_VERSION_FILE_NAME_ATTRIBUTE_NAME, defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME)
         self._asset_types = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_TYPES, list())
         self._asset_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_FILES, list())
         self._asset_must_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_MUST_FILES, list())
         self._wip_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_WIP_STATUS, None)
         self._publish_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_PUBLISH_STATUS, None)
         self._shelf_icon = project_config_data.get(defines.ARTELLA_CONFIG_SHELF_ICON, None)
+        self._folders_to_register = project_config_data.get(defines.ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME, defines.ARTELLA_CONFIG_DEFAULT_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -307,6 +331,24 @@ class ArtellaProject(object):
         except Exception as e:
             self.logger.error('{} | {}'.format(str(e), traceback.format_exc()))
 
+    def get_folders_to_register(self, full_path=True):
+        """
+        Returns folders to register paths
+        :param full_path: bool, Whether to return full path of the folder or not
+        :return: list(str)
+        """
+
+        if not self._folders_to_register:
+            return list()
+
+        if not full_path:
+            return self._folders_to_register
+        else:
+            paths_to_return = list()
+            for p in self._folders_to_register:
+                paths_to_return.append(path_utils.clean_path(os.path.join(self.PROJECT_PATH, p)))
+            return paths_to_return
+
     def message(self, msg, title=None):
         """
         Shows tray given message in OS tray. If tray is not available, the message will be
@@ -317,7 +359,7 @@ class ArtellaProject(object):
         """
 
         if not title:
-            title = self.PROJECT_NAME.title()
+            title = self.name.title()
 
         if osplatform.is_windows():
             if self.tray:
@@ -326,14 +368,3 @@ class ArtellaProject(object):
                 self.logger.debug(str(msg))
         else:
             self.logger.debug(str(msg))
-
-
-
-
-
-
-
-
-
-
-

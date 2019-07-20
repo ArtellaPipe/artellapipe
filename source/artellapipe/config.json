@@ -4,9 +4,11 @@
   "SHELF_ICON": "",
   "PROJECT_NUMBER": "",
   "PROJECT_ID": "",
+  "PROJECT_VERSION_FILE": "version.json",
   "ASSET_TYPES": [],
   "ASSET_FILES": [],
   "ASSET_MUST_FILES": [],
   "ASSET_WIP_STATUS": "working",
-  "ASSET_PUBLISH_STATUS": "published"
+  "ASSET_PUBLISH_STATUS": "published",
+  "PATHS_TO_REGISTER": ["pipeline", "pipeline/externals"]
 }
