@@ -1,2 +1,2 @@
-include source/artellapipe/resources/*.*
+include source/artellapipe/resources/icons/color/*.*
 include source/artellapipe/*.json
