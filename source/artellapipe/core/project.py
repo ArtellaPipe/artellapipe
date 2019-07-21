@@ -16,20 +16,24 @@ import os
 import sys
 import json
 import traceback
+import  webbrowser
 
 import tpDccLib as tp
 from tpPyUtils import osplatform, path as path_utils
 
 import artellapipe
 from artellapipe.core import defines, artellalib
+from artellapipe.gui import tray
 
 
 class ArtellaProject(object):
 
     PROJECT_RESOURCE = None
+    TRAY_CLASS = tray.ArtellaTray
     PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
+    PROJECT_MENU_FILE_PATH = artellapipe.get_project_menu_path()
 
     def __init__(self, resource=None):
         super(ArtellaProject, self).__init__()
@@ -47,6 +51,7 @@ class ArtellaProject(object):
         self._wip_status = None
         self._publish_status = None
         self._shelf_icon = None
+        self._tray_icon = None
         self._version_file = None
         self._folders_to_register = list()
         self._resource = resource
@@ -155,6 +160,15 @@ class ArtellaProject(object):
         return self._publish_status
 
     @property
+    def tray_icon_name(self):
+        """
+        Returns the name of the icon used by Artella project tray
+        :return: str
+        """
+
+        return self._tray_icon
+
+    @property
     def resource(self):
         """
         Returns the class used by the project to load resources (icons, images, fonts, etc)
@@ -176,12 +190,14 @@ class ArtellaProject(object):
             self.update_paths()
             self.set_environment_variables()
             self.create_shelf()
+            self.create_menu()
+            self._tray = self.create_tray()
             self.update_project()
 
-    def init_config(self):
+    def get_config_data(self):
         """
-        Function that reads project configuration file and initializes project variables properly
-        This function can be extended in new projects
+        Returns the config data of the project
+        :return: dict
         """
 
         if not self.PROJECT_CONFIG_PATH or not os.path.isfile(self.PROJECT_CONFIG_PATH):
@@ -192,6 +208,18 @@ class ArtellaProject(object):
             project_config_data = json.load(f)
         if not project_config_data:
             tp.Dcc.error('Project Configuration File for Artella Project is empty! {}'.format(self.PROJECT_CONFIG_PATH))
+            return
+
+        return project_config_data
+
+    def init_config(self):
+        """
+        Function that reads project configuration file and initializes project variables properly
+        This function can be extended in new projects
+        """
+
+        project_config_data = self.get_config_data()
+        if not project_config_data:
             return
 
         self._name = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NAME, defines.ARTELLA_DEFAULT_PROJECT_NAME)
@@ -205,6 +233,7 @@ class ArtellaProject(object):
         self._wip_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_WIP_STATUS, None)
         self._publish_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_PUBLISH_STATUS, None)
         self._shelf_icon = project_config_data.get(defines.ARTELLA_CONFIG_SHELF_ICON, None)
+        self._tray_icon = project_config_data.get(defines.ARTELLA_CONFIG_TRAY_ICON, None)
         self._folders_to_register = project_config_data.get(defines.ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME, defines.ARTELLA_CONFIG_DEFAULT_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
@@ -298,7 +327,7 @@ class ArtellaProject(object):
         Creates Artella Project shelf
         """
 
-        self.logger.debug('Building {} Tool Shelf'.format(self.name))
+        self.logger.debug('Building {} Tools Shelf'.format(self.name.title()))
 
         shelf_category_icon = None
         if self.resource and self._shelf_icon:
@@ -312,6 +341,41 @@ class ArtellaProject(object):
 
         project_shelf.build(shelf_file=shelf_file)
         project_shelf.set_as_active()
+
+    def create_menu(self):
+        """
+        Creates Artella Project menu
+        """
+
+        self.logger.debug('Building {} Tools Menu ...'.format(self.name.title()))
+        menu_name = self._name.title()
+        if tp.is_maya():
+            from tpMayaLib.core import menu
+            try:
+                menu.remove_menu(menu_name)
+            except Exception:
+                pass
+
+        try:
+            project_menu = tp.Menu(name=menu_name)
+            menu_file = self.PROJECT_SHELF_FILE_PATH
+            if menu_file and os.path.isfile(menu_file):
+                project_menu.create_menu(file_path=menu_file, parent_menu=menu_name)
+        except Exception as e:
+            self.logger.warning('Error during {} Tools Menu creation: {} | {}'.format(self.name.title(), e, traceback.format_exc()))
+
+    def create_tray(self):
+        """
+        Creates Artella Project tray
+        """
+
+        if not self.TRAY_CLASS:
+            return
+
+        self.logger.debug('Creating {} Tools Tray ...'.format(self.name.title()))
+        tray = self.TRAY_CLASS(project=self)
+
+        return tray
 
     def update_project(self):
         """
@@ -368,3 +432,19 @@ class ArtellaProject(object):
                 self.logger.debug(str(msg))
         else:
             self.logger.debug(str(msg))
+
+    def get_artella_project_url(self):
+        """
+        Returns URL of the Artella project
+        :return: str
+        """
+
+        return 'https://www.artella.com/project/{0}/files'.format(self._id)
+
+    def open_artella_project_url(self):
+        """
+        Opens Artella Project web page in browser
+        """
+
+        webbrowser.open(self.get_artella_project_url())
+

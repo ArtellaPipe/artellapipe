@@ -20,6 +20,9 @@ ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.json'
 # Defines the name of the shelf file used by artellapipe to setup project shelf
 ARTELLA_PROJECT_SHELF_FILE_NAME = 'shelf.json'
 
+# Defines the name of the menu file used by artellapipe to setup project shelf
+ARTELLA_PROJECT_MENU_FILE_NAME = 'menu.json'
+
 # Defines the name of the version file used by artellapipe to check current tools version
 ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME = 'version.json'
 
@@ -50,6 +53,9 @@ ARTELLA_CONFIG_ASSET_PUBLISH_STATUS = 'ASSET_PUBLISH_STATUS'
 
 # Defines the name of the attribute that defines the name of the icon used by shelf category button
 ARTELLA_CONFIG_SHELF_ICON = 'SHELF_ICON'
+
+# Defines the name of the attribute that defines the name of the icon used by Artella project tray
+ARTELLA_CONFIG_TRAY_ICON = 'TRAY_ICON'
 
 # Defines the name of the attribute that defines the Artella project id
 ARTELLA_CONFIG_PROJECT_ID = 'PROJECT_ID'

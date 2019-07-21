@@ -4,4 +4,3 @@
 tpPyUtils
 tpDccLib
 tpQtLib
-tpMayaLib

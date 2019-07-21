@@ -50,8 +50,8 @@ class ArtellaPipe(importer.Importer, object):
                 mod_dir = os.path.dirname(__file__)
             except Exception:
                 try:
-                    import tpDccLib
-                    mod_dir = tpDccLib.__path__[0]
+                    import artellapipe
+                    mod_dir = artellapipe.__path__[0]
                 except Exception:
                     return None
 
@@ -113,6 +113,14 @@ def get_project_shelf_path():
 
     return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_SHELF_FILE_NAME))
 
+
+def get_project_menu_path():
+    """
+    Returns path where default Artella shelf file is located
+    :return: str
+    """
+
+    return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_MENU_FILE_NAME))
 
 def get_project_version_relative_path():
     """

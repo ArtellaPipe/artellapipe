@@ -2,6 +2,7 @@
   "PROJECT_NAME": "Artella",
   "PROJECT_ENV_VARIABLE": "ARTELLA_PROJECT",
   "SHELF_ICON": "",
+  "TRAY_ICON": "",
   "PROJECT_NUMBER": "",
   "PROJECT_ID": "",
   "PROJECT_VERSION_FILE": "version.json",
