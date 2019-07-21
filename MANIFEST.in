@@ -1,0 +1,2 @@
+include source/artellapipe/resources/*.*
+include source/artellapipe/*.json
