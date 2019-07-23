@@ -12,7 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-from tpQtLib.Qt.QtWidgets import *
+from Qt.QtWidgets import *
 
 from tpQtLib.core import base
 

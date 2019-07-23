@@ -326,10 +326,10 @@ def fix_path_by_project(path, fullpath=False):
     :return: str
     """
 
-    project_path = sp.get_solstice_project_path()
-    new_path = path.replace(project_path, artella_root_prefix+'\\')
+    project_path = artellapipe.project.get_project_path()
+    new_path = path.replace(project_path, '${}\\'.format(defines.ARTELLA_ROOT_PREFIX))
     if fullpath:
-        new_path = path.replace(project_path, artella_root_prefix+'/'+sp.solstice_project_id_full)
+        new_path = path.replace(project_path, '${}'.format(defines.ARTELLA_ROOT_PREFIX)+'/'+sp.solstice_project_id_full)
     return new_path
 
 

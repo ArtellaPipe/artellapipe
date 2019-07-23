@@ -78,6 +78,9 @@ ARTELLA_MAYA_PLUGIN_NAME = 'Artella.py'
 # Defines the name of the Artella executable
 ARTELLA_APP_NAME = 'lifecycler'
 
+# Defines Artella production folder
+ARTELLA_PRODUCTION_FOLDER = '_art/production'
+
 # Defines the environment variable used by Artella to reference to user local installation folder
 ARTELLA_ROOT_PREFIX = 'ART_LOCAL_ROOT'
 

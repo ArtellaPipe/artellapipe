@@ -16,7 +16,7 @@ import os
 import sys
 import json
 import traceback
-import  webbrowser
+import webbrowser
 
 import tpDccLib as tp
 from tpPyUtils import osplatform, path as path_utils
@@ -45,6 +45,7 @@ class ArtellaProject(object):
         self._config = None
         self._id_number = None
         self._id = None
+        self._full_id = None
         self._asset_types = list()
         self._asset_files = list()
         self._asset_must_files = list()
@@ -77,6 +78,33 @@ class ArtellaProject(object):
         """
 
         return path_utils.clean_path(os.path.join(self.get_clean_name(), self._folders_to_register[0], self._version_file))
+
+    @property
+    def id(self):
+        """
+        Returns ID of the project
+        :return: str
+        """
+
+        return self._id
+
+    @property
+    def id_number(self):
+        """
+        Returns ID number of the project
+        :return: str
+        """
+
+        return self._id_number
+
+    @property
+    def full_id(self):
+        """
+        Returns full ID of the project
+        :return: str
+        """
+
+        return self._full_id
 
     @property
     def id_path(self):
@@ -226,6 +254,7 @@ class ArtellaProject(object):
         self._project_env_var = project_config_data.get(defines.ARTELLA_CONFIG_ENVIRONMENT_VARIABLE, defines.ARTELLA_DEFAULT_ENVIRONMENT_VARIABLE)
         self._id_number = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NUMBER, -1)
         self._id = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_ID, -1)
+        self._full_id = '{}/{}/{}/'.format(defines.ARTELLA_PRODUCTION_FOLDER, self._id_number, self._id)
         self._version_file = project_config_data.get(defines.ARTELLA_VERSION_FILE_NAME_ATTRIBUTE_NAME, defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME)
         self._asset_types = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_TYPES, list())
         self._asset_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_FILES, list())
@@ -308,7 +337,7 @@ class ArtellaProject(object):
             artella_var = os.environ.get(defines.ARTELLA_ROOT_PREFIX, None)
             self.logger.debug('Artella environment variable is set to: {}'.format(artella_var))
             if artella_var and os.path.exists(artella_var):
-                os.environ[self._project_env_var] = '{}_art/production/{}/{}/'.format(artella_var, self._id_number, self._id)
+                os.environ[self._project_env_var] = '{}{}/{}/{}/'.format(artella_var, defines.ARTELLA_PRODUCTION_FOLDER, self._id_number, self._id)
             else:
                 self.logger.warning('Impossible to set Artella environment variable!')
         except Exception as e:
