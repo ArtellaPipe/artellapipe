@@ -93,12 +93,6 @@ ARTELLA_CMS_URL = 'https://cms-static.artella.com'
 # Defines file name used by Artella to detect next version name
 ARTELLA_NEXT_VERSION_FILE_NAME = 'version_to_run_next'
 
-# Defines path where Artella is located in Windows
-ARTELLA_WINDOWS_INSTALL_PATH = os.path.join(os.getenv('PROGRAMDATA'), 'Artella')
-
-# Defines path where Artella is located in Windows
-ARTELLA_MAC_INSTALL_PATH = os.path.join(os.path.expanduser('~/Library/Application Support/'), 'Artella')
-
 # Defines default pipeline folder name
 ARTELLA_PIPELINE_DEFAULT_FOLDER_NAME = 'pipeline'
 

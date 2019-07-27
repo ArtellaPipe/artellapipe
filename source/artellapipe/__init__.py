@@ -84,7 +84,7 @@ def set_project(project_class, project_resource):
     import artellapipe
 
     project = project_class(resource=project_resource)
-    artellapipe.__dict__[project_class.__name__] = project
+    artellapipe.__dict__[project_class.__name__.lower()] = project
     project.init()
 
 

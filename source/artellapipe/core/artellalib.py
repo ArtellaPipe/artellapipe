@@ -103,9 +103,11 @@ def get_artella_data_folder():
     """
 
     if osplatform.is_mac():
-        artella_folder = defines.ARTELLA_MAC_INSTALL_PATH
+        artella_folder = os.path.join(os.path.expanduser('~/Library/Application Support/'), 'Artella')
+    elif osplatform.is_windows():
+        artella_folder = os.path.join(os.getenv('PROGRAMDATA'), 'Artella')
     else:
-        artella_folder = defines.ARTELLA_WINDOWS_INSTALL_PATH
+        return None
 
     artella_app_version = None
     version_file = os.path.join(artella_folder, defines.ARTELLA_NEXT_VERSION_FILE_NAME)
