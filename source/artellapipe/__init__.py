@@ -24,7 +24,6 @@ from artellapipe.core import defines
 
 logger = None
 resource = None
-project = None
 
 # =================================================================================
 
@@ -82,8 +81,10 @@ def set_project(project_class, project_resource):
     :param project_resource: Resource
     """
 
-    global project
+    import artellapipe
+
     project = project_class(resource=project_resource)
+    artellapipe.__dict__[project_class.__name__] = project
     project.init()
 
 
