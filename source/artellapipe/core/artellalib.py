@@ -16,8 +16,11 @@ import os
 import re
 import sys
 import json
-import urllib2
 import traceback
+try:
+    from urllib.request import urlopen, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, build_opener, install_opener
+except ImportError:
+    from urllib2 import urlopen, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, build_opener, install_opener
 
 # TODO: We need to manage psutil dependency properly
 try:
@@ -319,17 +322,18 @@ def get_artella_app_identifier():
     return app_identifier
 
 
-def fix_path_by_project(path, fullpath=False):
+def fix_path_by_project(project, path, fullpath=False):
     """
     Fix given path and updates to make it relative to the Artella project
+    :param project: ArtellaProject
     :param path: str, path to be fixed
     :return: str
     """
 
-    project_path = artellapipe.project.get_project_path()
+    project_path = project.get_project_path()
     new_path = path.replace(project_path, '${}\\'.format(defines.ARTELLA_ROOT_PREFIX))
     if fullpath:
-        new_path = path.replace(project_path, '${}'.format(defines.ARTELLA_ROOT_PREFIX)+'/'+sp.solstice_project_id_full)
+        new_path = path.replace(project_path, '${}'.format(defines.ARTELLA_ROOT_PREFIX)+'/'+project.full_id)
     return new_path
 
 
@@ -583,7 +587,7 @@ def get_asset_image(asset_path, project_id):
 
     # TODO: Authentication problem when doing request: look for workaround
     image_url = os.path.join('https://cms-static.artella.com/cms_browser/thumbcontainerAvatar', project_id, asset_path)
-    data = urllib2.urlopen(image_url).read()
+    data = urlopen(image_url).read()
 
     return data
 
@@ -1084,12 +1088,12 @@ def get_user_avatar(user_id):
     :return:
     """
 
-    manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    manager = HTTPPasswordMgrWithDefaultRealm()
     manager.add_password(None, defines.ARTELLA_CMS_URL, 'default', 'default')
-    auth = urllib2.HTTPBasicAuthHandler(manager)
-    opener = urllib2.build_opener(auth)
-    urllib2.install_opener(opener)
-    response = urllib2.urlopen('{0}/profile/{1}/avatarfull.img'.format(defines.ARTELLA_CMS_URL, user_id))
+    auth = HTTPBasicAuthHandler(manager)
+    opener = build_opener(auth)
+    install_opener(opener)
+    response = urlopen('{0}/profile/{1}/avatarfull.img'.format(defines.ARTELLA_CMS_URL, user_id))
 
     return response
 
@@ -1104,14 +1108,14 @@ def login_to_artella(user, password):
 
     # TODO: This always returns True, so its completely uselss :(
 
-    manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    manager = HTTPPasswordMgrWithDefaultRealm()
 
     artella_web = 'https://www.artella.com/project/2252d6c8-407d-4419-a186-cf90760c9967'
     manager.add_password(None, artella_web, user, password)
-    auth = urllib2.HTTPBasicAuthHandler(manager)
-    opener = urllib2.build_opener(auth)
-    urllib2.install_opener(opener)
-    response = urllib2.urlopen(artella_web)
+    auth = HTTPBasicAuthHandler(manager)
+    opener = build_opener(auth)
+    install_opener(opener)
+    response = urlopen(artella_web)
     if response:
         if response.getcode() == 200:
             return True
