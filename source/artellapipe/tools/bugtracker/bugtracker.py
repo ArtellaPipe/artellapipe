@@ -14,7 +14,6 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import sys
-import base64
 import shutil
 import getpass
 import datetime
@@ -60,34 +59,56 @@ class ArtellaBugTracker(dialog.ArtellaDialog, object):
 
         logo_pixmap = artellapipe.resource.pixmap(name='bugtracker_logo', extension='png')
         warning_pixmap = artellapipe.resource.pixmap(name='warning', category='icons', theme='color').scaled(QSize(24, 24))
+        bug_icon = artellapipe.resource.icon('bug')
 
+        self.setWindowIcon(bug_icon)
         self.set_logo(logo_pixmap)
 
         self._capture_lbl = QLabel()
         self._capture_lbl.setAlignment(Qt.AlignCenter)
         self._trace_text = QTextEdit()
         self._trace_text.setReadOnly(True)
+        self._trace_text.setEnabled(False)
         self._send_btn = QPushButton('Send Bug')
         self._send_btn.setEnabled(False)
 
+        self._add_error_img_cbx = QCheckBox('Include Error Image')
+        self._add_error_img_cbx.setChecked(True)
         note_layout = QHBoxLayout()
         note_layout.setAlignment(Qt.AlignLeft)
-        note_icon = QLabel()
-        note_icon.setPixmap(warning_pixmap)
-        note_text = QLabel('Error image will be uploaded to Artella server and all Team Members will be able to access to it.\nSo make sure your screen does not have sensible or confidential information')
-        note_layout.addWidget(note_icon)
+        self._note_icon = QLabel()
+        self._note_icon.setPixmap(warning_pixmap)
+        self._note_text = QLabel('Error image will be sended to: \n\n{}\n\nThey will be able to access to it. So make sure your screen does not have sensible or confidential information'.format('\n    '.join(self._project.emails)))
+        note_layout.addWidget(self._note_icon)
         note_layout.addWidget(qtutils.get_horizontal_separator())
-        note_layout.addWidget(note_text)
+        note_layout.addWidget(self._note_text)
+
+        self._steps_area = QTextEdit()
+
+        txt_msg = 'Explain briefly how to reproduce the error'
+        steps_lbl = QLabel(txt_msg)
+        if qtutils.is_pyside2():
+            self._steps_area.setPlaceholderText(txt_msg)
+        self._steps_area.setMinimumHeight(200)
 
         self.main_layout.addWidget(self._capture_lbl)
         self.main_layout.addLayout(splitters.SplitterLayout())
         self.main_layout.addWidget(self._trace_text)
         self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addWidget(self._add_error_img_cbx)
         self.main_layout.addLayout(note_layout)
+        self.main_layout.addLayout(splitters.SplitterLayout())
+        if qtutils.is_pyside():
+            self.main_layout.addWidget(steps_lbl)
+        self.main_layout.addWidget(self._steps_area)
         self.main_layout.addLayout(splitters.SplitterLayout())
         self.main_layout.addWidget(self._send_btn)
 
+        self._on_update_error_info()
+
+    def setup_signals(self):
         self._send_btn.clicked.connect(self._on_send_bug)
+        self._add_error_img_cbx.toggled.connect(self._on_update_error_info)
 
     def update_capture(self):
         """
@@ -117,6 +138,10 @@ class ArtellaBugTracker(dialog.ArtellaDialog, object):
 
         self._send_btn.setEnabled(self._trace_text.toPlainText() != '')
 
+    def _on_update_error_info(self):
+        self._note_icon.setVisible(self._add_error_img_cbx.isChecked())
+        self._note_text.setVisible(self._add_error_img_cbx.isChecked())
+
     def _on_send_bug(self):
         """
         Internal callback function that is called when the user press Send Bug button
@@ -134,12 +159,13 @@ class ArtellaBugTracker(dialog.ArtellaDialog, object):
         user = '{0}_{1}'.format(getpass.getuser(), sys.platform)
         current_time = str(datetime.datetime.now())
         bug_name = '{} : {}'.format(user, current_time)
+        current_steps = self._steps_area.toPlainText()
 
         image_base64 = 'none'
         temp_dir = tempfile.mkdtemp()
         try:
             temp_path = os.path.join(temp_dir, 'artella_bug.png')
-            self._screen_pixmap.scaled(600, 250, Qt.KeepAspectRatio).save(temp_path)
+            self._screen_pixmap.scaled(500, 200, Qt.KeepAspectRatio).save(temp_path)
             image_base64 = image.image_to_base64(image_path=temp_path)
         finally:
             try:
@@ -153,8 +179,9 @@ class ArtellaBugTracker(dialog.ArtellaDialog, object):
         msg += 'Time: {}\n'.format(current_time)
         msg += 'Bug Name: {}\n'.format(os.path.basename(bug_name))
         msg += 'Date: {}\n'.format(current_time)
+        msg += 'Steps: \n{}\n'.format(current_steps)
 
-        if len(image_base64) <= 30000:
+        if len(image_base64) <= 30000 and self._add_error_img_cbx.isChecked():
             msg += 'Bug: {}\n'.format(str(image_base64))
 
         if self._tool_name:
