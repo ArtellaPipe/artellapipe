@@ -66,6 +66,9 @@ ARTELLA_CONFIG_ENVIRONMENT_VARIABLE = 'PROJECT_ID'
 # Defines the name of the attribute that defines the paths that need to be registered in Python path
 ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME = 'PATHS_TO_REGISTER'
 
+# Defines the name of the attribute that defines the paths that need to be registered in Python path
+ARTELLA_CONFIG_EMAIL_ATTRIBUTE_NAME = 'EMAILS'
+
 # Defines the default name used by Artella projects
 ARTELLA_DEFAULT_PROJECT_NAME = 'Artella'
 

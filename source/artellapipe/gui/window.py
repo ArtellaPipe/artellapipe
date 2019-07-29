@@ -179,5 +179,3 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         """
 
         return artellapipe.resource.pixmap(name='artella_title', extension='png')
-        # title_logo.setOffset(offset[0], offset[1])
-

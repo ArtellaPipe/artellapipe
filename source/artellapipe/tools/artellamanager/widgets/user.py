@@ -110,7 +110,7 @@ class ArtellaUserInfoWidget(QWidget, object):
             self._enable_artella()
         else:
             self._disable_artella()
-        self.updatedAvailability.emit(available)
+        self.availabilityUpdated.emit(available)
 
     def _start_check(self):
         """

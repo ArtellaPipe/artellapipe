@@ -17,6 +17,10 @@ import sys
 import json
 import traceback
 import webbrowser
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib2 import quote
 
 import tpDccLib as tp
 from tpPyUtils import osplatform, path as path_utils
@@ -56,6 +60,7 @@ class ArtellaProject(object):
         self._version_file = None
         self._folders_to_register = list()
         self._resource = resource
+        self._emails = list()
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
@@ -205,6 +210,15 @@ class ArtellaProject(object):
 
         return self._resource
 
+    @property
+    def emails(self):
+        """
+        Returns list of emails that will be used when sending an email
+        :return: list(str)
+        """
+
+        return self._emails
+
     def init(self, force_skip_hello=False):
         """
         This function initializes Artella project
@@ -264,6 +278,7 @@ class ArtellaProject(object):
         self._shelf_icon = project_config_data.get(defines.ARTELLA_CONFIG_SHELF_ICON, None)
         self._tray_icon = project_config_data.get(defines.ARTELLA_CONFIG_TRAY_ICON, None)
         self._folders_to_register = project_config_data.get(defines.ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME, defines.ARTELLA_CONFIG_DEFAULT_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME)
+        self._emails = project_config_data.get(defines.ARTELLA_CONFIG_EMAIL_ATTRIBUTE_NAME, list())
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -477,3 +492,12 @@ class ArtellaProject(object):
 
         webbrowser.open(self.get_artella_project_url())
 
+    def send_email(self, title=None):
+        """
+        Opens email application with proper info
+        """
+
+        if not title:
+            title = self.name.title()
+
+        webbrowser.open("mailto:%s?subject=%s" % (','.join(self._emails), quote(title)))
