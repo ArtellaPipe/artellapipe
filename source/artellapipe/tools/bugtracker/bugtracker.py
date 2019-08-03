@@ -67,6 +67,7 @@ class ArtellaBugTracker(dialog.ArtellaDialog, object):
         self._capture_lbl = QLabel()
         self._capture_lbl.setAlignment(Qt.AlignCenter)
         self._trace_text = QTextEdit()
+        self._trace_text.setMinimumHeight(100)
         self._trace_text.setReadOnly(True)
         self._trace_text.setEnabled(False)
         self._send_btn = QPushButton('Send Bug')
@@ -89,7 +90,7 @@ class ArtellaBugTracker(dialog.ArtellaDialog, object):
         steps_lbl = QLabel(txt_msg)
         if qtutils.is_pyside2():
             self._steps_area.setPlaceholderText(txt_msg)
-        self._steps_area.setMinimumHeight(200)
+        self._steps_area.setMinimumHeight(100)
 
         self.main_layout.addWidget(self._capture_lbl)
         self.main_layout.addLayout(splitters.SplitterLayout())

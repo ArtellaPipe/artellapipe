@@ -20,7 +20,7 @@ from Qt.QtCore import *
 
 
 class Worker(QThread, object):
-    workCompleted = Signal(str, object)
+    workCompleted = Signal(str, dict)
     workFailure = Signal(str, str)
 
     def __init__(self, app, parent=None):
@@ -89,11 +89,98 @@ class Worker(QThread, object):
             if not self._execute_tasks:
                 break
 
-            data = None
             try:
                 data = item_to_process['fn'](item_to_process['params'])
             except Exception as e:
                 if self._execute_tasks:
                     self.workFailure.emit(item_to_process['id'], 'An error ocurred: {}'.format(str(e)))
-                else:
+            else:
+                if self._execute_tasks:
+                    data = data if data is not None else dict()
                     self.workCompleted.emit(item_to_process['id'], data)
+
+
+class QtWorker(QThread, object):
+
+    """
+    Qt based worker
+    """
+
+    workCompleted = Signal(str, object)
+    workFailure = Signal(str, str)
+
+    def __init__(self, app, parent=None):
+        super(QtWorker, self).__init__(parent)
+
+        self._execute_tasks = True
+        self._app = app
+        self._queue_mutex = QMutex()
+        self._queue = list()
+        self._receivers = dict()
+
+    def stop(self):
+        """
+        Stops the worker, run this before shutdown
+        """
+
+        self._execute_tasks = False
+
+    def clear(self):
+        """
+        Empties the queue
+        """
+
+        self._queue_mutex.lock()
+        try:
+            self._queue = list()
+        finally:
+            self._queue_mutex.unlock()
+
+    def queue_work(self, worker_fn, params, asap=False):
+        """
+        Queues up some work
+        :param worker_fn: fn
+        :param params: dict
+        :param asap: bool
+        :return: uid, unique identifier to identify the work
+        """
+
+        uid = uuid.uuid4().hex
+        work = {"id": uid, "fn": worker_fn, "params": params}
+        self._queue_mutex.lock()
+        try:
+            if asap:
+                self._queue.insert(0, work)
+            else:
+                self._queue.append(work)
+        finally:
+            self._queue_mutex.unlock()
+
+        return uid
+
+    def run(self):
+        while self._execute_tasks:
+            self._queue_mutex.lock()
+            try:
+                queue_len = len(self._queue)
+            finally:
+                self._queue_mutex.unlock()
+
+            if queue_len == 0:
+                self.msleep(200)
+            else:
+                self._queue_mutex.lock()
+                try:
+                    item_to_process = self._queue.pop(0)
+                finally:
+                    self._queue_mutex.unlock()
+
+                try:
+                    data = item_to_process['fn'](item_to_process['params'])
+                except Exception as e:
+                    if self._execute_tasks:
+                        self.workFailure.emit(item_to_process['id'], 'An error ocurred: {}'.format(e))
+                else:
+                    if self._execute_tasks:
+                        data = data if data is not None else dict()
+                        self.workCompleted.emit(item_to_process['id'], data)

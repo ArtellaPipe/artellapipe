@@ -23,7 +23,7 @@ except ImportError:
     from urllib2 import quote
 
 import tpDccLib as tp
-from tpPyUtils import osplatform, path as path_utils
+from tpPyUtils import osplatform, path as path_utils, folder as folder_utils
 
 import artellapipe
 from artellapipe.core import defines, artellalib
@@ -49,6 +49,7 @@ class ArtellaProject(object):
         self._config = None
         self._id_number = None
         self._id = None
+        self._url = None
         self._full_id = None
         self._asset_types = list()
         self._asset_files = list()
@@ -61,10 +62,16 @@ class ArtellaProject(object):
         self._folders_to_register = list()
         self._resource = resource
         self._emails = list()
+        self._progress_bar_color0 = None
+        self._progress_bar_color1 = None
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
         self._logger = self.create_logger()[1]
+
+    # ==========================================================================================================
+    # PROPERTIES
+    # ==========================================================================================================
 
     @property
     def name(self):
@@ -119,6 +126,15 @@ class ArtellaProject(object):
         """
 
         return '{}{}{}'.format(self._id_number, os.sep, self._id)
+
+    @property
+    def project_url(self):
+        """
+        Returns URL to official Plot Twist web page
+        :return: str
+        """
+
+        return self._url
 
     @property
     def project_environment_variable(self):
@@ -193,6 +209,24 @@ class ArtellaProject(object):
         return self._publish_status
 
     @property
+    def icon_name(self):
+        """
+        Returns the name of the icon by Artella project
+        :return: str
+        """
+
+        return self._project_icon
+
+    @property
+    def icon(self):
+        """
+        Returns the icon used by the Artella project
+        :return: QIcon
+        """
+
+        return self._resource.icon(self._project_icon)
+
+    @property
     def tray_icon_name(self):
         """
         Returns the name of the icon used by Artella project tray
@@ -200,6 +234,15 @@ class ArtellaProject(object):
         """
 
         return self._tray_icon
+
+    @property
+    def tray_icon(self):
+        """
+        Retrusn the tray icon used by Artella project tray
+        :return: QIcon
+        """
+
+        return self._resource.icon(self._tray_icon)
 
     @property
     def resource(self):
@@ -218,6 +261,28 @@ class ArtellaProject(object):
         """
 
         return self._emails
+
+    @property
+    def progress_bar_color_0(self):
+        """
+        Returns color 0 used in progress bar color gradient
+        :return: str
+        """
+
+        return self._progress_bar_color0
+
+    @property
+    def progress_bar_color_1(self):
+        """
+        Returns color 1 used in progress bar color gradient
+        :return: str
+        """
+
+        return self._progress_bar_color1
+
+    # ==========================================================================================================
+    # INITIALIZATION & CONFIG
+    # ==========================================================================================================
 
     def init(self, force_skip_hello=False):
         """
@@ -243,13 +308,13 @@ class ArtellaProject(object):
         """
 
         if not self.PROJECT_CONFIG_PATH or not os.path.isfile(self.PROJECT_CONFIG_PATH):
-            tp.Dcc.error('Project Configuration File for Artella Project not found! {}'.format(self.PROJECT_CONFIG_PATH))
+            tp.Dcc.error('Project Configuration File for {} Project not found! {}'.format(self.name.title(), self.PROJECT_CONFIG_PATH))
             return
 
         with open(self.PROJECT_CONFIG_PATH, 'r') as f:
             project_config_data = json.load(f)
         if not project_config_data:
-            tp.Dcc.error('Project Configuration File for Artella Project is empty! {}'.format(self.PROJECT_CONFIG_PATH))
+            tp.Dcc.error('Project Configuration File for {} Project is empty! {}'.format(self.name.title(), self.PROJECT_CONFIG_PATH))
             return
 
         return project_config_data
@@ -269,16 +334,20 @@ class ArtellaProject(object):
         self._id_number = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NUMBER, -1)
         self._id = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_ID, -1)
         self._full_id = '{}/{}/{}/'.format(defines.ARTELLA_PRODUCTION_FOLDER, self._id_number, self._id)
+        self._url = project_config_data.get(defines.ARTELLA_PROJECT_URL, None)
         self._version_file = project_config_data.get(defines.ARTELLA_VERSION_FILE_NAME_ATTRIBUTE_NAME, defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME)
         self._asset_types = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_TYPES, list())
         self._asset_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_FILES, list())
         self._asset_must_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_MUST_FILES, list())
         self._wip_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_WIP_STATUS, None)
         self._publish_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_PUBLISH_STATUS, None)
+        self._project_icon = project_config_data.get(defines.ARTELLA_PROJECT_ICON, defines.ARTELLA_PROJECT_DEFAULT_ICON)
         self._shelf_icon = project_config_data.get(defines.ARTELLA_CONFIG_SHELF_ICON, None)
         self._tray_icon = project_config_data.get(defines.ARTELLA_CONFIG_TRAY_ICON, None)
         self._folders_to_register = project_config_data.get(defines.ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME, defines.ARTELLA_CONFIG_DEFAULT_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME)
         self._emails = project_config_data.get(defines.ARTELLA_CONFIG_EMAIL_ATTRIBUTE_NAME, list())
+        self._progress_bar_color0 = project_config_data.get(defines.ARTELLA_PROGRESS_BAR_COLOR_0_ATTRIBUTE_NAME, '255, 255, 255')
+        self._progress_bar_color1 = project_config_data.get(defines.ARTELLA_PROGRESS_BAR_COLOR_1_ATTRIBUTE_NAME, '255, 255, 255')
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -408,37 +477,6 @@ class ArtellaProject(object):
         except Exception as e:
             self.logger.warning('Error during {} Tools Menu creation: {} | {}'.format(self.name.title(), e, traceback.format_exc()))
 
-    def create_tray(self):
-        """
-        Creates Artella Project tray
-        """
-
-        if not self.TRAY_CLASS:
-            return
-
-        self.logger.debug('Creating {} Tools Tray ...'.format(self.name.title()))
-        tray = self.TRAY_CLASS(project=self)
-
-        return tray
-
-    def update_project(self):
-        """
-        Sets the current Maya project to the path where Artella project is located inside Artella folder
-        """
-
-        try:
-            if tp.is_maya():
-                import tpMayaLib as maya
-                self.logger.debug('Setting {} Project ...'.format(self.name))
-                project_folder = os.environ.get(self._project_env_var, 'folder-not-defined')
-                if project_folder and os.path.exists(project_folder):
-                    maya.cmds.workspace(project_folder, openWorkspace=True)
-                    self.logger.debug('{} Project setup successfully! => {}'.format(self.name, project_folder))
-                else:
-                    self.logger.warning('Unable to set {} Project! => {}'.format(self.name, project_folder))
-        except Exception as e:
-            self.logger.error('{} | {}'.format(str(e), traceback.format_exc()))
-
     def get_folders_to_register(self, full_path=True):
         """
         Returns folders to register paths
@@ -477,6 +515,23 @@ class ArtellaProject(object):
         else:
             self.logger.debug(str(msg))
 
+    # ==========================================================================================================
+    # TRAY
+    # ==========================================================================================================
+
+    def create_tray(self):
+        """
+        Creates Artella Project tray
+        """
+
+        if not self.TRAY_CLASS:
+            return
+
+        self.logger.debug('Creating {} Tools Tray ...'.format(self.name.title()))
+        tray = self.TRAY_CLASS(project=self)
+
+        return tray
+
     def get_artella_project_url(self):
         """
         Returns URL of the Artella project
@@ -501,3 +556,110 @@ class ArtellaProject(object):
             title = self.name.title()
 
         webbrowser.open("mailto:%s?subject=%s" % (','.join(self._emails), quote(title)))
+
+    # ==========================================================================================================
+    # PROJECT
+    # ==========================================================================================================
+
+    def get_path(self, force_update=True):
+        """
+        Returns path where project is located
+        :param force_update: bool, Whether to force the update of project path is environment variables are not setup
+        :return: str
+        """
+
+        env_var = os.environ.get(self._project_env_var, None)
+
+        # If project environment variable is not setup we f
+        if not env_var and force_update:
+            self.update_project()
+            env_var = os.environ.get(self._project_env_var, None)
+
+            # We force the launch of Artella
+            if not env_var:
+                try:
+                    if tp.is_maya():
+                        artellalib.launch_artella_app()
+                        artellalib.load_artella_maya_plugin()
+                    self.update_project()
+                except Exception as e:
+                    raise RuntimeError('{} Project not set up properly after launching Artella. Is Artella Running?'.format(self.name.title()))
+
+        env_var = os.environ.get(self._project_env_var, None)
+        if not env_var:
+            raise RuntimeError('{} Project not setup properly. Please contact TD to fix this problem'.format(self.name.title()))
+
+        return os.environ.get(self._project_env_var)
+
+    def get_artella_url(self):
+        """
+        Returns Artella URL of the project
+        :return: str
+        """
+
+        return '{}/project/{}/files'.format(defines.ARTELLA_WEB, self.id)
+
+    def update_project(self):
+        """
+        Sets the current Maya project to the path where Artella project is located inside Artella folder
+        """
+
+        try:
+            if tp.is_maya():
+                import tpMayaLib as maya
+                self.logger.debug('Setting {} Project ...'.format(self.name))
+                project_folder = os.environ.get(self._project_env_var, 'folder-not-defined')
+                if project_folder and os.path.exists(project_folder):
+                    maya.cmds.workspace(project_folder, openWorkspace=True)
+                    self.logger.debug('{} Project setup successfully! => {}'.format(self.name, project_folder))
+                else:
+                    self.logger.warning('Unable to set {} Project! => {}'.format(self.name, project_folder))
+        except Exception as e:
+            self.logger.error('{} | {}'.format(str(e), traceback.format_exc()))
+
+    def open_in_artella(self):
+        """
+        Opens project Artella web page in user web browser
+        """
+
+        project_url = self.get_artella_url()
+        webbrowser.open(project_url)
+
+    def open_folder(self):
+        """
+        Opens folder where Artella project is located in user computer
+        """
+
+        project_path = self.get_path()
+        folder_utils.open_folder(project_path)
+
+    # ==========================================================================================================
+    # ASSETS
+    # ==========================================================================================================
+
+    def get_assets_path(self):
+        """
+        Returns path where project assets are located
+        :return: str
+        """
+
+        assets_path = os.path.join(self.get_path(), defines.ARTELLA_ASSETS_FOLDER_NAME)
+
+        return assets_path
+
+    def find_all_assets(self):
+        """
+        Returns a list of all assets in the project
+        :return: list(Asset)
+        """
+
+        return list()
+
+    def find_asset(self, asset_name):
+        """
+        Returns asset of the project if found
+        :param asset_name: str, name of the asset to find
+        :return: Asset or None
+        """
+
+        return None

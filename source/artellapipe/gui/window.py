@@ -12,6 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import os
 import webbrowser
 
 from Qt.QtCore import *
@@ -21,6 +22,7 @@ import tpQtLib
 from tpQtLib.widgets import statusbar
 
 import artellapipe
+from artellapipe.core import defines
 
 
 class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
@@ -91,9 +93,21 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
 
 class ArtellaWindow(tpQtLib.MainWindow, object):
 
+    VERSION = '0.0.0'
+    LOGO_NAME = None
     STATUS_BAR_WIDGET = ArtellaWindowStatusBar
 
-    def __init__(self, name='ArtellaWindow', title='Artella - Window', size=(800, 535), fixed_size=False, parent=None):
+    def __init__(self, project, name='Window', title='Window', size=(800, 535), fixed_size=False, parent=None):
+
+        self._project = project
+
+        if self._project:
+            name = '{}{}'.format(self._project.name.title(), name)
+            title = '{} - {} - {}'.format(self._project.name.title(), title, self.VERSION)
+        else:
+            name = 'ArtellaWindow'
+            title = '{} - {}'.format(title, self.VERSION)
+
         super(ArtellaWindow, self).__init__(
             name=name,
             title=title,
@@ -114,6 +128,9 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
     def ui(self):
         super(ArtellaWindow, self).ui()
 
+        window_icon = self._get_icon()
+        self.setWindowIcon(window_icon)
+
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(0)
@@ -133,6 +150,11 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         title_background_pixmap = self._get_title_pixmap()
         self._logo_scene.addPixmap(title_background_pixmap)
         title_layout.addWidget(self._logo_view)
+
+        logo_pixmap = self._get_logo()
+        if logo_pixmap and not logo_pixmap.isNull():
+            win_logo = self._logo_scene.addPixmap(logo_pixmap)
+            win_logo.setOffset(910, 0)
 
         if not self._status_bar.has_url():
             self._status_bar.hide_info()
@@ -163,19 +185,62 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         else:
             self._status_bar.show_info()
 
-    def add_logo(self, logo_pixmap, offset=(930, 0)):
+    def _get_logo(self):
         """
-        Adds  new logo into window title
-        :param logo_pixmap: QPixmap
-        :param offset: tuple(int, int)
+        Internal function taht returns the logo used in window title
         """
 
-        new_logo = self._logo_scene.addPixmap(logo_pixmap)
-        new_logo.setOffset(offset[0], offset[1])
+        if self.LOGO_NAME:
+            if self._project:
+                win_logo = self._project.resource.pixmap(self.LOGO_NAME, extension='png')
+                if not win_logo.isNull():
+                    return win_logo
+                else:
+                    self._project.logger.warning(
+                        '{} Project Logo Image not found: {}!'.format(
+                            self._project.name.title(), self.LOGO_NAME + '.png'
+                        )
+                    )
+
+            win_logo = artellapipe.resource.pixmap(self.LOGO_NAME, extension='png')
+            if not win_logo.isNull():
+                return win_logo
+
+        return None
+
+    def _get_icon(self):
+        """
+        Internal function that returns the icon used for the window
+        :return: QIcon
+        """
+
+        if self._project:
+            window_icon = self._project.icon
+            if not window_icon.isNull():
+                return window_icon
+            else:
+                self._project.logger.warning(
+                    '{} Project Icon not found: {}!'.format(
+                        self._project.name.title(), self._project.icon_name + '.png'
+                    )
+                )
+
+        return artellapipe.resource.icon(defines.ARTELLA_PROJECT_DEFAULT_ICON)
 
     def _get_title_pixmap(self):
         """
         Internal function that sets the pixmap used for the title
         """
 
-        return artellapipe.resource.pixmap(name='artella_title', extension='png')
+        if self._project:
+            title_pixmap = self._project.resource.pixmap(name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
+            if not title_pixmap.isNull():
+                return title_pixmap
+            else:
+                self._project.logger.warning(
+                    '{} Project Title Background image not found: {}!'.format(
+                        self._project.name.title(), defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME+'.png'
+                    )
+                )
+
+        return artellapipe.resource.pixmap(name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')

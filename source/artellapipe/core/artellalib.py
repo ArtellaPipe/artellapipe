@@ -332,7 +332,7 @@ def fix_path_by_project(project, path, fullpath=False):
     :return: str
     """
 
-    project_path = project.get_project_path()
+    project_path = project.get_path()
     new_path = path.replace(project_path, '${}\\'.format(defines.ARTELLA_ROOT_PREFIX))
     if fullpath:
         new_path = path.replace(project_path, '${}'.format(defines.ARTELLA_ROOT_PREFIX)+'/'+project.full_id)
@@ -525,7 +525,7 @@ def synchronize_file(file_path):
 
 def synchronize_path_with_folders(file_path, recursive=False):
     """
-    Syncronizhes given path and all its folders
+    Synchronizes given path and all its folders
     :param file_path: str
     :param recursive: bool
     :return:

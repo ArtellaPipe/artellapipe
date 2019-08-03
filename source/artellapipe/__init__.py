@@ -24,6 +24,7 @@ from artellapipe.core import defines
 
 logger = None
 resource = None
+project = None
 
 # =================================================================================
 
@@ -81,6 +82,8 @@ def set_project(project_class, project_resource):
     :param project_resource: Resource
     """
 
+    global project
+
     import artellapipe
 
     project = project_class(resource=project_resource)
@@ -122,6 +125,7 @@ def get_project_menu_path():
     """
 
     return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_MENU_FILE_NAME))
+
 
 def get_project_version_relative_path():
     """

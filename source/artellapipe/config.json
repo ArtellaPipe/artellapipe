@@ -5,11 +5,15 @@
   "TRAY_ICON": "",
   "PROJECT_NUMBER": "",
   "PROJECT_ID": "",
+  "PROJECT_ICON": "artella",
   "PROJECT_VERSION_FILE": "version.json",
+  "PROJECT_URL": "",
   "ASSET_TYPES": [],
   "ASSET_FILES": [],
   "ASSET_MUST_FILES": [],
   "ASSET_WIP_STATUS": "working",
   "ASSET_PUBLISH_STATUS": "published",
-  "PATHS_TO_REGISTER": ["pipeline", "pipeline/externals"]
+  "PATHS_TO_REGISTER": ["pipeline", "pipeline/externals"],
+  "PROGRESS_BAR_COLOR_0": "255, 255, 255",
+  "PROGRESS_BAR_COLOR_1": "255, 255, 255"
 }
