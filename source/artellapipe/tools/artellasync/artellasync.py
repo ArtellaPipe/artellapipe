@@ -18,13 +18,13 @@ from Qt.QtWidgets import *
 
 from artellapipe.gui import window
 
-from artellapipe.tools.artellasync.widgets import pathsync, synctree
+from artellapipe.tools.artellasync.widgets import localsync, serversync
 
 
 class ArtellaSyncerMode(object):
     ALL = 'all'
-    PATH = 'path'
-    TREE = 'tree'
+    LOCAL = 'local'
+    SERVER = 'server'
 
 
 class ArtellaSyncer(window.ArtellaWindow, object):
@@ -56,18 +56,18 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         if self._mode == ArtellaSyncerMode.ALL:
             self._tab = QTabWidget()
             self.main_layout.addWidget(self._tab)
-            self._local_widget = pathsync.ArtellaPathSyncWidget(self._project)
-            self._server_widget = synctree.ArtellaSyncWidget()
+            self._local_widget = localsync.ArtellaPathSyncWidget(self._project)
+            self._server_widget = serversync.ArtellaSyncWidget()
 
             self._tab.addTab(self._local_widget, 'Local')
             self._tab.addTab(self._server_widget, 'Server')
-        elif self._mode == ArtellaSyncerMode.PATH:
-            self._local_widget = pathsync.ArtellaPathSyncWidget(project=self._project)
+        elif self._mode == ArtellaSyncerMode.LOCAL:
+            self._local_widget = localsync.ArtellaPathSyncWidget(project=self._project)
             self._server_widget = None
             self.main_layout.addWidget(self._local_widget)
         else:
             self._local_widget = None
-            self._server_widget = synctree.ArtellaSyncTree()
+            self._server_widget = serversync.ArtellaSyncWidget(project=self._project)
             self.main_layout.addWidget(self._server_widget)
 
     def setup_signals(self):
@@ -86,8 +86,8 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         self.show_error_message(error_msg)
 
 
-def run(project):
-    win = ArtellaSyncer(project=project)
+def run(project, mode=ArtellaSyncerMode.ALL):
+    win = ArtellaSyncer(project=project, mode=mode)
     win.show()
 
     return win

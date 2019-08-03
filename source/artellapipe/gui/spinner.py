@@ -123,7 +123,7 @@ class WaitSpinner(QWidget, object):
         Internal callback function that is called by internal timer in a constant rate
         """
 
-        # print('asdfasdf')
+        # print('updating ...')
         self._thumb_lbl.setPixmap(self._spin_icons[self._current_spinner_index])
         self._current_spinner_index += 1
         if self._current_spinner_index == len(self._spin_icons):

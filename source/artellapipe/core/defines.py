@@ -95,6 +95,9 @@ ARTELLA_MAYA_PLUGIN_NAME = 'Artella.py'
 # Defines the name of the Artella executable
 ARTELLA_APP_NAME = 'lifecycler'
 
+# Defines the name of the working folder used by Artella
+ARTELLA_WORKING_FOLDER = '__working__'
+
 # Defines Artella production folder
 ARTELLA_PRODUCTION_FOLDER = '_art/production'
 

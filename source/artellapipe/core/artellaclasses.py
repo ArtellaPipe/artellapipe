@@ -69,6 +69,8 @@ class ArtellaHeaderMetaData(object):
 class ArtellaAssetMetaData(object):
     def __init__(self, metadata_path, status_dict):
 
+        from artellapipe.core import artellalib
+
         self._path = metadata_path
         self._metadata_header = ArtellaHeaderMetaData(header_dict=status_dict['meta'])
 
@@ -87,6 +89,7 @@ class ArtellaAssetMetaData(object):
             self._published_folders[f] = dict()
             self._published_folders_all[f] = dict()
 
+        # Retrieve asset published data
         for name, data in status_dict['data'].items():
             if name == '_latest' or name == 'latest':
                 continue
@@ -94,8 +97,7 @@ class ArtellaAssetMetaData(object):
             # Before doing nothing, check if the published version is valid (has not been deleted from Artella manually)
             version_valid = True
             version_path = os.path.join(self._path, '__{0}__'.format(name))
-            from solstice.pipeline.utils import artellautils as artella
-            version_info = artella.get_status(version_path)
+            version_info = artellalib.get_status(version_path)
             if version_info:
                 if isinstance(version_info, ArtellaHeaderMetaData):
                     version_valid = False
@@ -108,7 +110,7 @@ class ArtellaAssetMetaData(object):
             # Store all valid published folders
             for f in self._must_folders:
                 if f in name:
-                    version = sp.get_asset_version(name)[1]
+                    version = artellalib.get_asset_version(name)[1]
                     if not version_valid:
                         self._published_folders_all[f][str(version)] = '__{0}__'.format(name)
                     else:
