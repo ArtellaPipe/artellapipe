@@ -16,14 +16,17 @@ import os
 import weakref
 import traceback
 from copy import deepcopy
+from functools import partial
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
+from tpPyUtils import fileio
+
 import tpDccLib as tp
-from tpQtLib.core import base
-from tpQtLib.widgets import search
+from tpQtLib.core import base, qtutils
+from tpQtLib.widgets import search, stack
 
 import artellapipe
 from artellapipe.core import artellalib
@@ -70,10 +73,14 @@ class ArtellaLocalTreeView(QTreeView, object):
         self._project = project
         self._model = None
 
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+
         self._init()
 
         for i in range(1, 4):
             self.hideColumn(i)
+
+        self.customContextMenuRequested.connect(self._on_context_menu)
 
     def get_selected_names(self):
         """
@@ -82,7 +89,7 @@ class ArtellaLocalTreeView(QTreeView, object):
         """
 
         selected = self.selectionModel().selectedIndexes()
-        return [self._model.data(index, self._model.FileNameRole) for index in selected if index.column() == 0]
+        return [self.model().data(index, QFileSystemModel.FileNameRole) for index in selected if index.column() == 0]
 
     def get_selected_paths(self):
         """
@@ -91,7 +98,7 @@ class ArtellaLocalTreeView(QTreeView, object):
         """
 
         selected = self.selectionModel().selectedIndexes()
-        return [self._model.data(index, self._model.FilePathRole) for index in selected if index.column() == 0]
+        return [self.model().data(index, QFileSystemModel.FilePathRole) for index in selected if index.column() == 0]
 
     def get_selected_items_data(self):
         """
@@ -105,9 +112,9 @@ class ArtellaLocalTreeView(QTreeView, object):
         for index in selected:
             if index.column() == 0:
                 data = dict()
-                data['name'] = self.model().data(index, self._model.FileNameRole)
-                data['path'] = self.model().data(index, self._model.FilePathRole)
-                data['icon'] = self.model().data(index, self._model.FileIconRole)
+                data['name'] = self.model().data(index, QFileSystemModel.FileNameRole)
+                data['path'] = self.model().data(index, QFileSystemModel.FilePathRole)
+                data['icon'] = self.model().data(index, QFileSystemModel.FileIconRole)
                 selected_data.append(data)
 
         return selected_data
@@ -131,6 +138,16 @@ class ArtellaLocalTreeView(QTreeView, object):
         self.setRootIndex(self._proxy.mapFromSource(index))
         self.selectionModel().selectionChanged.connect(self._on_selection_changed)
         self._on_data_loaded()
+
+    def refresh(self):
+        """
+        Refreshes current data
+        """
+
+        self.selectionModel().selectionChanged.disconnect()
+        self._model.directoryLoaded.disconnect()
+
+        self._init()
 
     def _init(self):
         """
@@ -158,14 +175,68 @@ class ArtellaLocalTreeView(QTreeView, object):
         self.selectionModel().selectionChanged.connect(self._on_selection_changed)
         self._model.directoryLoaded.connect(self._on_data_loaded)
 
+    def _create_item_menu(self, item_path):
+        """
+        Creates contextual menu to with given path
+        :param item_path: str
+        :return: QMenu
+        """
+
+        contextual_menu = QMenu(self)
+
+        eye_icon = artellapipe.resource.icon('eye')
+        view_locally_action = QAction(eye_icon, 'View Locally', contextual_menu)
+        view_locally_action.triggered.connect(partial(self._on_open_item_folder, item_path))
+
+        contextual_menu.addAction(view_locally_action)
+
+        return contextual_menu
+
     def _on_data_loaded(self):
+        """
+        Internal callback function that is called when tree data is loaded
+        """
+
         self.expandAll()
         self.resizeColumnToContents(0)
 
     def _on_selection_changed(self):
+        """
+        Internal callback function that is called when the tree selection changes
+        """
 
         selected_items = self.get_selected_items_data()
         self.selectedItems.emit(selected_items)
+
+    def _on_context_menu(self, pos):
+        """
+        Internal callback function that is called when the user wants to show tree context menu
+        """
+
+        menu = None
+
+        index = self.indexAt(pos)
+        if index and index.isValid():
+            item_path = self.model().data(index, QFileSystemModel.FilePathRole)
+            if item_path and os.path.exists(item_path):
+                menu = self._create_item_menu(item_path)
+
+        if menu:
+            menu.exec_(self.mapToGlobal(pos))
+
+    def _on_open_item_folder(self, item_path):
+        """
+        Internal callback function that is called when the user selects View Locally item context menu action
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        if os.path.isfile(item_path):
+            fileio.open_browser(os.path.dirname(item_path))
+        else:
+            fileio.open_browser(item_path)
 
 
 class ArtellaLocalListViewDelegateRowPainter(object):
@@ -409,7 +480,7 @@ class ArtellaLocalSyncTree(QTreeWidget, object):
 
         self._project = project
 
-        super(ArtellaLocalSyncTree, self).__init__(parent=parent)
+        super(ArtellaLocalSyncTree, self).__init__(parent)
 
         self.header().setVisible(False)
         self.setSortingEnabled(False)
@@ -501,6 +572,9 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
     def ui(self):
         super(ArtellaPathSyncWidget, self).ui()
 
+        self._toolbar = QToolBar()
+        self.main_layout.addWidget(self._toolbar)
+
         splitter = QSplitter(Qt.Horizontal)
         splitter.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.main_layout.addWidget(splitter)
@@ -523,6 +597,23 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         self._tree = ArtellaLocalTreeView(project=self._project)
         tree_layout.addWidget(filters_widget)
         tree_layout.addWidget(self._tree)
+
+        self._list_stack = stack.SlidingStackedWidget()
+
+        no_items_widget = QFrame()
+        no_items_widget.setFrameShape(QFrame.StyledPanel)
+        no_items_widget.setFrameShadow(QFrame.Sunken)
+        no_items_layout = QVBoxLayout()
+        no_items_layout.setContentsMargins(0, 0, 0, 0)
+        no_items_layout.setSpacing(0)
+        no_items_widget.setLayout(no_items_layout)
+        no_items_lbl = QLabel()
+        no_items_pixmap = artellapipe.resource.pixmap('sync_no_items')
+        no_items_lbl.setPixmap(no_items_pixmap)
+        no_items_lbl.setAlignment(Qt.AlignCenter)
+        no_items_layout.addItem(QSpacerItem(0, 10, QSizePolicy.Preferred, QSizePolicy.Expanding))
+        no_items_layout.addWidget(no_items_lbl)
+        no_items_layout.addItem(QSpacerItem(0, 10, QSizePolicy.Preferred, QSizePolicy.Expanding))
 
         list_widget = QWidget()
         list_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -550,18 +641,44 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         buttons_layout.addWidget(self._sync_btn)
         list_layout.addLayout(buttons_layout)
 
+        self._list_stack.addWidget(no_items_widget)
+        self._list_stack.addWidget(list_widget)
+
         splitter.addWidget(tree_widget)
-        splitter.addWidget(list_widget)
+        splitter.addWidget(self._list_stack)
+
+        self._setup_toolbar()
 
     def setup_signals(self):
         self._tree.selectedItems.connect(self._on_selected_items)
         self._sync_btn.clicked.connect(self._on_sync)
         self._list_filter.textChanged.connect(self._on_update_name)
 
+    def _setup_toolbar(self):
+        """
+        Internal function that setup menu bar
+        """
+
+        refresh_icon = artellapipe.resource.icon('refresh')
+
+        refresh_btn = QToolButton()
+        refresh_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        refresh_action = QAction(refresh_icon, 'Refresh', refresh_btn)
+        refresh_btn.setDefaultAction(refresh_action)
+
+        refresh_btn.clicked.connect(self._on_refresh)
+
+        self._toolbar.addWidget(refresh_btn)
+
     def _init_filters(self):
         """
         Internal function that is called when Tree View loads all the data
         """
+
+        for btn in self._filters_grp.buttons():
+            self._filters_grp.removeButton(btn)
+
+        qtutils.clear_layout(self._filters_layout)
 
         root_path = self._tree._model.rootPath()
         if not os.path.exists(root_path):
@@ -620,6 +737,11 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         Internal callback function that is called when the user selects items in the tree widget
         :param selected_items: list(dict)
         """
+
+        if selected_items:
+            self._list_stack.slide_in_index(1)
+        else:
+            self._list_stack.slide_in_index(0)
 
         self._list.set_items(selected_items)
 
@@ -686,7 +808,24 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         self._progress.setVisible(False)
 
     def _on_update_filters(self):
+        """
+        Internal callback function that is called when any filter is activate/deactivated
+        """
+
         self._update_filters()
 
     def _on_update_name(self, text):
+        """
+        Internal callback function that is called when the user filters items to sync using search widget
+        :param text: str
+        """
+
         self._update_name(text)
+
+    def _on_refresh(self):
+        """
+        Internal callback function that is called when the user presses Refresh button in toolbar
+        """
+
+        self._tree.refresh()
+        self._init_filters()

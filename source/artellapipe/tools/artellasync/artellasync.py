@@ -18,6 +18,8 @@ from Qt.QtWidgets import *
 
 from artellapipe.gui import window
 
+import artellapipe
+from artellapipe.tools.bugtracker import bugtracker
 from artellapipe.tools.artellasync.widgets import localsync, serversync
 
 
@@ -56,8 +58,8 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         if self._mode == ArtellaSyncerMode.ALL:
             self._tab = QTabWidget()
             self.main_layout.addWidget(self._tab)
-            self._local_widget = localsync.ArtellaPathSyncWidget(self._project)
-            self._server_widget = serversync.ArtellaSyncWidget()
+            self._local_widget = localsync.ArtellaPathSyncWidget(project=self._project)
+            self._server_widget = serversync.ArtellaSyncWidget(project=self._project)
 
             self._tab.addTab(self._local_widget, 'Local')
             self._tab.addTab(self._server_widget, 'Server')
@@ -75,6 +77,8 @@ class ArtellaSyncer(window.ArtellaWindow, object):
             self._local_widget.syncOk.connect(self._on_local_sync_completed)
             self._local_widget.syncWarning.connect(self._on_local_sync_warning)
             self._local_widget.syncFailed.connect(self._on_local_sync_failed)
+        if self._server_widget:
+            self._server_widget.workerFailed.connect(self._on_server_worker_failed)
 
     def _on_local_sync_completed(self, ok_msg):
         self.show_ok_message(ok_msg)
@@ -84,6 +88,12 @@ class ArtellaSyncer(window.ArtellaWindow, object):
 
     def _on_local_sync_failed(self, error_msg):
         self.show_error_message(error_msg)
+
+    def _on_server_worker_failed(self, error_msg, trace):
+        self.show_error_message(error_msg)
+        artellapipe.logger.error(trace)
+        bugtracker.ArtellaBugTracker.run(self._project, '{} | {}'.format(error_msg, trace))
+        self.close()
 
 
 def run(project, mode=ArtellaSyncerMode.ALL):

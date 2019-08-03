@@ -14,6 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 
 import uuid
+import traceback
 from threading import Lock, Condition
 
 from Qt.QtCore import *
@@ -21,7 +22,7 @@ from Qt.QtCore import *
 
 class Worker(QThread, object):
     workCompleted = Signal(str, dict)
-    workFailure = Signal(str, str)
+    workFailure = Signal(str, str, str)
 
     def __init__(self, app, parent=None):
         super(Worker, self).__init__(parent=parent)
@@ -93,7 +94,7 @@ class Worker(QThread, object):
                 data = item_to_process['fn'](item_to_process['params'])
             except Exception as e:
                 if self._execute_tasks:
-                    self.workFailure.emit(item_to_process['id'], 'An error ocurred: {}'.format(str(e)))
+                    self.workFailure.emit(item_to_process['id'], 'An error ocurred: {}'.format(str(e)), str(traceback.format_exc()))
             else:
                 if self._execute_tasks:
                     data = data if data is not None else dict()
@@ -179,7 +180,7 @@ class QtWorker(QThread, object):
                     data = item_to_process['fn'](item_to_process['params'])
                 except Exception as e:
                     if self._execute_tasks:
-                        self.workFailure.emit(item_to_process['id'], 'An error ocurred: {}'.format(e))
+                        self.workFailure.emit(item_to_process['id'], 'An error ocurred: {} | {}'.format(e, traceback.format_exc()))
                 else:
                     if self._execute_tasks:
                         data = data if data is not None else dict()
