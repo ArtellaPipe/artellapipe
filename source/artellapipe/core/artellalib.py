@@ -359,12 +359,15 @@ def get_metadata():
     return metadata
 
 
-def get_status(file_path, as_json=False):
+def get_status(file_path, as_json=False, max_tries=10):
     """
     Returns the status of  the given file path
     :param file_path: str
     :return: str
     """
+
+    if max_tries > 50:
+        max_tries = 50
 
     uri = get_cms_uri(file_path)
     if not uri:
@@ -372,22 +375,35 @@ def get_status(file_path, as_json=False):
         return False
 
     spigot = get_spigot_client()
-    rsp = spigot.execute(command_action='do', command_name='status', payload=uri)
-    if isinstance(rsp, basestring):
-        try:
-            rsp = json.loads(rsp)
-        except Exception:
-            msg = 'Artella is not available at this moment ... Restart Maya and try again please!'
-            artellapipe.logger.error(msg)
-            if artellapipe.project:
-                artellapipe.project.message(msg)
-            return {}
+
+    current_try = 0
+
+    while current_try < max_tries:
+        rsp = spigot.execute(command_action='do', command_name='status', payload=uri)
+        if isinstance(rsp, (str, unicode)):
+            try:
+                rsp = json.loads(rsp)
+                break
+            except Exception:
+                pass
+        current_try += 1
+
+    if current_try >= max_tries:
+        msg = 'Artella is not available at this moment ... Restart Maya and try again please!'
+        artellapipe.logger.error(msg)
+        if artellapipe.project:
+            artellapipe.project.message(msg)
+        return {}
 
     if as_json:
         return rsp
 
     # Artella is down!!!!!
     if not rsp:
+        msg = 'Artella is not available at this moment ... Restart Maya and try again please!'
+        artellapipe.logger.error(msg)
+        if artellapipe.project:
+            artellapipe.project.message(msg)
         return None
 
     if 'data' in rsp:
