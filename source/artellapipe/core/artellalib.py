@@ -28,6 +28,7 @@ try:
 except:
     pass
 
+from Qt.QtWidgets import *
 
 import tpDccLib as tp
 from tpPyUtils import osplatform
@@ -496,7 +497,7 @@ def explore_file(path):
     spigot = get_spigot_client()
     rsp = spigot.execute(command_action='do', command_name='explore', payload=uri)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     return rsp
@@ -512,7 +513,7 @@ def synchronize_path(path):
     spigot = get_spigot_client()
     rsp = spigot.execute(command_action='do', command_name='updateCollection', payload=uri)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     return rsp
@@ -530,7 +531,7 @@ def synchronize_file(file_path):
         spigot = get_spigot_client()
         rsp = spigot.execute(command_action='do', command_name='update', payload=uri)
 
-        if isinstance(rsp, basestring):
+        if isinstance(rsp, (unicode, str)):
             rsp = json.loads(rsp)
 
         return rsp
@@ -591,7 +592,7 @@ def get_asset_history(file_path, as_json=False):
     rsp = spigot.execute(command_action='do', command_name='history', payload=uri)
 
     try:
-        if isinstance(rsp, basestring):
+        if isinstance(rsp, (unicode, str)):
             rsp = json.loads(rsp)
     except Exception as e:
         msg = 'Error while getting file history info: {}'.format(rsp)
@@ -645,8 +646,10 @@ def launch_maya(file_path, maya_version=None):
     payload['wait'] = "60"
     payload = json.dumps(payload)
     rsp = spigot.execute(command_action='do', command_name='launchApp', payload=payload)
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
+
+    return rsp
 
 
 def open_file_in_maya(file_path, maya_version=None):
@@ -676,7 +679,7 @@ def open_file_in_maya(file_path, maya_version=None):
 
     rsp = spigot.execute(command_action='do', command_name='passToApp', payload=payload)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     return rsp
@@ -705,7 +708,7 @@ def import_file_in_maya(file_path, maya_version=None):
 
     rsp = spigot.execute(command_action='do', command_name='passToApp', payload=payload)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     return rsp
@@ -734,7 +737,7 @@ def reference_file_in_maya(file_path, maya_version=None):
 
     rsp = spigot.execute(command_action='do', command_name='passToApp', payload=payload)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     return rsp
@@ -861,7 +864,7 @@ def lock_file(file_path=None, force=False):
 
     rsp = spigot.execute(command_action='do', command_name='checkout', payload=payload)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     artellapipe.logger.debug('Server checkout response: {}'.format(rsp))
@@ -892,7 +895,7 @@ def upload_file(file_path, comment):
     payload = json.dumps(payload)
 
     rsp = spigot.execute(command_action='do', command_name='upload', payload=payload)
-    if isinstance(rsp, basestring) or type(rsp) == str:
+    if isinstance(rsp, (str, unicode)):
         rsp = json.loads(rsp)
 
     if rsp.get('status', {}).get('meta', {}).get('status') != 'OK':
@@ -959,7 +962,7 @@ def unlock_file(file_path):
 
     rsp = spigot.execute(command_action='do', command_name='unlock', payload=payload)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     # if rsp.get('status', {}).get('meta', {}).get('status') != 'OK':
@@ -1031,7 +1034,7 @@ def upload_new_asset_version(file_path=None, comment='Published new version with
         payload = json.dumps(payload)
 
         rsp = spigot.execute(command_action='do', command_name='upload', payload=payload)
-        if isinstance(rsp, basestring) or type(rsp) == str:
+        if isinstance(rsp, (unicode, str)):
             rsp = json.loads(rsp)
 
         if 'status' in rsp and 'meta' in rsp['status'] and rsp['status']['meta']['status'] != 'OK':
@@ -1070,7 +1073,7 @@ def publish_asset(asset_path, comment, selected_versions, version_name):
 
     rsp = spigot.execute(command_action='do', command_name='createRelease', payload=payload)
 
-    if isinstance(rsp, basestring):
+    if isinstance(rsp, (unicode, str)):
         rsp = json.loads(rsp)
 
     return rsp
@@ -1151,12 +1154,94 @@ def get_dependencies(file_path):
 
         rsp = spigot.execute(command_action='do', command_name='getDependencies', payload=payload)
 
-        if isinstance(rsp, basestring):
+        if isinstance(rsp, (unicode, str)):
             rsp = json.loads(rsp)
 
         return rsp
 
     return None
+
+
+def create_asset(asset_name, asset_path):
+    """
+    Creates an asset with given name and in given path
+    :param asset_name: str
+    :param asset_path: str
+    :return: dict
+    """
+
+    full_path = os.path.join(asset_path, asset_name)
+    if os.path.exists(asset_path):
+        artellapipe.logger.warning('Impossible to create already existing asset!')
+        return False
+
+    spigot = get_spigot_client()
+    payload = dict()
+    payload['cms_uri'] = artella.getCmsUri(full_path)
+    payload = json.dumps(payload)
+
+    rsp = spigot.execute(command_action='do', command_name='createContainer', payload=payload)
+
+    if isinstance(rsp, (unicode, str)):
+        rsp = json.dumps(rsp)
+
+    return rsp
+
+
+def delete_file(file_path):
+    """
+    Removes given file from Artella server
+    :param file_path: str
+    :return: dict
+    """
+
+    spigot = get_spigot_client()
+    payload = dict()
+    payload['cms_uri'] = artella.getCmsUri(file_path)
+    payload = json.dumps(payload)
+
+    rsp = spigot.execute(command_action='do', command_name='delete', payload=payload)
+
+    if isinstance(rsp, (unicode, str)):
+        rsp = json.dumps(rsp)
+
+    return rsp
+
+
+def rename_file(file_path, new_name):
+    """
+    Renames given file with new given name
+    :param file_path: str
+    :param new_name: str
+    """
+
+    res = qtutils.show_question(None, 'Confirm Rename', 'Are you you would like to rename "{}" to "{}"?Any references to this file will need to be updated.'.format(os.path.basename(file_path, new_name)))
+    if res != QMessageBox.Yes:
+        return
+
+    dir_name = os.path.dirname(file_path)
+    file_ext = os.path.splitext(file_path)[-1]
+    if file_ext:
+        if not new_name.endswith(file_ext):
+            new_name += file_ext
+    else:
+        file_ext = os.path.splitext(file_path)[-1]
+        if file_ext:
+            new_name = file_ext[0]
+    new_path = os.path.join(dir_name, new_name)
+
+    spigot = get_spigot_client()
+    payload = dict()
+    payload['cms_uri'] = artella.getCmsUri(file_path)
+    payload['dst_uri'] = artella.getCmsUri(new_path)
+    payload = json.dumps(payload)
+
+    rsp = spigot.execute(command_action='do', command_name='rename', payload=payload)
+
+    if isinstance(rsp, (unicode, str)):
+        rsp = json.dumps(rsp)
+
+    return rsp
 
 
 if tp.is_maya():
