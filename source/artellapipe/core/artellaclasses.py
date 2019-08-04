@@ -69,7 +69,7 @@ class ArtellaHeaderMetaData(object):
 class ArtellaAssetMetaData(object):
     def __init__(self, metadata_path, status_dict):
 
-        from artellapipe.core import artellalib
+        self._dict = status_dict
 
         self._path = metadata_path
         self._metadata_header = ArtellaHeaderMetaData(header_dict=status_dict['meta'])
@@ -85,12 +85,89 @@ class ArtellaAssetMetaData(object):
         else:
             self._must_folders = list()
 
+        self._published_folders = None
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def _latest(self):
+        return self.__latest
+
+    @property
+    def latest(self):
+        return self._latest_
+
+    @property
+    def published_models(self):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        return self._published_folders['model']
+
+    @property
+    def published_textures(self):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        return self._published_folders['textures']
+
+    @property
+    def published_shading(self):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        return self._published_folders['shading']
+
+    @property
+    def published_rig(self):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        return self._published_folders['rig']
+
+    @property
+    def published_grooming(self):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        return self._published_folders['grooming']
+
+    def get_is_published(self):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        is_published = True
+        for f in self._must_folders:
+            must_dict = self._published_folders[f]
+            if not must_dict:
+                artellapipe.logger.debug('Asset {0} is not published -> Folder "{1}" is not published yet!'.format(self._path, f))
+                is_published = False
+        return is_published
+
+    def get_published_versions(self, all=False):
+        if self._published_folders is None:
+            self._get_published_data()
+
+        if all:
+            return self._published_folders_all
+        else:
+            return self._published_folders
+
+    def _get_published_data(self):
+        """
+        Internal function that caches the published data of the asset if that info is not already cached
+        """
+
+        from artellapipe.core import artellalib
+
         for f in self._must_folders:
             self._published_folders[f] = dict()
             self._published_folders_all[f] = dict()
 
         # Retrieve asset published data
-        for name, data in status_dict['data'].items():
+        for name, data in self._dict['data'].items():
             if name == '_latest' or name == 'latest':
                 continue
 
@@ -121,53 +198,6 @@ class ArtellaAssetMetaData(object):
         for f in self._must_folders:
             self._published_folders[f] = collections.OrderedDict(sorted(self._published_folders[f].items()))
             self._published_folders_all[f] = collections.OrderedDict(sorted(self._published_folders_all[f].items()))
-
-    @property
-    def path(self):
-        return self._path
-
-    @property
-    def _latest(self):
-        return self.__latest
-
-    @property
-    def latest(self):
-        return self._latest_
-
-    @property
-    def published_models(self):
-        return self._published_folders['model']
-
-    @property
-    def published_textures(self):
-        return self._published_folders['textures']
-
-    @property
-    def published_shading(self):
-        return self._published_folders['shading']
-
-    @property
-    def published_rig(self):
-        return self._published_folders['rig']
-
-    @property
-    def published_grooming(self):
-        return self._published_folders['grooming']
-
-    def get_is_published(self):
-        is_published = True
-        for f in self._must_folders:
-            must_dict = self._published_folders[f]
-            if not must_dict:
-                artellapipe.logger.debug('Asset {0} is not published -> Folder "{1}" is not published yet!'.format(self._path, f))
-                is_published = False
-        return is_published
-
-    def get_published_versions(self, all=False):
-        if all:
-            return self._published_folders_all
-        else:
-            return self._published_folders
 
 
 class ArtellaReferencesMetaData(object):
