@@ -17,18 +17,23 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import base
+from tpQtLib.core import base, qtutils
 
 import artellapipe
 from artellapipe.core import defines, assetsviewer
 
 
 class AssetsWidget(base.BaseWidget, object):
+
+    ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
+
     def __init__(self, project, parent=None):
 
         self._project = project
         if not self._project:
             artellapipe.logger.warning('Invalid project for AssetsWidget!')
+
+        self._categories_buttons = dict()
 
         super(AssetsWidget, self).__init__(parent=parent)
 
@@ -48,34 +53,60 @@ class AssetsWidget(base.BaseWidget, object):
         self.main_layout.addLayout(main_categories_menu_layout)
 
         categories_menu = QWidget()
-        categories_menu_layout = QVBoxLayout()
-        categories_menu_layout.setContentsMargins(0, 0, 0, 0)
-        categories_menu_layout.setSpacing(0)
-        categories_menu_layout.setAlignment(Qt.AlignTop)
-        categories_menu.setLayout(categories_menu_layout)
+        self._categories_menu_layout = QVBoxLayout()
+        self._categories_menu_layout.setContentsMargins(0, 0, 0, 0)
+        self._categories_menu_layout.setSpacing(0)
+        self._categories_menu_layout.setAlignment(Qt.AlignTop)
+        categories_menu.setLayout(self._categories_menu_layout)
         main_categories_menu_layout.addWidget(categories_menu)
 
         asset_splitter = QSplitter(Qt.Horizontal)
         main_categories_menu_layout.addWidget(asset_splitter)
 
-        self._assets_viewer = assetsviewer.AssetsViewer(project=self._project, parent=self)
+        self._assets_viewer = self.ASSETS_VIEWER_CLASS(project=self._project, parent=self)
         asset_splitter.addWidget(self._assets_viewer)
         self._assets_viewer.first_empty_cell()
 
         self._categories_btn_grp = QButtonGroup(self)
         self._categories_btn_grp.setExclusive(True)
-        categories_buttons = dict()
         asset_categories = self._project.asset_types if self._project else list()
+        self.update_asset_categories(asset_categories)
+
+    def update_assets(self):
+        """
+        Updates the list of assets in the asset viewer
+        """
+
+        self._assets_viewer.update_assets()
+
+    def clear_assets(self):
+        """
+        Clear all the assets of the asset viewer
+        """
+
+        self._assets_viewer.clear_assets()
+
+    def update_asset_categories(self, asset_categories):
+        """
+        Updates current categories with the given ones
+        :param asset_categories: list(str)
+        """
+
+        for btn in self._categories_btn_grp.buttons():
+            self._categories_btn_grp.removeButton(btn)
+
+        qtutils.clear_layout(self._categories_menu_layout)
+
         all_asset_categories = [defines.ARTELLA_ALL_CATEGORIES_NAME]
         all_asset_categories.extend(asset_categories)
         for category in all_asset_categories:
             new_btn = QPushButton(category)
             new_btn.setCheckable(True)
-            categories_buttons[category] = new_btn
-            categories_menu_layout.addWidget(new_btn)
+            self._categories_menu_layout.addWidget(new_btn)
             self._categories_btn_grp.addButton(new_btn)
+            if category == defines.ARTELLA_ALL_CATEGORIES_NAME:
+                new_btn.setChecked(True)
             new_btn.toggled.connect(partial(self._change_category, category))
-        categories_buttons[defines.ARTELLA_ALL_CATEGORIES_NAME].setChecked(True)
 
     def _change_category(self, category, flag):
         """
@@ -85,6 +116,3 @@ class AssetsWidget(base.BaseWidget, object):
 
         if flag:
             self._assets_viewer.change_category(category=category)
-
-
-

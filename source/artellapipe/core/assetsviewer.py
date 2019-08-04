@@ -18,10 +18,12 @@ from Qt.QtWidgets import *
 from tpQtLib.widgets import grid
 
 import artellapipe
-from artellapipe.core import defines
+from artellapipe.core import defines, asset
 
 
 class AssetsViewer(grid.GridWidget, object):
+
+    ASSET_WIDGET_CLASS = asset.ArtellaAssetWidget
 
     assetSynced = Signal()
 
@@ -40,14 +42,12 @@ class AssetsViewer(grid.GridWidget, object):
 
         self._project = project
 
-        self.update_assets()
-
     def update_assets(self):
         """
         Updates the list of assets in the asset viewer
         """
 
-        self.clear()
+        self.clear_assets()
 
         if not self._project:
             artellapipe.logger.warning('Project not defined!')
@@ -56,6 +56,18 @@ class AssetsViewer(grid.GridWidget, object):
         all_assets = self._project.find_all_assets()
         if not all_assets:
             return
+
+        for asset in all_assets:
+            asset_data = self._project.ASSET_CLASS(asset)
+            asset_widget = self.ASSET_WIDGET_CLASS(asset_data)
+            self.add_asset(asset_widget)
+
+    def clear_assets(self):
+        """
+        Clear all the assets of the asset viewer
+        """
+
+        self.clear()
 
     def change_category(self, category=None):
         """
@@ -72,3 +84,15 @@ class AssetsViewer(grid.GridWidget, object):
 
         print('Changing category to: {}'.format(category))
 
+    def add_asset(self, asset_widget):
+        """
+        Adds given asset to viewer
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        if asset_widget is None:
+            return
+
+        row, col = self.first_empty_cell()
+        self.addWidget(row, col, asset_widget)
+        self.resizeRowsToContents()

@@ -26,7 +26,7 @@ import tpDccLib as tp
 from tpPyUtils import osplatform, path as path_utils, folder as folder_utils
 
 import artellapipe
-from artellapipe.core import defines, artellalib
+from artellapipe.core import defines, artellalib, asset
 from artellapipe.gui import tray
 
 
@@ -34,6 +34,7 @@ class ArtellaProject(object):
 
     PROJECT_RESOURCE = None
     TRAY_CLASS = tray.ArtellaTray
+    ASSET_CLASS = asset.ArtellaAsset
     PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
@@ -327,7 +328,7 @@ class ArtellaProject(object):
 
         project_config_data = self.get_config_data()
         if not project_config_data:
-            return
+            return False
 
         self._name = project_config_data.get(defines.ARTELLA_CONFIG_PROJECT_NAME, defines.ARTELLA_DEFAULT_PROJECT_NAME)
         self._project_env_var = project_config_data.get(defines.ARTELLA_CONFIG_ENVIRONMENT_VARIABLE, defines.ARTELLA_DEFAULT_ENVIRONMENT_VARIABLE)
@@ -351,7 +352,7 @@ class ArtellaProject(object):
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
-            return
+            return False
 
     def get_clean_name(self):
         """
@@ -652,6 +653,15 @@ class ArtellaProject(object):
         Returns a list of all assets in the project
         :return: list(Asset)
         """
+
+        assets_path = self.get_assets_path()
+        if assets_path or not os.path.exists(assets_path):
+            return list()
+
+        for root, dirs, files in os.walk(assets_path):
+            if dirs and defines.ARTELLA_WORKING_FOLDER in dirs:
+                asset_path = path_utils.clean_path(root)
+                asset_name = os.path.basename(root)
 
         return list()
 

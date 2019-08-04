@@ -12,7 +12,6 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-
 import uuid
 import traceback
 from threading import Lock, Condition

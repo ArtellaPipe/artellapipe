@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Tool that allow artists to interact with Artella functionality inside DCCS
+Tool that allow artists to easily sync files from Artella server
 """
 
 from __future__ import print_function, division, absolute_import
@@ -16,24 +16,32 @@ __email__ = "tpovedatd@gmail.com"
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.widgets import stack
+from artellapipe.gui import window
 
 import artellapipe
-from artellapipe.gui import window
-from artellapipe.tools.artellamanager.widgets import userinfo, assetswidget
+from artellapipe.tools.bugtracker import bugtracker
+from artellapipe.tools.artellamanager.widgets import localsync, serversync
 
 
-class ArtellaManager(window.ArtellaWindow, object):
+class ArtellaSyncerMode(object):
+    ALL = 'all'
+    LOCAL = 'local'
+    SERVER = 'server'
 
-    LOGO_NAME = 'manager_logo'
-    USER_INFO_CLASS = userinfo.UserInfo
 
-    def __init__(self, project):
-        super(ArtellaManager, self).__init__(
+class ArtellaSyncer(window.ArtellaWindow, object):
+
+    LOGO_NAME = 'syncer_logo'
+
+    def __init__(self, project, mode=ArtellaSyncerMode.ALL):
+
+        self._mode = mode
+
+        super(ArtellaSyncer, self).__init__(
             project=project,
-            name='ManagerWindow',
-            title='Manager',
-            size=(1100, 900)
+            name='SyncerWindow',
+            title='Artella Syncer',
+            size=(800, 1100)
         )
 
     def get_main_layout(self):
@@ -45,126 +53,69 @@ class ArtellaManager(window.ArtellaWindow, object):
         return main_layout
 
     def ui(self):
-        super(ArtellaManager, self).ui()
+        super(ArtellaSyncer, self).ui()
 
-        # Add User Info widget
-        self._user_info = self.USER_INFO_CLASS()
-        self.main_layout.addWidget(self._user_info)
+        if self._mode == ArtellaSyncerMode.ALL:
+            self._tab = QTabWidget()
+            self.main_layout.addWidget(self._tab)
+            self._local_widget = localsync.ArtellaPathSyncWidget(project=self._project)
+            self._server_widget = serversync.ArtellaSyncWidget(project=self._project)
 
-        # Create Top Menu Bar
-        self._menu_bar = self._setup_menubar()
-        if not self._menu_bar:
-            self._menu_bar = QMenuBar(self)
-        self.main_layout.addWidget(self._menu_bar)
-        sep = QFrame()
-        sep.setFrameShape(QFrame.HLine)
-        sep.setFrameShadow(QFrame.Raised)
-        self.main_layout.addWidget(sep)
-
-        # Create main slack widget
-        self._stack = stack.SlidingStackedWidget(parent=self)
-
-        # Add tabs and its categories (Assets, Shots, etc)
-        self._tab_widget = QTabWidget()
-        self._tab_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self._tab_widget.setMinimumHeight(330)
-        self._stack.addWidget(self._tab_widget)
-
-        assets_widget = assetswidget.AssetsWidget(project=self._project)
-
-        sequences_widget = QWidget()
-        sequences_layout = QVBoxLayout()
-        sequences_layout.setContentsMargins(0, 0, 0, 0)
-        sequences_layout.setSpacing(0)
-        sequences_widget.setLayout(sequences_layout)
-
-        self._tab_widget.addTab(assets_widget, 'Assets')
-        self._tab_widget.addTab(sequences_widget, 'Sequences')
-        self._tab_widget.setTabEnabled(1, False)
-
-        # ============================================================================================
-
-        self.main_layout.addWidget(self._stack)
+            self._tab.addTab(self._local_widget, 'Local')
+            self._tab.addTab(self._server_widget, 'Server')
+        elif self._mode == ArtellaSyncerMode.LOCAL:
+            self._local_widget = localsync.ArtellaPathSyncWidget(project=self._project)
+            self._server_widget = None
+            self.main_layout.addWidget(self._local_widget)
+        else:
+            self._local_widget = None
+            self._server_widget = serversync.ArtellaSyncWidget(project=self._project)
+            self.main_layout.addWidget(self._server_widget)
 
     def setup_signals(self):
-        self._project_artella_btn.clicked.connect(self._on_open_project_in_artella)
-        self._project_folder_btn.clicked.connect(self._on_open_project_folder)
+        if self._local_widget:
+            self._local_widget.syncOk.connect(self._on_local_sync_completed)
+            self._local_widget.syncWarning.connect(self._on_local_sync_warning)
+            self._local_widget.syncFailed.connect(self._on_local_sync_failed)
+        if self._server_widget:
+            self._server_widget.workerFailed.connect(self._on_server_worker_failed)
+            self._server_widget.syncOk.connect(self._on_server_sync_completed)
+            self._server_widget.syncWarning.connect(self._on_server_sync_warning)
+            self._server_widget.syncFailed.connect(self._on_server_sync_failed)
 
     def closeEvent(self, event):
-        """
-        Overrides base window.ArtellaWindow closeEvent function
-        :param event: QEvent
-        """
-
-        self.save_settings()
-        self.remove_callbacks()
-        self.windowClosed.emit()
+        if self._server_widget:
+            if self._server_widget.worker_is_running():
+                self._server_widget.stop_artella_worker()
         event.accept()
 
-    def _setup_menubar(self):
-        """
-        Internal function used to setup Artella Manager menu bar
-        """
+    def _on_local_sync_completed(self, ok_msg):
+        self.show_ok_message(ok_msg)
 
-        menubar_widget = QWidget()
-        menubar_layout = QGridLayout()
-        menubar_layout.setAlignment(Qt.AlignTop)
-        menubar_layout.setContentsMargins(0, 0, 0, 0)
-        menubar_layout.setSpacing(2)
-        menubar_widget.setLayout(menubar_layout)
-        self._project_artella_btn = QToolButton()
-        self._project_artella_btn.setText('Artella')
-        self._project_artella_btn.setIcon(artellapipe.resource.icon('artella'))
-        self._project_artella_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self._project_folder_btn = QToolButton()
-        self._project_folder_btn.setText('Project')
-        self._project_folder_btn.setIcon(artellapipe.resource.icon('folder'))
-        self._project_folder_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        synchronize_btn = QToolButton()
-        synchronize_btn.setText('Synchronize')
-        synchronize_btn.setPopupMode(QToolButton.InstantPopup)
-        synchronize_btn.setIcon(artellapipe.resource.icon('sync'))
-        synchronize_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        # settings_btn = QToolButton()
-        # settings_btn.setText('Settings')
-        # settings_btn.setIcon(artellapipe.resource.icon('settings'))
-        # settings_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        for i, btn in enumerate([self._project_artella_btn, self._project_folder_btn, synchronize_btn]):
-            menubar_layout.addWidget(btn, 0, i, 1, 1, Qt.AlignCenter)
+    def _on_local_sync_warning(self, warning_msg):
+        self.show_warning_message(warning_msg)
 
-        return menubar_widget
+    def _on_local_sync_failed(self, error_msg):
+        self.show_error_message(error_msg)
 
-    def _on_artella_not_available(self):
-        """
-        Internal callback function that is called by ArtellaUserInfo widget when Artella is not available
-        TODO: If Artella is not enabled we should disable all the widget of the UI and notify the user
-        """
+    def _on_server_worker_failed(self, error_msg, trace):
+        self.show_error_message(error_msg)
+        artellapipe.logger.error(trace)
+        bugtracker.ArtellaBugTracker.run(self._project, '{} | {}'.format(error_msg, trace))
+        self.close()
 
-        pass
+    def _on_server_sync_completed(self, ok_msg):
+        self.show_ok_message(ok_msg)
 
-    def _on_open_project_in_artella(self):
-        """
-        Internal callback function that is called when the user presses Artella menu bar button
-        """
+    def _on_server_sync_warning(self, warning_msg):
+        self.show_warning_message(warning_msg)
 
-        if not self._project:
-            return
-
-        self._project.open_in_artella()
-
-    def _on_open_project_folder(self):
-        """
-        Internal callback function that is called when the user presses Project menu bar button
-        """
-
-        if not self._project:
-            return
-
-        self._project.open_folder()
+    def _on_server_sync_failed(self, error_msg):
+        self.show_error_message(error_msg)
 
 
-def run(project):
-    win = ArtellaManager(project=project)
+def run(project, mode=ArtellaSyncerMode.ALL):
+    win = ArtellaSyncer(project=project, mode=mode)
     win.show()
 
     return win

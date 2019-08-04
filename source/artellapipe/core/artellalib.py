@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Utility module that contains useful utilities  and classes related with Artella
+Utility module that contains useful utilities and classes related with Artella
 """
 
 from __future__ import print_function, division, absolute_import

@@ -35,32 +35,12 @@ from artellapipe.tools.bugtracker import bugtracker
 
 
 class ArtellaLocalTreeModel(QFileSystemModel, object):
-    def __init__(self):
-        super(ArtellaLocalTreeModel, self).__init__()
+    def __init__(self, parent=None):
+        super(ArtellaLocalTreeModel, self).__init__(parent)
 
         self.setFilter(QDir.AllDirs | QDir.Files | QDir.NoDotAndDotDot)
         self.setNameFilterDisables(False)
         self.setReadOnly(True)
-
-
-class HideFileTypesProxy(QSortFilterProxyModel, object):
-    def __init__(self, excludes, *args, **kwargs):
-        super(HideFileTypesProxy, self).__init__(*args, **kwargs)
-
-        self._excludes = excludes[:]
-
-    def filterAcceptsRow(self, source_row, source_parent):
-        index = self.sourceModel().index(source_row, 0, source_parent)
-        name = index.data()
-
-        for exc in self._excludes:
-            if name.endswith(exc):
-                return False
-
-        return True
-
-    def get_excludes(self):
-        return self._excludes
 
 
 class ArtellaLocalTreeView(QTreeView, object):
@@ -119,26 +99,6 @@ class ArtellaLocalTreeView(QTreeView, object):
 
         return selected_data
 
-    def set_excludes_extensions(self, excluded_extensions):
-        """
-        Sets the extensions that should be excluded by the view
-        :param excluded_extensions: list(str)
-        """
-
-        root_path = ''
-        if self._project:
-            root_path = self._project.get_path()
-
-        self.selectionModel().selectionChanged.disconnect()
-        self._proxy = HideFileTypesProxy(excludes=excluded_extensions, parent=self)
-        self._proxy.setDynamicSortFilter(True)
-        self._proxy.setSourceModel(self._model)
-        self.setModel(self._proxy)
-        index = self._model.setRootPath(root_path)
-        self.setRootIndex(self._proxy.mapFromSource(index))
-        self.selectionModel().selectionChanged.connect(self._on_selection_changed)
-        self._on_data_loaded()
-
     def refresh(self):
         """
         Refreshes current data
@@ -158,18 +118,17 @@ class ArtellaLocalTreeView(QTreeView, object):
         if self._project:
             root_path = self._project.get_path()
 
-        self._model = ArtellaLocalTreeModel()
-        self._proxy = HideFileTypesProxy(excludes=[], parent=self)
-        self._proxy.setDynamicSortFilter(True)
-        self._proxy.setSourceModel(self._model)
+        self._model = QFileSystemModel(self)
+        self._model.setReadOnly(True)
         self.header().setFixedHeight(30)
         self.setSelectionMode(QTreeView.ExtendedSelection)
-        self.setModel(self._proxy)
+        self.setModel(self._model)
         self.setAnimated(True)
         self.setIndentation(20)
         self.setSortingEnabled(True)
+        print('Setting path: {}'.format(root_path))
         index = self._model.setRootPath(root_path)
-        self.setRootIndex(self._proxy.mapFromSource(index))
+        self.setRootIndex(index)
         self.setItemsExpandable(True)
 
         self.selectionModel().selectionChanged.connect(self._on_selection_changed)
@@ -197,7 +156,7 @@ class ArtellaLocalTreeView(QTreeView, object):
         Internal callback function that is called when tree data is loaded
         """
 
-        self.expandAll()
+        # self.expandAll()
         self.resizeColumnToContents(0)
 
     def _on_selection_changed(self):
@@ -567,8 +526,6 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
 
         super(ArtellaPathSyncWidget, self).__init__(parent=parent)
 
-        self._init_filters()
-
     def ui(self):
         super(ArtellaPathSyncWidget, self).ui()
 
@@ -586,16 +543,7 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         tree_layout.setSpacing(2)
         tree_widget.setLayout(tree_layout)
 
-        filters_widget = QWidget()
-        self._filters_layout = QHBoxLayout()
-        self._filters_layout.setContentsMargins(2, 2, 2, 2)
-        self._filters_layout.setSpacing(2)
-        filters_widget.setLayout(self._filters_layout)
-        self._filters_grp = QButtonGroup(self)
-        self._filters_grp.setExclusive(False)
-
         self._tree = ArtellaLocalTreeView(project=self._project)
-        tree_layout.addWidget(filters_widget)
         tree_layout.addWidget(self._tree)
 
         self._list_stack = stack.SlidingStackedWidget()
@@ -669,59 +617,6 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         refresh_btn.clicked.connect(self._on_refresh)
 
         self._toolbar.addWidget(refresh_btn)
-
-    def _init_filters(self):
-        """
-        Internal function that is called when Tree View loads all the data
-        """
-
-        for btn in self._filters_grp.buttons():
-            self._filters_grp.removeButton(btn)
-
-        qtutils.clear_layout(self._filters_layout)
-
-        root_path = self._tree._model.rootPath()
-        if not os.path.exists(root_path):
-            return
-
-        extensions_dict = dict()
-
-        for d, _, files in os.walk(root_path):
-            for f in files:
-                file_path = os.path.join(d, f)
-                ext = os.path.splitext(file_path)[-1]
-                if ext not in extensions_dict:
-                    file_info = QFileInfo(file_path)
-                    icon_provider = QFileIconProvider()
-                    file_icon = icon_provider.icon(file_info)
-                    extensions_dict[ext] = file_icon
-
-        for ext, ext_icon in extensions_dict.items():
-            filter_btn = QPushButton(ext[1:])
-            filter_btn.setMinimumWidth(45)
-            filter_btn.setCheckable(True)
-            filter_btn.setChecked(True)
-            filter_btn.setIcon(ext_icon)
-            filter_btn.toggled.connect(self._on_update_filters)
-            self._filters_grp.addButton(filter_btn)
-            self._filters_layout.addWidget(filter_btn)
-        self._filters_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
-
-        self._update_filters()
-
-    def _update_filters(self):
-        """
-        Internal function that updates filters
-        """
-
-        extensions_to_hide = list()
-        for btn in self._filters_grp.buttons():
-            ext = '.{}'.format(btn.text())
-            if btn.isChecked():
-                continue
-            extensions_to_hide.append(ext)
-
-        self._tree.set_excludes_extensions(extensions_to_hide)
 
     def _update_name(self, name):
         """
@@ -828,4 +723,3 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         """
 
         self._tree.refresh()
-        self._init_filters()
