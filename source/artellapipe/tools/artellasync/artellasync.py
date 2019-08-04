@@ -79,6 +79,9 @@ class ArtellaSyncer(window.ArtellaWindow, object):
             self._local_widget.syncFailed.connect(self._on_local_sync_failed)
         if self._server_widget:
             self._server_widget.workerFailed.connect(self._on_server_worker_failed)
+            self._server_widget.syncOk.connect(self._on_server_sync_completed)
+            self._server_widget.syncWarning.connect(self._on_server_sync_warning)
+            self._server_widget.syncFailed.connect(self._on_server_sync_failed)
 
     def closeEvent(self, event):
         if self._server_widget:
@@ -100,6 +103,15 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         artellapipe.logger.error(trace)
         bugtracker.ArtellaBugTracker.run(self._project, '{} | {}'.format(error_msg, trace))
         self.close()
+
+    def _on_server_sync_completed(self, ok_msg):
+        self.show_ok_message(ok_msg)
+
+    def _on_server_sync_warning(self, warning_msg):
+        self.show_warning_message(warning_msg)
+
+    def _on_server_sync_failed(self, error_msg):
+        self.show_error_message(error_msg)
 
 
 def run(project, mode=ArtellaSyncerMode.ALL):

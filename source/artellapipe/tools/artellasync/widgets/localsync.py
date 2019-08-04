@@ -772,7 +772,7 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
             self._progress.set_text('Syncing file: {}'.format(item_name))
             self._list.repaint()
             try:
-                valid_sync = True
+                valid_sync = False
                 if os.path.isfile(item_path):
                     valid_sync = artellalib.synchronize_file(item_path)
                 elif os.path.isdir(item_path):
