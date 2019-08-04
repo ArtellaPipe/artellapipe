@@ -80,6 +80,12 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         if self._server_widget:
             self._server_widget.workerFailed.connect(self._on_server_worker_failed)
 
+    def closeEvent(self, event):
+        if self._server_widget:
+            if self._server_widget.worker_is_running():
+                self._server_widget.stop_artella_worker()
+        event.accept()
+
     def _on_local_sync_completed(self, ok_msg):
         self.show_ok_message(ok_msg)
 

@@ -80,6 +80,8 @@ class Worker(QThread, object):
 
     def run(self):
         while self._execute_tasks:
+            if self.isInterruptionRequested():
+                return
             with self._queue_mutex:
                 if len(self._queue) == 0:
                     self._wait_condition.wait()

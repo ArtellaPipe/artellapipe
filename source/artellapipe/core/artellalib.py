@@ -1130,31 +1130,6 @@ def get_user_avatar(user_id):
     return response
 
 
-def login_to_artella(user, password):
-    """
-    Login to Artella
-    :param user: str, user name
-    :param password: str, password
-    :return:
-    """
-
-    # TODO: This always returns True, so its completely uselss :(
-
-    manager = HTTPPasswordMgrWithDefaultRealm()
-
-    artella_web = 'https://www.artella.com/project/2252d6c8-407d-4419-a186-cf90760c9967'
-    manager.add_password(None, artella_web, user, password)
-    auth = HTTPBasicAuthHandler(manager)
-    opener = build_opener(auth)
-    install_opener(opener)
-    response = urlopen(artella_web)
-    if response:
-        if response.getcode() == 200:
-            return True
-
-    return False
-
-
 def get_dependencies(file_path):
     """
     Returns a list with all the dependencies

@@ -13,7 +13,7 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-import shutil
+import webbrowser
 from functools import partial
 
 from Qt.QtCore import *
@@ -56,6 +56,9 @@ class ArtellaSyncWidget(base.BaseWidget, object):
     def ui(self):
         super(ArtellaSyncWidget, self).ui()
 
+        self._toolbar = QToolBar()
+        self.main_layout.addWidget(self._toolbar)
+        
         splitter = QSplitter(Qt.Horizontal)
         splitter.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -104,6 +107,8 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         self._reset_title()
 
         self._init()
+        
+        self._setup_toolbar()
 
     def setup_signals(self):
         self._stack.animFinished.connect(self._on_stack_anim_finished)
@@ -118,6 +123,21 @@ class ArtellaSyncWidget(base.BaseWidget, object):
 
         return self._queue_widget.add_item(item)
 
+    def worker_is_running(self):
+        """
+        Returns whether Artella worker is running or not
+        """
+
+        return self._artella_worker.isRunning()
+
+    def stop_artella_worker(self):
+        """
+        Forces the stop of the Artella worker if running
+        """
+
+        if self.worker_is_running():
+            self._artella_worker.requestInterruption()
+
     def _init(self):
         """
         Internal function that initializes tree
@@ -125,6 +145,29 @@ class ArtellaSyncWidget(base.BaseWidget, object):
 
         assets_path = self._project.get_assets_path()
         self._add_tree(assets_path)
+
+    def _setup_toolbar(self):
+        """
+        Internal function that setup menu bar
+        """
+
+        refresh_icon = artellapipe.resource.icon('refresh')
+        queue_icon = artellapipe.resource.icon('queue')
+
+        refresh_btn = QToolButton()
+        refresh_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        refresh_action = QAction(refresh_icon, 'Refresh', refresh_btn)
+        refresh_btn.setDefaultAction(refresh_action)
+        queue_btn = QToolButton()
+        queue_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        queue_action = QAction(queue_icon, 'Add All Items to Sync Queue', queue_btn)
+        queue_btn.setDefaultAction(queue_action)
+
+        refresh_btn.clicked.connect(self._on_refresh)
+        queue_btn.clicked.connect(self._on_add_all_items_to_sync_queue)
+
+        self._toolbar.addWidget(refresh_btn)
+        self._toolbar.addWidget(queue_btn)
 
     def _update_title(self):
         """
@@ -163,6 +206,27 @@ class ArtellaSyncWidget(base.BaseWidget, object):
 
         self._breadcrumb.set(['Retrieving data from Artella ...'])
 
+    def _show_loading_widget(self):
+        """
+        Internal function that shows the loading widget
+        """
+
+        self._back_btn.setVisible(False)
+        self._next_btn.setVisible(False)
+        self._toolbar.setVisible(False)
+        self._stack.slide_in_index(0)
+
+    def _slide_in_index(self, index):
+        """
+        Internal function that slides index and also shows hided UI during Artella work
+        :param index: int
+        """
+
+        self._back_btn.setVisible(True)
+        self._next_btn.setVisible(True)
+        self._toolbar.setVisible(True)
+        self._stack.slide_in_index(index)
+
     def _add_tree(self, path):
         """
         Internal callback function that adds a new tree into the stack
@@ -172,7 +236,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         current_tree = self._stack.currentWidget()
         parent_path = current_tree.get_path()
 
-        self._stack.slide_in_index(0)
+        self._show_loading_widget()
 
         if path in self._trees:
             sync_tree = self._trees[path]['tree']
@@ -201,6 +265,8 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         sync_tree.itemDoubleClicked.connect(self._on_item_double_clicked)
         sync_tree.updateBreadcrumb.connect(self._on_update_breadcrumb)
         sync_tree.addToSyncQueue.connect(self._on_add_item_to_sync_queue)
+        sync_tree.forceRefresh.connect(self._on_refresh)
+        sync_tree.addAllItemsToSyncQueue.connect(self._on_add_all_items_to_sync_queue)
 
         return sync_tree
 
@@ -224,7 +290,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         """
 
         index = data.get('index', 1)
-        self._stack.slide_in_index(index)
+        self._slide_in_index(index)
 
     def _on_item_clicked(self, item):
         """
@@ -244,6 +310,9 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         if not item or item.isDisabled():
             return
 
+        if item.is_disabled():
+            return
+
         if item.is_file():
             self.add_item_to_queue_list(item)
         else:
@@ -255,7 +324,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
             path_to_add = item.get_path()
             if path_to_add in self._trees:
                 index_to_move = self._trees[path_to_add]['index']
-                self._stack.slide_in_index(index_to_move)
+                self._slide_in_index(index_to_move)
             else:
                 self._add_tree(path_to_add)
 
@@ -279,7 +348,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
             self._remove_tree(self._last_add)
             self._last_add = None
 
-        self._stack.slide_in_index(parent_index)
+        self._slide_in_index(parent_index)
 
     def _on_back(self):
         """
@@ -296,7 +365,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
             return
 
         parent_index = self._trees[parent_path]['index']
-        self._stack.slide_in_index(parent_index)
+        self._slide_in_index(parent_index)
 
     def _on_next(self):
         """
@@ -313,7 +382,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
 
         widget_in_index = self._stack.widget(next_index)
         if widget_in_index:
-            self._stack.slide_in_index(next_index)
+            self._slide_in_index(next_index)
 
         self._update_title()
 
@@ -346,11 +415,47 @@ class ArtellaSyncWidget(base.BaseWidget, object):
 
         self.add_item_to_queue_list(item)
 
+    def _on_refresh(self, tree_to_refresh=None):
+        """
+        Internal callback function that refresh current tree data
+        """
+
+        if tree_to_refresh:
+            current_tree = tree_to_refresh
+        else:
+            current_tree = self._stack.currentWidget()
+        if not current_tree:
+            return
+
+        current_path = current_tree.get_path()
+        if current_path not in self._trees:
+            return
+
+        self._show_loading_widget()
+
+        current_index = self._trees[current_path]['index']
+        self._artella_worker.queue_work(current_tree.update_data, {'index': current_index})
+
+    def _on_add_all_items_to_sync_queue(self, source_tree=None):
+        """
+        Internal callback function that is called when the user selects Add All Items toolbar button
+        :param source_tree: variant, ArtellaSyncTree or None
+        """
+
+        if source_tree:
+            current_tree = source_tree
+        else:
+            current_tree = self._stack.currentWidget()
+
+        print('addidididid')
+
 
 class ArtellaSyncTree(treewidgets.TreeWidget, object):
 
     updateBreadcrumb = Signal(str)
     addToSyncQueue = Signal(object)
+    forceRefresh = Signal(object)
+    addAllItemsToSyncQueue = Signal(object)
 
     def __init__(self, project, path, parent=None):
         super(ArtellaSyncTree, self).__init__(parent)
@@ -389,16 +494,15 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
 
         return self._path
 
-    def refresh(self):
+    def refresh(self, force_update=False):
         """
         Refreshes the items in the tree
         """
 
         self.clear()
-
         self.addTopLevelItems(self._items)
 
-    def update_data(self, data):
+    def update_data(self, data=None):
         """
         Function that updates tree with current project info
         """
@@ -456,21 +560,43 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
                 file_info = QFileInfo(cache_path)
                 icon_provider = QFileIconProvider()
                 file_icon = icon_provider.icon(file_info)
-                new_item = ArtellaSyncItem(ref_name, artella_data, is_file, file_icon)
+                new_item = ArtellaSyncItem(self._project, ref_name, ref_path, artella_data, is_file, file_icon)
             except Exception:
-                new_item = ArtellaSyncItem(ref_name, artella_data, False)
+                new_item = ArtellaSyncItem(self._project, ref_name, ref_path, artella_data, False)
         else:
             split_name = ref_name.split('/')
             if len(split_name) > 1:
                 ref_name = split_name[-1]
-            new_item = ArtellaSyncItem(ref_name, artella_data, is_file)
+            new_item = ArtellaSyncItem(self._project, ref_name, ref_path, artella_data, is_file)
 
         return new_item
 
-    def _create_context_menu(self, item=None):
+    def _create_tree_context_menu(self):
         """
         Internal function that creates the context menu of the tree
-        :return: QMenu
+        :return:
+        """
+
+        context_menu = QMenu(self)
+
+        refresh_icon = artellapipe.resource.icon('refresh')
+        queue_icon = artellapipe.resource.icon('queue')
+
+        refresh_action = QAction(refresh_icon, 'Refresh', context_menu, statusTip='Refresh Tree Data')
+        add_all_items_action = QAction(queue_icon, 'Add all Items to Sync Queue', context_menu, statusTip='Add all items into Sync queue')
+
+        refresh_action.triggered.connect(self._on_refresh)
+        add_all_items_action.triggered.connect(self._on_add_all_items_to_sync_queue)
+
+        context_menu.addAction(refresh_action)
+        context_menu.addAction(add_all_items_action)
+
+        return context_menu
+
+    def _create_tree_item_context_menu(self, item):
+        """
+        Internal function that creates the context menu of the tree items
+        :param item: ArtellaSyncItem
         """
 
         context_menu = QMenu(self)
@@ -486,15 +612,28 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
         open_in_artella_action.triggered.connect(partial(self._on_open_item_in_artella, item))
         add_to_sync_queue_action.triggered.connect(partial(self._on_add_item_to_sync_queue, item))
 
+        context_menu.addAction(open_in_artella_action)
         context_menu.addAction(add_to_sync_queue_action)
+
+        return context_menu
+
+    def _create_context_menu(self, item=None):
+        """
+        Internal function that creates the context menu to show
+        :return: QMenu
+        """
+
+        if item:
+            context_menu = self._create_tree_item_context_menu(item)
+        else:
+            context_menu = self._create_tree_context_menu()
 
         return context_menu
 
     def _on_context_menu(self, pos):
         item = self.itemAt(pos)
         if not item:
-            return
-            # context_menu = self._context_menu
+            context_menu = self._create_context_menu()
         else:
             context_menu = self._create_context_menu(item)
 
@@ -519,6 +658,20 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
 
         self.addToSyncQueue.emit(item)
 
+    def _on_refresh(self):
+        """
+        Internal callback function that is called when the user wants to refresh tree data
+        """
+
+        self.forceRefresh.emit(self)
+
+    def _on_add_all_items_to_sync_queue(self):
+        """
+        Internal callback function that is called when the user wants to add all items to sync queue
+        """
+
+        self.addAllItemsToSyncQueue.emit(self)
+
 
 class ArtellaSyncItem(QTreeWidgetItem, object):
 
@@ -526,11 +679,14 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
     ICON_FOLDER = artellapipe.resource.icon('folder')
     ICON_ASSET = artellapipe.resource.icon('teapot')
 
-    def __init__(self, name, artella_data, is_file=False, file_icon=None, parent=None):
+    def __init__(self, project, name, path, artella_data, is_file=False, file_icon=None, parent=None):
         super(ArtellaSyncItem, self).__init__(parent)
 
+        self._project = project
         self._name = name
+        self._path = path
         self._artella_data = artella_data
+        self._is_disabled = False if artella_data else True
         self._is_file = is_file
         self._file_icon = file_icon if file_icon else self.ICON_UNKNOWN
 
@@ -576,8 +732,18 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
 
         if isinstance(self._artella_data, (artellaclasses.ArtellaDirectoryMetaData, artellaclasses.ArtellaAssetMetaData)):
             return self._artella_data.path
+        elif isinstance(self._artella_data, artellaclasses.ArtellaHeaderMetaData):
+            return self._path
 
         return None
+
+    def get_relative_path(self):
+        """
+        Returns poath of the item relative to the Artella project
+        :return: str
+        """
+
+        return os.path.relpath(self.get_path(), self._project.get_assets_path())
 
     def get_icon(self):
         """
@@ -585,7 +751,7 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
         """
 
         if not self._artella_data:
-            self.setDisabled(True)
+            self._is_disabled = True
             return self.ICON_UNKNOWN
 
         if not self._is_file:
@@ -596,8 +762,20 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
         else:
             return self._file_icon
 
-        self.setDisabled(True)
+        self._is_disabled = True
         return self.ICON_UNKNOWN
+
+    def get_artella_url(self):
+        """
+        Returns Artella URL of the item
+        :return: str
+        """
+
+        relative_path = self.get_relative_path()
+        assets_url = self._project.get_artella_assets_url()
+        artella_url = '{}{}'.format(assets_url, relative_path)
+
+        return artella_url
 
     def is_file(self):
         """
@@ -607,13 +785,22 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
 
         return self._is_file
 
+    def is_disabled(self):
+        """
+        Returns whether the item is disabled or not
+        :return: bool
+        """
+
+        return self._is_disabled
+
     def open_in_artella(self):
         """
         Opens current item in Artella web
         :return:
         """
 
-        pass
+        artella_url = self.get_artella_url()
+        webbrowser.open(artella_url)
 
 
 class ArtellaSyncQueueTree(QTreeWidget, object):

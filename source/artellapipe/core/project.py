@@ -532,20 +532,12 @@ class ArtellaProject(object):
 
         return tray
 
-    def get_artella_project_url(self):
-        """
-        Returns URL of the Artella project
-        :return: str
-        """
-
-        return 'https://www.artella.com/project/{0}/files'.format(self._id)
-
     def open_artella_project_url(self):
         """
         Opens Artella Project web page in browser
         """
 
-        webbrowser.open(self.get_artella_project_url())
+        webbrowser.open(self.get_artella_url())
 
     def send_email(self, title=None):
         """
@@ -598,6 +590,14 @@ class ArtellaProject(object):
         """
 
         return '{}/project/{}/files'.format(defines.ARTELLA_WEB, self.id)
+
+    def get_artella_assets_url(self):
+        """
+        Returns URL of the Artella Assets of the project are located
+        :return: str
+        """
+
+        return '{}/Assets/'.format(self.get_artella_url())
 
     def update_project(self):
         """
