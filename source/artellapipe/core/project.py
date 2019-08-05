@@ -23,7 +23,7 @@ except ImportError:
     from urllib2 import quote
 
 import tpDccLib as tp
-from tpPyUtils import osplatform, path as path_utils, folder as folder_utils
+from tpPyUtils import osplatform, jsonio, path as path_utils, folder as folder_utils
 
 import artellapipe
 from artellapipe.core import defines, artellalib, asset
@@ -59,12 +59,15 @@ class ArtellaProject(object):
         self._publish_status = None
         self._shelf_icon = None
         self._tray_icon = None
+        self._project_icon = None
         self._version_file = None
         self._folders_to_register = list()
         self._resource = resource
         self._emails = list()
         self._progress_bar_color0 = None
         self._progress_bar_color1 = None
+        self._asset_ignored_paths = list()
+        self._asset_data_filename = None
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
@@ -349,6 +352,8 @@ class ArtellaProject(object):
         self._emails = project_config_data.get(defines.ARTELLA_CONFIG_EMAIL_ATTRIBUTE_NAME, list())
         self._progress_bar_color0 = project_config_data.get(defines.ARTELLA_PROGRESS_BAR_COLOR_0_ATTRIBUTE_NAME, '255, 255, 255')
         self._progress_bar_color1 = project_config_data.get(defines.ARTELLA_PROGRESS_BAR_COLOR_1_ATTRIBUTE_NAME, '255, 255, 255')
+        self._asset_ignored_paths = project_config_data.get(defines.ARTELLA_ASSETS_IGNORED_PATHS_ATTRIBUTE_NAME, list())
+        self._asset_data_filename = project_config_data.get(defines.ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME, None)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -648,22 +653,89 @@ class ArtellaProject(object):
 
         return assets_path
 
-    def find_all_assets(self):
+    def is_valid_asset_path(self):
         """
-        Returns a list of all assets in the project
-        :return: list(Asset)
+        Returns whether current asset path exists or not
+        :return: bool
         """
 
         assets_path = self.get_assets_path()
-        if assets_path or not os.path.exists(assets_path):
+        if not assets_path or not os.path.exists(assets_path):
+            return False
+
+        return True
+
+    def get_asset_data_file_path(self, asset_path):
+        """
+        Returns asset data file path of given asset
+        :param asset_path: str
+        :return: str
+        """
+
+        return os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self._asset_data_filename)
+
+    def create_asset(self, asset_data):
+        """
+        Returns a new asset with the given data
+        :param asset_data: dict
+        """
+
+        return self.ASSET_CLASS(asset_data)
+
+    def find_all_assets(self, asset_name=None):
+        """
+        Returns a list of all assets in the project
+        :param asset_name: str, If given, a list with the given item will be returned instead
+        :return: variant, ArtellaAsset or list(ArtellaAsset)
+        """
+
+        assets_path = self.get_assets_path()
+        if not self.is_valid_asset_path():
+            self.logger.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
+            return
+
+        if not assets_path or not os.path.exists(assets_path):
+            self.logger.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
             return list()
+
+        if not self._asset_data_filename:
+            self.logger.warning('Impossible to retrieve Solstice assets because asset data file name is not defined!')
+            return
+
+        found_assets = list()
 
         for root, dirs, files in os.walk(assets_path):
             if dirs and defines.ARTELLA_WORKING_FOLDER in dirs:
                 asset_path = path_utils.clean_path(root)
-                asset_name = os.path.basename(root)
+                _asset_name = os.path.basename(root)
 
-        return list()
+                if asset_name and asset_name != _asset_name:
+                    continue
+
+                asset_data_file = self.get_asset_data_file_path(asset_path)
+
+                is_ignored = False
+                for ignored in self._asset_ignored_paths:
+                    if ignored in asset_data_file:
+                        is_ignored = True
+                        break
+
+                if is_ignored:
+                    continue
+
+                if not os.path.isfile(asset_data_file):
+                    artellapipe.logger.warning('Impossible to get info of asset "{}". Please sync it! Skipping it ...'.format(_asset_name))
+                    continue
+
+                asset_data = jsonio.read_file(asset_data_file)
+                asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_NAME_ATTR] = _asset_name
+                asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_PATH_ATTR] = asset_path
+
+                new_asset = self.create_asset(asset_data)
+
+                found_assets.append(new_asset)
+
+        return found_assets
 
     def find_asset(self, asset_name):
         """
@@ -672,4 +744,11 @@ class ArtellaProject(object):
         :return: Asset or None
         """
 
-        return None
+        asset_founds = self.find_all_assets(asset_name=asset_name)
+        if not asset_founds:
+            return None
+
+        if len(asset_founds) > 0:
+            artellapipe.logger.warning('Found Multiple instances of Asset "{}"'.format(asset_name))
+
+        return asset_founds[0]

@@ -16,9 +16,13 @@ __email__ = "tpovedatd@gmail.com"
 import tpQtLib
 
 import artellapipe
+from artellapipe.core import defines
 
 
 class ArtellaDialog(tpQtLib.Dialog, object):
+
+    LOGO_NAME = None
+
     def __init__(self, name='ArtellaDialog', title='Artella - Dialog', parent=None):
 
         title_pixmap = artellapipe.resource.pixmap(name='artella_title', extension='png')
@@ -30,3 +34,63 @@ class ArtellaDialog(tpQtLib.Dialog, object):
             has_title=True,
             title_pixmap=title_pixmap
         )
+
+    def _get_logo(self):
+        """
+        Internal function taht returns the logo used in window title
+        """
+
+        if self.LOGO_NAME:
+            if self._project:
+                win_logo = self._project.resource.pixmap(self.LOGO_NAME, extension='png')
+                if not win_logo.isNull():
+                    return win_logo
+                else:
+                    self._project.logger.warning(
+                        '{} Project Logo Image not found: {}!'.format(
+                            self._project.name.title(), self.LOGO_NAME + '.png'
+                        )
+                    )
+
+            win_logo = artellapipe.resource.pixmap(self.LOGO_NAME, extension='png')
+            if not win_logo.isNull():
+                return win_logo
+
+        return None
+
+    def _get_icon(self):
+        """
+        Internal function that returns the icon used for the window
+        :return: QIcon
+        """
+
+        if self._project:
+            window_icon = self._project.icon
+            if not window_icon.isNull():
+                return window_icon
+            else:
+                self._project.logger.warning(
+                    '{} Project Icon not found: {}!'.format(
+                        self._project.name.title(), self._project.icon_name + '.png'
+                    )
+                )
+
+        return artellapipe.resource.icon(defines.ARTELLA_PROJECT_DEFAULT_ICON)
+
+    def _get_title_pixmap(self):
+        """
+        Internal function that sets the pixmap used for the title
+        """
+
+        if self._project:
+            title_pixmap = self._project.resource.pixmap(name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
+            if not title_pixmap.isNull():
+                return title_pixmap
+            else:
+                self._project.logger.warning(
+                    '{} Project Title Background image not found: {}!'.format(
+                        self._project.name.title(), defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME+'.png'
+                    )
+                )
+
+        return artellapipe.resource.pixmap(name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')

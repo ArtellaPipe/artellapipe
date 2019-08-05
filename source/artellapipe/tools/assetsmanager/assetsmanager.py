@@ -23,14 +23,14 @@ from artellapipe.gui import window
 from artellapipe.tools.assetsmanager.widgets import userinfo, assetswidget
 
 
-class ArtellaManager(window.ArtellaWindow, object):
+class ArtellaAssetsManager(window.ArtellaWindow, object):
 
-    LOGO_NAME = 'manager_logo'
+    LOGO_NAME = 'assetsmanager_logo'
     USER_INFO_CLASS = userinfo.UserInfo
     ASSET_WIDGET_CLASS = assetswidget.AssetsWidget
 
     def __init__(self, project, auto_start_assets_viewer=True):
-        super(ArtellaManager, self).__init__(
+        super(ArtellaAssetsManager, self).__init__(
             project=project,
             name='ManagerWindow',
             title='Manager',
@@ -49,7 +49,7 @@ class ArtellaManager(window.ArtellaWindow, object):
         return main_layout
 
     def ui(self):
-        super(ArtellaManager, self).ui()
+        super(ArtellaAssetsManager, self).ui()
 
         # Add User Info widget
         self._user_info = self.USER_INFO_CLASS()
@@ -115,6 +115,7 @@ class ArtellaManager(window.ArtellaWindow, object):
     def setup_signals(self):
         self._project_artella_btn.clicked.connect(self._on_open_project_in_artella)
         self._project_folder_btn.clicked.connect(self._on_open_project_folder)
+        self._assets_widget.assetAdded.connect(self._on_asset_added)
 
     def closeEvent(self, event):
         """
@@ -160,6 +161,15 @@ class ArtellaManager(window.ArtellaWindow, object):
 
         return menubar_widget
 
+    def _setup_asset_signals(self, asset_widget):
+        """
+        Internal function that sets proper signals to given asset widget
+        This function can be extended to add new signals to added items
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        pass
+
     def _on_artella_not_available(self):
         """
         Internal callback function that is called by ArtellaUserInfo widget when Artella is not available
@@ -188,9 +198,20 @@ class ArtellaManager(window.ArtellaWindow, object):
 
         self._project.open_folder()
 
+    def _on_asset_added(self, asset_widget):
+        """
+        Internal callback function that is called when a new asset widget is added to the assets viewer
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        if not asset_widget:
+            return
+
+        self._setup_asset_signals(asset_widget)
+
 
 def run(project):
-    win = ArtellaManager(project=project)
+    win = ArtellaAssetsManager(project=project)
     win.show()
 
     return win

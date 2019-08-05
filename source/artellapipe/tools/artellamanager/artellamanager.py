@@ -31,7 +31,7 @@ class ArtellaSyncerMode(object):
 
 class ArtellaSyncer(window.ArtellaWindow, object):
 
-    LOGO_NAME = 'syncer_logo'
+    LOGO_NAME = 'manager_logo'
 
     def __init__(self, project, mode=ArtellaSyncerMode.ALL):
 

@@ -40,6 +40,12 @@ ARTELLA_CONFIG_ASSET_TYPES = 'ASSET_TYPES'
 # Defines the name of the attribute that defines the asset files types in the Artella project
 ARTELLA_CONFIG_ASSET_FILES = 'ASSET_FILES'
 
+# Defines the name of the attribute that defines the list of paths that should be ignored during asset search
+ARTELLA_ASSETS_IGNORED_PATHS_ATTRIBUTE_NAME = 'ASSET_IGNORED_PATHS'
+
+# Defines the name of the attribute that defines the name of the file that stores asset info file created by builder
+ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME = 'PROJECT_ASSET_DATA_FILENAME'
+
 # Defines the name of the attribute that defines the asset files types that must be published to consider
 # an asset ready for production
 ARTELLA_CONFIG_ASSET_MUST_FILES = 'ASSET_MUST_FILES'
@@ -130,3 +136,24 @@ ARTELLA_ALL_CATEGORIES_NAME = 'All'
 
 # Defines the name of Assets Artella folder
 ARTELLA_ASSETS_FOLDER_NAME = 'Assets'
+
+# Defines the default name used for assets
+ARTELLA_DEFAULT_ASSET_NAME = 'New_Asset'
+
+# Defines the dict attribute used to access asset attributes in standard Artella assets
+ARTELLA_ASSET_DATA_ATTR = 'asset'
+
+# Defines the dict attribute used to store asset name in standard Artella assets
+ARTELLA_ASSET_DATA_NAME_ATTR = 'name'
+
+# Defines the dict attribute used to store asset path in standard Artella assets
+ARTELLA_ASSET_DATA_PATH_ATTR = 'path'
+
+# Defines the dict attribute used to store asset description in standard Artella assets
+ARTELLA_ASSET_DATA_DESCRIPTION_ATTR = 'description'
+
+# Defines the dict attribute used to store asset icon in standard Artella assets
+ARTELLA_ASSET_DATA_ICON_ATTR = 'icon'
+
+# Defines the dict attribute used to store asset icon format in standard Artella assets
+ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR = 'icon_format'

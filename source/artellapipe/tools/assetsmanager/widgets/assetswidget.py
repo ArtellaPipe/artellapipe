@@ -27,13 +27,13 @@ class AssetsWidget(base.BaseWidget, object):
 
     ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
 
+    assetAdded = Signal(object)
+
     def __init__(self, project, parent=None):
 
         self._project = project
         if not self._project:
             artellapipe.logger.warning('Invalid project for AssetsWidget!')
-
-        self._categories_buttons = dict()
 
         super(AssetsWidget, self).__init__(parent=parent)
 
@@ -71,6 +71,9 @@ class AssetsWidget(base.BaseWidget, object):
         self._categories_btn_grp.setExclusive(True)
         asset_categories = self._project.asset_types if self._project else list()
         self.update_asset_categories(asset_categories)
+
+    def setup_signals(self):
+        self._assets_viewer.assetAdded.connect(self.assetAdded.emit)
 
     def update_assets(self):
         """

@@ -16,6 +16,7 @@ from tpPyUtils import decorators
 
 
 class AbstractAsset(object):
+
     def __init__(self, asset_data):
         super(AbstractAsset, self).__init__()
 
@@ -30,3 +31,29 @@ class AbstractAsset(object):
 
         raise NotImplementedError('get_name function for {} is not implemented!'.format(self.__class__.__name__))
 
+    @decorators.abstractmethod
+    def get_path(self):
+        """
+        Returns the path of the asset
+        :return: str
+        """
+
+        raise NotImplementedError('get_path function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_thumbnail_icon(self):
+        """
+        Returns the icon of the asset
+        :return: QIcon
+        """
+
+        raise NotImplementedError('get_thumbnail_icon function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_category(self):
+        """
+        Returns the category of the asset
+        :return: str
+        """
+
+        raise NotImplementedError('get_category function for {} is not implemented!'.format(self.__class__.__name__))
