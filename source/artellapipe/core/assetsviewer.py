@@ -107,7 +107,7 @@ class AssetsViewer(grid.GridWidget, object):
                 new_asset.setVisible(True)
                 new_assets.insert(0, new_asset)
             else:
-                if new_asset.get_category() == category:
+                if new_asset.asset.get_category() == category:
                     new_asset.setVisible(True)
                     new_assets.insert(0, new_asset)
                 else:
@@ -128,6 +128,7 @@ class AssetsViewer(grid.GridWidget, object):
 
         self._add_widget(asset_widget)
         self._assets.append(asset_widget)
+        self.assetAdded.emit(asset_widget)
 
     def _add_widget(self, widget):
         """
@@ -142,4 +143,3 @@ class AssetsViewer(grid.GridWidget, object):
         row, col = self.first_empty_cell()
         self.addWidget(row, col, widget)
         self.resizeRowsToContents()
-        self.assetAdded.emit(widget)

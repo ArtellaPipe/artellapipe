@@ -19,12 +19,13 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import strings
+from tpPyUtils import strings, decorators
 
 from tpQtLib.core import base, image
 
 import artellapipe
-from artellapipe.core import abstract, defines
+from artellapipe.core import abstract, defines, artellalib
+from artellapipe.tools.assetsmanager.widgets import assetinfo
 
 
 class ArtellaAsset(abstract.AbstractAsset, object):
@@ -33,6 +34,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         self._thumbnail_icon = None
         self._category = None
+        self._artella_data = None
 
         super(ArtellaAsset, self).__init__(asset_data)
 
@@ -94,10 +96,29 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._category
 
+    def get_artella_data(self, update=True, force=False):
+        """
+        Retrieves status data of the asset from Artella
+        :param update: bool, Whether to resync data if it is already synced
+        :param force: bool, Whether to force the resync of the data
+        :return: ArtellaAssetMetaData
+        """
+
+        if not update:
+            return self._artella_data
+
+        if self._artella_data and not update and not force:
+            return self._artella_data
+
+        self._artella_data = artellalib.get_status(file_path=self.get_path())
+
+        return self._artella_data
+
 
 class ArtellaAssetWidget(base.BaseWidget, object):
 
     DEFAULT_ICON = artellapipe.resource.icon('default')
+    ASSET_INFO_CLASS = assetinfo.AssetInfoWidget
 
     clicked = Signal(object)
 
@@ -133,7 +154,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         self._asset_btn = QPushButton('', self)
         self._asset_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._asset_btn.setIconSize(QSize(150, 150))
-        self._asset_lbl = QLabel(self.get_name())
+        self._asset_lbl = QLabel(defines.ARTELLA_DEFAULT_ASSET_NAME)
         self._asset_lbl.setAlignment(Qt.AlignCenter)
 
         widget_layout.addWidget(self._asset_btn)
@@ -142,36 +163,22 @@ class ArtellaAssetWidget(base.BaseWidget, object):
     def setup_signals(self):
         self._asset_btn.clicked.connect(partial(self.clicked.emit, self))
 
-    def get_name(self):
+    @property
+    def asset(self):
         """
-        Returns name of the asset
-        :return: str
-        """
-
-        return self._asset.get_name()
-
-    def get_default_thumbnail_icon(self):
-        """
-        Returns the default thumbnail icon
-        :return: QIcon
+        Returns asset data
+        :return: ArtellaAsset
         """
 
-        return self.DEFAULT_ICON
+        return self._asset
 
-    def get_thumbnail_icon(self):
+    def get_asset_info(self):
         """
-        Returns thumbnail icon of the item
-        """
-
-        return self._asset.get_thumbnail_icon()
-
-    def get_category(self):
-        """
-        Returns the category of the asset
-        :return: str
+        Retruns AssetInfo widget associated to this asset
+        :return: AssetInfoWidget
         """
 
-        return self._asset.get_category()
+        return self.ASSET_INFO_CLASS(self)
 
     def _init(self):
         """
@@ -179,6 +186,11 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         Can be extended to add custom initialization functionality to asset widgets
         """
 
-        thumb_icon = self.get_thumbnail_icon()
+        if not self._asset:
+            return
+
+        self._asset_lbl.setText(self._asset.get_name())
+
+        thumb_icon = self._asset.get_thumbnail_icon()
         if thumb_icon:
             self._asset_btn.setIcon(thumb_icon)

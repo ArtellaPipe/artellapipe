@@ -95,6 +95,7 @@ class Worker(QThread, object):
                 data = item_to_process['fn'](item_to_process['params'])
             except Exception as e:
                 if self._execute_tasks:
+                    import traceback
                     self.workFailure.emit(item_to_process['id'], 'An error ocurred: {}'.format(str(e)), str(traceback.format_exc()))
             else:
                 if self._execute_tasks:

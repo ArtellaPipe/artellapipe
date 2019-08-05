@@ -12,14 +12,15 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+from tpQtLib.core import  qtutils
 from tpQtLib.widgets import stack
 
 import artellapipe
-from artellapipe.gui import window
+from artellapipe.utils import worker
+from artellapipe.gui import window, waiter
 from artellapipe.tools.assetsmanager.widgets import userinfo, assetswidget
 
 
@@ -30,6 +31,15 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
     ASSET_WIDGET_CLASS = assetswidget.AssetsWidget
 
     def __init__(self, project, auto_start_assets_viewer=True):
+
+        self._artella_worker = worker.Worker(app=QApplication.instance())
+        self._artella_worker.workCompleted.connect(self._on_artella_worker_completed)
+        self._artella_worker.workFailure.connect(self._on_artella_worker_failed)
+        self._artella_worker.start()
+
+        self._is_blocked = False
+        self._asset_to_sync = None
+
         super(ArtellaAssetsManager, self).__init__(
             project=project,
             name='ManagerWindow',
@@ -87,6 +97,14 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         no_items_layout.addWidget(no_items_lbl)
         no_items_layout.addItem(QSpacerItem(0, 10, QSizePolicy.Preferred, QSizePolicy.Expanding))
 
+        self._waiter = waiter.ArtellaWaiter()
+
+        self._user_info_layout = QVBoxLayout()
+        self._user_info_layout.setContentsMargins(0, 0, 0, 0)
+        self._user_info_layout.setSpacing(0)
+        self._user_info_widget = QWidget()
+        self._user_info_widget.setLayout(self._user_info_layout)
+
         self._tab_widget = QTabWidget()
         self._tab_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._tab_widget.setMinimumHeight(330)
@@ -108,6 +126,8 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         self._main_stack.addWidget(splitter)
 
         self._attrs_stack.addWidget(no_items_widget)
+        self._attrs_stack.addWidget(self._waiter)
+        self._attrs_stack.addWidget(self._user_info_widget)
 
         splitter.addWidget(self._tab_widget)
         splitter.addWidget(self._attrs_stack)
@@ -116,6 +136,7 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         self._project_artella_btn.clicked.connect(self._on_open_project_in_artella)
         self._project_folder_btn.clicked.connect(self._on_open_project_folder)
         self._assets_widget.assetAdded.connect(self._on_asset_added)
+        self._attrs_stack.animFinished.connect(self._on_attrs_stack_anim_finished)
 
     def closeEvent(self, event):
         """
@@ -127,6 +148,19 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         self.remove_callbacks()
         self.windowClosed.emit()
         event.accept()
+
+    def show_asset_info(self, asset_widget):
+        """
+        Shows Asset Info Widget UI associated to the given asset widget
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        asset_info = asset_widget.get_asset_info()
+        if not asset_info:
+            artellapipe.logger.warning('Asset {} has not an AssetInfo widget associated to it. Skipping ...!'.format(asset_widget.get_name()))
+            return
+
+        self._set_asset_info(asset_info)
 
     def _setup_menubar(self):
         """
@@ -168,7 +202,33 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         :param asset_widget: ArtellaAssetWidget
         """
 
-        pass
+        asset_widget.clicked.connect(self._on_asset_clicked)
+
+    def _set_asset_info(self, asset_info):
+        """
+        Sets the asset info widget currently being showed
+        :param asset_info: AssetInfoWidget
+        """
+
+        if self._user_info_widget == asset_info:
+            return
+
+        qtutils.clear_layout(self._user_info_layout)
+
+        if asset_info:
+            self._user_info_widget = asset_info
+            self._user_info_layout.addWidget(asset_info)
+            self._attrs_stack.slide_in_index(2)
+
+    def _get_asset_data_from_artella(self, data):
+        """
+        Internal function that starts worker to get asset data from Artella asynchronously
+        :param data, dict
+        """
+
+        data.get('asset_widget').asset.get_artella_data()
+
+        return data['asset_widget']
 
     def _on_artella_not_available(self):
         """
@@ -177,6 +237,28 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         """
 
         pass
+
+    def _on_artella_worker_completed(self, uid, asset_widget):
+        """
+        Internal callback function that is called when worker finishes its job
+        """
+
+        self.show_asset_info(asset_widget)
+        self._is_blocked = False
+        self._attrs_stack.slide_in_index(2)
+
+
+    def _on_artella_worker_failed(self, uid, msg, trace):
+        """
+        Internal callback function that is called when the Artella worker fails
+        :param uid: str
+        :param msg: str
+        :param trace: str
+        """
+
+        self._is_blocked = False
+        self._attrs_stack.slide_in_index(0)
+
 
     def _on_open_project_in_artella(self):
         """
@@ -208,6 +290,45 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
             return
 
         self._setup_asset_signals(asset_widget)
+
+    def _on_asset_clicked(self, asset_widget):
+        """
+        Internal callback function that is called when an asset button is clicked
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        if not asset_widget or self._is_blocked:
+            return
+
+        asset_data = asset_widget.asset.get_artella_data(update=False)
+        if asset_data:
+            print('Data is already loaded')
+        else:
+            self._asset_to_sync = asset_widget
+            self._attrs_stack.slide_in_index(1)
+
+    def _on_attrs_stack_anim_finished(self, index):
+        """
+        Internal callback that is called each time slack animation finishes
+        :return:
+        """
+
+        if self._asset_to_sync and index == 1:
+            self._is_blocked = True
+            self._artella_worker.queue_work(self._get_asset_data_from_artella, {'asset_widget': self._asset_to_sync})
+
+
+        # t = time.time()
+        # status = artellalib.get_status(file_path=asset_widget.get_path(), as_json=True)
+        # t2 = time.time() - t
+        # print('Status in {} seconds!'.format(t2))
+        # print(status)
+        #
+        # t = time.time()
+        # status = artellalib.get_status(file_path=asset_widget.get_path())
+        # t2 = time.time() - t
+        # print('Status in {} seconds!'.format(t2))
+        # print(status)
 
 
 def run(project):
