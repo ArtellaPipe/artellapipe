@@ -23,7 +23,7 @@ except ImportError:
     from urllib2 import quote
 
 import tpDccLib as tp
-from tpPyUtils import osplatform, jsonio, path as path_utils, folder as folder_utils
+from tpPyUtils import strings, osplatform, jsonio, path as path_utils, folder as folder_utils
 
 import artellapipe
 from artellapipe.core import defines, artellalib, asset
@@ -69,9 +69,13 @@ class ArtellaProject(object):
         self._asset_ignored_paths = list()
         self._asset_data_filename = None
 
+        self._registered_asset_classes = dict()
+
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
         self._logger = self.create_logger()[1]
+
+        self._register_asset_classes()
 
     # ==========================================================================================================
     # PROPERTIES
@@ -643,6 +647,15 @@ class ArtellaProject(object):
     # ASSETS
     # ==========================================================================================================
 
+    def register_asset_class(self, asset_type, asset_class):
+        """
+        Registers a new asset class into the project
+        :param asset_class: cls
+        """
+
+        if asset_type not in self._registered_asset_classes:
+            self._registered_asset_classes[asset_type] = asset_class
+
     def get_assets_path(self):
         """
         Returns path where project assets are located
@@ -674,13 +687,17 @@ class ArtellaProject(object):
 
         return os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self._asset_data_filename)
 
-    def create_asset(self, asset_data):
+    def create_asset(self, asset_data, category=None):
         """
         Returns a new asset with the given data
         :param asset_data: dict
+        :param category: str
         """
 
-        return self.ASSET_CLASS(asset_data)
+        if category and category in self._registered_asset_classes:
+            return self._registered_asset_classes[category](project=self, asset_data=asset_data)
+        else:
+            return self.ASSET_CLASS(project=self, asset_data=asset_data)
 
     def find_all_assets(self, asset_name=None):
         """
@@ -730,8 +747,12 @@ class ArtellaProject(object):
                 asset_data = jsonio.read_file(asset_data_file)
                 asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_NAME_ATTR] = _asset_name
                 asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_PATH_ATTR] = asset_path
+                asset_category = strings.camel_case_to_string(os.path.basename(os.path.dirname(asset_path)))
 
-                new_asset = self.create_asset(asset_data)
+                if asset_category in self._asset_types:
+                    new_asset = self.create_asset(asset_data=asset_data, category=asset_category)
+                else:
+                    new_asset = self.create_asset(asset_data=asset_data)
 
                 found_assets.append(new_asset)
 
@@ -752,3 +773,13 @@ class ArtellaProject(object):
             artellapipe.logger.warning('Found Multiple instances of Asset "{}"'.format(asset_name))
 
         return asset_founds[0]
+
+    def _register_asset_classes(self):
+        """
+        Internal function that can be override to register specific project asset classes
+        :return:
+        """
+
+        from artellapipe.tools.assetsmanager.assets import propasset
+
+        self.register_asset_class('Props', propasset.ArtellaPropAsset)

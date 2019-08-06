@@ -157,3 +157,30 @@ ARTELLA_ASSET_DATA_ICON_ATTR = 'icon'
 
 # Defines the dict attribute used to store asset icon format in standard Artella assets
 ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR = 'icon_format'
+
+# Defines sync operation that should sync all asset types
+ARTELLA_SYNC_ALL_ASSET_TYPES = 'all'
+
+# Defines of textures asset type
+ARTELLA_TEXTURES_ASSET_TYPE = 'textures'
+
+# Defines of model asset type
+ARTELLA_MODEL_ASSET_TYPE = 'model'
+
+# Defines of shading asset type
+ARTELLA_SHADING_ASSET_TYPE = 'shading'
+
+# Defines of rig asset type
+ARTELLA_RIG_ASSET_TYPE = 'rig'
+
+# Defines of groom asset type
+ARTELLA_GROOM_ASSET_TYPE = 'groom'
+
+# Define the asset sync type that synchronizes all asset statuses (working and published)
+ARTELLA_SYNC_ALL_ASSET_STATUS = 'all'
+
+# Defines the asset sync type that synchronizes working status
+ARTELLA_SYNC_WORKING_ASSET_STATUS = 'working'
+
+# Defines the asset sync type that synchronizes published status
+ARTELLA_SYNC_PUBLISHED_ASSET_STATUS = 'published'

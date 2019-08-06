@@ -186,11 +186,11 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         synchronize_btn.setPopupMode(QToolButton.InstantPopup)
         synchronize_btn.setIcon(artellapipe.resource.icon('sync'))
         synchronize_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        # settings_btn = QToolButton()
-        # settings_btn.setText('Settings')
-        # settings_btn.setIcon(artellapipe.resource.icon('settings'))
-        # settings_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        for i, btn in enumerate([self._project_artella_btn, self._project_folder_btn, synchronize_btn]):
+        settings_btn = QToolButton()
+        settings_btn.setText('Settings')
+        settings_btn.setIcon(artellapipe.resource.icon('settings'))
+        settings_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        for i, btn in enumerate([self._project_artella_btn, self._project_folder_btn, synchronize_btn, settings_btn]):
             menubar_layout.addWidget(btn, 0, i, 1, 1, Qt.AlignCenter)
 
         return menubar_widget
@@ -203,6 +203,7 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         """
 
         asset_widget.clicked.connect(self._on_asset_clicked)
+        asset_widget.startSync.connect(self._on_start_asset_sync)
 
     def _set_asset_info(self, asset_info):
         """
@@ -230,6 +231,17 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
 
         return data['asset_widget']
 
+    def _show_asset_info(self, asset_widget):
+        """
+        Internal function that shows the asset info widget
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        self.show_asset_info(asset_widget)
+        self._is_blocked = False
+        self._asset_to_sync = None
+        self._attrs_stack.slide_in_index(2)
+
     def _on_artella_not_available(self):
         """
         Internal callback function that is called by ArtellaUserInfo widget when Artella is not available
@@ -243,10 +255,7 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         Internal callback function that is called when worker finishes its job
         """
 
-        self.show_asset_info(asset_widget)
-        self._is_blocked = False
-        self._attrs_stack.slide_in_index(2)
-
+        self._show_asset_info(asset_widget)
 
     def _on_artella_worker_failed(self, uid, msg, trace):
         """
@@ -256,9 +265,22 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         :param trace: str
         """
 
-        self._is_blocked = False
-        self._attrs_stack.slide_in_index(0)
+        if self._asset_to_sync:
+            self._show_asset_info(self._asset_to_sync)
+        else:
+            self._is_blocked = False
+            self._asset_to_sync = None
+            self._attrs_stack.slide_in_index(0)
 
+    def _on_attrs_stack_anim_finished(self, index):
+        """
+        Internal callback that is called each time slack animation finishes
+        :return:
+        """
+
+        if self._asset_to_sync and index == 1:
+            self._is_blocked = True
+            self._artella_worker.queue_work(self._get_asset_data_from_artella, {'asset_widget': self._asset_to_sync})
 
     def _on_open_project_in_artella(self):
         """
@@ -291,7 +313,7 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
 
         self._setup_asset_signals(asset_widget)
 
-    def _on_asset_clicked(self, asset_widget):
+    def _on_asset_clicked(self, asset_widget, skip_sync=True):
         """
         Internal callback function that is called when an asset button is clicked
         :param asset_widget: ArtellaAssetWidget
@@ -300,35 +322,30 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         if not asset_widget or self._is_blocked:
             return
 
-        asset_data = asset_widget.asset.get_artella_data(update=False)
-        if asset_data:
-            print('Data is already loaded')
+        print(asset_widget.asset.__class__.__name__)
+
+        if skip_sync:
+            self._show_asset_info(asset_widget)
         else:
-            self._asset_to_sync = asset_widget
-            self._attrs_stack.slide_in_index(1)
+            asset_data = asset_widget.asset.get_artella_data(update=False)
+            if asset_data:
+                self._show_asset_info(asset_widget)
+            else:
+                self._asset_to_sync = asset_widget
+                self._attrs_stack.slide_in_index(1)
 
-    def _on_attrs_stack_anim_finished(self, index):
+    def _on_start_asset_sync(self, asset, file_type, sync_type):
         """
-        Internal callback that is called each time slack animation finishes
-        :return:
+        Internal callback function that is called when an asset needs to be synced
+        :param asset: ArtellaAsset
+        :param file_type: str
+        :param sync_type: str
         """
 
-        if self._asset_to_sync and index == 1:
-            self._is_blocked = True
-            self._artella_worker.queue_work(self._get_asset_data_from_artella, {'asset_widget': self._asset_to_sync})
+        if not asset:
+            return
 
-
-        # t = time.time()
-        # status = artellalib.get_status(file_path=asset_widget.get_path(), as_json=True)
-        # t2 = time.time() - t
-        # print('Status in {} seconds!'.format(t2))
-        # print(status)
-        #
-        # t = time.time()
-        # status = artellalib.get_status(file_path=asset_widget.get_path())
-        # t2 = time.time() - t
-        # print('Status in {} seconds!'.format(t2))
-        # print(status)
+        asset.sync(file_type, sync_type)
 
 
 def run(project):

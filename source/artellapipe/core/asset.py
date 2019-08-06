@@ -13,15 +13,17 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
+import time
+import webbrowser
 from functools import partial
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import strings, decorators
+from tpPyUtils import strings
 
-from tpQtLib.core import base, image
+from tpQtLib.core import base, image, qtutils
 
 import artellapipe
 from artellapipe.core import abstract, defines, artellalib
@@ -30,13 +32,26 @@ from artellapipe.tools.assetsmanager.widgets import assetinfo
 
 class ArtellaAsset(abstract.AbstractAsset, object):
 
-    def __init__(self, asset_data):
+    DEFAULT_ICON = artellapipe.resource.icon('default')
+    ASSET_FILES = dict()
 
+    def __init__(self, project, asset_data, category=None):
+
+        self._project = project
         self._thumbnail_icon = None
-        self._category = None
+        self._category = category
         self._artella_data = None
 
         super(ArtellaAsset, self).__init__(asset_data)
+
+    @property
+    def project(self):
+        """
+        Returns project linked to this assset
+        :return: ArtellaProject
+        """
+
+        return self._project
 
     def get_name(self):
         """
@@ -56,6 +71,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_PATH_ATTR, '')
 
+    def get_relative_path(self):
+        """
+        Returns path of the asset relative to the Artella project
+        :return: str
+        """
+
+        return os.path.relpath(self.get_path(), self._project.get_assets_path())
+
     def get_thumbnail_icon(self):
         """
         Implements abstract get_thumbnail_icon function
@@ -70,11 +93,11 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         str_icon = self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_ICON_ATTR, None)
         icon_format = self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR, None)
         if not str_icon or not icon_format:
-            return self.DEFAULT_iCON
+            return self.DEFAULT_ICON
 
         self._thumbnail_icon = QPixmap.fromImage(image.base64_to_image(str_icon.encode('utf-8'), image_format=icon_format))
         if not self._thumbnail_icon:
-            self._thumbnail_icon = self.DEFAULT_iCON
+            self._thumbnail_icon = self.DEFAULT_ICON
 
         return self._thumbnail_icon
 
@@ -96,6 +119,18 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._category
 
+    def get_artella_url(self):
+        """
+        Returns Artella URL of the asset
+        :return: str
+        """
+
+        relative_path = self.get_relative_path()
+        assets_url = self._project.get_artella_assets_url()
+        artella_url = '{}{}'.format(assets_url, relative_path)
+
+        return artella_url
+
     def get_artella_data(self, update=True, force=False):
         """
         Retrieves status data of the asset from Artella
@@ -114,13 +149,62 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._artella_data
 
+    def open_in_artella(self):
+        """
+        Opens current asset in Artelal web
+        """
+
+        artella_url = self.get_artella_url()
+        webbrowser.open(artella_url)
+
+    def sync(self, file_type, sync_type):
+        """
+        Synchronizes assaet file type and with the given sync type (working or published)
+        :param asset_type: str, type of asset file
+        :param sync_type: str, type of sync (working, published or all)
+        :param ask: bool, Whether user will be informed of the sync operation before starting or not
+        """
+
+        if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_TYPES:
+            if sync_type not in self.ASSET_FILES:
+                artellapipe.logger.warning('Impossible to sync "{}" because current Asset {} does not support it!'.format(file_type, self.__class__.__name__))
+                return
+            if sync_type not in self.project:
+                artellapipe.logger.warning('Impossible to sync "{}" because project "{}" does not support it!'.format(file_type, self.project.name.title()))
+                return
+
+        start_time = time.time()
+
+        paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
+
+        elapsed_time = time.time() - start_time
+        artellapipe.logger.warning('{} synchronized in {} seconds'.format(self.get_name(), elapsed_time))
+
+    def _get_paths_to_sync(self, file_type, sync_type):
+        """
+        Internal function that returns a complete list of paths to sync depending on the given file type and sync type
+        :param file_type: str
+        :param sync_type: str
+        :return: list(str)
+        """
+
+        paths_to_sync = list()
+
+        if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or sync_type == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+            if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
+                paths_to_sync.append(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER))
+            else:
+                paths_to_sync.append(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type))
+
+        return paths_to_sync
+
 
 class ArtellaAssetWidget(base.BaseWidget, object):
 
-    DEFAULT_ICON = artellapipe.resource.icon('default')
     ASSET_INFO_CLASS = assetinfo.AssetInfoWidget
 
     clicked = Signal(object)
+    startSync = Signal(object, str, str)
 
     def __init__(self, asset, parent=None):
 
@@ -141,6 +225,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
         self.setFixedWidth(160)
         self.setFixedHeight(160)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
 
         widget_layout = QVBoxLayout()
         widget_layout.setContentsMargins(2, 2, 2, 2)
@@ -162,6 +247,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
     def setup_signals(self):
         self._asset_btn.clicked.connect(partial(self.clicked.emit, self))
+        self.customContextMenuRequested.connect(self._on_context_menu)
 
     @property
     def asset(self):
@@ -194,3 +280,89 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         thumb_icon = self._asset.get_thumbnail_icon()
         if thumb_icon:
             self._asset_btn.setIcon(thumb_icon)
+
+    def _create_context_menu(self, menu):
+        """
+        Internal function that generates contextual menu for asset widget
+        Reimplement for custom functionality
+        """
+
+        sync_icon = artellapipe.resource.icon('sync')
+        artella_icon = artellapipe.resource.icon('artella')
+
+        artella_action = QAction(artella_icon, 'Open in Artella', menu)
+
+        sync_action = QAction(sync_icon, 'Synchronize', menu)
+        sync_menu = QMenu(self)
+        actions_added = self._fill_sync_action_menu(sync_menu)
+
+        artella_action.triggered.connect(self._on_open_in_artella)
+
+        menu.addAction(artella_action)
+
+        if actions_added:
+            sync_action.setMenu(sync_menu)
+            menu.addAction(sync_action)
+
+    def _fill_sync_action_menu(self, sync_menu):
+        """
+        Internal function that fills sync menu with proper actions depending of the asset files supported
+        :param sync_menu: QMenu
+        """
+
+        if not sync_menu:
+            return
+
+        actions_to_add = list()
+
+        for asset_type_name, asset_type_icon in self.asset.ASSET_FILES.items():
+            asset_type_action = QAction(asset_type_icon, asset_type_name.title(), sync_menu)
+            asset_type_action.triggered.connect(partial(self._on_sync, asset_type_name, defines.ARTELLA_SYNC_ALL_ASSET_STATUS, False))
+            actions_to_add.append(asset_type_action)
+
+        if actions_to_add:
+            download_icon = artellapipe.resource.icon('download')
+            all_action = QAction(download_icon, 'All', sync_menu)
+            all_action.triggered.connect(partial(self._on_sync, defines.ARTELLA_SYNC_ALL_ASSET_TYPES, defines.ARTELLA_SYNC_ALL_ASSET_STATUS, False))
+            actions_to_add.insert(0, all_action)
+
+            for action in actions_to_add:
+                sync_menu.addAction(action)
+
+        return actions_to_add
+
+    def _on_context_menu(self, pos):
+        """
+        Internal callback function that is called when the user wants to show asset widget contextual menu
+        :param pos: QPoint
+        """
+
+        menu = QMenu(self)
+        self._create_context_menu(menu)
+        menu.exec_(self.mapToGlobal(pos))
+
+    def _on_open_in_artella(self):
+        """
+        Internal callback function that is called when the user presses Open in Artella contextual menu action
+        """
+
+        self._asset.open_in_artella()
+
+    def _on_sync(self, file_type, sync_type, ask=False):
+        """
+        Internal callback function that is called when the user tries to Sync an asset through UI
+        :param file_type: str
+        :param sync_type: str
+        :param ask: bool
+        """
+
+        if ask:
+            res = qtutils.show_question(
+                None,
+                'Synchronize "{}" file: {}'.format(self.asset.get_name(), file_type.title()),
+                'Are you sure you want to sync this asset? This can take some time!'
+            )
+            if res != QMessageBox.Yes:
+                return
+
+        self.startSync.emit(self.asset, file_type, sync_type)
