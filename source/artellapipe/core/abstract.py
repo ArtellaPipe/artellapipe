@@ -12,15 +12,30 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import os
+
 from tpPyUtils import decorators
 
 
 class AbstractAsset(object):
 
-    def __init__(self, asset_data):
+    ASSET_FILES = dict()
+
+    def __init__(self, project, asset_data, category=None):
         super(AbstractAsset, self).__init__()
 
+        self._project = project
         self._asset_data = asset_data
+        self._category = category
+
+    @property
+    def data(self):
+        """
+        Returns asset data
+        :return: object
+        """
+
+        return self._asset_data
 
     @decorators.abstractmethod
     def get_name(self):
@@ -41,15 +56,6 @@ class AbstractAsset(object):
         raise NotImplementedError('get_path function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_thumbnail_icon(self):
-        """
-        Returns the icon of the asset
-        :return: QIcon
-        """
-
-        raise NotImplementedError('get_thumbnail_icon function for {} is not implemented!'.format(self.__class__.__name__))
-
-    @decorators.abstractmethod
     def get_category(self):
         """
         Returns the category of the asset
@@ -57,3 +63,11 @@ class AbstractAsset(object):
         """
 
         raise NotImplementedError('get_category function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def get_relative_path(self):
+        """
+        Returns path of the asset relative to the Artella project
+        :return: str
+        """
+
+        return os.path.relpath(self.get_path(), self._project.get_assets_path())

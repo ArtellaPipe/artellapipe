@@ -14,7 +14,6 @@ __email__ = "tpovedatd@gmail.com"
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
-from Qt.QtGui import *
 
 from tpQtLib.core import base
 from tpQtLib.widgets import breadcrumb
@@ -68,4 +67,6 @@ class AssetInfoWidget(base.BaseWidget, object):
             return
 
         self._title_breadcrumb.set([self._asset_widget.asset.get_name()])
-        self._asset_icon_lbl.setPixmap(QPixmap(self._asset_widget.asset.get_thumbnail_icon()).scaled(200, 200, Qt.KeepAspectRatio))
+        thumb_icon = self._asset_widget.get_thumbnail_icon()
+        thumb_size = self._asset_widget.THUMB_SIZE
+        self._asset_icon_lbl.setPixmap(thumb_icon.pixmap(thumb_icon.availableSizes()[-1]).scaled(thumb_size[0], thumb_size[1], Qt.KeepAspectRatio))

@@ -666,7 +666,7 @@ class ArtellaProject(object):
 
         return assets_path
 
-    def is_valid_asset_path(self):
+    def is_valid_assets_path(self):
         """
         Returns whether current asset path exists or not
         :return: bool
@@ -707,7 +707,7 @@ class ArtellaProject(object):
         """
 
         assets_path = self.get_assets_path()
-        if not self.is_valid_asset_path():
+        if not self.is_valid_assets_path():
             self.logger.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
             return
 

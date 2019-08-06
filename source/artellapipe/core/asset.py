@@ -32,17 +32,11 @@ from artellapipe.tools.assetsmanager.widgets import assetinfo
 
 class ArtellaAsset(abstract.AbstractAsset, object):
 
-    DEFAULT_ICON = artellapipe.resource.icon('default')
-    ASSET_FILES = dict()
-
     def __init__(self, project, asset_data, category=None):
 
-        self._project = project
-        self._thumbnail_icon = None
-        self._category = category
         self._artella_data = None
 
-        super(ArtellaAsset, self).__init__(asset_data)
+        super(ArtellaAsset, self).__init__(project=project, asset_data=asset_data, category=category)
 
     @property
     def project(self):
@@ -70,36 +64,6 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         return self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_PATH_ATTR, '')
-
-    def get_relative_path(self):
-        """
-        Returns path of the asset relative to the Artella project
-        :return: str
-        """
-
-        return os.path.relpath(self.get_path(), self._project.get_assets_path())
-
-    def get_thumbnail_icon(self):
-        """
-        Implements abstract get_thumbnail_icon function
-        Returns the icon of the asset
-        :return: QIcon
-        """
-
-        # If the icon is already cached we return it
-        if self._thumbnail_icon:
-            return self._thumbnail_icon
-
-        str_icon = self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_ICON_ATTR, None)
-        icon_format = self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR, None)
-        if not str_icon or not icon_format:
-            return self.DEFAULT_ICON
-
-        self._thumbnail_icon = QPixmap.fromImage(image.base64_to_image(str_icon.encode('utf-8'), image_format=icon_format))
-        if not self._thumbnail_icon:
-            self._thumbnail_icon = self.DEFAULT_ICON
-
-        return self._thumbnail_icon
 
     def get_category(self):
         """
@@ -202,6 +166,8 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 class ArtellaAssetWidget(base.BaseWidget, object):
 
     ASSET_INFO_CLASS = assetinfo.AssetInfoWidget
+    DEFAULT_ICON = artellapipe.resource.icon('default')
+    THUMB_SIZE = (200, 200)
 
     clicked = Signal(object)
     startSync = Signal(object, str, str)
@@ -209,6 +175,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
     def __init__(self, asset, parent=None):
 
         self._asset = asset
+        self._thumbnail_icon = None
 
         super(ArtellaAssetWidget, self).__init__(parent=parent)
 
@@ -266,6 +233,28 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
         return self.ASSET_INFO_CLASS(self)
 
+    def get_thumbnail_icon(self):
+        """
+        Implements abstract get_thumbnail_icon function
+        Returns the icon of the asset
+        :return: QIcon
+        """
+
+        # If the icon is already cached we return it
+        if self._thumbnail_icon:
+            return self._thumbnail_icon
+
+        str_icon = self.asset.data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_ICON_ATTR, None)
+        icon_format = self.asset.data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR, None)
+        if not str_icon or not icon_format:
+            return self.DEFAULT_ICON
+
+        thumbnail_pixmap = QPixmap.fromImage(image.base64_to_image(str_icon.encode('utf-8'), image_format=icon_format))
+        if not thumbnail_pixmap:
+            self._thumbnail_icon = self.DEFAULT_ICON
+
+        return QIcon(thumbnail_pixmap)
+
     def _init(self):
         """
         Internal function that initializes asset widget
@@ -277,7 +266,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
         self._asset_lbl.setText(self._asset.get_name())
 
-        thumb_icon = self._asset.get_thumbnail_icon()
+        thumb_icon = self.get_thumbnail_icon()
         if thumb_icon:
             self._asset_btn.setIcon(thumb_icon)
 
