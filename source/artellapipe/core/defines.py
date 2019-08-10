@@ -25,6 +25,9 @@ ARTELLA_PROJECT_MENU_FILE_NAME = 'menu.json'
 # Defines the name of the version file used by artellapipe to check current tools version
 ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME = 'version.json'
 
+# Defines the name of the naing file used by artellapipe for pipeline naming
+ARTELLA_PROJECT_DEFAULT_NAMING_FILE_NAME = 'naming.json'
+
 # Defines the name of the attribute that defines the Artella project name
 ARTELLA_CONFIG_PROJECT_NAME = 'PROJECT_NAME'
 
@@ -33,6 +36,9 @@ ARTELLA_CONFIG_PROJECT_NUMBER = 'PROJECT_NUMBER'
 
 # Defines the name of the attribute that defines the Artella version file name
 ARTELLA_VERSION_FILE_NAME_ATTRIBUTE_NAME = 'PROJECT_VERSION_FILE'
+
+# Defines the name of the attribute that defines the Artella project naming file name
+ARTELLA_NAMING_FILE_NAME_ATTRIBUTE_NAME = 'PROJECT_NAMING_FILE'
 
 # Defines the name of the attribute that defines the asset types in the Artella project
 ARTELLA_CONFIG_ASSET_TYPES = 'ASSET_TYPES'

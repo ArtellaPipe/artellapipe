@@ -23,7 +23,7 @@ from Qt.QtGui import *
 
 from tpPyUtils import strings
 
-from tpQtLib.core import base, image, qtutils
+from tpQtLib.core import base, image, qtutils, menu
 
 import artellapipe
 from artellapipe.core import abstract, defines, artellalib
@@ -115,7 +115,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
     def open_in_artella(self):
         """
-        Opens current asset in Artelal web
+        Opens current asset in Artella web
         """
 
         artella_url = self.get_artella_url()
@@ -270,33 +270,33 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         if thumb_icon:
             self._asset_btn.setIcon(thumb_icon)
 
-    def _create_context_menu(self, menu):
+    def _create_context_menu(self, context_menu):
         """
         Internal function that generates contextual menu for asset widget
         Reimplement for custom functionality
+        :param context_menu: Menu
         """
 
         sync_icon = artellapipe.resource.icon('sync')
         artella_icon = artellapipe.resource.icon('artella')
 
-        artella_action = QAction(artella_icon, 'Open in Artella', menu)
+        artella_action = QAction(artella_icon, 'Open in Artella', context_menu)
 
-        sync_action = QAction(sync_icon, 'Synchronize', menu)
-        sync_menu = QMenu(self)
+        sync_action = QAction(sync_icon, 'Synchronize', context_menu)
+        sync_menu = menu.Menu(self)
         actions_added = self._fill_sync_action_menu(sync_menu)
-
         artella_action.triggered.connect(self._on_open_in_artella)
 
-        menu.addAction(artella_action)
+        context_menu.addAction(artella_action)
 
         if actions_added:
             sync_action.setMenu(sync_menu)
-            menu.addAction(sync_action)
+            context_menu.addAction(sync_action)
 
     def _fill_sync_action_menu(self, sync_menu):
         """
         Internal function that fills sync menu with proper actions depending of the asset files supported
-        :param sync_menu: QMenu
+        :param sync_menu: Menu
         """
 
         if not sync_menu:
@@ -326,9 +326,9 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         :param pos: QPoint
         """
 
-        menu = QMenu(self)
-        self._create_context_menu(menu)
-        menu.exec_(self.mapToGlobal(pos))
+        context_menu = menu.Menu(self)
+        self._create_context_menu(context_menu)
+        context_menu.exec_(self.mapToGlobal(pos))
 
     def _on_open_in_artella(self):
         """

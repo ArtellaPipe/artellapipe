@@ -7,6 +7,7 @@
   "PROJECT_ID": "",
   "PROJECT_ICON": "artella",
   "PROJECT_VERSION_FILE": "version.json",
+  "PROJECT_NAMING_FILE": "naming.json",
   "PROJECT_URL": "",
   "PROJECT_ASSET_DATA_FILENAME": "data.json",
   "ASSET_TYPES": [],

@@ -75,18 +75,19 @@ def init(do_reload=False):
     artella_importer.import_modules()
 
 
-def set_project(project_class, project_resource):
+def set_project(project_class, project_resource, project_naming_file):
     """
     This functions sets the given class instance as the current Artella project used
     :param project_class: ArtellaProject
     :param project_resource: Resource
+    :param project_naming_file: str
     """
 
     global project
 
     import artellapipe
 
-    project = project_class(resource=project_resource)
+    project = project_class(resource=project_resource, naming_file=project_naming_file)
     artellapipe.__dict__[project_class.__name__.lower()] = project
     project.init()
 

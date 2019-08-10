@@ -15,6 +15,7 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import sys
 import json
+import inspect
 import traceback
 import webbrowser
 try:
@@ -40,7 +41,7 @@ class ArtellaProject(object):
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
     PROJECT_MENU_FILE_PATH = artellapipe.get_project_menu_path()
 
-    def __init__(self, resource=None):
+    def __init__(self, resource, naming_file):
         super(ArtellaProject, self).__init__()
 
         self._name = None
@@ -62,7 +63,6 @@ class ArtellaProject(object):
         self._project_icon = None
         self._version_file = None
         self._folders_to_register = list()
-        self._resource = resource
         self._emails = list()
         self._progress_bar_color0 = None
         self._progress_bar_color1 = None
@@ -70,6 +70,9 @@ class ArtellaProject(object):
         self._asset_data_filename = None
 
         self._registered_asset_classes = dict()
+
+        self._resource = resource
+        self._naming_file = naming_file
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
@@ -98,6 +101,15 @@ class ArtellaProject(object):
         """
 
         return path_utils.clean_path(os.path.join(self.get_clean_name(), self._folders_to_register[0], self._version_file))
+
+    @property
+    def naming_file(self):
+        """
+        Returns naming file path
+        :return: str
+        """
+
+        return self._naming_file
 
     @property
     def id(self):
