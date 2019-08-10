@@ -29,6 +29,8 @@ import artellapipe
 from artellapipe.core import defines, artellalib, asset
 from artellapipe.gui import tray
 
+from artellapipe.tools.namemanager import namemanager
+
 
 class ArtellaProject(object):
 
@@ -68,10 +70,13 @@ class ArtellaProject(object):
         self._asset_ignored_paths = list()
         self._asset_data_filename = None
 
-        self._registered_asset_classes = dict()
+        self._registered_asset_classes = list()
+        self._asset_classes_types = dict()
 
         self._resource = resource
         self._naming_file = naming_file
+
+        self._nameit = namemanager.NameWidget(self)
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
@@ -319,6 +324,25 @@ class ArtellaProject(object):
             self.create_menu()
             self._tray = self.create_tray()
             self.update_project()
+
+    def solve_name(self, rule_name, *args, **kwargs):
+        """
+        Resolves name with given rule and attributes
+        :param rule_name: str
+        :param args: list
+        :param kwargs: dict
+        """
+
+        current_rule = self._nameit.get_active_rule()
+        self._nameit.set_active_rule(rule_name)
+        solved_name = self._nameit.solve(*args, **kwargs)
+        if current_rule:
+            if rule_name != current_rule.name:
+                self._nameit.set_active_rule(current_rule.name)
+        else:
+            self._nameit.set_active_rule(None)
+
+        return solved_name
 
     def get_config_data(self):
         """
@@ -658,14 +682,14 @@ class ArtellaProject(object):
     # ASSETS
     # ==========================================================================================================
 
-    def register_asset_class(self, asset_type, asset_class):
+    def register_asset_class(self, asset_class):
         """
         Registers a new asset class into the project
         :param asset_class: cls
         """
 
-        if asset_type not in self._registered_asset_classes:
-            self._registered_asset_classes[asset_type] = asset_class
+        if asset_class not in self._registered_asset_classes:
+            self._registered_asset_classes.append(asset_class)
 
     def get_assets_path(self):
         """
@@ -705,8 +729,8 @@ class ArtellaProject(object):
         :param category: str
         """
 
-        if category and category in self._registered_asset_classes:
-            return self._registered_asset_classes[category](project=self, asset_data=asset_data)
+        if category and category in self._asset_classes_types:
+            return self._asset_classes_types[category](project=self, asset_data=asset_data)
         else:
             return self.ASSET_CLASS(project=self, asset_data=asset_data)
 
@@ -791,6 +815,12 @@ class ArtellaProject(object):
         :return:
         """
 
-        from artellapipe.tools.assetsmanager.assets import propasset
+        for asset_type in self.asset_types:
+            for registered_asset in self._registered_asset_classes:
+                if registered_asset.ASSET_TYPE == asset_type:
+                    self._asset_classes_types[asset_type] = registered_asset
+                    break
 
-        self.register_asset_class('Props', propasset.ArtellaPropAsset)
+        for asset_type in self.asset_types:
+            if asset_type not in self._asset_classes_types:
+                self.logger.warning('Asset Type {} has not an associated asset class!'.format(asset_type))

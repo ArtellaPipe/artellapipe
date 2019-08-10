@@ -21,8 +21,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import strings
-
+from tpPyUtils import strings, path as path_utils
 from tpQtLib.core import base, image, qtutils, menu
 
 import artellapipe
@@ -30,7 +29,26 @@ from artellapipe.core import abstract, defines, artellalib
 from artellapipe.tools.assetsmanager.widgets import assetinfo
 
 
+class ArtellaAssetFileStatus(object):
+
+    WORKING = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+    PUBLISHED = defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS
+
+    @staticmethod
+    def is_valid(status):
+        """
+        Returns whether given status is valid or not
+        :param status: str
+        :return: bool
+        """
+
+        return status == ArtellaAssetFileStatus.WORKING or status == ArtellaAssetFileStatus.PUBLISHED
+
+
 class ArtellaAsset(abstract.AbstractAsset, object):
+
+    ASSET_TYPE = None
+    ASSET_FILES = dict()
 
     def __init__(self, project, asset_data, category=None):
 
@@ -113,6 +131,33 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._artella_data
 
+    def get_file(self, file_type, status, extension=None):
+        """
+        Returns file path of the given file type and status
+        :param file_type: str
+        :param status: str
+        :param extension: str
+        """
+
+        if not extension:
+            extension = defines.ARTELLA_DEFAULT_ASSET_FILES_EXTENSION
+
+        if file_type not in self.project.asset_files:
+            return None
+        if not ArtellaAssetFileStatus.is_valid(status):
+            return None
+
+        asset_name = self.get_short_name()
+        file_name = self._project.solve_name('asset_file', asset_name, asset_file_type=file_type)
+        file_name += extension
+
+        if status == ArtellaAssetFileStatus.WORKING:
+            file_path = path_utils.clean_path(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type, file_name))
+        else:
+            raise NotImplementedError('Open Published Assets is not implemented yet!')
+
+        return file_path
+
     def open_in_artella(self):
         """
         Opens current asset in Artella web
@@ -120,6 +165,27 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         artella_url = self.get_artella_url()
         webbrowser.open(artella_url)
+
+    def view_locally(self):
+        """
+        Opens folder where item is located locally
+        """
+
+        artellalib.explore_file(self.get_path())
+
+    def open_file(self, file_type, status):
+        """
+        Opens asset file with the given type and status (if exists)
+        :param file_type: str
+        :param status: str
+        :return:
+        """
+
+        file_path = self.get_file(file_type=file_type, status=status)
+        if os.path.isfile(file_path):
+            artellalib.open_file_in_maya(file_path)
+        else:
+            artellapipe.logger.warning('Impossible to open asset file of type "{}": {}'.format(file_type, file_path))
 
     def sync(self, file_type, sync_type):
         """

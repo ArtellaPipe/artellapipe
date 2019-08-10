@@ -190,3 +190,6 @@ ARTELLA_SYNC_WORKING_ASSET_STATUS = 'working'
 
 # Defines the asset sync type that synchronizes published status
 ARTELLA_SYNC_PUBLISHED_ASSET_STATUS = 'published'
+
+# Defines the default extension used by Artella pipeline files
+ARTELLA_DEFAULT_ASSET_FILES_EXTENSION = '.ma'

@@ -20,7 +20,7 @@ from tpNameIt.core import nameit
 class NameWidget(nameit.NameIt, object):
     def __init__(self, project, parent=None):
         self._project = project
-        self.DATA_FILE = self._project.naming_file
+        NameWidget.DATA_FILE = self._project.naming_file
         super(NameWidget, self).__init__(parent=parent)
 
 
@@ -41,6 +41,10 @@ class NameManager(window.ArtellaWindow, object):
 
         self._name_widget = NameWidget(project=self._project)
         self.main_layout.addWidget(self._name_widget)
+
+    @property
+    def nameit(self):
+        return self._name_widget
 
 
 def run(project):

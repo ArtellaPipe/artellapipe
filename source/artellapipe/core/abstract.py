@@ -16,10 +16,10 @@ import os
 
 from tpPyUtils import decorators
 
+import tpDccLib as tp
+
 
 class AbstractAsset(object):
-
-    ASSET_FILES = dict()
 
     def __init__(self, project, asset_data, category=None):
         super(AbstractAsset, self).__init__()
@@ -63,6 +63,14 @@ class AbstractAsset(object):
         """
 
         raise NotImplementedError('get_category function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def get_short_name(self):
+        """
+        Returns short name of the asset
+        :return: str
+        """
+
+        return tp.Dcc.node_short_name(self.get_name())
 
     def get_relative_path(self):
         """
