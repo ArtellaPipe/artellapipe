@@ -22,6 +22,7 @@ from Qt.QtGui import *
 
 import tpQtLib
 from tpQtLib.core import base, qtutils, animation
+from tpQtLib.widgets import splitters
 
 import artellapipe
 from artellapipe.gui import dialog
@@ -71,10 +72,7 @@ class WelcomeWidget(base.BaseWidget, object):
 
         self.main_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
         lbl = QLabel('Welcome to {}!'.format(self._project.name.title()))
-        font = lbl.font()
-        font.setFamily('Montserrat')
-        font.setPointSize(45)
-        lbl.setFont(font)
+        lbl.setStyleSheet('font-size: 35px; font-family: "Montserrat";')
         self.main_layout.addWidget(lbl)
         self.main_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
 
@@ -85,12 +83,96 @@ class ShortcutsWidget(base.BaseWidget, object):
 
         super(ShortcutsWidget, self).__init__(parent=parent)
 
+    def get_main_layout(self):
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(2, 2, 2, 2)
+        main_layout.setSpacing(2)
+
+        return main_layout
+
     def ui(self):
         super(ShortcutsWidget, self).ui()
 
-        top_layout = QLabel('{} Tools can be accessed through: '.format(self._project.name.title()))
+        lbl = QLabel('{} Tools can be accessed through: '.format(self._project.name.title()))
+        lbl.setAlignment(Qt.AlignCenter)
+        lbl.setStyleSheet('font-size: 14px; font-family: "Montserrat";')
 
-        self.main_layout.addWidget(top_layout)
+        shelf_lbl = QLabel('{} Shelf'.format(self._project.name.title()))
+        shelf_lbl.setAlignment(Qt.AlignCenter)
+        shelf_lbl.setStyleSheet('font-size: 18px; font-family: "Montserrat"; font-weight: bold')
+
+        self.main_layout.addWidget(lbl)
+        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addWidget(shelf_lbl)
+
+
+class FinalWidget(base.BaseWidget, object):
+    def __init__(self, project, parent=None):
+        self._project = project
+
+        super(FinalWidget, self).__init__(parent=parent)
+
+    def get_main_layout(self):
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(2, 2, 2, 2)
+        main_layout.setSpacing(2)
+
+        return main_layout
+
+    def ui(self):
+        super(FinalWidget, self).ui()
+
+        ready_lbl = QLabel('You are ready to go!')
+        ready_lbl.setAlignment(Qt.AlignCenter)
+        ready_lbl.setStyleSheet('font-size: 24px; font-family: "Montserrat"; font-weight: bold;')
+
+        more_info_lbl = QLabel('You can find more info in the following links')
+        more_info_lbl.setAlignment(Qt.AlignCenter)
+        more_info_lbl.setStyleSheet('font-size: 18px; font-family: "Montserrat";')
+
+        icons_layout = QHBoxLayout()
+        icons_layout.setContentsMargins(2, 2, 2, 2)
+        icons_layout.setSpacing(2)
+
+        doc_icon = artellapipe.resource.icon('manual')
+        change_icon = artellapipe.resource.icon('document')
+
+        self._documentation_btn = QToolButton()
+        self._documentation_btn.setText('Open Documentation')
+        self._documentation_btn.setIcon(doc_icon)
+        self._documentation_btn.setIconSize(QSize(64, 64))
+        self._documentation_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        self._changelog_btn = QToolButton()
+        self._changelog_btn.setText('Show Changelog')
+        self._changelog_btn.setIcon(change_icon)
+        self._changelog_btn.setIconSize(QSize(64, 64))
+        self._changelog_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        icons_layout.addWidget(self._documentation_btn)
+        icons_layout.addWidget(self._changelog_btn)
+
+        self.main_layout.addWidget(ready_lbl)
+        self.main_layout.addWidget(more_info_lbl)
+        self.main_layout.addLayout(icons_layout)
+
+    def setup_signals(self):
+        self._documentation_btn.clicked.connect(self._on_open_documentation)
+        self._changelog_btn.clicked.connect(self._on_open_changelog)
+
+    def _on_open_documentation(self):
+        """
+        Internal callback function that is called when Opening Documentation button is pressed
+        """
+
+        self._project.open_documentation()
+
+    def _on_open_changelog(self):
+        """
+        Internal callback function that is called when Show Changelog button is pressed
+        """
+
+        pass
 
 
 class WelcomeDialog(dialog.ArtellaDialog, object):
@@ -99,6 +181,7 @@ class WelcomeDialog(dialog.ArtellaDialog, object):
 
         self._project = project
         self._radio_buttons = list()
+        self._offset = 0
 
         super(WelcomeDialog, self).__init__(
             name='ArtellaWelcome',
@@ -247,9 +330,11 @@ class WelcomeDialog(dialog.ArtellaDialog, object):
 
         self._welcome_widget = WelcomeWidget(project=self._project)
         self._shortcuts_widget = ShortcutsWidget(project=self._project)
+        self._final_widget = FinalWidget(project=self._project)
 
         self._add_page(self._welcome_widget)
         self._add_page(self._shortcuts_widget)
+        self._add_page(self._final_widget)
 
     def _get_welcome_pixmap(self):
         """

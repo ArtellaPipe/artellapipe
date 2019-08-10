@@ -559,12 +559,14 @@ def synchronize_path_with_folders(file_path, recursive=False):
                     if recursive:
                         synchronize_path_with_folders(ref_path, recursive=True)
                 else:
-                    print('Syncing: {}'.format(ref_path))
                     synchronize_file(ref_path)
+            return True
     except Exception as e:
         artellapipe.logger.error(str(e))
         artellapipe.logger.error(traceback.format_exc())
         return None
+
+    return False
 
 
 def get_asset_version(name):
@@ -1171,7 +1173,7 @@ def create_asset(asset_name, asset_path):
     """
 
     full_path = os.path.join(asset_path, asset_name)
-    if os.path.exists(asset_path):
+    if os.path.exists(full_path):
         artellapipe.logger.warning('Impossible to create already existing asset!')
         return False
 
@@ -1237,6 +1239,34 @@ def rename_file(file_path, new_name):
     payload = json.dumps(payload)
 
     rsp = spigot.execute(command_action='do', command_name='rename', payload=payload)
+
+    if isinstance(rsp, (unicode, str)):
+        rsp = json.dumps(rsp)
+
+    return rsp
+
+
+def new_folder(root_path, folder_name):
+    """
+    Creates a new folder in the given path
+    :param root_path: str
+    :param folder_name: str
+    """
+
+    if not folder_name:
+        folder_name = qtutils.get_string_input('Folder Name', 'Create Folder')
+        if not folder_name:
+            return
+
+    file_path = os.path.join(root_path, folder_name)
+
+    spigot = get_spigot_client()
+    payload = dict()
+    payload['cms_uri'] = artella.getCmsUri(file_path)
+    payload['new_folder'] = True
+    payload = json.dumps(payload)
+
+    rsp = spigot.execute(command_action='do', command_name='upload', payload=payload)
 
     if isinstance(rsp, (unicode, str)):
         rsp = json.dumps(rsp)

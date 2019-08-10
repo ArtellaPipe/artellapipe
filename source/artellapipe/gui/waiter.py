@@ -18,7 +18,7 @@ from artellapipe.gui import spinner
 
 
 class ArtellaWaiter(QFrame, object):
-    def __init__(self, parent=None):
+    def __init__(self, spinner_type=spinner.SpinnerType.Loading, parent=None):
         super(ArtellaWaiter, self).__init__(parent)
 
         self.setStyleSheet("#background {border-radius: 3px;border-style: solid;border-width: 1px;border-color: rgb(32,32,32);}")
@@ -30,7 +30,7 @@ class ArtellaWaiter(QFrame, object):
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
-        self.wait_spinner = spinner.WaitSpinner(spinner_type=spinner.SpinnerType.Loading)
+        self.wait_spinner = spinner.WaitSpinner(spinner_type=spinner_type)
         self.wait_spinner._bg.setFrameShape(QFrame.NoFrame)
         self.wait_spinner._bg.setFrameShadow(QFrame.Plain)
 

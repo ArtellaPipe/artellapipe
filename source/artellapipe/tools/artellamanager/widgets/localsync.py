@@ -25,7 +25,7 @@ from Qt.QtGui import *
 from tpPyUtils import fileio
 
 import tpDccLib as tp
-from tpQtLib.core import base, qtutils
+from tpQtLib.core import base
 from tpQtLib.widgets import search, stack
 
 import artellapipe

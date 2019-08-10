@@ -15,7 +15,6 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import sys
 import json
-import inspect
 import traceback
 import webbrowser
 try:

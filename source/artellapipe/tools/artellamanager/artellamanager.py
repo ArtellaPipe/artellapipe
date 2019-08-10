@@ -16,11 +16,13 @@ __email__ = "tpovedatd@gmail.com"
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+from tpQtLib.widgets import lightbox
+
 from artellapipe.gui import window
 
 import artellapipe
 from artellapipe.tools.bugtracker import bugtracker
-from artellapipe.tools.artellamanager.widgets import localsync, serversync
+from artellapipe.tools.artellamanager.widgets import localsync, serversync, newassetdialog
 
 
 class ArtellaSyncerMode(object):
@@ -82,6 +84,7 @@ class ArtellaSyncer(window.ArtellaWindow, object):
             self._server_widget.syncOk.connect(self._on_server_sync_completed)
             self._server_widget.syncWarning.connect(self._on_server_sync_warning)
             self._server_widget.syncFailed.connect(self._on_server_sync_failed)
+            self._server_widget.createAsset.connect(self._on_create_new_asset)
 
     def closeEvent(self, event):
         if self._server_widget:
@@ -112,6 +115,13 @@ class ArtellaSyncer(window.ArtellaWindow, object):
 
     def _on_server_sync_failed(self, error_msg):
         self.show_error_message(error_msg)
+
+    def _on_create_new_asset(self, item):
+        new_asset_dlg = newassetdialog.ArtellaNewAssetDialog(project=self._project, asset_path=item.get_path())
+        self._lightbox = lightbox.Lightbox(self)
+        self._lightbox.set_widget(new_asset_dlg)
+        self._lightbox.show()
+        new_asset_dlg.show()
 
 
 def run(project, mode=ArtellaSyncerMode.ALL):

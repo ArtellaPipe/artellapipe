@@ -46,6 +46,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
     syncOk = Signal(str)
     syncFailed = Signal(str)
     syncWarning = Signal(str)
+    createAsset = Signal(object)
 
     def __init__(self, project, parent=None):
 
@@ -284,6 +285,7 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         sync_tree.addToSyncQueue.connect(self._on_add_item_to_sync_queue)
         sync_tree.forceRefresh.connect(self._on_refresh)
         sync_tree.addAllItemsToSyncQueue.connect(self._on_add_all_items_to_sync_queue)
+        sync_tree.createAsset.connect(self._on_create_new_asset)
 
         return sync_tree
 
@@ -476,6 +478,14 @@ class ArtellaSyncWidget(base.BaseWidget, object):
 
         self._queue_widget.clear()
 
+    def _on_create_new_asset(self, item):
+        """
+        Internal callback function that is called when a new asset should be created
+        :param item: ArtellaSyncItem
+        """
+
+        self.createAsset.emit(item)
+
 
 class ArtellaSyncTree(treewidgets.TreeWidget, object):
 
@@ -484,6 +494,7 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
     forceRefresh = Signal(object)
     addAllItemsToSyncQueue = Signal(object)
     clearSyncQueue = Signal()
+    createAsset = Signal(object)
 
     def __init__(self, project, path, parent=None):
         super(ArtellaSyncTree, self).__init__(parent)
@@ -648,15 +659,26 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
 
         artella_icon = artellapipe.resource.icon('artella')
         queue_icon = artellapipe.resource.icon('queue')
+        teapot_icon = artellapipe.resource.icon('teapot')
+        eye_icon = artellapipe.resource.icon('eye')
 
         open_in_artella_action = QAction(artella_icon, 'Open in Artella', context_menu, statusTip='Open Item in Artella')
         add_to_sync_queue_action = QAction(queue_icon, 'Add to Sync Queue', context_menu, statusTip='Add item to Artella Syncer queue')
+        create_asset_action = QAction(teapot_icon, 'Create New Asset', context_menu, statusTip='Create New Asset')
+        view_locally_action = QAction(eye_icon, 'View Locally', context_menu, statusTip='View File Locally')
 
         open_in_artella_action.triggered.connect(partial(self._on_open_item_in_artella, item))
         add_to_sync_queue_action.triggered.connect(partial(self._on_add_item_to_sync_queue, item))
+        create_asset_action.triggered.connect(partial(self._on_create_new_asset, item))
+        view_locally_action.triggered.connect(partial(self._on_view_locally, item))
 
         context_menu.addAction(open_in_artella_action)
         context_menu.addAction(add_to_sync_queue_action)
+        context_menu.addAction(view_locally_action)
+
+        if not item.is_asset():
+            context_menu.addSeparator()
+            context_menu.addAction(create_asset_action)
 
         return context_menu
 
@@ -692,6 +714,22 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
         """
 
         item.open_in_artella()
+
+    def _on_create_new_asset(self, item):
+        """
+        Internal callback function that opens Create New Assset dialog
+        :param item: ArtellaSyncItem
+        """
+
+        self.createAsset.emit(item)
+
+    def _on_view_locally(self, item):
+        """
+        Internal callback function that opens file locally
+        :param item: ArtellaSyncItem
+        """
+
+        item.view_locally()
 
     def _on_add_item_to_sync_queue(self, item):
         """
@@ -796,6 +834,17 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
 
         return os.path.relpath(self.get_path(), self._project.get_assets_path())
 
+    def is_asset(self):
+        """
+        Returns whether current item is an asset or not
+        :return: bool
+        """
+
+        if not self._artella_data:
+            return False
+
+        return isinstance(self._artella_data, artellaclasses.ArtellaAssetMetaData)
+
     def get_icon(self):
         """
         Returns item icon depending of the wrapped Artella object
@@ -853,6 +902,13 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
         artella_url = self.get_artella_url()
         webbrowser.open(artella_url)
 
+    def view_locally(self):
+        """
+        Opens item locally
+        """
+
+        artellalib.explore_file(self.get_path())
+
 
 class ArtellaSyncQueueItemStatus(object):
     WAIT = 'wait'
@@ -868,13 +924,14 @@ class ArtellaSyncQueueItem(QTreeWidgetItem, object):
     OK_ICON = artellapipe.resource.icon('ok')
     ERROR_ICON = artellapipe.resource.icon('error')
 
-    def __init__(self, project, name, path, icon, is_file, parent=None):
+    def __init__(self, project, name, path, icon, is_file, is_asset, parent=None):
         super(ArtellaSyncQueueItem, self).__init__(parent)
 
         self._project = project
         self._path = path
         self._icon = icon
         self._is_file = is_file
+        self._is_asset = is_asset
         self._sync_status = ArtellaSyncQueueItemStatus.WAIT
 
         self.setText(0, name)
@@ -919,6 +976,14 @@ class ArtellaSyncQueueItem(QTreeWidgetItem, object):
         """
 
         return self._is_file
+
+    def is_asset(self):
+        """
+        Returns whether current item is an asset or not
+        :return: bool
+        """
+
+        return self._is_asset
 
     def get_relative_path(self):
         """
@@ -1016,7 +1081,7 @@ class ArtellaSyncQueueTree(QTreeWidget, object):
         queue_item = self.item_in_queue(item)
 
         if not queue_item:
-            queue_item = ArtellaSyncQueueItem(item.get_project(), item.get_name(), item.get_path(), item.get_icon(), item.is_file(), self)
+            queue_item = ArtellaSyncQueueItem(item.get_project(), item.get_name(), item.get_path(), item.get_icon(), item.is_file(), item.is_asset(), self)
             self.addTopLevelItem(queue_item)
 
         return queue_item
@@ -1271,23 +1336,29 @@ class ArtellaSyncQueueWidget(base.BaseWidget, object):
             item_name = os.path.basename(item_path)
             item.set_sync_status(ArtellaSyncQueueItemStatus.RUN)
             self._progress.set_value(i + 1)
-            self._progress.set_text('Syncing file: {}'.format(item_name))
+            self._progress.set_text('Syncing file: {}. Please wait ...'.format(item_name))
             self._queue_list.repaint()
             try:
                 if item.is_file():
                     valid_sync = artellalib.synchronize_file(item_path)
                 else:
-                    if self._sync_subfolders_cbx.isChecked():
+                    if self._sync_subfolders_cbx.isChecked() or item.is_asset():
                         valid_sync = artellalib.synchronize_path_with_folders(item_path, True)
+                        if not valid_sync:
+                            item_path = os.path.join(item_path, defines.ARTELLA_WORKING_FOLDER)
+                            valid_sync = artellalib.synchronize_path_with_folders(item_path, True)
                     else:
                         valid_sync = artellalib.synchronize_path(item_path)
+                        if not valid_sync:
+                            item_path = os.path.join(item_path, defines.ARTELLA_WORKING_FOLDER)
+                            valid_sync = artellalib.synchronize_path(item_path)
                 if valid_sync:
                     item.set_sync_status(ArtellaSyncQueueItemStatus.OK)
                     self._queue_list.repaint()
                     self.syncOk.emit('File {} synced successfully!'.format(item_name))
                 else:
                     item.set_sync_status(ArtellaSyncQueueItemStatus.ERROR)
-                    self._list.repaint()
+                    self._queue_list.repaint()
                     self.syncFailed.emit('Error while syncing file {} from Artella server!'.format(item_name))
             except Exception as e:
                 item.set_sync_status(ArtellaSyncQueueItemStatus.ERROR)
