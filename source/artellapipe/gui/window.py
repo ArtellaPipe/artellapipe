@@ -18,6 +18,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 import tpQtLib
+from tpQtLib.core import qtutils
 from tpQtLib.widgets import statusbar
 
 import artellapipe
@@ -243,3 +244,31 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
                 )
 
         return artellapipe.resource.pixmap(name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
+
+
+def dock_window(project, window_class):
+    """
+    Utility function to dock Maya window
+    :param project: ArtellaProject
+    :param window_class: cls
+    """
+
+    import maya.cmds as cmds
+    import maya.OpenMayaUI as OpenMayaUI
+    try:
+        cmds.deleteUI(window_class.name)
+    except Exception:
+        pass
+
+    main_control = cmds.workspaceControl(window_class.name, ttc=["AttributeEditor", -1], iw=300, mw=True, wp='preferred', label=window_class.title)
+
+    control_widget = OpenMayaUI.MQtUtil.findControl(window_class.name)
+    control_wrap = qtutils.wrapinstance(int(control_widget), QWidget)
+    control_wrap.setAttribute(Qt.WA_DeleteOnClose)
+    win = window_class(project=project, parent=control_wrap)
+
+    cmds.evalDeferred(lambda *args: cmds.workspaceControl(main_control, e=True, rs=True))
+
+    win.show()
+
+    return win

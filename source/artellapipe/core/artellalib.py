@@ -1217,7 +1217,7 @@ def rename_file(file_path, new_name):
     :param new_name: str
     """
 
-    res = qtutils.show_question(None, 'Confirm Rename', 'Are you you would like to rename "{}" to "{}"?Any references to this file will need to be updated.'.format(os.path.basename(file_path, new_name)))
+    res = qtutils.show_question(None, 'Confirm Rename', 'Are you you would like to rename "{}" to "{}"?Any references to this file will need to be updated.'.format(os.path.basename(file_path), new_name))
     if res != QMessageBox.Yes:
         return
 
@@ -1242,6 +1242,8 @@ def rename_file(file_path, new_name):
 
     if isinstance(rsp, (unicode, str)):
         rsp = json.dumps(rsp)
+
+    print(rsp)
 
     return rsp
 
