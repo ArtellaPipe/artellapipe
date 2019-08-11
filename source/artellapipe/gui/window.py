@@ -17,6 +17,8 @@ import webbrowser
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+import tpDccLib as tp
+
 import tpQtLib
 from tpQtLib.core import qtutils
 from tpQtLib.widgets import statusbar
@@ -246,12 +248,15 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         return artellapipe.resource.pixmap(name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
 
 
-def dock_window(project, window_class):
+def dock_window(project, window_class, min_width=300):
     """
     Utility function to dock Maya window
     :param project: ArtellaProject
     :param window_class: cls
     """
+
+    if not tp.is_maya():
+        return
 
     import maya.cmds as cmds
     import maya.OpenMayaUI as OpenMayaUI
@@ -260,7 +265,7 @@ def dock_window(project, window_class):
     except Exception:
         pass
 
-    main_control = cmds.workspaceControl(window_class.name, ttc=["AttributeEditor", -1], iw=300, mw=True, wp='preferred', label=window_class.title)
+    main_control = cmds.workspaceControl(window_class.name, ttc=["AttributeEditor", -1], iw=min_width, mw=True, wp='preferred', label=window_class.title)
 
     control_widget = OpenMayaUI.MQtUtil.findControl(window_class.name)
     control_wrap = qtutils.wrapinstance(int(control_widget), QWidget)

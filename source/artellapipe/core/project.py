@@ -71,6 +71,8 @@ class ArtellaProject(object):
         self._asset_ignored_paths = list()
         self._assets_library_file_types = dict()
         self._asset_data_filename = None
+        self._tag_types = list()
+        self._outliner_categories = dict()
 
         self._registered_asset_classes = list()
         self._asset_classes_types = dict()
@@ -215,6 +217,24 @@ class ArtellaProject(object):
         """
 
         return self._asset_must_files
+
+    @property
+    def tag_types(self):
+        """
+        Returns the list of types that can be used to categorize all the elements of the project
+        :return: list(str)
+        """
+
+        return self._tag_types
+
+    @property
+    def outliner_categories(self):
+        """
+        Returns a dictionary that maps tag types with outliner categories
+        :return: dict
+        """
+
+        return self._outliner_categories
 
     @property
     def working_status(self):
@@ -405,6 +425,8 @@ class ArtellaProject(object):
         self._asset_ignored_paths = project_config_data.get(defines.ARTELLA_ASSETS_IGNORED_PATHS_ATTRIBUTE_NAME, list())
         self._assets_library_file_types = project_config_data.get(defines.ARTELLA_ASSETS_LIBRARY_SUPPORTED_TYPES_ATTRIBUTE_NAME, dict())
         self._asset_data_filename = project_config_data.get(defines.ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME, None)
+        self._tag_types = project_config_data.get(defines.ARTELLA_CONFIG_TAG_TYPES, list())
+        self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES, dict())
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -484,6 +506,28 @@ class ArtellaProject(object):
         except Exception as e:
             self.logger.debug('Error while setting Solstice Environment Variables. Solstice Tools may not work properly!')
             self.logger.error('{} | {}'.format(e, traceback.format_exc()))
+
+        icons_paths = [
+            artellapipe.resource.RESOURCES_FOLDER,
+            self.resource.RESOURCES_FOLDER
+        ]
+
+        current_paths = list()
+        if os.environ.get('XBMLANGPATH'):
+            if osplatform.is_mac():
+                current_paths = os.environ['XBMLANGPATH'].split(':')
+            else:
+                current_paths = os.environ['XBMLANGPATH'].split(';')
+
+        for p in icons_paths:
+            for root, _, _ in os.walk(p):
+                if root in current_paths:
+                    continue
+                if tp.is_maya():
+                    if osplatform.is_mac():
+                        os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + ':' + root
+                    else:
+                        os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + ';' + root
 
         self.logger.debug('=' * 100)
         self.logger.debug("{} Pipeline initialization completed!".format(self.name))

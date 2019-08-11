@@ -64,7 +64,7 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
             except Exception:
                 pass
 
-            ArtellaAssetsLibraryWidget.instances.remove(ins)
+            ArtellaAssetsLibraryWidget._instances.remove(ins)
             del ins
 
     def ui(self):

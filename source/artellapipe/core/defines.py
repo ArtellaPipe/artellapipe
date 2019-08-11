@@ -59,6 +59,12 @@ ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME = 'PROJECT_ASSET_DATA_FILENAME'
 # an asset ready for production
 ARTELLA_CONFIG_ASSET_MUST_FILES = 'ASSET_MUST_FILES'
 
+# Defines the list of types that can be used to tag all the elements of the short
+ARTELLA_CONFIG_TAG_TYPES = 'TAG_TYPES'
+
+# Defines a dictionary that maps tag types with categories in the Artella Outliner
+ARTELLA_CONFIG_OUTLINER_CATEGORIES = 'OUTLINER_CATEGORIES'
+
 # Defines the name of the attribute that defines the working status of an asset
 ARTELLA_CONFIG_ASSET_WIP_STATUS = 'ASSET_WIP_STATUS'
 
@@ -81,7 +87,7 @@ ARTELLA_CONFIG_TRAY_ICON = 'TRAY_ICON'
 ARTELLA_CONFIG_PROJECT_ID = 'PROJECT_ID'
 
 # Defines the name of the attribute that defines the environemtn variable used to store Artella project path
-ARTELLA_CONFIG_ENVIRONMENT_VARIABLE = 'PROJECT_ID'
+ARTELLA_CONFIG_ENVIRONMENT_VARIABLE = 'PROJECT_ENV_VARIABLE'
 
 # Defines the name of the attribute that defines the paths that need to be registered in Python path
 ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME = 'PATHS_TO_REGISTER'
