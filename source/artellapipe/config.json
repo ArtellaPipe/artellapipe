@@ -16,6 +16,7 @@
   "ASSET_WIP_STATUS": "working",
   "ASSET_PUBLISH_STATUS": "published",
   "ASSET_IGNORED_PATHS": [],
+  "ASSETS_LIBRARY_SUPPORTED_FILES": {},
   "PATHS_TO_REGISTER": ["pipeline", "pipeline/externals"],
   "PROGRESS_BAR_COLOR_0": "255, 255, 255",
   "PROGRESS_BAR_COLOR_1": "255, 255, 255"

@@ -16,8 +16,6 @@ import os
 
 from tpPyUtils import decorators
 
-import tpDccLib as tp
-
 
 class AbstractAsset(object):
 
@@ -64,13 +62,69 @@ class AbstractAsset(object):
 
         raise NotImplementedError('get_category function for {} is not implemented!'.format(self.__class__.__name__))
 
-    def get_short_name(self):
+    @decorators.abstractmethod
+    def get_file(self, file_type, status, extension=None):
         """
-        Returns short name of the asset
-        :return: str
+        Returns file path of the given file type and status
+        :param file_type: str
+        :param status: str
+        :param extension: str
         """
 
-        return tp.Dcc.node_short_name(self.get_name())
+        raise NotImplementedError('get_file function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_file(self, file_type, status, extension=None):
+        """
+        Returns file path of the given file type and status
+        :param file_type: str
+        :param status: str
+        :param extension: str
+        """
+
+        raise NotImplementedError('get_file function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def open_file(self, file_type, status, extension=None):
+        """
+        Opens asset file with the given type and status (if exists)
+        :param file_type: str
+        :param status: str
+        :param extension: str
+        """
+
+        raise NotImplementedError('get_file function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def import_file(self, file_type, status, extension=None):
+        """
+        Imports asset file with the given type and status (if exists)
+        :param file_type: str
+        :param status: str
+        :param extension: str
+        """
+        raise NotImplementedError('import_file function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def import_file_by_extension(self, extension=None):
+        """
+        Imports asset file with the given extension
+        :param extension: str
+        """
+        raise NotImplementedError('import_file_by_extension function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def reference_file(self, file_type, status, extension=None):
+        """
+        References asset file with the given type and status (if exists)
+        :param file_type: str
+        :param status: str
+        :param extension: str
+        """
+        raise NotImplementedError('reference_file function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def reference_file_by_extension(self, extension=None):
+        """
+        References asset file with the given extension
+        :param extension: str
+        """
+        raise NotImplementedError('reference_file_by_extension function for {} is not implemented!'.format(self.__class__.__name__))
 
     def get_relative_path(self):
         """

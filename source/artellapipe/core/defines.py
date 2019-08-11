@@ -49,6 +49,9 @@ ARTELLA_CONFIG_ASSET_FILES = 'ASSET_FILES'
 # Defines the name of the attribute that defines the list of paths that should be ignored during asset search
 ARTELLA_ASSETS_IGNORED_PATHS_ATTRIBUTE_NAME = 'ASSET_IGNORED_PATHS'
 
+# Defines the name of the attribute that defines the dict of file types supported by Artella Assets Viewer
+ARTELLA_ASSETS_LIBRARY_SUPPORTED_TYPES_ATTRIBUTE_NAME = 'ASSETS_LIBRARY_SUPPORTED_FILES'
+
 # Defines the name of the attribute that defines the name of the file that stores asset info file created by builder
 ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME = 'PROJECT_ASSET_DATA_FILENAME'
 

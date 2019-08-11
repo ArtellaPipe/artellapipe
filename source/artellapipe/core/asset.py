@@ -173,15 +173,16 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         artellalib.explore_file(self.get_path())
 
-    def open_file(self, file_type, status):
+    def open_file(self, file_type, status, extension=None):
         """
         Opens asset file with the given type and status (if exists)
         :param file_type: str
         :param status: str
+        :param extension: str
         :return:
         """
 
-        file_path = self.get_file(file_type=file_type, status=status)
+        file_path = self.get_file(file_type=file_type, status=status, extension=extension)
         if os.path.isfile(file_path):
             artellalib.open_file_in_maya(file_path)
         else:

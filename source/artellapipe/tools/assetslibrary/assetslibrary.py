@@ -13,25 +13,28 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import weakref
+from functools import partial
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 import tpDccLib as tp
 
-from artellapipe.core import assetsviewer
+from tpQtLib.core import qtutils
+
+from artellapipe.core import defines, assetsviewer
 from artellapipe.gui import window
 
-global asset_viewer_window
 
-
-class ArtellaAssetsViewer(QWidget, object):
+class ArtellaAssetsLibraryWidget(QWidget, object):
 
     # Necessary to support Maya dock
     name = 'ArtellaAssetsLibrary'
     title = 'Artella Assets Viewer'
 
     _instances = list()
+
+    ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
 
     def __init__(self, project, parent=None):
 
@@ -41,30 +44,27 @@ class ArtellaAssetsViewer(QWidget, object):
         if parent is None:
             parent = main_window
 
-        super(ArtellaAssetsViewer, self).__init__(parent=parent)
+        super(ArtellaAssetsLibraryWidget, self).__init__(parent=parent)
 
         if tp.is_maya():
-            ArtellaAssetsViewer._delete_instances()
+            ArtellaAssetsLibraryWidget._delete_instances()
             self.__class__._instances.append(weakref.proxy(self))
 
         self.ui()
         self.resize(150, 800)
 
-        global asset_viewer_window
-        asset_viewer_window = self
-
         self._assets_viewer.update_assets()
 
     @staticmethod
     def _delete_instances():
-        for ins in ArtellaAssetsViewer._instances:
+        for ins in ArtellaAssetsLibraryWidget._instances:
             try:
                 ins.setParent(None)
                 ins.deleteLater()
             except Exception:
                 pass
 
-            ArtellaAssetsViewer.instances.remove(ins)
+            ArtellaAssetsLibraryWidget.instances.remove(ins)
             del ins
 
     def ui(self):
@@ -78,7 +78,7 @@ class ArtellaAssetsViewer(QWidget, object):
         else:
             self.setLayout(self.main_layout)
 
-        self._assets_viewer = assetsviewer.AssetsViewer(
+        self._assets_viewer = self.ASSETS_VIEWER_CLASS(
             project=self._project,
             column_count=2,
             parent=self
@@ -91,7 +91,124 @@ class ArtellaAssetsViewer(QWidget, object):
         top_layout.setAlignment(Qt.AlignCenter)
         self.main_layout.addLayout(top_layout)
 
+        self._categories_menu_layout = QHBoxLayout()
+        self._categories_menu_layout.setContentsMargins(0, 0, 0, 0)
+        self._categories_menu_layout.setSpacing(0)
+        self._categories_menu_layout.setAlignment(Qt.AlignTop)
+        top_layout.addLayout(self._categories_menu_layout)
+
+        self._categories_btn_grp = QButtonGroup(self)
+        self._categories_btn_grp.setExclusive(True)
+        asset_categories = self._project.asset_types if self._project else list()
+
         self.main_layout.addWidget(self._assets_viewer)
+
+        self._supported_types_layout = QHBoxLayout()
+        self._supported_types_layout.setContentsMargins(2, 2, 2, 2)
+        self._supported_types_layout.setSpacing(2)
+        self._supported_types_layout.setAlignment(Qt.AlignTop)
+        self.main_layout.addLayout(self._supported_types_layout)
+
+        self._supported_types_btn_grp = QButtonGroup(self)
+        self._supported_types_btn_grp.setExclusive(True)
+        supported_types = self._project.assets_library_file_types if self._project else list()
+
+        self._assets_viewer.assetAdded.connect(self._on_asset_added)
+
+        self.update_asset_categories(asset_categories)
+        self.update_supported_types(supported_types)
+
+    def update_asset_categories(self, asset_categories):
+        """
+        Updates current categories with the given ones
+        :param asset_categories: list(str)
+        """
+
+        for btn in self._categories_btn_grp.buttons():
+            self._categories_btn_grp.removeButton(btn)
+
+        qtutils.clear_layout(self._categories_menu_layout)
+
+        all_asset_categories = [defines.ARTELLA_ALL_CATEGORIES_NAME]
+        all_asset_categories.extend(asset_categories)
+        for category in all_asset_categories:
+            new_btn = QPushButton(category)
+            new_btn.setCheckable(True)
+            self._categories_menu_layout.addWidget(new_btn)
+            self._categories_btn_grp.addButton(new_btn)
+            if category == defines.ARTELLA_ALL_CATEGORIES_NAME:
+                new_btn.setChecked(True)
+            new_btn.toggled.connect(partial(self._change_category, category))
+
+    def update_supported_types(self, supported_types):
+        """
+        Updates current supported types
+        :param supported_types: dict(str, str)
+        """
+
+        for btn in self._supported_types_btn_grp.buttons():
+            self._supported_types_btn_grp.removeButton(btn)
+
+        qtutils.clear_layout(self._supported_types_layout)
+
+        total_buttons = 0
+        for type_name, type_extension in supported_types.items():
+            new_btn = QPushButton(type_name.title())
+            new_btn.setCheckable(True)
+            new_btn.extension = type_extension
+            self._supported_types_layout.addWidget(new_btn)
+            self._supported_types_btn_grp.addButton(new_btn)
+            if total_buttons == 0:
+                new_btn.setChecked(True)
+            total_buttons += 1
+
+    def _change_category(self, category, flag):
+        """
+        Internal function that is called when the user presses an Asset Category button
+        :param category: str
+        """
+
+        if flag:
+            self._assets_viewer.change_category(category=category)
+
+    def _setup_asset_signals(self, asset_widget):
+        """
+        Internal function that sets proper signals to given asset widget
+        This function can be extended to add new signals to added items
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        asset_widget.clicked.connect(self._on_asset_clicked)
+
+    def _on_asset_added(self, asset_widget):
+        """
+        Internal callback function that is called when a new asset widget is added to the assets viewer
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        if not asset_widget:
+            return
+
+        self._setup_asset_signals(asset_widget)
+
+    def _on_asset_clicked(self, asset_widget):
+        """
+        Internal callback function that is called when an asset button is clicked
+        :param asset_widget: ArtellaAssetWidget
+        """
+
+        if not asset_widget:
+            return
+
+        for btn in self._supported_types_btn_grp.buttons():
+            if btn.isChecked():
+                try:
+                    asset_widget.asset.reference_file_by_extension(extension=btn.extension)
+                except Exception as e:
+                    self._project.logger.warning('Impossible to reference asset!')
+                    self._project.logger.error(e)
+                finally:
+                    return
 
 
 class ArtellaAssetsLibrary(window.ArtellaWindow, object):
@@ -113,7 +230,7 @@ class ArtellaAssetsLibrary(window.ArtellaWindow, object):
 
 def run(project):
     if tp.is_maya():
-        win = window.dock_window(project=project, window_class=ArtellaAssetsViewer)
+        win = window.dock_window(project=project, window_class=ArtellaAssetsLibraryWidget)
         return win
     else:
         win = ArtellaAssetsLibrary(project=project)

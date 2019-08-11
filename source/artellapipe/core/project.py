@@ -21,6 +21,7 @@ try:
     from urllib.parse import quote
 except ImportError:
     from urllib2 import quote
+from collections import OrderedDict
 
 import tpDccLib as tp
 from tpPyUtils import strings, osplatform, jsonio, path as path_utils, folder as folder_utils
@@ -68,6 +69,7 @@ class ArtellaProject(object):
         self._progress_bar_color0 = None
         self._progress_bar_color1 = None
         self._asset_ignored_paths = list()
+        self._assets_library_file_types = dict()
         self._asset_data_filename = None
 
         self._registered_asset_classes = list()
@@ -287,6 +289,15 @@ class ArtellaProject(object):
         return self._emails
 
     @property
+    def assets_library_file_types(self):
+        """
+        Returns file types supported by assets library
+        :return: dict
+        """
+
+        return self._assets_library_file_types
+
+    @property
     def progress_bar_color_0(self):
         """
         Returns color 0 used in progress bar color gradient
@@ -355,7 +366,7 @@ class ArtellaProject(object):
             return
 
         with open(self.PROJECT_CONFIG_PATH, 'r') as f:
-            project_config_data = json.load(f)
+            project_config_data = json.load(f, object_hook=OrderedDict)
         if not project_config_data:
             tp.Dcc.error('Project Configuration File for {} Project is empty! {}'.format(self.name.title(), self.PROJECT_CONFIG_PATH))
             return
@@ -392,6 +403,7 @@ class ArtellaProject(object):
         self._progress_bar_color0 = project_config_data.get(defines.ARTELLA_PROGRESS_BAR_COLOR_0_ATTRIBUTE_NAME, '255, 255, 255')
         self._progress_bar_color1 = project_config_data.get(defines.ARTELLA_PROGRESS_BAR_COLOR_1_ATTRIBUTE_NAME, '255, 255, 255')
         self._asset_ignored_paths = project_config_data.get(defines.ARTELLA_ASSETS_IGNORED_PATHS_ATTRIBUTE_NAME, list())
+        self._assets_library_file_types = project_config_data.get(defines.ARTELLA_ASSETS_LIBRARY_SUPPORTED_TYPES_ATTRIBUTE_NAME, dict())
         self._asset_data_filename = project_config_data.get(defines.ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME, None)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:

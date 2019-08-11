@@ -64,7 +64,7 @@ def init(do_reload=False):
     :param do_reload: bool, Whether to reload modules or not
     """
 
-    artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=do_reload)
+    artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False)
 
     global logger
     global resource
@@ -73,6 +73,9 @@ def init(do_reload=False):
     resource = ArtellaResource
 
     artella_importer.import_modules()
+    artella_importer.import_packages(only_packages=True)
+    if do_reload:
+        artella_importer.reload_all()
 
 
 def set_project(project_class, project_resource, project_naming_file):
