@@ -134,6 +134,7 @@ class AbstractAsset(object):
         References asset file with the given extension
         :param extension: str
         """
+
         raise NotImplementedError('reference_file_by_extension function for {} is not implemented!'.format(self.__class__.__name__))
 
     def get_relative_path(self):

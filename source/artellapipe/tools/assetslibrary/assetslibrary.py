@@ -13,6 +13,7 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import weakref
+import traceback
 from functools import partial
 
 from Qt.QtCore import *
@@ -21,7 +22,9 @@ from Qt.QtWidgets import *
 import tpDccLib as tp
 
 from tpQtLib.core import qtutils
+from tpQtLib.widgets import  button
 
+import artellapipe
 from artellapipe.core import defines, assetsviewer
 from artellapipe.gui import window
 
@@ -54,6 +57,7 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
         self.resize(150, 800)
 
         self._assets_viewer.update_assets()
+        self._update_assets_status()
 
     @staticmethod
     def _delete_instances():
@@ -180,6 +184,29 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
 
         asset_widget.clicked.connect(self._on_asset_clicked)
 
+    def _update_assets_status(self):
+        """
+        Internal function that checks asset availability an enables sync button if necessary
+        """
+
+        for i in range(self._assets_viewer.rowCount()):
+            for j in range(self._assets_viewer.columnCount()):
+                item = self._assets_viewer.cellWidget(i, j)
+                if not item:
+                    continue
+                asset = item.containedWidget
+                print('Asset: {}'.format(asset))
+
+    def _create_sync_button(self, item):
+        """
+        Internal function that creates a sync button in the given item
+        :param item: ArtellaAssetWidget
+        """
+
+        sync_icon = artellapipe.resource.icon('sync')
+        sync_hover_icon = artellapipe.resource.icon('sync_hover')
+        sync_btn = button.IconButton(icon=sync_icon, icon_min_size=50)
+
     def _on_asset_added(self, asset_widget):
         """
         Internal callback function that is called when a new asset widget is added to the assets viewer
@@ -206,7 +233,7 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
                     asset_widget.asset.reference_file_by_extension(extension=btn.extension)
                 except Exception as e:
                     self._project.logger.warning('Impossible to reference asset!')
-                    self._project.logger.error(e)
+                    self._project.logger.error('{} | {}'.format(e, traceback.format_exc()))
                 finally:
                     return
 

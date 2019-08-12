@@ -24,13 +24,14 @@ from Qt.QtWidgets import *
 from Qt.QtGui import *
 
 import tpDccLib as tp
-from tpPyUtils import strings, path as path_utils
+from tpPyUtils import python, decorators, strings, path as path_utils
 from tpQtLib.core import base, image, qtutils, menu
 
 import artellapipe
 from artellapipe.core import abstract, defines, artellalib
 from artellapipe.tools.assetsmanager.widgets import assetinfo
 from artellapipe.tools.tagger.core import defines as tagger_defines
+
 
 class ArtellaAssetFileStatus(object):
 
@@ -104,6 +105,18 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._category
 
+    def get_file_type(self, file_type):
+        """
+        Returns asset file object of the current asset and given file type
+        :param file_type: str
+        :return: ArtellaAssetType
+        """
+
+        if file_type not in self.ASSET_FILES:
+            return None
+
+        return self._project.get_asset_file(file_type=file_type)(asset=self)
+
     def get_artella_url(self):
         """
         Returns Artella URL of the asset
@@ -134,12 +147,22 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._artella_data
 
-    def get_file(self, file_type, status, extension=None):
+    def get_valid_file_types(self):
+        """
+        Returns a list with all valid file types of current asset
+        :return: list(str)
+        """
+
+        asset_files = self.ASSET_FILES.keys()
+        return [i for i in asset_files if i in self._project.asset_files]
+
+    def get_file(self, file_type, status, extension=None, resolve_path=False):
         """
         Returns file path of the given file type and status
         :param file_type: str
         :param status: str
         :param extension: str
+        :param resolve_path: str
         """
 
         if not extension:
@@ -150,14 +173,19 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if not ArtellaAssetFileStatus.is_valid(status):
             return None
 
-        asset_name = self.get_short_name()
+        asset_name = self.get_name()
         file_name = self._project.solve_name('asset_file', asset_name, asset_file_type=file_type)
         file_name += extension
 
         if status == ArtellaAssetFileStatus.WORKING:
             file_path = path_utils.clean_path(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type, file_name))
         else:
-            raise NotImplementedError('Open Published Assets is not implemented yet!')
+            latest_local_versions = self.get_latest_local_versions()
+            if latest_local_versions[file_type]:
+                file_path = os.path.join(self.get_path(), latest_local_versions[file_type][1], file_type, file_name)
+
+        if resolve_path:
+            file_path = self._project.resolve_path(file_path)
 
         return file_path
 
@@ -176,30 +204,50 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         artellalib.explore_file(self.get_path())
 
-    def open_file(self, file_type, status, extension=None):
+    def open_file(self, file_type, status, extension=None, resolve_path=True):
         """
         Opens asset file with the given type and status (if exists)
         :param file_type: str
         :param status: str
         :param extension: str
+        :param resolve_path: bool
         :return:
         """
 
-        file_path = self.get_file(file_type=file_type, status=status, extension=extension)
+        file_path = self.get_file(file_type=file_type, status=status, extension=extension, resolve_path=False)
         if os.path.isfile(file_path):
+            if resolve_path:
+                file_path = self._project.resolve_path(file_path)
             artellalib.open_file_in_maya(file_path)
         else:
             artellapipe.logger.warning('Impossible to open asset file of type "{}": {}'.format(file_type, file_path))
 
+    def reference_file(self, file_type, status, extension=None, resolve_path=True):
+        """
+        References asset file with the given type and status
+        :param file_type: str
+        :param status: str
+        :param resolve_path: bool
+        """
+
+        file_path = self.get_file(file_type=file_type, status=status, extension=extension, resolve_path=False)
+        if os.path.isfile(file_path):
+            if resolve_path:
+                file_path = self._project.resolve_path(file_path)
+            artellalib.reference_file_in_maya(file_path=file_path)
+        else:
+            artellapipe.logger.warning('Impossible to reference asset file of type "{}": {}'.format(file_type, file_path))
+
+    @decorators.timestamp
     def sync(self, file_type, sync_type):
         """
-        Synchronizes assaet file type and with the given sync type (working or published)
+        Synchronizes asset file type and with the given sync type (working or published)
         :param asset_type: str, type of asset file
         :param sync_type: str, type of sync (working, published or all)
         :param ask: bool, Whether user will be informed of the sync operation before starting or not
         """
 
-        if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_TYPES:
+        if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
             if sync_type not in self.ASSET_FILES:
                 artellapipe.logger.warning('Impossible to sync "{}" because current Asset {} does not support it!'.format(file_type, self.__class__.__name__))
                 return
@@ -207,12 +255,69 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                 artellapipe.logger.warning('Impossible to sync "{}" because project "{}" does not support it!'.format(file_type, self.project.name.title()))
                 return
 
-        start_time = time.time()
-
         paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
 
-        elapsed_time = time.time() - start_time
-        artellapipe.logger.warning('{} synchronized in {} seconds'.format(self.get_name(), elapsed_time))
+    def get_local_versions(self, status=None, file_types=None):
+        """
+        Returns all local version of the given asset file types and with the given status
+        :param status: ArtellaAssetFileStatus
+        :param file_types:
+        :return:
+        """
+
+        valid_types = self._get_types_to_check(file_types)
+
+        local_versions = dict()
+        for file_type in valid_types:
+            local_versions[file_type] = dict()
+
+        if not self.get_path():
+            return local_versions
+
+        for p in os.listdir(self.get_path()):
+            if status == ArtellaAssetFileStatus.WORKING:
+                if p != defines.ARTELLA_WORKING_FOLDER:
+                    continue
+                for f in os.listdir(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER)):
+                    if f not in valid_types:
+                        continue
+                    self.get_working_files_for_file_type(file_type)
+            else:
+                if p == defines.ARTELLA_WORKING_FOLDER:
+                    continue
+                for f in valid_types:
+                    if f in p:
+                        version = artellalib.get_asset_version(p)
+                        if version:
+                            local_versions[f][str(version[1])] = p
+
+        return local_versions
+
+    def get_latest_local_versions(self, file_types=None):
+        """
+        Returns latest local version of the given asset file types
+        :param file_types: list (optional)
+        :return: dict
+        """
+
+        valid_types = self._get_types_to_check(file_types)
+
+        latest_local_versions = dict()
+        for file_type in valid_types:
+            latest_local_versions[file_type] = None
+
+        local_versions = self.get_local_versions()
+
+        for f, versions in local_versions.items():
+            if versions:
+                for version, version_folder in versions.items():
+                    if latest_local_versions[f] is None:
+                        latest_local_versions[f] = [int(version), version_folder]
+                    else:
+                        if int(latest_local_versions[f][0]) < int(version):
+                            latest_local_versions[f] = [int(version), version_folder]
+
+        return latest_local_versions
 
     def _get_paths_to_sync(self, file_type, sync_type):
         """
@@ -224,13 +329,29 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         paths_to_sync = list()
 
-        if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or sync_type == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+        if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or sync_type == ArtellaAssetFileStatus.WORKING:
             if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
                 paths_to_sync.append(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER))
             else:
                 paths_to_sync.append(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type))
 
         return paths_to_sync
+
+    def _get_types_to_check(self, file_types=None):
+        """
+        Returns all file types that should be checked
+        :param file_types: list(str) (optional)
+        :return: list(str)
+        """
+
+        asset_valid_file_types = self.get_valid_file_types()
+        file_types = python.force_list(file_types)
+        if not file_types:
+            file_types = asset_valid_file_types
+        else:
+            file_types = [i for i in file_types if i in asset_valid_file_types]
+
+        return file_types
 
 
 class ArtellaAssetWidget(base.BaseWidget, object):

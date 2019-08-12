@@ -79,6 +79,8 @@ class ArtellaProject(object):
 
         self._registered_asset_classes = list()
         self._asset_classes_types = dict()
+        self._registered_asset_file_type_classes = list()
+        self._asset_classes_file_types = dict()
 
         self._resource = resource
         self._naming_file = naming_file
@@ -90,6 +92,7 @@ class ArtellaProject(object):
         self._logger = self.create_logger()[1]
 
         self._register_asset_classes()
+        self._register_asset_file_types()
 
     # ==========================================================================================================
     # PROPERTIES
@@ -586,7 +589,7 @@ class ArtellaProject(object):
             project_menu = tp.Menu(name=menu_name)
             menu_file = self.PROJECT_SHELF_FILE_PATH
             if menu_file and os.path.isfile(menu_file):
-                project_menu._create_menu(file_path=menu_file, parent_menu=menu_name)
+                project_menu.create_menu(file_path=menu_file, parent_menu=menu_name)
         except Exception as e:
             self.logger.warning('Error during {} Tools Menu creation: {} | {}'.format(self.name.title(), e, traceback.format_exc()))
 
@@ -696,6 +699,49 @@ class ArtellaProject(object):
 
         return os.environ.get(self._project_env_var)
 
+    def resolve_path(self, path_to_resolve):
+        """
+        Converts path to a valid full path
+        :param path_to_resolve: str
+        :return: str
+        """
+
+        path_to_resolve = path_to_resolve.replace('\\', '/')
+        project_var = os.environ.get(self._project_env_var)
+        if not project_var:
+            return path_to_resolve
+
+        if path_to_resolve.startswith(project_var):
+            path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(self._project_env_var))
+
+        return path_to_resolve
+
+    def fix_path(self, path_to_fix):
+        """
+        Converts path to a path relative to project environment variable
+        :param path_to_fix: str
+        :return: str
+        """
+
+        path_to_fix = path_to_fix.replace('\\', '/')
+        project_var = os.environ.get(self._project_env_var)
+        if not project_var:
+            return path_to_fix
+
+        if path_to_fix.startswith('${}/'.format(self._project_env_var)):
+            path_to_fix = path_to_fix.replace('${}/'.format(self._project_env_var), project_var)
+
+        return path_to_fix
+
+    def relative_path(self, full_path):
+        """
+        Returns relative path of the given path relative to Project path
+        :param full_path: str
+        :return: str
+        """
+
+        return os.path.relpath(full_path, self.get_path())
+
     def get_artella_url(self):
         """
         Returns Artella URL of the project
@@ -759,6 +805,15 @@ class ArtellaProject(object):
         if asset_class not in self._registered_asset_classes:
             self._registered_asset_classes.append(asset_class)
 
+    def register_asset_file_type(self, asset_file_type_class):
+        """
+        Registers a new asset file type class into the project
+        :param asset_file_type_class: cls
+        """
+
+        if asset_file_type_class not in self._registered_asset_file_type_classes:
+            self._registered_asset_file_type_classes.append(asset_file_type_class)
+
     def get_assets_path(self):
         """
         Returns path where project assets are located
@@ -780,6 +835,27 @@ class ArtellaProject(object):
             return False
 
         return True
+
+    def is_valid_asset_file_type(self, file_type):
+        """
+        Returns whether the current file type is valid or not for current project
+        :param file_type: str
+        :return: bool
+        """
+
+        return file_type in self._asset_classes_file_types.keys()
+
+    def get_asset_file(self, file_type):
+        """
+        Returns asset file object linked to given file type for current project
+        :param file_type: str
+        :return: ArtellaAssetType
+        """
+
+        if not self.is_valid_asset_file_type(file_type):
+            return None
+
+        return self._asset_classes_file_types[file_type]
 
     def get_asset_data_file_path(self, asset_path):
         """
@@ -976,7 +1052,6 @@ class ArtellaProject(object):
     def _register_asset_classes(self):
         """
         Internal function that can be override to register specific project asset classes
-        :return:
         """
 
         for asset_type in self.asset_types:
@@ -988,3 +1063,18 @@ class ArtellaProject(object):
         for asset_type in self.asset_types:
             if asset_type not in self._asset_classes_types:
                 self.logger.warning('Asset Type {} has not an associated asset class!'.format(asset_type))
+
+    def _register_asset_file_types(self):
+        """
+        Internal function that can be override to register specific project file type classes
+        """
+
+        for asset_file in self.asset_files:
+            for registered_file in self._registered_asset_file_type_classes:
+                if registered_file.FILE_TYPE == asset_file:
+                    self._asset_classes_file_types[asset_file] = registered_file
+                    break
+
+        for asset_file in self.asset_files:
+            if asset_file not in self._asset_classes_file_types:
+                self.logger.warning('Asset File Type {} has not associated asset file class!'.format(asset_file))
