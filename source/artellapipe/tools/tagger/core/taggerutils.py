@@ -14,6 +14,8 @@ __email__ = "tpovedatd@gmail.com"
 
 import tpDccLib as tp
 
+from artellapipe.tools.tagger.core import defines
+
 
 def get_current_selection():
     """
@@ -99,3 +101,25 @@ def check_if_current_selected_metadata_node_has_valid_info():
         return True
 
     return False
+
+
+def get_tag_data_nodes(project, as_tag_nodes=False):
+    """
+    Returns all scene tag data nodes in the current scene and for the given project
+    :param project: ArtellaProject
+    :param as_tag_nodes: bool
+    :return: list
+    """
+
+    tag_nodes = list()
+    objs = tp.Dcc.all_scene_objects()
+    for obj in objs:
+        valid_tag_data = tp.Dcc.attribute_exists(node=obj, attribute_name=defines.TAG_TYPE_ATTRIBUTE_NAME)
+        if valid_tag_data:
+            tag_type = tp.Dcc.get_attribute_value(node=obj, attribute_name=defines.TAG_TYPE_ATTRIBUTE_NAME)
+            if tag_type and tag_type == project.tag_type_id:
+                if as_tag_nodes and project.TAG_NODE_CLASS:
+                    obj = project.TAG_NODE_CLASS(project=project, node=obj)
+                tag_nodes.append(obj)
+
+    return tag_nodes

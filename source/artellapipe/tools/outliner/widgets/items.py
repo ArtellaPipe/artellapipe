@@ -16,8 +16,8 @@ import tpDccLib as tp
 
 import artellapipe
 
-from solstice.pipeline.tools.outliner.core import outlineritems, buttons
-from solstice.pipeline.tools.outliner.widgets import buttons as solstice_buttons
+from artellapipe.tools.outliner.core import outlineritems, buttons
+from artellapipe.tools.outliner.widgets import buttons as widget_buttons
 
 if tp.is_maya():
     from tpMayaLib.core import decorators as maya_decorators
@@ -27,11 +27,14 @@ else:
 
 
 class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
+
+    DISPLAY_BUTTONS = buttons.AssetDisplayButtons
+
     viewToggled = Signal(QObject, bool)
     viewSolo = Signal(QObject, bool)
 
-    def __init__(self, asset, parent=None):
-        super(OutlinerAssetItem, self).__init__(asset=asset, parent=parent)
+    def __init__(self, asset_node, parent=None):
+        super(OutlinerAssetItem, self).__init__(asset_node=asset_node, parent=parent)
 
     def get_display_widget(self):
         return buttons.AssetDisplayButtons()
@@ -56,7 +59,7 @@ class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
         #                 return
         #             model_widget.model_buttons.proxy_hires_cbx.setCurrentIndex(plug.asInt())
 
-    def create_menu(self, menu):
+    def _create_menu(self, menu):
         replace_menu = QMenu('Replace by', self)
         menu.addMenu(replace_menu)
         replace_abc = replace_menu.addAction('Alembic')
@@ -79,7 +82,7 @@ class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
         """
 
         valid_tag_data = False
-        main_group_connections = tp.Dcc.list_source_connections(node=self.asset.node)
+        main_group_connections = tp.Dcc.list_source_connections(node=self._asset_node.node)
         for connection in main_group_connections:
             attrs = tp.Dcc.list_user_attributes(node=connection)
             if attrs and type(attrs) == list:
@@ -97,7 +100,7 @@ class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
         """
 
         valid_tag_data = False
-        main_group_connections = tp.Dcc.list_source_connections(node=self.asset.node)
+        main_group_connections = tp.Dcc.list_source_connections(node=self._asset_node.node)
         for connection in main_group_connections:
             attrs = tp.Dcc.list_user_attributes(node=connection)
             if attrs and type(attrs) == list:
@@ -118,11 +121,11 @@ class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
 
     @undo_decorator
     def _on_replace_alembic(self):
-        abc_file = self.asset.get_alembic_files()
-        is_referenced = tp.Dcc.node_is_referenced(self.asset.node)
+        abc_file = self._asset_node.get_alembic_files()
+        is_referenced = tp.Dcc.node_is_referenced(self._asset_node.node)
         if is_referenced:
             if self.is_rig():
-                main_group_connections = tp.Dcc.list_source_connections(node=self.asset.node)
+                main_group_connections = tp.Dcc.list_source_connections(node=self._asset_node.node)
                 for connection in main_group_connections:
                     attrs = tp.Dcc.list_user_attributes(node=connection)
                     if attrs and type(attrs) == list:
@@ -138,7 +141,7 @@ class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
             elif self.is_standin():
                 pass
             else:
-                artellapipe.solstice.logger.warning('Impossible to replace {} by Alembic!'.format(self.name))
+                artellapipe.solstice.logger.warning('Impossible to replace {} by Alembic!'.format(self._name))
         else:
             artellapipe.solstice.logger.warning('Imported asset cannot be replaced!')
 
@@ -153,68 +156,23 @@ class OutlinerAssetItem(outlineritems.OutlinerAssetItem, object):
         #             namespace = namespace[1:] + ':'
 
     def _on_replace_rig(self):
-        is_referenced = tp.Dcc.node_is_referenced(self.asset.node)
+        is_referenced = tp.Dcc.node_is_referenced(self._asset_node.node)
         if not is_referenced:
             valid_refs = True
-            children = tp.Dcc.node_children(self.asset.node, all_hierarchy=False, full_path=True)
+            children = tp.Dcc.node_children(self._asset_node.node, all_hierarchy=False, full_path=True)
             for child in children:
                 is_child_ref = tp.Dcc.node_is_referenced(child)
                 if not is_child_ref:
                     valid_refs = False
                     break
             if not valid_refs:
-                artellapipe.solstice.logger.warning('Impossible to replace {} by rig file ...'.format(self.asset.node))
+                artellapipe.solstice.logger.warning('Impossible to replace {} by rig file ...'.format(self._asset_node.node))
                 return
-            rig_ref = self.asset.reference_asset_file('rig')
+            rig_ref = self._asset_node.reference_asset_file('rig')
             print(rig_ref)
 
     def _on_sync_shaders(self):
-        self.asset.sync_shaders()
+        self._asset_node.sync_shaders()
 
     def _on_unload_shaders(self):
-        self.asset.unload_shaders()
-
-
-class OutlinerModelItem(outlineritems.OutlinerFileItem, object):
-
-    proxyHiresToggled = Signal(QObject, int)
-
-    def __init__(self, parent=None):
-        super(OutlinerModelItem, self).__init__(category='model', parent=parent)
-
-    @staticmethod
-    def get_category_pixmap():
-        return artellapipe.solstice.resource.pixmap('cube', category='icons').scaled(18, 18, Qt.KeepAspectRatio)
-
-    def custom_ui(self):
-        super(OutlinerModelItem, self).custom_ui()
-
-        self.model_buttons = solstice_buttons.ModelDisplayButtons()
-        self.item_layout.addWidget(self.model_buttons, 0, 3, 1, 1)
-
-    # def setup_signals(self):
-    #     self.model_buttons.proxy_hires_cbx.currentIndexChanged.connect(partial(self.proxyHiresToggled.emit, self))
-
-
-class OutlinerShadingItem(outlineritems.OutlinerFileItem, object):
-    def __init__(self, parent=None):
-        super(OutlinerShadingItem, self).__init__(category='shading', parent=parent)
-
-    @staticmethod
-    def get_category_pixmap():
-        return artellapipe.solstice.resource.pixmap('shader', category='icons').scaled(18, 18, Qt.KeepAspectRatio)
-
-
-class OutlinerGroomItem(outlineritems.OutlinerFileItem, object):
-    def __init__(self, parent=None):
-        super(OutlinerGroomItem, self).__init__(category='groom', parent=parent)
-
-
-class OutlinerArtellaItem(outlineritems.OutlinerFileItem, object):
-    def __init__(self, parent=None):
-        super(OutlinerArtellaItem, self).__init__(category='artella', parent=parent)
-
-    @staticmethod
-    def get_category_pixmap():
-        return artellapipe.solstice.resource.pixmap('artella', category='icons').scaled(18, 18, Qt.KeepAspectRatio)
-
+        self._asset_node.unload_shaders()

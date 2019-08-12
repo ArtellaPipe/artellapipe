@@ -39,6 +39,7 @@ class ArtellaOutlinerWidget(QWidget, object):
     def __init__(self, project, parent=None):
 
         self._project = project
+        self._outliners = list()
 
         main_window = tp.Dcc.get_main_window()
         if parent is None:
@@ -51,6 +52,7 @@ class ArtellaOutlinerWidget(QWidget, object):
             self.__class__._instances.append(weakref.proxy(self))
 
         self.ui()
+        self._create_outliners()
 
     @staticmethod
     def _delete_instances():
@@ -101,7 +103,7 @@ class ArtellaOutlinerWidget(QWidget, object):
 
         self._tags_btn_grp = QButtonGroup(self)
         self._tags_btn_grp.setExclusive(True)
-        tag_types = self._project.tag_types if self._project else list()
+        outliner_categories = self._project.outliner_categories.keys() if self._project else list()
 
         self._outliners_stack = stack.SlidingStackedWidget()
         self._outliner_layout.addLayout(top_layout)
@@ -113,14 +115,14 @@ class ArtellaOutlinerWidget(QWidget, object):
         self._main_stack.addWidget(self._outliner_widget)
         self._main_stack.addWidget(self._settings_widget)
 
-        self.update_tags_types(tag_types)
+        self.update_categories(outliner_categories)
 
         # self.settingswidget.settingsSaved.connect(self.open_tabs)
 
-    def update_tags_types(self, tags_types):
+    def update_categories(self, outliner_categories):
         """
         Updates current tag categories with the given ones
-        :param tags_types: list(str)
+        :param outliner_categories: list(str)
         """
 
         for btn in self._tags_btn_grp.buttons():
@@ -129,14 +131,28 @@ class ArtellaOutlinerWidget(QWidget, object):
         qtutils.clear_layout(self._tags_menu_layout)
 
         total_buttons = 0
-        for tag_type in tags_types:
-            new_btn = QPushButton(tag_type.title())
+        for category in reversed(outliner_categories):
+            new_btn = QPushButton(category.title())
+            new_btn.category = category
             new_btn.setCheckable(True)
             self._tags_menu_layout.addWidget(new_btn)
             self._tags_btn_grp.addButton(new_btn)
             if total_buttons == 0:
                 new_btn.setChecked(True)
             total_buttons += 1
+
+    def add_outliner(self, outliner_widget):
+        """
+        Adds a new outliner to the stack widget
+        :param outliner_widget: BaseOutliner
+        """
+
+        if outliner_widget in self._outliners:
+            artellapipe.logger.warning('Outliner {} already exists!'.format(outliner_widget))
+            return
+
+        self._outliners.append(outliner_widget)
+        self._outliners_stack.addWidget(outliner_widget)
 
     def _setup_toolbar(self):
         load_scene_shaders_action = QToolButton(self)
@@ -178,13 +194,20 @@ class ArtellaOutlinerWidget(QWidget, object):
         # unload_scene_shaders_action.clicked.connect(sp.unload_shaders)
         # settings_action.clicked.connect(self.open_settings)
 
+    def _create_outliners(self):
+        """
+        Internal function that creates the outliner widgets
+        """
 
-class SolsticeOutliner(window.ArtellaWindow, object):
+        pass
+
+
+class ArtellaOutliner(window.ArtellaWindow, object):
 
     LOGO_NAME = 'outliner_logo'
 
     def __init__(self, project, parent=None):
-        super(SolsticeOutliner, self).__init__(
+        super(ArtellaOutliner, self).__init__(
             project=project,
             name='ManagerWindow',
             title='Manager',
@@ -193,7 +216,7 @@ class SolsticeOutliner(window.ArtellaWindow, object):
         )
 
     def ui(self):
-        super(SolsticeOutliner, self).ui()
+        super(ArtellaOutliner, self).ui()
 
         self._outliner = ArtellaOutlinerWidget()
         self.main_layout.addWidget(self._outliner)
@@ -204,6 +227,6 @@ def run(project):
         win = window.dock_window(project=project, window_class=ArtellaOutlinerWidget)
         return win
     else:
-        win = SolsticeOutliner(project=project)
+        win = ArtellaOutliner(project=project)
         win.show()
         return win

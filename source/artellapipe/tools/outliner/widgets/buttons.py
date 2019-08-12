@@ -12,8 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-
-from solstice.pipeline.tools.outliner.core import buttons
+from artellapipe.tools.outliner.core import buttons
 
 from Qt.QtWidgets import *
 

@@ -202,3 +202,6 @@ ARTELLA_SYNC_PUBLISHED_ASSET_STATUS = 'published'
 
 # Defines the default extension used by Artella pipeline files
 ARTELLA_DEFAULT_ASSET_FILES_EXTENSION = '.ma'
+
+# Defines the name of the attribute for tag info
+ARTELLA_TAG_INFO_ATTRIBUTE_NAME = 'tag_info'

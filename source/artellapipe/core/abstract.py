@@ -19,12 +19,13 @@ from tpPyUtils import decorators
 
 class AbstractAsset(object):
 
-    def __init__(self, project, asset_data, category=None):
+    def __init__(self, project, asset_data, category=None, node=None):
         super(AbstractAsset, self).__init__()
 
         self._project = project
         self._asset_data = asset_data
         self._category = category
+        self._node = node
 
     @property
     def data(self):
@@ -34,6 +35,15 @@ class AbstractAsset(object):
         """
 
         return self._asset_data
+
+    @property
+    def node(self):
+        """
+        Returns DCC node linked to this asset
+        :return: str
+        """
+
+        return self._node
 
     @decorators.abstractmethod
     def get_name(self):
@@ -133,3 +143,4 @@ class AbstractAsset(object):
         """
 
         return os.path.relpath(self.get_path(), self._project.get_assets_path())
+

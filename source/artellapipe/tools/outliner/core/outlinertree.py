@@ -24,47 +24,65 @@ from tpQtLib.core import base
 import artellapipe
 
 
-class BaseOutliner(base.BaseWidget, object):
-    def __init__(self, parent=None):
+class OutlinerTree(base.BaseWidget, object):
+    """
+    Core class to create outliner widgets
+    """
 
-        self.widget_tree = defaultdict(list)
-        self.callbacks = list()
-        self.widgets = list()
+    ALLOWED_TYPES = None
 
-        super(BaseOutliner, self).__init__(parent=parent)
+    def __init__(self, project, parent=None):
+
+        self._project = project
+        self._widget_tree = defaultdict(list)
+        self._widgets = list()
+
+        super(OutlinerTree, self).__init__(parent=parent)
 
     @staticmethod
     def get_file_widget_by_category(category, parent=None):
+        """
+        Returns file widget by the given categoyr
+        Overrides in specific outliners
+        :param category: str
+        :param parent:
+        """
+
         return None
 
     def mousePressEvent(self, event):
+        """
+        Overrides BaseWidget mousePressEvent function
+        :param event: QMouseEvent
+        """
+
         if event.button() == Qt.LeftButton:
             tp.Dcc.clear_selection()
 
     def ui(self):
-        super(BaseOutliner, self).ui()
+        super(OutlinerTree, self).ui()
 
         self.setMouseTracking(True)
 
-        self.top_layout = QGridLayout()
-        self.top_layout.setAlignment(Qt.AlignLeft)
-        self.top_layout.setContentsMargins(0, 0, 0, 0)
-        self.top_layout.setSpacing(2)
-        self.main_layout.addLayout(self.top_layout)
+        top_layout = QGridLayout()
+        top_layout.setAlignment(Qt.AlignLeft)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(2)
+        self.main_layout.addLayout(top_layout)
 
-        self.refresh_btn = QPushButton()
-        self.refresh_btn.setIcon(artellapipe.resource.icon('refresh'))
-        self.refresh_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
-        self.expand_all_btn = QPushButton()
-        self.expand_all_btn.setIcon(artellapipe.resource.icon('expand'))
-        self.expand_all_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
-        self.collapse_all_btn = QPushButton()
-        self.collapse_all_btn.setIcon(artellapipe.resource.icon('collapse'))
-        self.collapse_all_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        self._refresh_btn = QPushButton()
+        self._refresh_btn.setIcon(artellapipe.resource.icon('refresh'))
+        self._refresh_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        self._expand_all_btn = QPushButton()
+        self._expand_all_btn.setIcon(artellapipe.resource.icon('expand'))
+        self._expand_all_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        self._collapse_all_btn = QPushButton()
+        self._collapse_all_btn.setIcon(artellapipe.resource.icon('collapse'))
+        self._collapse_all_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
 
-        self.top_layout.addWidget(self.refresh_btn, 0, 0, 1, 1)
-        self.top_layout.addWidget(self.expand_all_btn, 0, 1, 1, 1)
-        self.top_layout.addWidget(self.collapse_all_btn, 0, 2, 1, 1)
+        top_layout.addWidget(self._refresh_btn, 0, 0, 1, 1)
+        top_layout.addWidget(self._expand_all_btn, 0, 1, 1, 1)
+        top_layout.addWidget(self._collapse_all_btn, 0, 2, 1, 1)
 
         scroll_widget = QWidget()
         scroll_area = QScrollArea()
@@ -73,84 +91,101 @@ class BaseOutliner(base.BaseWidget, object):
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setWidget(scroll_widget)
 
-        self.outliner_layout = QVBoxLayout()
-        self.outliner_layout.setContentsMargins(1, 1, 1, 1)
-        self.outliner_layout.setSpacing(0)
-        self.outliner_layout.addStretch()
-        scroll_widget.setLayout(self.outliner_layout)
+        self._outliner_layout = QVBoxLayout()
+        self._outliner_layout.setContentsMargins(1, 1, 1, 1)
+        self._outliner_layout.setSpacing(0)
+        self._outliner_layout.addStretch()
+        scroll_widget.setLayout(self._outliner_layout)
         self.main_layout.addWidget(scroll_area)
 
     def setup_signals(self):
-        self.refresh_btn.clicked.connect(self._on_refresh_outliner)
-        self.expand_all_btn.clicked.connect(self._on_expand_all_assets)
-        self.collapse_all_btn.clicked.connect(self._on_collapse_all_assets)
-
-    def init_ui(self):
-        pass
-
-    def allowed_types(self):
-        return None
-
-    def add_callbacks(self):
-        pass
-
-    def remove_callbacks(self):
-        for c in self.callbacks:
-            try:
-                self.callbacks.remove(c)
-                del c
-            except Exception as e:
-                artellapipe.solstice.logger.error('Impossible to clean callback {}'.format(c))
-                artellapipe.solstice.logger.error(str(e))
-
-        self.callbacks = list()
-        self.scrip_jobs = list()
+        self._refresh_btn.clicked.connect(self._on_refresh_outliner)
+        self._expand_all_btn.clicked.connect(self._on_expand_all_assets)
+        self._collapse_all_btn.clicked.connect(self._on_collapse_all_assets)
 
     def append_widget(self, asset):
-        self.widgets.append(asset)
-        self.outliner_layout.insertWidget(0, asset)
+        """
+        Adds a new outliner widget into it
+        :param asset: OutlinerItem
+        """
+
+        self._widgets.append(asset)
+        self._outliner_layout.insertWidget(0, asset)
 
     def remove_widget(self, asset):
-        pass
+        """
+        Removes an outliner widget from it
+        :param asset: OutlinerItem
+        """
 
-    def clear_outliner_layout(self):
-        del self.widgets[:]
-        while self.outliner_layout.count():
-            child = self.outliner_layout.takeAt(0)
+        raise NotImplementedError('remove_widget function is not implemente yet!')
+
+    def clear_items(self):
+        """
+        Clears all the items in the outliner
+        :return:
+        """
+        del self._widgets[:]
+        while self._outliner_layout.count():
+            child = self._outliner_layout.takeAt(0)
             if child.widget() is not None:
                 child.widget().deleteLater()
 
-        self.outliner_layout.setSpacing(0)
-        self.outliner_layout.addStretch()
+        self._outliner_layout.setSpacing(0)
+        self._outliner_layout.addStretch()
 
     def refresh_outliner(self):
-        self._on_refresh_outliner()
+        """
+        Refresh the items in the outliner
+        """
 
-    def _on_refresh_outliner(self, *args):
-        self.widget_tree = defaultdict(list)
-        self.clear_outliner_layout()
-        self.init_ui()
+        self._widget_tree = defaultdict(list)
+        self.clear_items()
+        self._init()
         can_expand = False
-        for w in self.widgets:
+        for w in self._widgets:
             if w.expand_enable:
                 can_expand = True
         if not can_expand:
-            self.expand_all_btn.setVisible(False)
-            self.collapse_all_btn.setVisible(False)
+            self._expand_all_btn.setVisible(False)
+            self._collapse_all_btn.setVisible(False)
 
+    def _init(self):
+        """
+        Internal callback function that initializes the outliner
+        Overrides in custom outliners
+        """
+
+        pass
+
+    def _on_refresh_outliner(self):
+        """
+        Internal callback function that is called when Refresh button is clicked
+        :return:
+        """
+
+        self.refresh_outliner()
 
     def _on_expand_all_assets(self):
-        for asset_widget in self.widget_tree.keys():
+        """
+        Internal callback function that is called when Expand button is clicked
+        """
+
+        for asset_widget in self._widget_tree.keys():
             asset_widget.expand()
 
     def _on_collapse_all_assets(self):
-        for asset_widget in self.widget_tree.keys():
+        """
+        Internal callback function that is called when Collapse button is clicked
+        """
+
+        for asset_widget in self._widget_tree.keys():
             asset_widget.collapse()
 
     def _on_item_clicked(self, widget, event):
         if widget is None:
             artellapipe.solstice.logger.warning('Selected Asset is not valid!')
-            artellapipe
+            return
 
         asset_name = widget.asset.name
         item_state = widget.is_selected
@@ -159,7 +194,7 @@ class BaseOutliner(base.BaseWidget, object):
             if not is_modified:
                 tp.Dcc.clear_selection()
 
-            for asset_widget, file_items in self.widget_tree.items():
+            for asset_widget, file_items in self._widget_tree.items():
                 if asset_widget != widget:
                     continue
                 if is_modified and widget.is_selected:
@@ -176,7 +211,7 @@ class BaseOutliner(base.BaseWidget, object):
 
     def _on_selection_changed(self, *args):
         selection = tp.Dcc.selected_nodes(full_path=True)
-        for asset_widget, file_items in self.widget_tree.items():
+        for asset_widget, file_items in self._widget_tree.items():
             if '|{}'.format(asset_widget.asset.name) in selection:
                 asset_widget.select()
             else:

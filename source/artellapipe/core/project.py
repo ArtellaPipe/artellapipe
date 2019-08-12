@@ -24,13 +24,14 @@ except ImportError:
 from collections import OrderedDict
 
 import tpDccLib as tp
-from tpPyUtils import strings, osplatform, jsonio, path as path_utils, folder as folder_utils
+from tpPyUtils import strings, decorators, osplatform, jsonio, path as path_utils, folder as folder_utils
 
 import artellapipe
-from artellapipe.core import defines, artellalib, asset
+from artellapipe.core import defines, artellalib, asset, node
 from artellapipe.gui import tray
 
 from artellapipe.tools.namemanager import namemanager
+from artellapipe.tools.tagger.core import taggerutils
 
 
 class ArtellaProject(object):
@@ -38,6 +39,8 @@ class ArtellaProject(object):
     PROJECT_RESOURCE = None
     TRAY_CLASS = tray.ArtellaTray
     ASSET_CLASS = asset.ArtellaAsset
+    ASSET_NODE_CLASS = node.ArtellaAssetNode
+    TAG_NODE_CLASS = asset.ArtellaTagNode
     PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
@@ -335,6 +338,15 @@ class ArtellaProject(object):
 
         return self._progress_bar_color1
 
+    @property
+    def tag_type_id(self):
+        """
+        Returns tag name used to identify assets for the current project
+        :return: str
+        """
+
+        return '{}_TAG'.format(self.get_clean_name().upper())
+
     # ==========================================================================================================
     # INITIALIZATION & CONFIG
     # ==========================================================================================================
@@ -574,7 +586,7 @@ class ArtellaProject(object):
             project_menu = tp.Menu(name=menu_name)
             menu_file = self.PROJECT_SHELF_FILE_PATH
             if menu_file and os.path.isfile(menu_file):
-                project_menu.create_menu(file_path=menu_file, parent_menu=menu_name)
+                project_menu._create_menu(file_path=menu_file, parent_menu=menu_name)
         except Exception as e:
             self.logger.warning('Error during {} Tools Menu creation: {} | {}'.format(self.name.title(), e, traceback.format_exc()))
 
@@ -864,6 +876,102 @@ class ArtellaProject(object):
             artellapipe.logger.warning('Found Multiple instances of Asset "{}"'.format(asset_name))
 
         return asset_founds[0]
+
+    def get_tag_info_nodes(self, as_tag_nodes=False):
+        """
+        Returns all nodes containing tag info data
+        :return: list
+        """
+
+        tag_info_nodes = list()
+        objs = tp.Dcc.all_scene_objects()
+        for obj in objs:
+            valid_tag_info_data = tp.Dcc.attribute_exists(node=obj, attribute_name=defines.ARTELLA_TAG_INFO_ATTRIBUTE_NAME)
+            if valid_tag_info_data:
+                if as_tag_nodes and self.TAG_NODE_CLASS:
+                    tag_info = tp.Dcc.get_attribute_value(node=obj, attribute_name=defines.ARTELLA_TAG_INFO_ATTRIBUTE_NAME)
+                    obj = self.TAG_NODE_CLASS(project=self, node=obj, tag_info=tag_info)
+                tag_info_nodes.append(obj)
+
+        return tag_info_nodes
+
+    @decorators.timestamp
+    def get_scene_assets(self, as_nodes=True, allowed_types=None):
+        """
+        Implements base ArtellaProject get_scene_assets function
+        Returns a list with all nodes in the current scene
+        :return: list
+        """
+
+        asset_nodes = list()
+
+        abc_nodes = self.get_alembics(as_asset_nodes=False, only_roots=True)
+
+        tag_data_nodes = taggerutils.get_tag_data_nodes(project=self, as_tag_nodes=as_nodes)
+        for tag_data in tag_data_nodes:
+            asset_node = tag_data.get_asset_node()
+            if asset_node is None or asset_node in abc_nodes:
+                continue
+            if allowed_types:
+                asset_types = tag_data.get_types()
+                allow = [i for i in asset_types if i in allowed_types]
+                if allow:
+                    asset_nodes.append(asset_node)
+            else:
+                asset_nodes.append(asset_node)
+
+        tag_info_nodes = self.get_tag_info_nodes(as_tag_nodes=as_nodes)
+        for tag_info in tag_info_nodes:
+            asset_node = tag_info.get_asset_node()
+            if not asset_node:
+                continue
+            if allowed_types:
+                asset_types = tag_info.get_types()
+                allow = [i for i in asset_types if i in allowed_types]
+                if allow:
+                    asset_nodes.append(asset_node)
+            else:
+                asset_nodes.append(asset_node)
+
+        return asset_nodes
+
+    def get_alembics(self, as_asset_nodes=True, only_roots=True):
+        """
+        Returns all alembic nodes in the scene
+        :param as_asset_nodes: bool, Whether to return nodes as ArtellaAssetNodes
+        :param only_roots: bool
+        :return: list
+        """
+
+        all_abc_roots = list()
+        added_roots = list()
+        abc_nodes = list()
+
+        objs = tp.Dcc.all_scene_objects()
+        for obj in objs:
+            if tp.Dcc.node_type(obj) == 'AlembicNode':
+                abc_nodes.append(obj)
+
+        for abc in abc_nodes:
+            connections = tp.Dcc.list_connections(abc, 'transOp')
+            for cnt in connections:
+                cnt_root = tp.Dcc.node_root(cnt)
+                if cnt_root in added_roots:
+                    continue
+                if tp.Dcc.attribute_exists(cnt_root, defines.ARTELLA_TAG_INFO_ATTRIBUTE_NAME):
+                    if as_asset_nodes:
+                        if only_roots:
+                            all_abc_roots.append(self.ASSET_NODE_CLASS(project=self, node=cnt_root))
+                        else:
+                            all_abc_roots.append((self.ASSET_NODE_CLASS(project=self, node=cnt_root), abc))
+                    else:
+                        if only_roots:
+                            all_abc_roots.append(cnt_root)
+                        else:
+                            all_abc_roots.append((cnt_root, abc))
+                    added_roots.append(cnt_root)
+
+        return all_abc_roots
 
     def _register_asset_classes(self):
         """
