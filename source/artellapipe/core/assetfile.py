@@ -64,11 +64,11 @@ class ArtellaAssetType(object):
 
         self._import_file(path=file_path)
 
-    def reference_file(self, status, resolve_path=True):
+    def reference_file(self, status, fix_path=True):
         """
         References current file into DCC
         :param status: str
-        :param resolve_path: bool
+        :param fix_path: bool
         :return:
         """
 
@@ -77,7 +77,7 @@ class ArtellaAssetType(object):
         else:
             file_path = self.get_latest_local_published_path()
 
-        self._reference_file(path=file_path, resolve_path=resolve_path)
+        self._reference_file(path=file_path, fix_path=fix_path)
 
     @property
     def asset(self):
@@ -338,34 +338,34 @@ class ArtellaAssetType(object):
                     return artellalib.get_asset_history(ref_path)
                 break
 
-    def _open_file(self, path, resolve_path=True):
+    def _open_file(self, path, fix_path=True):
         """
         Internal function that opens current file in DCC
         Overrides in custom asset file
         :param path: str
-        :param resolve_path: bool
+        :param fix_path: bool
         :return:
         """
 
         pass
 
-    def _import_file(self, path, resolve_path=True):
+    def _import_file(self, path, fix_path=True):
         """
         Internal function that imports current file in DCC
         Overrides in custom asset file
         :param path: str
-        :param resolve_path: bool
+        :param fix_path: bool
         :return:
         """
 
         pass
 
-    def _reference_file(self, path, resolve_path=True):
+    def _reference_file(self, path, fix_path=True):
         """
         Internal function that references current file in DCC
         Overrides in custom asset file
         :param path: str
-        :param resolve_path: bool
+        :param fix_path: bool
         :return:
         """
 

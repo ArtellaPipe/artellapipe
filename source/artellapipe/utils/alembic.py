@@ -261,7 +261,7 @@ def export(alembicFile,
     return os.path.exists(alembicFile)
 
 
-def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None, resolve_path=False):
+def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None, fix_path=False):
     if not os.path.exists(alembic_file):
         tp.Dcc.confirm_dialog(
             title='Error',
@@ -272,10 +272,11 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
     artellapipe.logger.debug('Import Alembic File ({}) with job arguments:\n{}\n\n{}'.format(mode, alembic_file, nodes))
 
     try:
-        if resolve_path:
-            abc_file = project.resolve_path(alembic_file)
+        if fix_path:
+            abc_file = project.fix_path(alembic_file)
         else:
             abc_file = alembic_file
+
         if tp.is_maya():
             import maya.cmds as cmds
             if nodes:
@@ -284,7 +285,6 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
                 res = cmds.AbcImport(abc_file, mode=mode, rpr=parent)
             else:
                 res = cmds.AbcImport(abc_file, mode=mode)
-            return res
         elif tp.is_houdini():
             if not parent:
                 artellapipe.logger.warning('Impossible to import Alembic File because not Alembic parent given!')
@@ -293,7 +293,6 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
             build_hierarch_param = parent.parm('buildHierarchy')
             if build_hierarch_param:
                 build_hierarch_param.pressButton()
-
     except Exception as e:
         artellapipe.logger.error(traceback.format_exc())
         return False

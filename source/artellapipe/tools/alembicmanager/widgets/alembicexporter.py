@@ -32,6 +32,7 @@ from artellapipe.core import artellalib
 from artellapipe.utils import alembic
 from artellapipe.gui import waiter, spinner
 from artellapipe.tools.tagger.core import taggerutils
+from artellapipe.tools.alembicmanager import alembicmanager
 from artellapipe.tools.alembicmanager.core import defines
 from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
@@ -970,3 +971,7 @@ class AlembicNode(AlembicExporterNode, object):
 class AlembicExporterModelHires(AlembicExporterNode, object):
     def __init__(self, name, parent=None):
         super(AlembicExporterModelHires, self).__init__(name=name, parent=parent)
+
+
+alembicmanager.register_exporter(AlembicExporter)
+

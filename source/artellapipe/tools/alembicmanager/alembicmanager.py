@@ -12,6 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import sys
 from functools import partial
 
 from Qt.QtWidgets import *
@@ -23,7 +24,7 @@ from tpQtLib.widgets import stack, splitters
 import artellapipe
 from artellapipe.gui import window
 
-from artellapipe.tools.alembicmanager.widgets import alembicgroup, alembicexporter, alembicimporter
+from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
 
 class AlembicManager(window.ArtellaWindow, object):
@@ -82,12 +83,8 @@ class AlembicManager(window.ArtellaWindow, object):
 
         self._alembic_group_widget = alembicgroup.AlembicGroup()
 
-        self._alembic_exporter = alembicexporter.AlembicExporter(project=self._project)
-
-        if tp.is_houdini():
-            self._alembic_importer = alembicimporter.HoudiniAlembicImporter(project=self._project)
-        else:
-            self._alembic_importer = alembicimporter.AlembicImporter(project=self._project)
+        self._alembic_exporter = getattr(sys.modules[__name__], 'exporter')(project=self._project)
+        self._alembic_importer = getattr(sys.modules[__name__], 'importer')(project=self._project)
 
         self._stack.addWidget(self._alembic_group_widget)
         self._stack.addWidget(self._alembic_exporter)
@@ -144,6 +141,24 @@ class AlembicManager(window.ArtellaWindow, object):
 
         artellapipe.logger.warning(warning_msg)
         self.show_warning_message(warning_msg)
+
+
+def register_importer(cls):
+    """
+    This function registers given class
+    :param cls: class, Alembic importer class we want to register
+    """
+
+    sys.modules[__name__].__dict__['importer'] = cls
+
+
+def register_exporter(cls):
+    """
+    This function registers given class
+    :param cls: class, Alembic importer class we want to register
+    """
+
+    sys.modules[__name__].__dict__['exporter'] = cls
 
 
 def run(project):
