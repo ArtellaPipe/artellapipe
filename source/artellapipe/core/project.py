@@ -39,6 +39,7 @@ class ArtellaProject(object):
 
     PROJECT_RESOURCE = None
     TRAY_CLASS = tray.ArtellaTray
+    SHELF_CLASS = tp.Shelf
     ASSET_CLASS = asset.ArtellaAsset
     ASSET_NODE_CLASS = node.ArtellaAssetNode
     TAG_NODE_CLASS = asset.ArtellaTagNode
@@ -564,7 +565,7 @@ class ArtellaProject(object):
         shelf_category_icon = None
         if self.resource and self._shelf_icon:
             shelf_category_icon = self.resource.icon(self._shelf_icon, theme=None)
-        project_shelf = tp.Shelf(name=self._name.replace(' ', ''), category_icon=shelf_category_icon)
+        project_shelf = self.SHELF_CLASS(name=self._name.replace(' ', ''), category_icon=shelf_category_icon)
         project_shelf.create(delete_if_exists=True)
         shelf_file = self.PROJECT_SHELF_FILE_PATH
         if not shelf_file or not os.path.isfile(shelf_file):

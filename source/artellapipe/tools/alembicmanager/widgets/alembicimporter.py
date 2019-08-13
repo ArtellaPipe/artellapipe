@@ -53,11 +53,11 @@ class AlembicImporter(base.BaseWidget, object):
         self.main_layout.addLayout(buttons_layout)
 
         shot_name_lbl = QLabel('Shot Name: ')
-        self.shot_line = QLineEdit()
+        self._shot_line = QLineEdit()
         buttons_layout.addWidget(shot_name_lbl, 1, 0, 1, 1, Qt.AlignRight)
-        buttons_layout.addWidget(self.shot_line, 1, 1)
+        buttons_layout.addWidget(self._shot_line, 1, 1)
         shot_name_lbl.setVisible(False)
-        self.shot_line.setVisible(False)
+        self._shot_line.setVisible(False)
 
         folder_icon = artellapipe.resource.icon('folder')
         alembic_path_layout = QHBoxLayout()
@@ -66,15 +66,15 @@ class AlembicImporter(base.BaseWidget, object):
         alembic_path_widget = QWidget()
         alembic_path_widget.setLayout(alembic_path_layout)
         alembic_path_lbl = QLabel('Alembic File: ')
-        self.alembic_path_line = QLineEdit()
-        self.alembic_path_line.setReadOnly(True)
-        self.alembic_path_btn = QPushButton()
-        self.alembic_path_btn.setIcon(folder_icon)
-        self.alembic_path_btn.setIconSize(QSize(18, 18))
-        self.alembic_path_btn.setStyleSheet(
+        self._alembic_path_line = QLineEdit()
+        self._alembic_path_line.setReadOnly(True)
+        self._alembic_path_btn = QPushButton()
+        self._alembic_path_btn.setIcon(folder_icon)
+        self._alembic_path_btn.setIconSize(QSize(18, 18))
+        self._alembic_path_btn.setStyleSheet(
             "background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(255,255,255,0);")
-        alembic_path_layout.addWidget(self.alembic_path_line)
-        alembic_path_layout.addWidget(self.alembic_path_btn)
+        alembic_path_layout.addWidget(self._alembic_path_line)
+        alembic_path_layout.addWidget(self._alembic_path_btn)
         buttons_layout.addWidget(alembic_path_lbl, 2, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(alembic_path_widget, 2, 1)
 
@@ -84,23 +84,29 @@ class AlembicImporter(base.BaseWidget, object):
         import_mode_widget = QWidget()
         import_mode_widget.setLayout(import_mode_layout)
         import_mode_lbl = QLabel('Import mode: ')
-        self.create_radio = QRadioButton('Create')
-        self.add_radio = QRadioButton('Add')
-        self.merge_radio = QRadioButton('Merge')
-        self.create_radio.setChecked(True)
-        import_mode_layout.addWidget(self.create_radio)
-        import_mode_layout.addWidget(self.add_radio)
-        import_mode_layout.addWidget(self.merge_radio)
+        self._create_radio = QRadioButton('Create')
+        self._add_radio = QRadioButton('Add')
+        self._merge_radio = QRadioButton('Merge')
+        self._create_radio.setChecked(True)
+        import_mode_layout.addWidget(self._create_radio)
+        import_mode_layout.addWidget(self._add_radio)
+        import_mode_layout.addWidget(self._merge_radio)
         buttons_layout.addWidget(import_mode_lbl, 3, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(import_mode_widget, 3, 1)
         import_mode_lbl.setVisible(False)
         import_mode_widget.setVisible(False)
 
         auto_display_lbl = QLabel('Auto Display Smooth?: ')
-        self.auto_smooth_display = QCheckBox()
-        self.auto_smooth_display.setChecked(True)
+        self._auto_smooth_display = QCheckBox()
+        self._auto_smooth_display.setChecked(True)
         buttons_layout.addWidget(auto_display_lbl, 4, 0, 1, 1, Qt.AlignRight)
-        buttons_layout.addWidget(self.auto_smooth_display, 4, 1)
+        buttons_layout.addWidget(self._auto_smooth_display, 4, 1)
+
+        if tp.is_houdini():
+            hou_archive_abc_node_lbl = QLabel('Import Alembic as Archive?')
+            self._hou_archive_abc_node_cbx = QCheckBox()
+            buttons_layout.addWidget(hou_archive_abc_node_lbl, 5, 0, 1, 1, Qt.AlignRight)
+            buttons_layout.addWidget(self._hou_archive_abc_node_cbx, 5, 1)
 
         self.main_layout.addLayout(splitters.SplitterLayout())
 
@@ -137,11 +143,14 @@ class AlembicImporter(base.BaseWidget, object):
         buttons_layout.addWidget(self._import_btn)
         buttons_layout.addWidget(self._reference_btn)
 
+        if tp.is_houdini():
+            self._reference_btn.setEnabled(False)
+
     def setup_signals(self):
-        self.create_radio.clicked.connect(self._on_mode_changed)
-        self.add_radio.clicked.connect(self._on_mode_changed)
-        self.merge_radio.clicked.connect(self._on_mode_changed)
-        self.alembic_path_btn.clicked.connect(self._on_browse_alembic)
+        self._create_radio.clicked.connect(self._on_mode_changed)
+        self._add_radio.clicked.connect(self._on_mode_changed)
+        self._merge_radio.clicked.connect(self._on_mode_changed)
+        self._alembic_path_btn.clicked.connect(self._on_browse_alembic)
         self._import_btn.clicked.connect(self._on_import_alembic)
         self._reference_btn.clicked.connect(partial(self._on_import_alembic, True))
 
@@ -185,14 +194,14 @@ class AlembicImporter(base.BaseWidget, object):
         if m:
             shot_name = m.group(1)
 
-        self.shot_line.setText(shot_name)
+        self._shot_line.setText(shot_name)
 
     def _on_mode_changed(self):
-        self.merge_abc_widget.setVisible(self.merge_radio.isChecked())
+        self.merge_abc_widget.setVisible(self._merge_radio.isChecked())
 
     def _on_browse_alembic(self):
 
-        shot_name = self.shot_line.text()
+        shot_name = self._shot_line.text()
         abc_folder = os.path.normpath(os.path.join(self._project.get_path(), shot_name)) if shot_name != 'unresolved' else self._project.get_path()
 
         pattern = 'Alembic Files (*.abc)'
@@ -200,7 +209,7 @@ class AlembicImporter(base.BaseWidget, object):
             pattern = '*.abc'
         abc_file = tp.Dcc.select_file_dialog(title='Select Alembic to Import', start_directory=abc_folder, pattern=pattern)
         if abc_file:
-            self.alembic_path_line.setText(abc_file)
+            self._alembic_path_line.setText(abc_file)
 
     @classmethod
     def import_alembic(cls, project, alembic_path, parent=None, unresolve_path=False):
@@ -281,13 +290,13 @@ class AlembicImporter(base.BaseWidget, object):
             tp.Dcc.set_parent(obj, sel[0])
 
     def _on_import_alembic(self, as_reference=False):
-        abc_file = self.alembic_path_line.text()
+        abc_file = self._alembic_path_line.text()
         if not abc_file or not os.path.isfile(abc_file):
             tp.Dcc.confirm_dialog(title='Error', message='No Alembic File is selected or file is not currently available in disk')
             return None
 
         sel_set = self.alembic_groups_combo.currentText()
-        if self.merge_radio.isChecked() and not sel_set:
+        if self._merge_radio.isChecked() and not sel_set:
             tp.Dcc.confirm_dialog(title='Error', message='No Alembic Group selected. Please create the Alembic Group first and retry')
             return None
 
@@ -313,18 +322,21 @@ class AlembicImporter(base.BaseWidget, object):
 
         sel = None
         root_to_add = None
-        if self.create_radio.isChecked():
-            if valid_tag_info:
-                if tp.is_maya():
-                    root = tp.Dcc.create_empty_group(name=abc_name)
-                    root_to_add = root
-                elif tp.is_houdini():
-                    n = hou.node('obj')
-                    root = n.createNode('alembicarchive')
-                    root_to_add = root
-                # if valid_tag_info:
-                #     self._add_tag_info_data(tag_info, root)
-                sel = [root]
+        if self._create_radio.isChecked():
+            if tp.is_maya():
+                root = tp.Dcc.create_empty_group(name=abc_name)
+                root_to_add = root
+            elif tp.is_houdini():
+                n = hou.node('obj')
+                if self._hou_archive_abc_node_cbx.isChecked():
+                    root = n.createNode('alembicarchive', node_name=abc_name)
+                else:
+                    geo = n.createNode('geo', node_name=abc_name)
+                    root = geo.createNode('alembic', node_name=abc_name)
+                root_to_add = root
+            # if valid_tag_info:
+            #     self._add_tag_info_data(tag_info, root)
+            sel = [root]
         else:
             sel = tp.Dcc.selected_nodes(full_path=True)
             if not sel:
@@ -339,6 +351,8 @@ class AlembicImporter(base.BaseWidget, object):
         if tp.is_maya():
             track_nodes = maya_scene.TrackNodes()
             track_nodes.load()
+
+        all_nodes = None
 
         if as_reference:
             if tp.is_maya():
@@ -363,7 +377,10 @@ class AlembicImporter(base.BaseWidget, object):
             if valid_tag_info:
                 res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import', nodes=nodes, parent=sel[0])
             else:
-                res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import')
+                if tp.is_houdini():
+                    res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import', parent=root_to_add)
+                else:
+                    res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import')
             res = [res]
 
             if tp.is_maya():
@@ -371,31 +388,33 @@ class AlembicImporter(base.BaseWidget, object):
 
         added_tag = False
         for key in tag_info.keys():
-            for obj in all_nodes:
-                short_obj = tp.Dcc.node_short_name(obj)
-                if key == short_obj:
-                    self._add_tag_info_data(tag_info[key], obj)
-                    added_tag = True
-                # elif '{}_hires_grp'.format(key) == short_obj:
-                #     self._add_tag_info_data(tag_info[key], obj)
-                #     added_tag = True
+            if all_nodes:
+                for obj in all_nodes:
+                    short_obj = tp.Dcc.node_short_name(obj)
+                    if key == short_obj:
+                        self._add_tag_info_data(tag_info[key], obj)
+                        added_tag = True
+                    # elif '{}_hires_grp'.format(key) == short_obj:
+                    #     self._add_tag_info_data(tag_info[key], obj)
+                    #     added_tag = True
 
         if not added_tag and root_to_add:
             self._add_tag_info_data(tag_info, root_to_add)
 
-        if self.auto_smooth_display.isChecked():
-            for obj in all_nodes:
-                if obj and tp.Dcc.object_exists(obj):
-                    if tp.Dcc.node_type(obj) == 'shape':
-                        if tp.Dcc.attribute_exists(node=obj, attribute_name='aiSubdivType'):
-                            tp.Dcc.set_integer_attribute_value(node=obj, attribute_name='aiSubdivType', attribute_value=1)
-                    elif tp.Dcc.node_type(obj) == 'transform':
-                        shapes = tp.Dcc.list_shapes(node=obj, full_path=True)
-                        if not shapes:
-                            continue
-                        for s in shapes:
-                            if tp.Dcc.attribute_exists(node=s, attribute_name='aiSubdivType'):
-                                tp.Dcc.set_integer_attribute_value(node=s, attribute_name='aiSubdivType', attribute_value=1)
+        if self._auto_smooth_display.isChecked():
+            if all_nodes:
+                for obj in all_nodes:
+                    if obj and tp.Dcc.object_exists(obj):
+                        if tp.Dcc.node_type(obj) == 'shape':
+                            if tp.Dcc.attribute_exists(node=obj, attribute_name='aiSubdivType'):
+                                tp.Dcc.set_integer_attribute_value(node=obj, attribute_name='aiSubdivType', attribute_value=1)
+                        elif tp.Dcc.node_type(obj) == 'transform':
+                            shapes = tp.Dcc.list_shapes(node=obj, full_path=True)
+                            if not shapes:
+                                continue
+                            for s in shapes:
+                                if tp.Dcc.attribute_exists(node=s, attribute_name='aiSubdivType'):
+                                    tp.Dcc.set_integer_attribute_value(node=s, attribute_name='aiSubdivType', attribute_value=1)
 
         if res:
             if as_reference:

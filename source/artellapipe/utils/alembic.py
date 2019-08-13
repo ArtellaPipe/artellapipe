@@ -290,7 +290,9 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
                 artellapipe.logger.warning('Impossible to import Alembic File because not Alembic parent given!')
                 return False
             parent.parm('fileName').set(abc_file)
-            parent.parm('buildHierarchy').pressButton()
+            build_hierarch_param = parent.parm('buildHierarchy')
+            if build_hierarch_param:
+                build_hierarch_param.pressButton()
 
     except Exception as e:
         artellapipe.logger.error(traceback.format_exc())
@@ -298,6 +300,7 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
 
     artellapipe.logger.debug('Alembic File {} imported successfully!'.format(os.path.basename(alembic_file)))
     return True
+
 
 def reference_alembic(project, alembic_file, namespace=None, resolve_path=False):
 

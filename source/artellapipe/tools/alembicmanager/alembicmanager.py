@@ -79,6 +79,7 @@ class AlembicManager(window.ArtellaWindow, object):
         self.main_layout.addWidget(self._stack)
 
         self._alembic_group_widget = alembicgroup.AlembicGroup()
+
         self._alembic_exporter = alembicexporter.AlembicExporter(project=self._project)
         self._alembic_importer = alembicimporter.AlembicImporter(project=self._project)
 

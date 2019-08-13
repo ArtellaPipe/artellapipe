@@ -42,6 +42,7 @@ class AlembicGroup(base.BaseWidget, object):
         self.main_layout.addLayout(group_layout)
 
         group_name_lbl = QLabel('Group Name: ')
+        group_name_lbl.setStyleSheet('background-color: transparent;')
         self.name_line = QLineEdit()
         group_layout.addWidget(group_name_lbl, 0, 0, 1, 1, Qt.AlignRight)
         group_layout.addWidget(self.name_line, 0, 1)
