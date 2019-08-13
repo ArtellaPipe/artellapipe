@@ -16,6 +16,8 @@ from functools import partial
 
 from Qt.QtWidgets import *
 
+import tpDccLib as tp
+
 from tpQtLib.widgets import stack, splitters
 
 import artellapipe
@@ -81,7 +83,11 @@ class AlembicManager(window.ArtellaWindow, object):
         self._alembic_group_widget = alembicgroup.AlembicGroup()
 
         self._alembic_exporter = alembicexporter.AlembicExporter(project=self._project)
-        self._alembic_importer = alembicimporter.AlembicImporter(project=self._project)
+
+        if tp.is_houdini():
+            self._alembic_importer = alembicimporter.HoudiniAlembicImporter(project=self._project)
+        else:
+            self._alembic_importer = alembicimporter.AlembicImporter(project=self._project)
 
         self._stack.addWidget(self._alembic_group_widget)
         self._stack.addWidget(self._alembic_exporter)

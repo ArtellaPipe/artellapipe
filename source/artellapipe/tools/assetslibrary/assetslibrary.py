@@ -215,6 +215,7 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
 class ArtellaAssetsLibrary(window.ArtellaWindow, object):
 
     LOGO_NAME = 'assetsmanager_logo'
+    LIBRARY_WIDGET = ArtellaAssetsLibraryWidget
 
     def __init__(self, project, parent=None):
         super(ArtellaAssetsLibrary, self).__init__(
@@ -227,6 +228,9 @@ class ArtellaAssetsLibrary(window.ArtellaWindow, object):
 
     def ui(self):
         super(ArtellaAssetsLibrary, self).ui()
+
+        self._library_widget = self.LIBRARY_WIDGET(project=self._project)
+        self.main_layout.addWidget(self._library_widget)
 
 
 def run(project):

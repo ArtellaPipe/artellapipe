@@ -324,13 +324,14 @@ def reference_alembic(project, alembic_file, namespace=None, resolve_path=False)
             abc_file = alembic_file
 
         if namespace:
-            cmds.file(abc_file, type='Alembic', reference=True, namespace=namespace)
+            new_nodes = cmds.file(abc_file, type='Alembic', reference=True, returnNewNodes=True, namespace=namespace)
         else:
-            cmds.file(abc_file, type='Alembic', reference=True)
+            new_nodes = cmds.file(abc_file, type='Alembic', reference=True, returnNewNodes=True)
+
     except Exception as e:
         artellapipe.logger.error(traceback.format_exc())
         raise Exception(e)
 
     artellapipe.logger.debug('Alembic File {} referenced successfully!'.format(os.path.basename(alembic_file)))
 
-    return True
+    return new_nodes

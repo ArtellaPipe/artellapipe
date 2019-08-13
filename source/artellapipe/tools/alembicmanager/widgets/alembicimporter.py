@@ -19,14 +19,15 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+from tpPyUtils import decorators, python
+
 import tpDccLib as tp
 
 from tpQtLib.core import base
-from artellapipe.utils import alembic
 from tpQtLib.widgets import splitters
 
 import artellapipe
-
+from artellapipe.utils import alembic
 from artellapipe.tools.alembicmanager.core import defines
 
 if tp.is_maya():
@@ -96,10 +97,10 @@ class AlembicImporter(base.BaseWidget, object):
         import_mode_lbl.setVisible(False)
         import_mode_widget.setVisible(False)
 
-        auto_display_lbl = QLabel('Auto Display Smooth?: ')
+        self._auto_display_lbl = QLabel('Auto Display Smooth?: ')
         self._auto_smooth_display = QCheckBox()
         self._auto_smooth_display.setChecked(True)
-        buttons_layout.addWidget(auto_display_lbl, 4, 0, 1, 1, Qt.AlignRight)
+        buttons_layout.addWidget(self._auto_display_lbl, 4, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(self._auto_smooth_display, 4, 1)
 
         if tp.is_houdini():
@@ -156,6 +157,110 @@ class AlembicImporter(base.BaseWidget, object):
 
         self._on_mode_changed()
 
+    @classmethod
+    def import_alembic(cls, project, alembic_path, parent=None, resolve_path=False):
+        """
+        Imports Alembic in current DCC scene
+        :param project: ArtellaProject
+        :param alembic_path: str
+        :param parent: object
+        :param resolve_path: bool
+        :return: bool
+        """
+
+        if not alembic_path or not os.path.isfile(alembic_path):
+            artellapipe.logger.warning('Alembic file {} does not exits!'.format(alembic_path))
+            return None
+
+        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
+        valid_tag_info = True
+        if os.path.isfile(tag_json_file):
+            with open(tag_json_file, 'r') as f:
+                tag_info = json.loads(f.read())
+            if not tag_info:
+                artellapipe.logger.warning('No Alembic Info loaded!')
+                valid_tag_info = False
+        else:
+            artellapipe.logger.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
+            valid_tag_info = False
+
+        if parent and valid_tag_info:
+            cls._add_tag_info_data(project=project, tag_info=tag_info, attr_node=parent)
+
+        track_nodes = maya_scene.TrackNodes()
+        track_nodes.load()
+
+        valid_import = alembic.import_alembic(project, alembic_path, mode='import', nodes=None, parent=parent, resolve_path=resolve_path)
+
+        if not valid_import:
+            return
+
+        res = track_nodes.get_delta()
+
+        return res
+
+    @staticmethod
+    def reference_alembic(project, alembic_path, namespace=None, resolve_path=False):
+        """
+        References alembic file in current DCC scene
+        :param project: ArtellaProject
+        :param alembic_path: str
+        :param namespace: str
+        :param resolve_path: bool
+        """
+
+        if not alembic_path or not os.path.isfile(alembic_path):
+            artellapipe.logger.warning('Alembic file {} does not exits!'.format(alembic_path))
+            return None
+
+        abc_name = os.path.basename(alembic_path).split('.')[0]
+        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
+        if not os.path.isfile(tag_json_file):
+            artellapipe.logger.warning('No Alembic Info file found!')
+            return
+
+        with open(tag_json_file, 'r') as f:
+            tag_info = json.loads(f.read())
+        if not tag_info:
+            artellapipe.logger.warning('No Alembic Info loaded!')
+            return
+
+        root = tp.Dcc.create_empty_group(name=abc_name)
+        AlembicImporter._add_tag_info_data(project, tag_info, root)
+        sel = [root]
+        sel = sel or None
+
+        if not namespace:
+            namespace = abc_name
+
+        new_nodes = alembic.reference_alembic(project=project, alembic_file=alembic_path, namespace=namespace, resolve_path=resolve_path)
+        if not new_nodes:
+            artellapipe.logger.warning('Error while reference Alembic file: {}'.format(alembic_path))
+            return
+        for obj in new_nodes:
+            if not tp.Dcc.object_exists(obj):
+                continue
+            if not tp.Dcc.node_type(obj) == 'transform':
+                continue
+            obj_parent = tp.Dcc.node_parent(obj)
+            if obj_parent:
+                continue
+            tp.Dcc.set_parent(obj, sel[0])
+        tp.Dcc.select_object(sel[0])
+
+    @staticmethod
+    def _add_tag_info_data(project, tag_info, attr_node):
+        """
+        Internal function that updates the tag info of the Alembic node
+        :param project: ArtellaProject
+        :param tag_info: dict
+        :param attr_node: str
+        """
+
+        if not tp.Dcc.attribute_exists(node=attr_node, attribute_name='tag_info'):
+            tp.Dcc.add_string_attribute(node=attr_node, attribute_name='tag_info', keyable=True)
+        tp.Dcc.set_string_attribute_value(node=attr_node, attribute_name='tag_info', attribute_value=str(tag_info))
+
     def refresh(self):
         """
         Function that update necessary info of the tool
@@ -200,6 +305,9 @@ class AlembicImporter(base.BaseWidget, object):
         self.merge_abc_widget.setVisible(self._merge_radio.isChecked())
 
     def _on_browse_alembic(self):
+        """
+        Internal callback function that is called when Browse Alembic File button is clicked
+        """
 
         shot_name = self._shot_line.text()
         abc_folder = os.path.normpath(os.path.join(self._project.get_path(), shot_name)) if shot_name != 'unresolved' else self._project.get_path()
@@ -211,85 +319,12 @@ class AlembicImporter(base.BaseWidget, object):
         if abc_file:
             self._alembic_path_line.setText(abc_file)
 
-    @classmethod
-    def import_alembic(cls, project, alembic_path, parent=None, unresolve_path=False):
-        if not alembic_path or not os.path.isfile(alembic_path):
-            artellapipe.logger.warning('Alembic file {} does not exits!'.format(alembic_path))
-            return None
-
-        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
-        valid_tag_info = True
-        if os.path.isfile(tag_json_file):
-            with open(tag_json_file, 'r') as f:
-                tag_info = json.loads(f.read())
-            if not tag_info:
-                artellapipe.logger.warning('No Alembic Info loaded!')
-                valid_tag_info = False
-        else:
-            artellapipe.logger.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
-            valid_tag_info = False
-
-        if tp.Dcc.is_houdini():
-            import hou
-            n = hou.node('obj')
-            parent = n.createNode('alembicarchive')
-        if parent and valid_tag_info:
-            cls._add_tag_info_data(tag_info=tag_info, attr_node=parent)
-
-        res = alembic.import_alembic(project, alembic_path, mode='import', nodes=None, parent=parent, unresolve_path=unresolve_path)
-
-        return res
-
-    @staticmethod
-    def reference_alembic(project, alembic_path, namespace=None, unresolve_path=False):
-
-        if not tp.is_maya():
-            artellapipe.logger.warning('DCC {} does not supports the reference of Alembic groups!'.format(tp.Dcc.get_name()))
-            return None
-
-        if not alembic_path or not os.path.isfile(alembic_path):
-            artellapipe.logger.warning('Alembic file {} does not exits!'.format(alembic_path))
-            return None
-
-        abc_name = os.path.basename(alembic_path).split('.')[0]
-        tag_json_file = os.path.join(os.path.dirname(alembic_path), os.path.basename(alembic_path).replace('.abc', '_abc.info'))
-        if not os.path.isfile(tag_json_file):
-            artellapipe.logger.warning('No Alembic Info file found!')
-            return
-
-        with open(tag_json_file, 'r') as f:
-            tag_info = json.loads(f.read())
-        if not tag_info:
-            artellapipe.logger.warning('No Alembic Info loaded!')
-            return
-
-        root = tp.Dcc.create_empty_group(name=abc_name)
-        AlembicImporter._add_tag_info_data(tag_info, root)
-        sel = [root]
-        sel = sel or None
-
-        track_nodes = maya_scene.TrackNodes()
-        track_nodes.load()
-
-        if not namespace:
-            namespace = abc_name
-
-        valid_reference = alembic.reference_alembic(project=project, alembic_file=alembic_path, namespace=namespace, unresolve_path=unresolve_path)
-        if not valid_reference:
-            artellapipe.logger.warning('Error while reference Alembic file: {}'.format(alembic_path))
-            return
-        res = track_nodes.get_delta()
-        for obj in res:
-            if not tp.Dcc.object_exists(obj):
-                continue
-            if not tp.Dcc.node_type(obj) == 'transform':
-                continue
-            obj_parent = tp.Dcc.node_parent(obj)
-            if obj_parent:
-                continue
-            tp.Dcc.set_parent(obj, sel[0])
-
     def _on_import_alembic(self, as_reference=False):
+        """
+        Internal callback function that is called when Import/Reference Alembic button is clicked
+        :param as_reference: bool
+        """
+
         abc_file = self._alembic_path_line.text()
         if not abc_file or not os.path.isfile(abc_file):
             tp.Dcc.confirm_dialog(title='Error', message='No Alembic File is selected or file is not currently available in disk')
@@ -323,19 +358,8 @@ class AlembicImporter(base.BaseWidget, object):
         sel = None
         root_to_add = None
         if self._create_radio.isChecked():
-            if tp.is_maya():
-                root = tp.Dcc.create_empty_group(name=abc_name)
-                root_to_add = root
-            elif tp.is_houdini():
-                n = hou.node('obj')
-                if self._hou_archive_abc_node_cbx.isChecked():
-                    root = n.createNode('alembicarchive', node_name=abc_name)
-                else:
-                    geo = n.createNode('geo', node_name=abc_name)
-                    root = geo.createNode('alembic', node_name=abc_name)
-                root_to_add = root
-            # if valid_tag_info:
-            #     self._add_tag_info_data(tag_info, root)
+            root = self._create_alembic_group(group_name=abc_name)
+            root_to_add = root
             sel = [root]
         else:
             sel = tp.Dcc.selected_nodes(full_path=True)
@@ -343,98 +367,229 @@ class AlembicImporter(base.BaseWidget, object):
                 if valid_tag_info:
                     sel = tp.Dcc.create_empty_group(name=abc_name)
                     root_to_add = sel
-                    # if valid_tag_info:
-                    #     self._add_tag_info_data(tag_info, sel)
 
         sel = sel or None
 
-        if tp.is_maya():
-            track_nodes = maya_scene.TrackNodes()
-            track_nodes.load()
-
-        all_nodes = None
-
         if as_reference:
-            if tp.is_maya():
-                res = alembic.reference_alembic(project=self._project, alembic_file=abc_file, namespace=abc_name)
-                if not res:
-                    artellapipe.logger.warning('Error while reference Alembic file: {}'.format(abc_file))
-                    return
-                all_nodes = track_nodes.get_delta()
-                for obj in all_nodes:
-                    if not tp.Dcc.object_exists(obj):
-                        continue
-                    if not tp.Dcc.node_type(obj) == 'transform':
-                        continue
-                    obj_parent = tp.Dcc.node_parent(obj)
-                    if obj_parent:
-                        continue
-                    tp.Dcc.set_parent(node=obj, parent=sel[0])
-            else:
-                artellapipe.logger.warning('Alembic Reference is only supported in Maya!')
-                return None
+            reference_nodes = self._reference_alembic(alembic_file=abc_file, namespace=abc_name, parent=sel[0])
         else:
             if valid_tag_info:
-                res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import', nodes=nodes, parent=sel[0])
+                parent = sel[0]
             else:
-                if tp.is_houdini():
-                    res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import', parent=root_to_add)
-                else:
-                    res = alembic.import_alembic(project=self._project, alembic_file=abc_file, mode='import')
-            res = [res]
-
-            if tp.is_maya():
-                all_nodes = track_nodes.get_delta()
+                parent = root_to_add
+            reference_nodes = self._import_alembic(alembic_file=abc_file, valid_tag_info=valid_tag_info, nodes=nodes, parent=parent)
+        reference_nodes = python.force_list(reference_nodes)
 
         added_tag = False
         for key in tag_info.keys():
-            if all_nodes:
-                for obj in all_nodes:
+            if reference_nodes:
+                for obj in reference_nodes:
                     short_obj = tp.Dcc.node_short_name(obj)
                     if key == short_obj:
-                        self._add_tag_info_data(tag_info[key], obj)
+                        self._add_tag_info_data(self._project, tag_info[key], obj)
                         added_tag = True
                     # elif '{}_hires_grp'.format(key) == short_obj:
                     #     self._add_tag_info_data(tag_info[key], obj)
                     #     added_tag = True
 
         if not added_tag and root_to_add:
-            self._add_tag_info_data(tag_info, root_to_add)
+            self._add_tag_info_data(self._project, tag_info, root_to_add)
+
+        if reference_nodes:
+            if as_reference:
+                self.showOk.emit('Alembic file referenced successfully!')
+            else:
+                self.showOk.emit('Alembic file imported successfully!')
+
+        return reference_nodes
+
+    def _create_alembic_group(self, group_name):
+        """
+        Internal function that creates root gruop for Alembic Node
+        :return: str
+        """
+
+        root = tp.Dcc.create_empty_group(name=group_name)
+
+        return root
+
+    def _import_alembic(self, alembic_file, valid_tag_info, nodes=None, parent=None):
+        """
+        Internal callback function that imports given alembic file
+        :param alembic_file: str
+        :param valid_tag_info: bool
+        :param nodes: list
+        :param parent: object
+        :return:
+        """
+
+        if valid_tag_info:
+            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import', nodes=nodes, parent=parent)
+        else:
+            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import')
+
+        return res
+
+    def _reference_alembic(self, alembic_file, namespace, parent):
+        """
+        Internal function that references given alembic file
+        :param alembic_file: str
+        :param namespace: str
+        :return:
+        """
+
+        all_nodes = alembic.reference_alembic(project=self._project, alembic_file=alembic_file, namespace=namespace)
+        if not all_nodes:
+            artellapipe.logger.warning('Error while reference Alembic file: {}'.format(alembic_file))
+            return
+        for obj in all_nodes:
+            if not tp.Dcc.object_exists(obj):
+                continue
+            if not tp.Dcc.node_type(obj) == 'transform':
+                continue
+            obj_parent = tp.Dcc.node_parent(obj)
+            if obj_parent:
+                continue
+            tp.Dcc.set_parent(node=obj, parent=parent)
+
+        return all_nodes
+
+
+class MayaAlembicImporter(AlembicImporter, object):
+    def __init__(self, project, parent=None):
+        super(MayaAlembicImporter, self).__init__(project=project, parent=parent)
+
+    def _on_import_alembic(self, as_reference=False):
+        """
+        Overrides base AlembicImporter _on_import_alembic function
+        Internal callback function that is called when Import/Reference Alembic button is clicked
+        :param as_reference: bool
+        """
+
+        reference_nodes = super(MayaAlembicImporter, self)._on_import_alembic(as_reference=as_reference)
 
         if self._auto_smooth_display.isChecked():
-            if all_nodes:
-                for obj in all_nodes:
+            if reference_nodes and type(reference_nodes) in [list, tuple]:
+                for obj in reference_nodes:
                     if obj and tp.Dcc.object_exists(obj):
                         if tp.Dcc.node_type(obj) == 'shape':
                             if tp.Dcc.attribute_exists(node=obj, attribute_name='aiSubdivType'):
-                                tp.Dcc.set_integer_attribute_value(node=obj, attribute_name='aiSubdivType', attribute_value=1)
+                                tp.Dcc.set_integer_attribute_value(node=obj, attribute_name='aiSubdivType',
+                                                                   attribute_value=1)
                         elif tp.Dcc.node_type(obj) == 'transform':
                             shapes = tp.Dcc.list_shapes(node=obj, full_path=True)
                             if not shapes:
                                 continue
                             for s in shapes:
                                 if tp.Dcc.attribute_exists(node=s, attribute_name='aiSubdivType'):
-                                    tp.Dcc.set_integer_attribute_value(node=s, attribute_name='aiSubdivType', attribute_value=1)
+                                    tp.Dcc.set_integer_attribute_value(node=s, attribute_name='aiSubdivType',
+                                                                       attribute_value=1)
 
-        if res:
-            if as_reference:
-                self.showOk.emit('Alembic file referenced successfully!')
-            else:
-                self.showOk.emit('Alembic file imported successfully!')
 
-        return all_nodes
+
+
+class HoudiniAlembicImporter(AlembicImporter, object):
+    def __init__(self, project, parent=None):
+        super(HoudiniAlembicImporter, self).__init__(project=project, parent=parent)
+
+    def ui(self):
+        super(HoudiniAlembicImporter, self).ui()
+
+        self._auto_smooth_display.setChecked(False)
+        self._auto_display_lbl.setEnabled(False)
+        self._auto_smooth_display.setEnabled(False)
+
+    @classmethod
+    def import_alembic(cls, project, alembic_path, parent=None, resolve_path=False):
+        """
+        Overrides base AlembicImporter import_alembic function
+        Imports Alembic in current DCC scene
+        :param project: ArtellaProject
+        :param alembic_path: str
+        :param parent: object
+        :param resolve_path: bool
+        :return: bool
+        """
+
+        n = hou.node('obj')
+        parent = n.createNode('alembicarchive')
+        AlembicImporter.import_alembic(project=project, alembic_path=alembic_path, parent=parent, resolve_path=resolve_path)
 
     @staticmethod
-    def _add_tag_info_data(tag_info, attr_node):
-        if tp.is_maya():
-            if not tp.Dcc.attribute_exists(node=attr_node, attribute_name='tag_info'):
-                tp.Dcc.add_string_attribute(node=attr_node, attribute_name='tag_info', keyable=True)
-            tp.Dcc.set_string_attribute_value(node=attr_node, attribute_name='tag_info', attribute_value=str(tag_info))
-        elif tp.is_houdini():
-            import hou
-            parm_group = attr_node.parmTemplateGroup()
-            parm_folder = hou.FolderParmTemplate('folder', 'Solstice Info')
-            parm_folder.addParmTemplate(hou.StringParmTemplate('tag_info', 'Tag Info', 1))
-            parm_group.append(parm_folder)
-            attr_node.setParmTemplateGroup(parm_group)
-            attr_node.parm('tag_info').set(str(tag_info))
+    def reference_alembic(project, alembic_path, namespace=None, resolve_path=False):
+        """
+        Overrides base AlembicImporter reference_alembic function
+        References alembic file in current DCC scene
+        :param project: ArtellaProject
+        :param alembic_path: str
+        :param namespace: str
+        :param resolve_path: bool
+        """
+
+        artellapipe.logger.warning('Alembic Reference is not supported in Houdini!')
+        return
+
+    @staticmethod
+    def _add_tag_info_data(project, tag_info, attr_node):
+        """
+        Overrides base AlembicImporter _add_tag_info_data function
+        Internal function that updates the tag info of the Alembic node
+        :param project: dict
+        :param tag_info: dict
+        :param attr_node: str
+        """
+
+        parm_group = attr_node.parmTemplateGroup()
+        parm_folder = hou.FolderParmTemplate('folder', '{} Info'.format(project.name.title()))
+        parm_folder.addParmTemplate(hou.StringParmTemplate('tag_info', 'Tag Info', 1))
+        parm_group.append(parm_folder)
+        attr_node.setParmTemplateGroup(parm_group)
+        attr_node.parm('tag_info').set(str(tag_info))
+
+    def _create_alembic_group(self, group_name):
+        """
+        Overrides base AlembicImporter _create_alembic_group function
+        Internal function that creates root gruop for Alembic Node
+        :return: str
+        """
+
+        n = hou.node('obj')
+        if self._hou_archive_abc_node_cbx.isChecked():
+            root = n.createNode('alembicarchive', node_name=group_name)
+        else:
+            geo = n.createNode('geo', node_name=group_name)
+            root = geo.createNode('alembic', node_name=group_name)
+
+        return root
+
+    def _import_alembic(self, alembic_file, valid_tag_info, nodes=None, parent=None):
+        """
+        Overrides base AlembicImporter _import_alembic function
+        Internal callback function that imports given alembic file
+        :param alembic_file: str
+        :param valid_tag_info: bool
+        :param nodes: list
+        :param parent: object
+        :return:
+        """
+
+        if valid_tag_info:
+            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import', nodes=nodes, parent=parent)
+        else:
+            res = alembic.import_alembic(project=self._project, alembic_file=alembic_file, mode='import', parent=parent)
+
+        return res
+
+    def _reference_alembic(self, alembic_file, namespace):
+        """
+        Overrides base AlembicImporter _reference_alembic function
+        Internal function that references given alembic file
+        :param alembic_file: str
+        :param namespace: str
+        :return:
+        """
+
+        artellapipe.logger.warning('Alembic Reference is not supported in Houdini!')
+        return
+
+
