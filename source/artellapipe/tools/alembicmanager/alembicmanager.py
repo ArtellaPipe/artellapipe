@@ -39,6 +39,10 @@ class AlembicManager(window.ArtellaWindow, object):
     def ui(self):
         super(AlembicManager, self).ui()
 
+        alembic_icon = artellapipe.resource.icon('alembic_white')
+        export_icon = artellapipe.resource.icon('export')
+        import_icon = artellapipe.resource.icon('import')
+
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(2, 2, 2, 2)
         buttons_layout.setSpacing(2)
@@ -46,12 +50,15 @@ class AlembicManager(window.ArtellaWindow, object):
         self.main_layout.addLayout(splitters.SplitterLayout())
 
         self._abc_btn = QPushButton('ABC Group')
+        self._abc_btn.setIcon(alembic_icon)
         self._abc_btn.setMinimumWidth(80)
         self._abc_btn.setCheckable(True)
         self._exporter_btn = QPushButton('Exporter')
+        self._exporter_btn.setIcon(export_icon)
         self._exporter_btn.setMinimumWidth(80)
         self._exporter_btn.setCheckable(True)
         self._importer_btn = QPushButton('Importer')
+        self._importer_btn.setIcon(import_icon)
         self._importer_btn.setMinimumWidth(80)
         self._importer_btn.setCheckable(True)
         buttons_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
@@ -84,12 +91,18 @@ class AlembicManager(window.ArtellaWindow, object):
         self._abc_btn.clicked.connect(partial(self._on_slide_stack, 0))
         self._exporter_btn.clicked.connect(partial(self._on_slide_stack, 1))
         self._importer_btn.clicked.connect(partial(self._on_slide_stack, 2))
+        self._alembic_exporter.showWarning.connect(self._on_show_warning)
+        self._alembic_exporter.showOk.connect(self._on_show_ok)
+        self._alembic_importer.showOk.connect(self._on_show_ok)
 
     def _on_slide_stack(self, index):
         """
         Internal callback function that is called when stack needs to change current widget
         :param index: int
         """
+
+        if index == self._stack.currentIndex():
+            return
 
         for btn in self._buttons_grp.buttons():
             btn.setEnabled(False)
@@ -104,9 +117,30 @@ class AlembicManager(window.ArtellaWindow, object):
         for btn in self._buttons_grp.buttons():
             btn.setEnabled(True)
 
+        if self._stack.currentWidget() == self._alembic_exporter:
+            self._alembic_exporter.refresh()
 
-def run():
-    win = AlembicManager(artellapipe.solstice)
+    def _on_show_ok(self, warning_msg):
+        """
+        Internal callback function that is called when an ok message should be showed
+        :param warning_msg: str
+        """
+
+        artellapipe.logger.debug(warning_msg)
+        self.show_ok_message(warning_msg)
+
+    def _on_show_warning(self, warning_msg):
+        """
+        Internal callback function that is called when a warning message should be showed
+        :param warning_msg: str
+        """
+
+        artellapipe.logger.warning(warning_msg)
+        self.show_warning_message(warning_msg)
+
+
+def run(project):
+    win = AlembicManager(project=project)
     win.show()
 
     return win

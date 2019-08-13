@@ -19,22 +19,22 @@ from Qt.QtWidgets import *
 
 import tpDccLib as tp
 
+from tpQtLib.core import base
 from tpQtLib.widgets import splitters
 
 import artellapipe
-
 from artellapipe.tools.alembicmanager.core import defines
 
 
-class AlembicGroup(QWidget, object):
+class AlembicGroup(base.BaseWidget, object):
     def __init__(self, parent=None):
         super(AlembicGroup, self).__init__(parent=parent)
 
-        self.main_layout = QVBoxLayout()
-        self.main_layout.setContentsMargins(2, 2, 2, 2)
-        self.main_layout.setSpacing(2)
-        self.main_layout.setAlignment(Qt.AlignTop)
-        self.setLayout(self.main_layout)
+    def ui(self):
+        super(AlembicGroup, self).ui()
+
+        add_icon = artellapipe.resource.icon('add')
+        delete_icon = artellapipe.resource.icon('delete')
 
         group_layout = QGridLayout()
         group_layout.setContentsMargins(2, 2, 2, 2)
@@ -52,14 +52,17 @@ class AlembicGroup(QWidget, object):
         buttons_layout.setContentsMargins(25, 5, 25, 5)
         self.main_layout.addLayout(buttons_layout)
 
-        create_btn = QPushButton('Create')
-        buttons_layout.addWidget(create_btn)
+        self._create_btn = QPushButton('Create')
+        self._create_btn.setIcon(add_icon)
+        buttons_layout.addWidget(self._create_btn)
         buttons_layout.addItem(QSpacerItem(0, 10, QSizePolicy.Fixed, QSizePolicy.Expanding))
-        clean_alembic_groups_btn = QPushButton('Clean Alembic Groups')
-        self.main_layout.addWidget(clean_alembic_groups_btn)
+        self._clean_alembic_groups_btn = QPushButton('Clean Alembic Groups')
+        self._clean_alembic_groups_btn.setIcon(delete_icon)
+        self.main_layout.addWidget(self._clean_alembic_groups_btn)
 
-        create_btn.clicked.connect(partial(lambda: self.create_alembic_group(self.name_line.text())))
-        clean_alembic_groups_btn.clicked.connect(self.clean_alembic_groups)
+    def setup_signals(self):
+        self._create_btn.clicked.connect(partial(lambda: self.create_alembic_group(self.name_line.text())))
+        self._clean_alembic_groups_btn.clicked.connect(self.clean_alembic_groups)
 
     @staticmethod
     def get_alembic_group_name_from_node_name(node_name):

@@ -65,6 +65,9 @@ ARTELLA_CONFIG_TAG_TYPES = 'TAG_TYPES'
 # Defines a dictionary that maps tag types with categories in the Artella Outliner
 ARTELLA_CONFIG_OUTLINER_CATEGORIES = 'OUTLINER_CATEGORIES'
 
+# Defines attribute name used to define project shot regex
+ARTELLA_CONFIG_SHOT_REGEX = 'SHOT_REGEX'
+
 # Defines the name of the attribute that defines the working status of an asset
 ARTELLA_CONFIG_ASSET_WIP_STATUS = 'ASSET_WIP_STATUS'
 

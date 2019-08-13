@@ -14,22 +14,33 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import sys
+import json
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
+from Qt.QtGui import *
+
+from tpPyUtils import path as path_utils, folder as folder_utils
 
 import tpDccLib as tp
 
 from tpQtLib.core import base
-from tpQtLib.widgets import splitters
+from tpQtLib.widgets import splitters, stack
 
 import artellapipe
-
+from artellapipe.core import artellalib
+from artellapipe.utils import alembic
+from artellapipe.gui import waiter, spinner
+from artellapipe.tools.tagger.core import taggerutils
 from artellapipe.tools.alembicmanager.core import defines
 from artellapipe.tools.alembicmanager.widgets import alembicgroup
 
 
 class AlembicExporter(base.BaseWidget, object):
+
+    showOk = Signal(str)
+    showWarning = Signal(str)
+
     def __init__(self, project, parent=None):
 
         self._project = project
@@ -39,8 +50,21 @@ class AlembicExporter(base.BaseWidget, object):
     def ui(self):
         super(AlembicExporter, self).ui()
 
+        self._stack = stack.SlidingStackedWidget()
+        self.main_layout.addWidget(self._stack)
+
+        exporter_widget = QWidget()
+        exporter_layout = QVBoxLayout()
+        exporter_layout.setContentsMargins(0, 0, 0, 0)
+        exporter_layout.setSpacing(0)
+        exporter_widget.setLayout(exporter_layout)
+        self._stack.addWidget(exporter_widget)
+
+        self._waiter = waiter.ArtellaWaiter(spinner_type=spinner.SpinnerType.Thumb)
+        self._stack.addWidget(self._waiter)
+
         buttons_layout = QGridLayout()
-        self.main_layout.addLayout(buttons_layout)
+        exporter_layout.addLayout(buttons_layout)
         export_tag_lbl = QLabel('Alembic Group: ')
         self._alembic_groups_combo = QComboBox()
         self._alembic_groups_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -76,7 +100,7 @@ class AlembicExporter(base.BaseWidget, object):
         buttons_layout.addWidget(frame_range_lbl, 3, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(frame_range_widget, 3, 1)
 
-        folder_icon = artellapipe.solstice.resource.icon('open')
+        folder_icon = artellapipe.resource.icon('folder')
         export_path_layout = QHBoxLayout()
         export_path_layout.setContentsMargins(2, 2, 2, 2)
         export_path_layout.setSpacing(2)
@@ -86,42 +110,44 @@ class AlembicExporter(base.BaseWidget, object):
         self._export_path_line = QLineEdit()
         self._export_path_line.setReadOnly(True)
         self._export_path_line.setText(self._project.get_path())
-        self.export_path_btn = QPushButton()
-        self.export_path_btn.setIcon(folder_icon)
-        self.export_path_btn.setIconSize(QSize(18, 18))
-        self.export_path_btn.setStyleSheet("background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(255,255,255,0);")
+        self._export_path_btn = QPushButton()
+        self._export_path_btn.setIcon(folder_icon)
+        self._export_path_btn.setIconSize(QSize(18, 18))
+        self._export_path_btn.setStyleSheet("background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(255,255,255,0);")
         export_path_layout.addWidget(self._export_path_line)
-        export_path_layout.addWidget(self.export_path_btn)
+        export_path_layout.addWidget(self._export_path_btn)
         buttons_layout.addWidget(export_path_lbl, 4, 0, 1, 1, Qt.AlignRight)
         buttons_layout.addWidget(export_path_widget, 4, 1)
 
-        self.open_folder_after_export_cbx = QCheckBox('Open Folder After Export?')
-        self.open_folder_after_export_cbx.setChecked(True)
-        buttons_layout.addWidget(self.open_folder_after_export_cbx, 5, 1)
+        self._open_folder_after_export_cbx = QCheckBox('Open Folder After Export?')
+        self._open_folder_after_export_cbx.setChecked(True)
+        buttons_layout.addWidget(self._open_folder_after_export_cbx, 5, 1)
 
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        exporter_layout.addLayout(splitters.SplitterLayout())
 
         export_layout = QHBoxLayout()
-        self.export_btn = QPushButton('Export')
-        self.export_btn.setEnabled(False)
+        self._export_btn = QPushButton('Export')
+        self._export_btn.setIcon(artellapipe.resource.icon('export'))
+        self._export_btn.setEnabled(False)
         export_layout.addItem(QSpacerItem(25, 0, QSizePolicy.Fixed, QSizePolicy.Fixed))
-        export_layout.addWidget(self.export_btn)
+        export_layout.addWidget(self._export_btn)
         export_layout.addItem(QSpacerItem(25, 0, QSizePolicy.Fixed, QSizePolicy.Fixed))
-        self.main_layout.addLayout(export_layout)
+        exporter_layout.addLayout(export_layout)
 
-        self.export_path_btn.clicked.connect(self._on_set_export_path)
-        self.export_btn.clicked.connect(self._on_export)
-
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        exporter_layout.addLayout(splitters.SplitterLayout())
 
         self._tree_model = AlembicExporterGroupsModel(self)
         self._abc_tree = QTreeView()
         self._abc_tree.setModel(self._tree_model)
-        self.main_layout.addWidget(self._abc_tree)
+        exporter_layout.addWidget(self._abc_tree)
 
+    def setup_signals(self):
+        self._export_path_btn.clicked.connect(self._on_set_export_path)
+        self._export_btn.clicked.connect(self._on_export)
         self._shot_line.textChanged.connect(self._on_update_tree)
         self._name_line.textChanged.connect(self._on_update_tree)
         self._alembic_groups_combo.currentIndexChanged.connect(self._on_update_tree)
+        self._stack.animFinished.connect(self._on_stack_anim_finished)
 
     def refresh(self):
         """
@@ -151,7 +177,7 @@ class AlembicExporter(base.BaseWidget, object):
         """
 
         if not tp.is_maya():
-            artellapipe.solstice.logger.warning('DCC {} does not supports the retrieving of Alembic Group Nodes!'.format(tp.Dcc.get_name()))
+            artellapipe.logger.warning('DCC {} does not supports the retrieving of Alembic Group Nodes!'.format(tp.Dcc.get_name()))
             return None
 
         import maya.cmds as cmds
@@ -196,7 +222,7 @@ class AlembicExporter(base.BaseWidget, object):
         if not object_to_export or not tp.Dcc.object_exists(object_to_export):
             object_to_export = tp.Dcc.selected_nodes(False)
             if not object_to_export:
-                artellapipe.solstice.logger.warning('Impossible to export Alembic from inexistent object {}'.format(object_to_export))
+                self.show_warning.emit('Impossible to export Alembic from non-existent object {}'.format(object_to_export))
                 return
             object_to_export = object_to_export[0]
 
@@ -220,26 +246,26 @@ class AlembicExporter(base.BaseWidget, object):
         if self._name_line.text() != '':
             return
 
-        sel = sys.solstice.dcc.selected_nodes()
+        sel = tp.Dcc.selected_nodes()
         if sel:
             sel = sel[0]
-            is_referenced = sys.solstice.dcc.node_is_referenced(sel)
+            is_referenced = tp.Dcc.node_is_referenced(sel)
             if is_referenced:
-                sel_namespace = sys.solstice.dcc.node_namespace(sel)
+                sel_namespace = tp.Dcc.node_namespace(sel)
                 if not sel_namespace or not sel_namespace.startswith(':'):
                     pass
                 else:
                     sel_namespace = sel_namespace[1:] + ':'
                     sel = sel.replace(sel_namespace, '')
 
-            self._name_line.setText(sys.solstice.dcc.node_short_name(sel))
+            self._name_line.setText(tp.Dcc.node_short_name(sel))
 
     def _refresh_alembic_groups(self):
         """
         Internal function that updates the list of alembic groups
         """
 
-        self.export_btn.setEnabled(False)
+        self._export_btn.setEnabled(False)
 
         filtered_sets = filter(lambda x: x.endswith(defines.ALEMBIC_GROUP_SUFFIX), tp.Dcc.list_nodes(node_type='objectSet'))
         filtered_sets.insert(0, '')
@@ -266,16 +292,280 @@ class AlembicExporter(base.BaseWidget, object):
         """
 
         shot_name = ''
-        current_scene = tp.Dcc.scene_path()
+        current_scene = tp.Dcc.scene_name()
         if current_scene:
             current_scene = os.path.basename(current_scene)
 
-        shot_regex = sp.get_solstice_shot_name_regex()
+        shot_regex = self._project.get_shot_name_regex()
         m = shot_regex.match(current_scene)
         if m:
             shot_name = m.group(1)
 
         self._shot_line.setText(shot_name)
+
+    def _add_tag_attributes(self, attr_node, tag_node):
+        # We add attributes to the first node in the list
+        attrs = tp.Dcc.list_user_attributes(tag_node)
+        tag_info = dict()
+        for attr in attrs:
+            try:
+                tag_info[attr] = str(tp.Dcc.get_attribute_value(node=tag_info, attribute_name=attr))
+            except Exception:
+                pass
+        if not tag_info:
+            artellapipe.logger.warning('Node has not valid tag data: {}'.format(tag_node))
+            return
+
+        if not tp.Dcc.attribute_exists(node=attr_node, attribute_name='tag_info'):
+            tp.Dcc.add_string_attribute(node=attr_node, attribute_name='tag_info', keyable=True)
+        tp.Dcc.set_string_attribute_value(node=attr_node, attribute_name='tag_info', attribute_value=str(tag_info))
+
+    def _get_tag_atributes_dict(self, tag_node):
+        # We add attributes to the first node in the list
+        tag_info = dict()
+        if not tag_node:
+            return tag_info
+
+        attrs = tp.Dcc.list_user_attributes(tag_node)
+        for attr in attrs:
+            try:
+                tag_info[attr] = tp.Dcc.get_attribute_value(node=tag_node, attribute_name=attr)
+            except Exception:
+                pass
+        if not tag_info:
+            artellapipe.logger.warning('Node has not valid tag data: {}'.format(tag_node))
+            return
+
+        return tag_info
+
+    def _get_alembic_rig_export_list(self, root_node):
+        export_list = list()
+        root_node_child_count = root_node.childCount()
+        if root_node_child_count > 0 or len(tp.Dcc.list_shapes(root_node.name)) > 0:
+            for j in range(root_node.childCount()):
+                c = root_node.child(j)
+                c_name = c.name
+                if type(c_name) in [list, tuple]:
+                    c_name = c_name[0]
+                if isinstance(c, AlembicExporterModelHires):
+                    children = tp.Dcc.node_children(node=c_name, all_hierarchy=True, full_path=True)
+                    export_list.extend(children)
+                    export_list.append(c_name)
+
+                    # if tag_node:
+                    #     self._add_tag_attributes(c_name, tag_node)
+                    # export_list.append(c_name)
+                else:
+                    if 'transform' != tp.Dcc.node_type(c_name):
+                        xform = tp.Dcc.node_parent(node=c_name, full_path=True)
+                        parent_xform = tp.Dcc.node_parent(node=xform, full_path=True)
+                        if parent_xform:
+                            children = tp.Dcc.node_children(node=parent_xform, all_hierarchy=True, full_path=True)
+                            export_list.extend(children)
+                    else:
+                        children = tp.Dcc.node_children(node=c_name, all_hierarchy=True, full_path=True)
+                        export_list.extend(children)
+
+        for obj in reversed(export_list):
+            if tp.Dcc.node_type(obj) != 'transform':
+                export_list.remove(obj)
+                continue
+            is_visible = tp.Dcc.get_attribute_value(node=obj, attribute_name='visibility')
+            if not is_visible:
+                export_list.remove(obj)
+                continue
+            if tp.Dcc.attribute_exists(node=obj, attribute_name='displaySmoothMesh'):
+                tp.Dcc.set_integer_attribute_value(node=obj, attribute_name='displaySmoothMesh', attribute_value=2)
+
+        childs_to_remove = list()
+        for obj in export_list:
+            children = tp.Dcc.node_children(node=obj, all_hierarchy=True, full_path=True)
+            shapes = tp.Dcc.list_children_shapes(node=obj, all_hierarchy=True, full_path=True)
+            if children and not shapes:
+                childs_to_remove.extend(children)
+
+        if childs_to_remove:
+            for obj in childs_to_remove:
+                if obj in export_list:
+                    export_list.remove(obj)
+
+        return export_list
+
+    def _export(self):
+        """
+        Internal function that exports Alembic
+        """
+
+        out_folder = self._export_path_line.text()
+        if not os.path.exists(out_folder):
+            tp.Dcc.confirm_dialog(
+                title='Error during Alembic Exportation',
+                message='Output Path does not exists: {}. Select a valid one!'.format(out_folder)
+            )
+            return
+
+        abc_group_node = self._tree_model._root_node.child(0)
+        if not tp.Dcc.object_exists(abc_group_node.name):
+            raise Exception('ERROR: Invalid Alembic Group: {}'.format(abc_group_node.name))
+        if abc_group_node.childCount() == 0:
+            raise Exception('ERROR: Selected Alembic Group has no objects to export!')
+
+        file_paths = list()
+
+        export_info = list()
+        for i in range(abc_group_node.childCount()):
+            child = abc_group_node.child(i)
+            export_path = os.path.normpath(out_folder + os.path.basename(child.name))
+            file_paths.append(export_path)
+            export_info.append({'path': export_path, 'node': child})
+
+            # for j in range(root_tag_grp.childCount()):
+            #     c = child.child(j)
+            #     export_info[export_type]['path'] = export_path
+        #
+
+        res = tp.Dcc.confirm_dialog(
+            title='Export Alembic File',
+            message='Are you sure you want to export Alembic to files?\n\n' + '\n'.join([p for p in file_paths]),
+            button=['Yes', 'No'],
+            default_button='Yes',
+            cancel_button='No',
+            dismiss_string='No'
+        )
+        if res != 'Yes':
+            artellapipe.logger.debug('Aborting Alembic Export operation ...')
+            return
+
+        self._export_alembics(export_info)
+
+        self._stack.slide_in_index(0)
+
+    def _export_alembics(self, alembic_nodes):
+
+        def _recursive_hierarchy(transform):
+            child_nodes = list()
+            if not transform:
+                return child_nodes
+            transforms = tp.Dcc.list_relatives(node=transform, full_path=True)
+            if not transforms:
+                return child_nodes
+            for eachTransform in transforms:
+                if tp.Dcc.node_type(eachTransform) == 'transform':
+                    child_nodes.append(eachTransform)
+                    child_nodes.extend(_recursive_hierarchy(eachTransform))
+            return child_nodes
+
+        for n in alembic_nodes:
+            export_path = n.get('path')
+            abc_node = n.get('node')
+
+            if os.path.isfile(export_path):
+                res = tp.Dcc.confirm_dialog(
+                    title='Alembic File already exits!',
+                    message='Are you sure you want to overwrite already existing Alembic File?\n\n{}'.format(export_path),
+                    button=['Yes', 'No'],
+                    default_button='Yes',
+                    cancel_button='No',
+                    dismiss_string='No'
+                )
+                if res != 'Yes':
+                    artellapipe.logger.debug('Aborting Alembic Export operation ...')
+                    return
+
+            export_list = list()
+            all_nodes = list()
+            tag_info = dict()
+
+            child_count = abc_node.childCount()
+            if not child_count:
+                return
+
+            for i in range(abc_node.childCount()):
+                root_node = abc_node.child(i)
+                root_node_name = root_node.name
+                root_tag = taggerutils.get_tag_data_node_from_current_selection(root_node_name)
+                root_tag_info = self._get_tag_atributes_dict(root_tag)
+                if root_tag_info:
+                    tag_info[tp.Dcc.node_short_name(root_node_name)] = root_tag_info
+                    hires_grp = tp.Dcc.list_connections(node=root_tag, attribute_name='hires')
+                    if hires_grp and tp.Dcc.object_exists(hires_grp[0]):
+                        all_nodes.extend(_recursive_hierarchy(root_node_name))
+                        export_list.extend(self._get_alembic_rig_export_list(root_node))
+                    else:
+                        all_nodes.extend(_recursive_hierarchy(root_node_name))
+                        export_list.extend(tp.Dcc.list_children(root_node_name, all_hierarchy=False, full_path=True))
+                else:
+                    all_nodes.extend(_recursive_hierarchy(root_node_name))
+                    children_nodes = tp.Dcc.list_children(root_node_name, all_hierarchy=False, full_path=True)
+                    for child_node in children_nodes:
+                        if tp.Dcc.check_object_type(child_node, 'shape', check_sub_types=True):
+                            node_parent = tp.Dcc.node_parent(node=child_node)
+                            export_list.append(node_parent)
+                        else:
+                            export_list.append(child_node)
+
+            for node in all_nodes:
+                if tp.Dcc.attribute_exists(node=node, attribute_name='displaySmoothMesh'):
+                    tp.Dcc.set_integer_attribute_value(node=node, attribute_name='displaySmoothMesh', attribute_value=2)
+
+            if not export_list:
+                self.showWarning.emit('No geometry to export! Aborting Alembic Export operation ...')
+                return
+
+            geo_shapes = tp.Dcc.list_shapes(node=export_list)
+
+            if not geo_shapes:
+                children = tp.Dcc.list_children(node=export_list, all_hierarchy=True, full_path=True)
+                if children:
+                    for child in children:
+                        geo_shapes = tp.Dcc.list_shapes(node=child)
+                        if geo_shapes:
+                            break
+
+            if not geo_shapes:
+                geo_shapes = list()
+                for obj in export_list:
+                    if tp.Dcc.check_object_type(obj, 'shape', check_sub_types=True):
+                        geo_shapes.append(obj)
+
+            if not geo_shapes:
+                self.showWarning.emit('No geometry data to export! Aborting Alembic Export operation ...')
+                return
+            geo_shape = geo_shapes[0]
+
+            # Retrieve all Arnold attributes to export from the first element of the list
+            arnold_attrs = [attr for attr in tp.Dcc.list_attributes(geo_shape) if attr.startswith('ai')]
+
+            artellalib.lock_file(export_path, True)
+
+            valid_alembic = alembic.export(
+                root=export_list,
+                alembicFile=export_path,
+                frameRange=[[float(self._start.value()), float(self._end.value())]],
+                userAttr=arnold_attrs,
+                uvWrite=True,
+                writeUVSets=True,
+                writeCreases=True
+            )
+            if not valid_alembic:
+                artellapipe.logger.warning('Error while exporting Alembic file: {}'.format(export_path))
+                return
+
+            tag_json_file = abc_node.name.replace('.abc', '_abc.info')
+            with open(tag_json_file, 'w') as f:
+                json.dump(tag_info, f)
+
+            if self._open_folder_after_export_cbx.isChecked():
+                folder_utils.open_folder(os.path.dirname(export_path))
+
+            for n in export_list:
+                if tp.Dcc.attribute_exists(node=n, attribute_name='tag_info'):
+                    try:
+                        tp.Dcc.delete_attribute(node=n, attribute_name='tag_info')
+                    except Exception as e:
+                        pass
+
+            self.showOk.emit('Alembic File: {} exported successfully!'.format(os.path.basename(abc_node.name)))
 
     def _on_set_export_path(self):
         """
@@ -301,13 +591,13 @@ class AlembicExporter(base.BaseWidget, object):
         abc_group_objs = self.get_alembic_group_nodes(set_text, show_error)
         if not abc_group_objs:
             if set_text != '':
-                artellapipe.solstice.logger.warning('Selected Alembic Group is empty: {}'.format(set_text))
+                artellapipe.logger.warning('Selected Alembic Group is empty: {}'.format(set_text))
             return
 
         exports_dict = dict()
 
         for obj in abc_group_objs:
-            tag_node = tagger.SolsticeTagger.get_tag_data_node_from_curr_sel(obj)
+            tag_node = taggerutils.get_tag_data_node_from_current_selection(obj)
             if tag_node:
                 attr_exists = tp.Dcc.attribute_exists(node=tag_node, attribute_name='hires')
                 if not attr_exists:
@@ -336,11 +626,11 @@ class AlembicExporter(base.BaseWidget, object):
                     exports_dict[obj].append(o)
 
         if not exports_dict:
-            artellapipe.solstice.logger.warning('No objects in Alembic Groups to export')
+            artellapipe.logger.warning('No objects in Alembic Groups to export')
             return
 
         shot_name = self._shot_line.text()
-        shot_regex = sp.get_solstice_shot_name_regex()
+        shot_regex = self._project.get_shot_name_regex()
         m = shot_regex.match(shot_name)
         if m:
             shot_name = m.group(1)
@@ -352,7 +642,7 @@ class AlembicExporter(base.BaseWidget, object):
 
         out_folder = self._export_path_line.text()
         if not os.path.exists(out_folder):
-            artellapipe.solstice.logger.warning(
+            artellapipe.logger.warning(
                 'Output Path does not exists: {}. Select a valid one!'.format(out_folder)
             )
             return
@@ -381,21 +671,21 @@ class AlembicExporter(base.BaseWidget, object):
             anim_path = '{}'.format(abc_name+'.abc')
             filename = os.path.normpath(os.path.join(out_folder, anim_path))
 
-        anim_node = AlembicNode(browserutils.get_relative_path(filename, self._project.get_path()())[1:])
+        anim_node = AlembicNode(path_utils.get_relative_path(filename, self._project.get_path()))
         abc_group_node.addChild(anim_node)
         for obj, geo_list in exports_dict.items():
             root_grp = AlembicExporterNode(obj)
             anim_node.addChild(root_grp)
-            tag_node = tagger.SolsticeTagger.get_tag_data_node_from_curr_sel(obj)
-            has_hires = sys.solstice.dcc.attribute_exists(node=tag_node, attribute_name='hires') if tag_node else None
+            tag_node = taggerutils.get_tag_data_node_from_current_selection(obj)
+            has_hires = tp.Dcc.attribute_exists(node=tag_node, attribute_name='hires') if tag_node else None
             if tag_node and has_hires:
-                hires_grp = sys.solstice.dcc.list_connections(node=tag_node, attribute_name='hires')
-                if hires_grp and sys.solstice.dcc.object_exists(hires_grp[0]):
+                hires_grp = tp.Dcc.list_connections(node=tag_node, attribute_name='hires')
+                if hires_grp and tp.Dcc.object_exists(hires_grp[0]):
                     hires_node = AlembicExporterModelHires(hires_grp)
                     root_grp.addChild(hires_node)
                     for model in geo_list:
-                        model_xform = sys.solstice.dcc.node_parent(node=model, full_path=True)
-                        obj_is_visible = sys.solstice.dcc.get_attribute_value(node=model_xform, attribute_name='visibility')
+                        model_xform = tp.Dcc.node_parent(node=model, full_path=True)
+                        obj_is_visible = tp.Dcc.get_attribute_value(node=model_xform, attribute_name='visibility')
                         if not obj_is_visible:
                             continue
                         obj_node = AlembicExporterNode(model)
@@ -409,252 +699,26 @@ class AlembicExporter(base.BaseWidget, object):
                     geo_node = AlembicExporterNode(geo)
                     root_grp.addChild(geo_node)
 
-        self.export_btn.setEnabled(True)
+        self._export_btn.setEnabled(True)
 
         self._abc_tree.expandAll()
 
-    def _add_tag_attributes(self, attr_node, tag_node):
-        # We add attributes to the first node in the list
-        attrs = sys.solstice.dcc.list_user_attributes(tag_node)
-        tag_info = dict()
-        for attr in attrs:
-            try:
-                tag_info[attr] = str(sys.solstice.dcc.get_attribute_value(node=tag_info, attribute_name=attr))
-            except Exception:
-                pass
-        if not tag_info:
-            sys.solstice.logger.warning('Node has not valid tag data: {}'.format(tag_node))
-            return
+    def _on_stack_anim_finished(self, index):
+        """
+        Internal callback function that is called when stack animation finishes
+        :param index:
+        :return:
+        """
 
-        if not sys.solstice.dcc.attribute_exists(node=attr_node, attribute_name='tag_info'):
-            sys.solstice.dcc.add_string_attribute(node=attr_node, attribute_name='tag_info', keyable=True)
-        sys.solstice.dcc.set_string_attribute_value(node=attr_node, attribute_name='tag_info', attribute_value=str(tag_info))
-
-    def _get_tag_atributes_dict(self, tag_node):
-        # We add attributes to the first node in the list
-        tag_info = dict()
-        if not tag_node:
-            return tag_info
-
-        attrs = sys.solstice.dcc.list_user_attributes(tag_node)
-        for attr in attrs:
-            try:
-                tag_info[attr] = sys.solstice.dcc.get_attribute_value(node=tag_node, attribute_name=attr)
-            except Exception:
-                pass
-        if not tag_info:
-            sys.solstice.logger.warning('Node has not valid tag data: {}'.format(tag_node))
-            return
-
-        return tag_info
-
-    def _get_alembic_rig_export_list(self, root_node):
-        export_list = list()
-        root_node_child_count = root_node.childCount()
-        if root_node_child_count > 0 or len(sys.solstice.dcc.list_shapes(root_node.name)) > 0:
-            for j in range(root_node.childCount()):
-                c = root_node.child(j)
-                c_name = c.name
-                if type(c_name) in [list, tuple]:
-                    c_name = c_name[0]
-                if isinstance(c, AlembicExporterModelHires):
-                    children = sys.solstice.dcc.node_children(node=c_name, all_hierarchy=True, full_path=True)
-                    export_list.extend(children)
-                    export_list.append(c_name)
-
-                    # if tag_node:
-                    #     self._add_tag_attributes(c_name, tag_node)
-                    # export_list.append(c_name)
-                else:
-                    if 'transform' != sys.solstice.dcc.node_type(c_name):
-                        xform = sys.solstice.dcc.node_parent(node=c_name, full_path=True)
-                        parent_xform = sys.solstice.dcc.node_parent(node=xform, full_path=True)
-                        if parent_xform:
-                            children = sys.solstice.dcc.node_children(node=parent_xform, all_hierarchy=True, full_path=True)
-                            export_list.extend(children)
-                    else:
-                        children = sys.solstice.dcc.node_children(node=c_name, all_hierarchy=True, full_path=True)
-                        export_list.extend(children)
-
-        for obj in reversed(export_list):
-            if sys.solstice.dcc.node_type(obj) != 'transform':
-                export_list.remove(obj)
-                continue
-            is_visible = sys.solstice.dcc.get_attribute_value(node=obj, attribute_name='visibility')
-            if not is_visible:
-                export_list.remove(obj)
-                continue
-            if sys.solstice.dcc.attribute_exists(node=obj, attribute_name='displaySmoothMesh'):
-                sys.solstice.dcc.set_integer_attribute_value(node=obj, attribute_name='displaySmoothMesh', attribute_value=2)
-
-        childs_to_remove = list()
-        for obj in export_list:
-            children = sys.solstice.dcc.node_children(node=obj, all_hierarchy=True, full_path=True)
-            shapes = sys.solstice.dcc.list_children_shapes(node=obj, all_hierarchy=True, full_path=True)
-            if children and not shapes:
-                childs_to_remove.extend(children)
-
-        if childs_to_remove:
-            for obj in childs_to_remove:
-                if obj in export_list:
-                    export_list.remove(obj)
-
-        return export_list
-
-    def _export_alembics(self, alembic_nodes):
-
-        def _recursive_hierarchy(transform):
-            child_nodes = list()
-            if not transform:
-                return child_nodes
-            transforms = cmds.listRelatives(transform, f=True)
-            if not transforms:
-                return child_nodes
-            for eachTransform in transforms:
-                if cmds.nodeType(eachTransform) == "transform":
-                    child_nodes.append(eachTransform)
-                    child_nodes.extend(_recursive_hierarchy(eachTransform))
-            return child_nodes
-
-        for n in alembic_nodes:
-            export_path = n.get('path')
-            abc_node = n.get('node')
-
-            if os.path.isfile(export_path):
-                res = sys.solstice.dcc.confirm_dialog(
-                    title='Alembic File already exits!',
-                    message='Are you sure you want to overwrite already existing Alembic File?\n\n{}'.format(export_path),
-                    button=['Yes', 'No'],
-                    default_button='Yes',
-                    cancel_button='No',
-                    dismiss_string='No'
-                )
-                if res != 'Yes':
-                    sys.solstice.logger.debug('Aborting Alembic Export operation ...')
-                    return
-
-            export_list = list()
-            all_nodes = list()
-            tag_info = dict()
-
-            child_count = abc_node.childCount()
-            if not child_count:
-                return
-
-            for i in range(abc_node.childCount()):
-                root_node = abc_node.child(i)
-                root_node_name = root_node.name
-                root_tag = tagger.SolsticeTagger.get_tag_data_node_from_curr_sel(root_node_name)
-                root_tag_info = self._get_tag_atributes_dict(root_tag)
-                if not root_tag_info:
-                    sys.solstice.logger.warning('Impossible to retrieve tag info for {} ...'.format(root_node_name))
-                    return
-                tag_info[sys.solstice.dcc.node_short_name(root_node_name)] = root_tag_info
-                hires_grp = sys.solstice.dcc.list_connections(node=root_tag, attribute_name='hires')
-                if hires_grp and sys.solstice.dcc.object_exists(hires_grp[0]):
-                    all_nodes.extend(_recursive_hierarchy(root_node_name))
-                    export_list.extend(self._get_alembic_rig_export_list(root_node))
-                else:
-                    all_nodes.extend(_recursive_hierarchy(root_node_name))
-                    export_list.extend(sys.solstice.dcc.list_children(root_node_name, all_hierarchy=False, full_path=True))
-
-            for node in all_nodes:
-                # if sys.solstice.dcc.node_is_referenced(node):
-                #     raise RuntimeError('Alembic Exporter does not support references!')
-                if sys.solstice.dcc.attribute_exists(node=node, attribute_name='displaySmoothMesh'):
-                    sys.solstice.dcc.set_integer_attribute_value(node=node, attribute_name='displaySmoothMesh', attribute_value=2)
-
-            if not export_list:
-                sys.solstice.logger.debug('No geometry to export! Aborting Alembic Export operation ...')
-                return
-
-            # Retrieve all Arnold attributes to export from the first element of the list
-            geo_shapes = sys.solstice.dcc.list_shapes(node=export_list)
-            if not geo_shapes:
-                children = sys.solstice.dcc.list_children(node=export_list, all_hierarchy=True, full_path=True)
-                for child in children:
-                    geo_shapes = sys.solstice.dcc.list_shapes(node=child)
-                    if geo_shapes:
-                        break
-            if not geo_shapes:
-                sys.solstice.logger.debug('No geometry data to export! Aborting Alembic Export operation ...')
-                return
-            geo_shape = geo_shapes[0]
-
-            arnold_attrs = [attr for attr in sys.solstice.dcc.list_attributes(geo_shape) if attr.startswith('ai')]
-
-            artellautils.lock_file(export_path, True)
-
-            valid_alembic = alembic.export(
-                root=export_list,
-                alembicFile=export_path,
-                frameRange=[[float(self._start.value()), float(self._end.value())]],
-                userAttr=arnold_attrs,
-                uvWrite=True,
-                writeUVSets=True,
-                writeCreases=True
-            )
-            if not valid_alembic:
-                sys.solstice.logger.warning('Error while exporting Alembic file: {}'.format(export_path))
-                return
-
-            tag_json_file = os.path.join(os.path.dirname(export_path), abc_node.name.replace('.abc', '_abc.info')[1:])
-            with open(tag_json_file, 'w') as f:
-                json.dump(tag_info, f)
-
-            if self.open_folder_after_export_cbx.isChecked():
-                pythonutils.open_folder(os.path.dirname(export_path))
-
-            for n in export_list:
-                if sys.solstice.dcc.attribute_exists(node=n, attribute_name='tag_info'):
-                    try:
-                        sys.solstice.dcc.delete_attribute(node=n, attribute_name='tag_info')
-                    except Exception as e:
-                        pass
+        if index == 1:
+            self._export()
 
     def _on_export(self):
+        """
+        Internal callback function that is called when the user presses Export button
+        """
 
-        out_folder = self._export_path_line.text()
-        if not os.path.exists(out_folder):
-            sys.solstice.dcc.confirm_dialog(
-                title='Error during Alembic Exportation',
-                message='Output Path does not exists: {}. Select a valid one!'.format(out_folder)
-            )
-            return
-
-        abc_group_node = self._tree_model._root_node.child(0)
-        if not sys.solstice.dcc.object_exists(abc_group_node.name):
-            raise Exception('ERROR: Invalid Alembic Group: {}'.format(abc_group_node.name))
-        if abc_group_node.childCount() == 0:
-            raise Exception('ERROR: Selected Alembic Group has no objects to export!')
-
-        file_paths = list()
-
-        export_info = list()
-        for i in range(abc_group_node.childCount()):
-            child = abc_group_node.child(i)
-            export_path = os.path.normpath(out_folder + child.name)
-            file_paths.append(export_path)
-            export_info.append({'path': export_path, 'node': child})
-
-            # for j in range(root_tag_grp.childCount()):
-            #     c = child.child(j)
-            #     export_info[export_type]['path'] = export_path
-        #
-
-        res = sys.solstice.dcc.confirm_dialog(
-            title='Export Alembic File',
-            message='Are you sure you want to export Alembic to files?\n\n' + '\n'.join([p for p in file_paths]),
-            button=['Yes', 'No'],
-            default_button='Yes',
-            cancel_button='No',
-            dismiss_string='No'
-        )
-        if res != 'Yes':
-            sys.solstice.logger.debug('Aborting Alembic Export operation ...')
-            return
-
-        self._export_alembics(export_info)
+        self._stack.slide_in_index(1)
 
 
 class AlembicExporterGroupsModel(QAbstractItemModel, object):
@@ -872,10 +936,10 @@ class AlembicExporterNode(object):
 
         if column is 0:
             long_name = self.name
-            try:
-                return long_name.split(':')[-1].split('|')[-1]
-            except Exception:
-                return long_name
+            # try:
+            #     return long_name.split(':')[-1].split('|')[-1]
+            # except Exception:
+            return long_name
         elif column is 1:
             return self.typeInfo()
 
@@ -899,7 +963,7 @@ class AlembicNode(AlembicExporterNode, object):
         super(AlembicNode, self).__init__(name=name, parent=parent)
 
     def resource(self):
-        path = artellapipe.solstice.resource.get('icons', 'alembic_white_icon.png')
+        path = artellapipe.resource.get('icons', 'alembic_white_icon.png')
         return path
 
 

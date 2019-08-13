@@ -13,6 +13,7 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
+import re
 import sys
 import json
 import traceback
@@ -76,6 +77,7 @@ class ArtellaProject(object):
         self._asset_data_filename = None
         self._tag_types = list()
         self._outliner_categories = dict()
+        self._shot_regex = None
 
         self._registered_asset_classes = list()
         self._asset_classes_types = dict()
@@ -442,6 +444,7 @@ class ArtellaProject(object):
         self._asset_data_filename = project_config_data.get(defines.ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME, None)
         self._tag_types = project_config_data.get(defines.ARTELLA_CONFIG_TAG_TYPES, list())
         self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES, dict())
+        self._shot_regex = project_config_data.get(defines.ARTELLA_CONFIG_SHOT_REGEX, '*')
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -1058,6 +1061,22 @@ class ArtellaProject(object):
                     added_roots.append(cnt_root)
 
         return all_abc_roots
+
+    # ==========================================================================================================
+    # SHOTS
+    # ==========================================================================================================
+
+    def get_shot_name_regex(self):
+        """
+        Returns regex used to identeify shots
+        :return: str
+        """
+
+        return re.compile(r"{}".format(self._shot_regex))
+
+    # ==========================================================================================================
+    # PRIVATE
+    # ==========================================================================================================
 
     def _register_asset_classes(self):
         """
