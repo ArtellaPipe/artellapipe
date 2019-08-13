@@ -89,6 +89,11 @@ class ArtellaAssetMetaData(object):
 
     @property
     def path(self):
+        """
+        Returns path of the asset
+        :return:str
+        """
+
         return self._path
 
     @property
@@ -99,42 +104,12 @@ class ArtellaAssetMetaData(object):
     def latest(self):
         return self._latest_
 
-    @property
-    def published_models(self):
-        if self._published_folders is None:
-            self._get_published_data()
-
-        return self._published_folders['model']
-
-    @property
-    def published_textures(self):
-        if self._published_folders is None:
-            self._get_published_data()
-
-        return self._published_folders['textures']
-
-    @property
-    def published_shading(self):
-        if self._published_folders is None:
-            self._get_published_data()
-
-        return self._published_folders['shading']
-
-    @property
-    def published_rig(self):
-        if self._published_folders is None:
-            self._get_published_data()
-
-        return self._published_folders['rig']
-
-    @property
-    def published_grooming(self):
-        if self._published_folders is None:
-            self._get_published_data()
-
-        return self._published_folders['grooming']
-
     def get_is_published(self):
+        """
+        Returns whether the current asset is published or not
+        :return: bool
+        """
+
         if self._published_folders is None:
             self._get_published_data()
 
@@ -147,6 +122,12 @@ class ArtellaAssetMetaData(object):
         return is_published
 
     def get_published_versions(self, all=False):
+        """
+        Returns published versions of the asset
+        :param all: str
+        :return:
+        """
+
         if self._published_folders is None:
             self._get_published_data()
 

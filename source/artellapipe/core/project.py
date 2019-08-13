@@ -845,17 +845,27 @@ class ArtellaProject(object):
 
         return file_type in self._asset_classes_file_types.keys()
 
-    def get_asset_file(self, file_type):
+    def get_asset_file(self, file_type, extension=None):
         """
-        Returns asset file object linked to given file type for current project
+        Returns asset file object class linked to given file type for current project
         :param file_type: str
+        :param extension: str
         :return: ArtellaAssetType
         """
 
         if not self.is_valid_asset_file_type(file_type):
             return None
 
-        return self._asset_classes_file_types[file_type]
+        asset_classes = self._asset_classes_file_types[file_type]
+        if len(asset_classes) == 0:
+            return asset_classes[0]
+        else:
+            if extension:
+                for asset_class in asset_classes:
+                    if extension in asset_class.FILE_EXTENSIONS:
+                        return asset_class
+            else:
+                return asset_classes[0]
 
     def get_asset_data_file_path(self, asset_path):
         """
@@ -1070,10 +1080,11 @@ class ArtellaProject(object):
         """
 
         for asset_file in self.asset_files:
+            if asset_file not in self._asset_classes_file_types:
+                self._asset_classes_file_types[asset_file] = list()
             for registered_file in self._registered_asset_file_type_classes:
                 if registered_file.FILE_TYPE == asset_file:
-                    self._asset_classes_file_types[asset_file] = registered_file
-                    break
+                    self._asset_classes_file_types[asset_file].append(registered_file)
 
         for asset_file in self.asset_files:
             if asset_file not in self._asset_classes_file_types:

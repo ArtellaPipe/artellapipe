@@ -105,17 +105,23 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._category
 
-    def get_file_type(self, file_type):
+    def get_file_type(self, file_type, extension=None):
         """
         Returns asset file object of the current asset and given file type
         :param file_type: str
+        :param extension: str
         :return: ArtellaAssetType
         """
 
         if file_type not in self.ASSET_FILES:
             return None
 
-        return self._project.get_asset_file(file_type=file_type)(asset=self)
+        asset_file_class = self._project.get_asset_file(file_type=file_type, extension=extension)
+        if not asset_file_class:
+            artellapipe.logger.warning('File Type: {} | {} not registered in current project!'.format(file_type, extension))
+            return
+
+        return asset_file_class(asset=self)
 
     def get_artella_url(self):
         """
@@ -129,18 +135,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return artella_url
 
-    def get_artella_data(self, update=True, force=False):
+    def get_artella_data(self, force_update=False):
         """
         Retrieves status data of the asset from Artella
-        :param update: bool, Whether to resync data if it is already synced
-        :param force: bool, Whether to force the resync of the data
+        :param force_update: bool, Whether to resync data if it is already synced
         :return: ArtellaAssetMetaData
         """
 
-        if not update:
-            return self._artella_data
-
-        if self._artella_data and not update and not force:
+        if not force_update and self._artella_data:
             return self._artella_data
 
         self._artella_data = artellalib.get_status(file_path=self.get_path())
@@ -177,12 +179,16 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         file_name = self._project.solve_name('asset_file', asset_name, asset_file_type=file_type)
         file_name += extension
 
+        file_path = None
         if status == ArtellaAssetFileStatus.WORKING:
             file_path = path_utils.clean_path(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type, file_name))
         else:
-            latest_local_versions = self.get_latest_local_versions()
+            latest_local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
             if latest_local_versions[file_type]:
                 file_path = os.path.join(self.get_path(), latest_local_versions[file_type][1], file_type, file_name)
+
+        if not file_path:
+            raise RuntimeError('Impossible to retrieve file because asset path for {} is not valid!'.format(asset_name))
 
         if resolve_path:
             file_path = self._project.resolve_path(file_path)
@@ -257,6 +263,28 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
 
+    @decorators.timestamp
+    def sync_latest_published_files(self, file_type=None, ask=False):
+        """
+        Synchronizes all latest published files for current asset
+        :param file_type: str, if not given all files will be synced
+        """
+
+        valid_types = self._get_types_to_check(file_type)
+        if not valid_types:
+            return
+
+        for valid_type in valid_types:
+            file_type = self.get_file_type(valid_type)
+            if not file_type:
+                continue
+
+            latest_published_path = file_type.get_server_versions()
+
+            print(file_type, latest_published_path)
+
+            # print('Syncing: {}'.format(latest_published_path))
+
     def get_local_versions(self, status=None, file_types=None):
         """
         Returns all local version of the given asset file types and with the given status
@@ -264,6 +292,9 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param file_types:
         :return:
         """
+
+        if not status:
+            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
 
         valid_types = self._get_types_to_check(file_types)
 
@@ -274,31 +305,26 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if not self.get_path():
             return local_versions
 
-        for p in os.listdir(self.get_path()):
-            if status == ArtellaAssetFileStatus.WORKING:
-                if p != defines.ARTELLA_WORKING_FOLDER:
-                    continue
-                for f in os.listdir(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER)):
-                    if f not in valid_types:
-                        continue
-                    self.get_working_files_for_file_type(file_type)
-            else:
-                if p == defines.ARTELLA_WORKING_FOLDER:
-                    continue
-                for f in valid_types:
-                    if f in p:
-                        version = artellalib.get_asset_version(p)
-                        if version:
-                            local_versions[f][str(version[1])] = p
+        for valid_type in valid_types:
+            file_type = self.get_file_type(valid_type)
+            if not file_type:
+                continue
+            file_type_versions = file_type.get_local_versions(status=status)
+            if not file_type_versions:
+                continue
+            local_versions[valid_type] = file_type_versions
 
         return local_versions
 
-    def get_latest_local_versions(self, file_types=None):
+    def get_latest_local_versions(self, status=None, file_types=None):
         """
         Returns latest local version of the given asset file types
         :param file_types: list (optional)
         :return: dict
         """
+
+        if not status:
+            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
 
         valid_types = self._get_types_to_check(file_types)
 
@@ -306,16 +332,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         for file_type in valid_types:
             latest_local_versions[file_type] = None
 
-        local_versions = self.get_local_versions()
-
-        for f, versions in local_versions.items():
-            if versions:
-                for version, version_folder in versions.items():
-                    if latest_local_versions[f] is None:
-                        latest_local_versions[f] = [int(version), version_folder]
-                    else:
-                        if int(latest_local_versions[f][0]) < int(version):
-                            latest_local_versions[f] = [int(version), version_folder]
+        for valid_type in valid_types:
+            file_type = self.get_file_type(valid_type)
+            if not file_type:
+                continue
+            file_type_versions = file_type.get_latest_local_versions(status=status)
+            if not file_type_versions:
+                continue
+            latest_local_versions[valid_type] = file_type_versions
 
         return latest_local_versions
 
@@ -470,15 +494,19 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
         sync_icon = artellapipe.resource.icon('sync')
         artella_icon = artellapipe.resource.icon('artella')
+        eye_icon = artellapipe.resource.icon('eye')
+
 
         artella_action = QAction(artella_icon, 'Open in Artella', context_menu)
-
+        view_locally_action = QAction(eye_icon, 'View Locally', context_menu)
         sync_action = QAction(sync_icon, 'Synchronize', context_menu)
         sync_menu = menu.Menu(self)
         actions_added = self._fill_sync_action_menu(sync_menu)
         artella_action.triggered.connect(self._on_open_in_artella)
+        view_locally_action.triggered.connect(self._on_view_locally)
 
         context_menu.addAction(artella_action)
+        context_menu.addAction(view_locally_action)
 
         if actions_added:
             sync_action.setMenu(sync_menu)
@@ -527,6 +555,13 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         """
 
         self._asset.open_in_artella()
+
+    def _on_view_locally(self):
+        """
+        Internal callback function that is called when the user presses View Locally contextual menu action
+        """
+
+        self._asset.view_locally()
 
     def _on_sync(self, file_type, sync_type, ask=False):
         """
