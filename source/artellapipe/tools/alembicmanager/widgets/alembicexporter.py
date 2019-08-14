@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains implementation for Alembic Exporter for Solstice
+Module that contains implementation for Alembic Exporter
 """
 
 from __future__ import print_function, division, absolute_import

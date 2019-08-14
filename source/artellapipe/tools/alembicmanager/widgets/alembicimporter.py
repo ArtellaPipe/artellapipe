@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains implementation for Alembic Importer for Solstice
+Module that contains implementation for Alembic Importer
 """
 
 from __future__ import print_function, division, absolute_import
@@ -470,12 +470,26 @@ class MayaAlembicImporter(AlembicImporter, object):
         track_nodes.load()
         valid_import = alembic.import_alembic(project, alembic_path, mode='import', nodes=None, parent=parent, fix_path=fix_path)
 
-        print('VALID IMPORT: {}'.format(valid_import))
         if not valid_import:
             return
         res = track_nodes.get_delta()
 
-        print('adsfasfsfasdfasdfsdf')
+        maya.cmds.viewFit(res, animate=True)
+
+        return res
+
+    @staticmethod
+    def reference_alembic(project, alembic_path, namespace=None, fix_path=False):
+        """
+        References alembic file in current DCC scene
+        :param project: ArtellaProject
+        :param alembic_path: str
+        :param namespace: str
+        :param fix_path: bool
+        """
+
+        res = AlembicImporter.reference_alembic(project=project, alembic_path=alembic_path, namespace=namespace, fix_path=fix_path)
+
         maya.cmds.viewFit(res, animate=True)
 
         return res

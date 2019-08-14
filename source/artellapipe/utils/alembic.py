@@ -301,7 +301,7 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
     return True
 
 
-def reference_alembic(project, alembic_file, namespace=None, resolve_path=False):
+def reference_alembic(project, alembic_file, namespace=None, fix_path=False):
 
     if not tp.is_maya():
         artellapipe.logger.warning('DCC {} does not support Alembic Reference functionality yet!'.format(tp.Dcc.get_name()))
@@ -317,8 +317,8 @@ def reference_alembic(project, alembic_file, namespace=None, resolve_path=False)
         return None
 
     try:
-        if resolve_path:
-            abc_file = project.resolve_path(alembic_file)
+        if fix_path:
+            abc_file = project.fix_path(alembic_file)
         else:
             abc_file = alembic_file
 
