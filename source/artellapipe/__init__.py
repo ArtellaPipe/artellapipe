@@ -113,6 +113,15 @@ def get_project_config_path():
     return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_CONFIG_FILE_NAME))
 
 
+def get_project_changelog_path():
+    """
+    Returns path where default Artella project changelog is located
+    :return: str
+    """
+
+    return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_CHANGELOG_FILE_NAME))
+
+
 def get_project_shelf_path():
     """
     Returns path where default Artella shelf file is located

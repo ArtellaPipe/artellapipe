@@ -45,6 +45,7 @@ class ArtellaProject(object):
     TAG_NODE_CLASS = asset.ArtellaTagNode
     PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
+    PROJECT_CHANGELOG_PATH = artellapipe.get_project_changelog_path()
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
     PROJECT_MENU_FILE_PATH = artellapipe.get_project_menu_path()
 
@@ -702,6 +703,14 @@ class ArtellaProject(object):
             raise RuntimeError('{} Project not setup properly. Please contact TD to fix this problem'.format(self.name.title()))
 
         return os.environ.get(self._project_env_var)
+
+    def get_changelog_path(self):
+        """
+        Returns path where changelog data for Artella project is located
+        :return: str
+        """
+
+        return self.PROJECT_CHANGELOG_PATH
 
     def resolve_path(self, path_to_resolve):
         """
