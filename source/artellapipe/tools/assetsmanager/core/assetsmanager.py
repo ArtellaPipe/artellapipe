@@ -145,7 +145,6 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         """
 
         self.save_settings()
-        self.remove_callbacks()
         self.windowClosed.emit()
         event.accept()
 

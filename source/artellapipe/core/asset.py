@@ -14,7 +14,6 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import ast
-import time
 import string
 import webbrowser
 from functools import partial
@@ -28,8 +27,7 @@ from tpPyUtils import python, decorators, strings, path as path_utils
 from tpQtLib.core import base, image, qtutils, menu
 
 import artellapipe
-from artellapipe.core import abstract, defines, artellalib
-from artellapipe.tools.assetsmanager.widgets import assetinfo
+from artellapipe.core import abstract, defines, artellalib, assetinfo
 from artellapipe.tools.tagger.core import defines as tagger_defines
 
 
