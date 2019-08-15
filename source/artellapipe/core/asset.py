@@ -121,6 +121,26 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return asset_file_class(asset=self)
 
+    def view_locally(self):
+        """
+        Opens folder where item is located locally
+        """
+
+        artellalib.explore_file(self.get_path())
+
+    def get_valid_file_types(self):
+        """
+        Returns a list with all valid file types of current asset
+        :return: list(str)
+        """
+
+        asset_files = self.ASSET_FILES.keys()
+        return [i for i in asset_files if i in self._project.asset_files]
+
+    # ==========================================================================================================
+    # ARTELLA
+    # ==========================================================================================================
+
     def get_artella_url(self):
         """
         Returns Artella URL of the asset
@@ -147,14 +167,17 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._artella_data
 
-    def get_valid_file_types(self):
+    def open_in_artella(self):
         """
-        Returns a list with all valid file types of current asset
-        :return: list(str)
+        Opens current asset in Artella web
         """
 
-        asset_files = self.ASSET_FILES.keys()
-        return [i for i in asset_files if i in self._project.asset_files]
+        artella_url = self.get_artella_url()
+        webbrowser.open(artella_url)
+
+    # ==========================================================================================================
+    # FILES
+    # ==========================================================================================================
 
     def get_file(self, file_type, status, extension=None, resolve_path=False):
         """
@@ -193,21 +216,6 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return file_path
 
-    def open_in_artella(self):
-        """
-        Opens current asset in Artella web
-        """
-
-        artella_url = self.get_artella_url()
-        webbrowser.open(artella_url)
-
-    def view_locally(self):
-        """
-        Opens folder where item is located locally
-        """
-
-        artellalib.explore_file(self.get_path())
-
     def open_file(self, file_type, status, extension=None, resolve_path=True):
         """
         Opens asset file with the given type and status (if exists)
@@ -218,13 +226,16 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return:
         """
 
-        file_path = self.get_file(file_type=file_type, status=status, extension=extension, resolve_path=False)
+        file_path = self.get_file(file_type=file_type, status=status, extension=extension, resolve_path=resolve_path)
         if os.path.isfile(file_path):
             if resolve_path:
                 file_path = self._project.resolve_path(file_path)
             artellalib.open_file_in_maya(file_path)
+            return True
         else:
             artellapipe.logger.warning('Impossible to open asset file of type "{}": {}'.format(file_type, file_path))
+
+        return False
 
     def reference_file(self, file_type, status, extension=None, resolve_path=True):
         """
@@ -242,6 +253,10 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         else:
             artellapipe.logger.warning('Impossible to reference asset file of type "{}": {}'.format(file_type, file_path))
 
+    # ==========================================================================================================
+    # SYNC
+    # ==========================================================================================================
+
     @decorators.timestamp
     def sync(self, file_type, sync_type):
         """
@@ -251,20 +266,22 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param ask: bool, Whether user will be informed of the sync operation before starting or not
         """
 
-        if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
-            if sync_type not in self.ASSET_FILES:
-                artellapipe.logger.warning('Impossible to sync "{}" because current Asset {} does not support it!'.format(file_type, self.__class__.__name__))
-                return
-            if sync_type not in self.project:
-                artellapipe.logger.warning('Impossible to sync "{}" because project "{}" does not support it!'.format(file_type, self.project.name.title()))
-                return
+        self.export_shaders()
 
-        paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
-        if not paths_to_sync:
-            artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
-            return
-
-        self._project.sync_files(files=paths_to_sync)
+        # if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
+        #     if sync_type not in self.ASSET_FILES:
+        #         artellapipe.logger.warning('Impossible to sync "{}" because current Asset {} does not support it!'.format(file_type, self.__class__.__name__))
+        #         return
+        #     if sync_type not in self.project:
+        #         artellapipe.logger.warning('Impossible to sync "{}" because project "{}" does not support it!'.format(file_type, self.project.name.title()))
+        #         return
+        #
+        # paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
+        # if not paths_to_sync:
+        #     artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
+        #     return
+        #
+        # self._project.sync_files(files=paths_to_sync)
 
     @decorators.timestamp
     def sync_latest_published_files(self, file_type=None, ask=False):
@@ -288,6 +305,10 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             print(file_type, latest_published_path)
 
             # print('Syncing: {}'.format(latest_published_path))
+
+    # ==========================================================================================================
+    # VERSIONS
+    # ==========================================================================================================
 
     def get_local_versions(self, status=None, file_types=None):
         """
@@ -346,6 +367,47 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             latest_local_versions[valid_type] = file_type_versions
 
         return latest_local_versions
+
+    # ==========================================================================================================
+    # SHADERS
+    # ==========================================================================================================
+
+    @decorators.abstractmethod
+    def get_shading_type(self):
+        """
+        Returns the asset file type of the shading file for the project
+        :return: str
+        """
+
+        raise NotImplementedError('get_shading_type must be implemented in extended classes')
+
+    def export_shaders(self):
+        """
+        Exports shaders of current asset
+        This function generates 2 files:
+            1. Shader JSON files which are stored inside Shaders Library Path
+            2. Asset Shader Desription file, which maps the asset geometry to their respective shader
+        :return: str
+        """
+
+        shading_type = self.get_file_type(self.get_shading_type())
+        if not shading_type:
+            artellapipe.logger.warning('Impossible to export shaders because shading file type "{}" is not valid!'.format(shading_type))
+            return
+
+        valid_open = self.open_file(file_type=shading_type, status=ArtellaAssetFileStatus.WORKING)
+        if not valid_open:
+            return
+
+        all_shading_groups = list()
+        json_data = dict()
+
+        asset
+
+
+    # ==========================================================================================================
+    # PRIVATE
+    # ==========================================================================================================
 
     def _get_paths_to_sync(self, file_type, sync_type):
         """

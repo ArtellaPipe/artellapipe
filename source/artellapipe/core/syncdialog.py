@@ -68,11 +68,10 @@ class ArtellaSyncDialog(QDialog, object):
         self.extended_layout.setSpacing(2)
         self._splash_layout.addLayout(self.extended_layout)
 
-        self._progress_bar = QProgressBar()
+        self._progress_bar = self._project.get_progress_bar()
         self._progress_bar.setMaximum(50)
         self._progress_bar.setMinimum(0)
         self._progress_bar.setTextVisible(False)
-        self._progress_bar.setStyleSheet("QProgressBar {border: 0px solid grey; border-radius:4px; padding:0px} QProgressBar::chunk {background: qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 rgb(245, 180, 148), stop: 1 rgb(75, 70, 170)); }")
         self._splash_layout.addWidget(self._progress_bar)
 
         self._progress_text = QLabel('Synchronizing Artella Files ... Please wait!')

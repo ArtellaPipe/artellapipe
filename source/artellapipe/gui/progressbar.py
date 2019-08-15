@@ -15,7 +15,6 @@ __email__ = "tpovedatd@gmail.com"
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
-from Qt.QtGui import *
 
 from tpQtLib.core import base
 

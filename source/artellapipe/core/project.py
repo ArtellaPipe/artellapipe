@@ -24,8 +24,11 @@ except ImportError:
     from urllib2 import quote
 from collections import OrderedDict
 
+from Qt.QtWidgets import *
+
 import tpDccLib as tp
 from tpPyUtils import python, strings, decorators, osplatform, jsonio, path as path_utils, folder as folder_utils
+from tpQtLib.core import qtutils
 
 import artellapipe
 from artellapipe.core import defines, artellalib, asset, node, syncdialog
@@ -818,6 +821,17 @@ class ArtellaProject(object):
         project_path = self.get_path()
         folder_utils.open_folder(project_path)
 
+    def get_progress_bar(self):
+        """
+        Creates and returns a new instance of project Progress bar
+        :return: QProgressBar
+        """
+
+        new_progress_bar = QProgressBar()
+        new_progress_bar.setStyleSheet("QProgressBar {border: 0px solid grey; border-radius:4px; padding:0px} QProgressBar::chunk {background: qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 rgb(" + self.progress_bar_color_0 + "), stop: 1 rgb(" + self.progress_bar_color_1 + ")); }")
+
+        return new_progress_bar
+
     # ==========================================================================================================
     # SYNC
     # ==========================================================================================================
@@ -830,7 +844,7 @@ class ArtellaProject(object):
 
         files = python.force_list(files)
 
-        sync_dialog = syncdialog.ArtellaSyncFileDialog(project=self, files=files)
+        sync_dialog = self.SYNC_FILES_DIALOG_CLASS(project=self, files=files)
         sync_dialog.sync()
 
     def sync_paths(self, paths):
@@ -841,8 +855,102 @@ class ArtellaProject(object):
 
         paths = python.force_list(paths)
 
-        sync_dialog = syncdialog.ArtellaSyncPathDialog(project=self, paths=paths)
+        sync_dialog = self.SYNC_PATHS_DIALOG_CLASS(project=self, paths=paths)
         sync_dialog.sync()
+
+    # ==========================================================================================================
+    # FILES
+    # ==========================================================================================================
+
+    def lock_file(self, file_path=None, notify=False):
+        """
+        Locks given file in Artella
+        :param file_path: str
+        :param notify: bool
+        :return: bool
+        """
+
+        file_path = self.fix_path(file_path)
+        valid_path = self._check_file_path(file_path)
+        if not valid_path:
+            return False
+
+        valid_lock = artellalib.lock_file(file_path=file_path, force=True)
+        if not valid_lock:
+            return False
+
+        if notify:
+            self.tray.show_message(title='Lock File', msg='File locked successfully!')
+
+        return True
+
+    def unlock_file(self, file_path=None, notify=False, warn_user=True):
+        """
+        Unlocks current file in Artella
+        :param file_path: str
+        :param notify: bool
+        :param warn_user: bool
+        :return: bool
+        """
+
+        file_path = self.fix_path(file_path)
+        valid_path = self._check_file_path(file_path)
+        if not valid_path:
+            return False
+
+        if warn_user:
+            msg = 'If changes in file: \n\n{}\n\n are not submitted to Artella yet, submit them before unlocking the file please. \n\n Do you want to continue?'.format(file_path)
+            res = tp.Dcc.confirm_dialog(title='Unlock File', message=msg, button=['Yes', 'No'], cancel_button='No', dismiss_string='No')
+            if res != tp.Dcc.DialogResult.Yes:
+                return False
+
+        artellalib.unlock_file(file_path=file_path)
+        if notify:
+            self.tray.show_message(title='Unlock File', msg='File unlocked successfully!')
+
+        return True
+
+    def upload_working_version(self, file_path=None, skip_saving=False, notify=False, comment=None, force=False):
+        """
+        Uploads a new working version of the given file
+        :param file_path: str
+        :param skip_saving: bool
+        :param notify: bool
+        :param comment: str
+        :param force: bool
+        :return: bool
+        """
+
+        file_path = self.fix_path(file_path)
+        valid_path = self._check_file_path(file_path)
+        if not valid_path:
+            return False
+
+        short_path = file_path.replace(self.get_assets_path(), '')[1:]
+
+        history = artellalib.get_asset_history(short_path)
+        file_versions = history.versions
+        if not file_versions:
+            current_version = -1
+        else:
+            current_version = 0
+            for v in file_versions:
+                if int(v[0]) > current_version:
+                    current_version = int(v[0])
+            current_version += 1
+
+        if comment:
+            comment = str(comment)
+        else:
+            comment = qtutils.get_comment(text_message='Make New Version ({}) : {}'.format(current_version, short_path), title='Comment', parent=tp.Dcc.get_main_window())
+
+        if comment:
+            artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving, force=force)
+            if notify:
+                self.tray.show_message(title='New Working Version', msg='Version {} uploaded to Artella server successfully!'.format(current_version))
+            return True
+
+        return False
 
     # ==========================================================================================================
     # ASSETS
@@ -1162,6 +1270,29 @@ class ArtellaProject(object):
     # ==========================================================================================================
     # PRIVATE
     # ==========================================================================================================
+
+    def _check_file_path(self, file_path):
+        """
+        Returns whether given path is a valid project path or not
+        :param file_path: str
+        :return: str
+        """
+
+        if not file_path:
+            file_path = tp.Dcc.scene_name()
+            if not file_path:
+                self.logger.error('File {} cannot be locked because it does not exists!'.format(file_path))
+                return False
+
+        if not file_path.startswith(self.get_path()):
+            self.logger.error('Impossible to lock file that is nos located in {} Project Folder!'.format(self.name))
+            return
+
+        if not os.path.isfile(file_path):
+            self.logger.error('File {} cannot be locked because it does not exists!'.format(file_path))
+            return False
+
+        return True
 
     def _register_asset_classes(self):
         """

@@ -109,6 +109,7 @@ class ShaderManager(window.ArtellaWindow, object):
         :return:
         """
 
+
 def run(project):
     win = ShaderManager(project=project)
     win.show()
