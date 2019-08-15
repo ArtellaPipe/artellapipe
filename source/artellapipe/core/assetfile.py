@@ -13,10 +13,12 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
+from collections import OrderedDict
 
 from tpPyUtils import decorators, path as path_utils
 
-from artellapipe.core import defines, artellalib
+import artellapipe
+from artellapipe.core import defines, artellaclasses, artellalib
 
 
 class ArtellaAssetType(object):
@@ -45,7 +47,7 @@ class ArtellaAssetType(object):
         """
 
         if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
-            file_path = self._get_working_path()
+            file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
 
@@ -58,7 +60,7 @@ class ArtellaAssetType(object):
         """
 
         if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
-            file_path = self._get_working_path()
+            file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
 
@@ -73,7 +75,7 @@ class ArtellaAssetType(object):
         """
 
         if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
-            file_path = self._get_working_path()
+            file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
 
@@ -111,7 +113,7 @@ class ArtellaAssetType(object):
 
         return self._history
 
-    def get_working_path(self):
+    def get_working_path(self, sync_folder=False):
         """
         Returns working path to the file
         :return: str
@@ -120,43 +122,71 @@ class ArtellaAssetType(object):
         asset_name = self.asset.get_name()
         asset_path = self.asset.get_path()
 
-        return self._get_working_path(asset_name=asset_name, asset_path=asset_path)
+        working_path = self._get_working_path(asset_name=asset_name, asset_path=asset_path)
+        if sync_folder:
+            return path_utils.clean_path(os.path.dirname(working_path))
 
-    def get_latest_local_published_path(self):
+        return path_utils.clean_path(working_path)
+
+    def get_latest_local_published_path(self, sync_folder=False):
         """
-        Returns path to the latest published file
+        Returns local path to the latest published file
         :return: str
         """
 
-        latest_Local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
-        if not latest_Local_versions:
+        latest_local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+        if not latest_local_versions:
             return
 
         asset_name = self.asset.get_name()
         asset_path = self.asset.get_path()
-        version_folder = latest_Local_versions[1]
+        version_folder = latest_local_versions[1]
+
         published_path = self._get_published_path(asset_name=asset_name, asset_path=asset_path, version_folder=version_folder)
+        if sync_folder:
+            return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
 
         return path_utils.clean_path(published_path)
 
     def get_latest_local_published_version(self):
         """
-        Returns latest published version
+        Returns local latest published version
         :return: str
         """
 
-        latest_Local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+        latest_local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
 
-        return latest_Local_versions
+        return latest_local_versions
 
+    def get_latest_server_published_path(self, sync_folder=False):
+        """
+        Returns server path to the latest published file
+        :return: str
+        """
 
-    def get_latest_published_version(self):
+        latest_published_version = self.get_latest_server_published_versions()
+        if not latest_published_version:
+            return
+
+        asset_name = self.asset.get_name()
+        asset_path = self.asset.get_path()
+        version_folder = latest_published_version[1]
+
+        published_path = self._get_published_path(asset_name=asset_name, asset_path=asset_path, version_folder=version_folder)
+        if sync_folder:
+            return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
+
+        return path_utils.clean_path(published_path)
+
+    def get_latest_server_published_versions(self):
         """
         Returns latest published version in Artella server
         :return: str
         """
 
-        pass
+        latest_server_versions = self.get_latest_server_version(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+
+        return latest_server_versions
 
     def get_local_versions(self, status=None):
         """
@@ -194,7 +224,7 @@ class ArtellaAssetType(object):
 
     def get_latest_local_versions(self, status=None):
         """
-        Returns latest local version of the given asset file types
+        Returns latest local version of the of the current file type
         :param status: str
         :return: dict
         """
@@ -215,12 +245,29 @@ class ArtellaAssetType(object):
 
         return latest_local_versions
 
+    def get_latest_server_version(self, status=None):
+        """
+        Returns latest server version of the current file type
+        :param status: str
+        :return: dict
+        """
+
+        if not status:
+            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+
+        server_versions = self.get_server_versions(status=status, all_versions=False)
+        if not server_versions:
+            return None
+
+        latest_server_version = server_versions[0]
+
+        return latest_server_version
+
     @decorators.timestamp
     def get_server_versions(self, status=None, all_versions=True, force_update=False):
         """
         Returns all server version of the current file type in the wrapped asset
         :param status: ArtellaAssetFileStatus
-        :param all_versions: bool, Whether to return all server versions of the file or only the latest one
         :param force_update: bool, Whether to update Artella data or not (this can take time)
         :return:
         """
@@ -233,13 +280,51 @@ class ArtellaAssetType(object):
         if not force_update and self._latest_server_version.get(status):
             return self._latest_server_version[status]
 
+        asset_path = self.asset.get_path()
+        if not asset_path:
+            return
+
         if status == defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS:
-            self._get_published_server_versions(all_versions=all_versions, force_update=force_update)
-        else:
-            asset_path = self.asset.get_path()
-            if not asset_path:
+
+            latest_versions = list()
+
+            versions = dict()
+            status = artellalib.get_status(asset_path, as_json=True)
+            status_data = status.get('data')
+            if not status_data:
+                artellapipe.logger.error('Impossible to retrieve sync data from Artella. Try it again!')
                 return
 
+            for name, data in status_data.items():
+                if self.FILE_TYPE not in name:
+                    continue
+                version = artellalib.get_asset_version(name)[1]
+                versions[version] = name
+
+            ordered_versions = OrderedDict(sorted(versions.items()))
+
+            if all_versions:
+                for version, name in ordered_versions.items():
+                    valid_version = self._check_valid_published_version(asset_path, name)
+                    if not valid_version:
+                        continue
+                    else:
+                        latest_versions.append([version, name])
+            else:
+                current_index = -1
+                latest_version = None
+                valid_version = False
+                while not valid_version and current_index >= (len(ordered_versions) * -1):
+                    latest_version = ordered_versions[ordered_versions.keys()[current_index]]
+                    valid_version = self._check_valid_published_version(asset_path, latest_version)
+                    if not valid_version:
+                        current_index -= 1
+                if valid_version:
+                    latest_versions.append([ordered_versions.keys()[current_index], latest_version])
+
+            working_data = latest_versions
+
+        else:
             working_path = os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self.FILE_TYPE)
 
             if not force_update and self._working_status:
@@ -253,6 +338,25 @@ class ArtellaAssetType(object):
                     working_data.append(server_data)
 
         return working_data
+
+    def _check_valid_published_version(self, asset_path, version):
+        """
+        Returns whether the given version is a valid one or not
+        :return: bool
+        """
+
+        version_valid = True
+        version_path = os.path.join(asset_path, '__{}__'.format(version))
+        version_info = artellalib.get_status(version_path)
+        if version_info:
+            if isinstance(version_info, artellaclasses.ArtellaHeaderMetaData):
+                version_valid = False
+            else:
+                for n, d in version_info.references.items():
+                    if d.maximum_version_deleted and d.deleted:
+                        version_valid = False
+
+        return version_valid
 
     def get_extension(self):
         """
@@ -285,7 +389,7 @@ class ArtellaAssetType(object):
         :return: str
         """
 
-        return os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self.FILE_TYPE, asset_name+self.FILE_EXTENSIONS[0])
+        return path_utils.clean_path(os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self.FILE_TYPE, asset_name+self.FILE_EXTENSIONS[0]))
 
     def _get_published_path(self, asset_name, asset_path, version_folder):
         """
@@ -297,9 +401,9 @@ class ArtellaAssetType(object):
         :return: str
         """
 
-        return os.path.join(asset_path, version_folder, self.FILE_TYPE, asset_name+self.FILE_EXTENSIONS[0])
+        return path_utils.clean_path(os.path.join(asset_path, version_folder, self.FILE_TYPE, asset_name+self.FILE_EXTENSIONS[0]))
 
-    def _get_published_server_versions(self, all_version=True, force_update=False):
+    def _get_published_server_versions(self, all_versions=True, force_update=False):
         """
         Internal function that returns all the published server versions of the current file type in the wrapped asset
         Overrides to implement custom functionality
@@ -312,7 +416,8 @@ class ArtellaAssetType(object):
         if not artella_data:
             return
         published_versions = artella_data.get_published_versions(all=all_versions)
-        print('Published Versions: {}'.format(published_versions))
+
+        return published_versions
 
     def _get_working_server_versions(self, working_path, artella_data, force_update=False):
         """

@@ -27,7 +27,7 @@ from tpPyUtils import python, decorators, strings, path as path_utils
 from tpQtLib.core import base, image, qtutils, menu
 
 import artellapipe
-from artellapipe.core import abstract, defines, artellalib, assetinfo
+from artellapipe.core import abstract, defines, artellalib, assetinfo, syncdialog
 from artellapipe.tools.tagger.core import defines as tagger_defines
 
 
@@ -260,6 +260,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                 return
 
         paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
+        if not paths_to_sync:
+            artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
+            return
+
+        sync_dialog = syncdialog.ArtellaSyncFileDialog(project=self._project, files=paths_to_sync)
+        sync_dialog.sync()
+
+        # print(paths_to_sync)
 
     @decorators.timestamp
     def sync_latest_published_files(self, file_type=None, ask=False):
@@ -273,6 +281,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             return
 
         for valid_type in valid_types:
+            file_type = self.get_file_type(valid_type)
             file_type = self.get_file_type(valid_type)
             if not file_type:
                 continue
@@ -349,13 +358,21 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: list(str)
         """
 
+        valid_types = self._get_types_to_check(file_type)
+        if not valid_types:
+            return
+
         paths_to_sync = list()
 
-        if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or sync_type == ArtellaAssetFileStatus.WORKING:
-            if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
-                paths_to_sync.append(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER))
-            else:
-                paths_to_sync.append(os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type))
+        for valid_type in valid_types:
+            file_type = self.get_file_type(valid_type)
+            if not file_type:
+                continue
+
+            if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or sync_type == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+                paths_to_sync.append(file_type.get_working_path(sync_folder=True))
+            if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or sync_type == defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS:
+                paths_to_sync.append(file_type.get_latest_server_published_path(sync_folder=True))
 
         return paths_to_sync
 
@@ -367,11 +384,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         asset_valid_file_types = self.get_valid_file_types()
-        file_types = python.force_list(file_types)
-        if not file_types:
+        if file_types == defines.ARTELLA_SYNC_ALL_ASSET_TYPES:
             file_types = asset_valid_file_types
         else:
-            file_types = [i for i in file_types if i in asset_valid_file_types]
+            file_types = python.force_list(file_types)
+            if not file_types:
+                file_types = asset_valid_file_types
+            else:
+                file_types = [i for i in file_types if i in asset_valid_file_types]
 
         return file_types
 

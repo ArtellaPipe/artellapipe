@@ -3,4 +3,6 @@ order = [
     'artellapipe.core.artellaclasses',
     'artellapipe.core.artellalib',
     'artellapipe.core.assetinfo',
+    'artellapipe.core.assetfile',
+    'artellapipe.core.asset'
 ]

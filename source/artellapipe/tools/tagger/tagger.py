@@ -296,7 +296,17 @@ class ArtellaTagger(window.ArtellaWindow, object):
         Overrides to add custom editors
         """
 
-        pass
+        from artellapipe.tools.tagger.editors import nameeditor
+        from artellapipe.tools.tagger.editors import descriptioneditor
+        from artellapipe.tools.tagger.editors import typeeditor
+
+        name_editor = nameeditor.NameEditor(project=self._project)
+        description_editor = descriptioneditor.DescriptionEditor(project=self._project)
+        type_editor = typeeditor.TypeEditor(project=self._project)
+
+        self.add_editor(name_editor)
+        self.add_editor(description_editor)
+        self.add_editor(type_editor)
 
     def _fill_new_tag_data_node(self, tag_data_node, current_selection):
         """

@@ -1085,6 +1085,19 @@ class ArtellaProject(object):
         return re.compile(r"{}".format(self._shot_regex))
 
     # ==========================================================================================================
+    # PUBLISHER
+    # ==========================================================================================================
+
+    def get_publisher_plugin_paths(self):
+        """
+        Function that registers all plugins available for Artella Publisher
+        """
+
+        return [
+            path_utils.clean_path(os.path.join(artellapipe.get_project_path(), 'tools', 'publisher', 'plugins'))
+        ]
+
+    # ==========================================================================================================
     # PRIVATE
     # ==========================================================================================================
 

@@ -77,15 +77,13 @@ class ArtellaAssetMetaData(object):
         self.__latest = status_dict['data']['_latest']
         self._latest_ = status_dict['data']['latest']
 
-        self._published_folders = dict()
-        self._published_folders_all = dict()
+        self._published_folders = None
+        self._published_folders_all = None
 
         if artellapipe.project:
             self._must_folders = artellapipe.project.asset_must_files
         else:
             self._must_folders = list()
-
-        self._published_folders = None
 
     @property
     def path(self):
@@ -121,15 +119,20 @@ class ArtellaAssetMetaData(object):
                 is_published = False
         return is_published
 
-    def get_published_versions(self, all=False):
+    def get_published_versions(self, all=False, force_update=False):
         """
         Returns published versions of the asset
         :param all: str
         :return:
         """
 
-        if self._published_folders is None:
-            self._get_published_data()
+        if not force_update and self._published_folders_all is not None and self._published_folders is not None:
+            if all:
+                return self._published_folders_all
+            else:
+                return self._published_folders
+
+        self._get_published_data()
 
         if all:
             return self._published_folders_all
@@ -142,6 +145,9 @@ class ArtellaAssetMetaData(object):
         """
 
         from artellapipe.core import artellalib
+
+        self._published_folders = dict()
+        self._published_folders_all = dict()
 
         for f in self._must_folders:
             self._published_folders[f] = dict()

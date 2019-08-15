@@ -17,6 +17,8 @@ import string
 
 import tpDccLib as tp
 
+import artellapipe
+
 
 class ArtellaDCCNode(object):
     def __init__(self, project, node=None, update_at_init=True):
@@ -172,6 +174,109 @@ class ArtellaDCCNode(object):
             if self._valid:
                 self._filename_with_copy_number = tp.Dcc.node_filename(self._node, no_copy_number=False)
                 self._nodes_list = tp.Dcc.node_nodes(self._node)
+
+    def change_namespace(self, new_namespace):
+        """
+         Updates the namespace of the reference stored node
+        :param new_namespace: str
+        :return: str
+        """
+
+        result = None
+        try:
+            result = tp.Dcc.change_namespace(self.namespace, new_namespace)
+        except Exception as e:
+            artellapipe.logger.warning('Impossible to change namespace for reference node: "{0}" >> "{1}" to "{2}" --> {3}'.format(self.node, self.namespace, new_namespace, e))
+
+        if result:
+            artellapipe.logger.info('Namespace for reference node: "{0}" >> "{1}" to "{2}" changed successfully!'.format(self.node, self.namespace, new_namespace))
+
+        self.update_info()
+
+        return result
+
+    def change_filename(self, new_filename):
+        """
+        Updates the filename that the current stored reference node is pointing to
+        :param new_filename: str
+        :return: str
+        """
+
+        result = None
+        try:
+            result = tp.Dcc.change_filename(node=self.node, new_filename=new_filename)
+        except Exception as e:
+            artellapipe.logger.error('Impossible to change filename for reference node: "{0}" > "{1}" to "{2}" --> {3}'.format(self.node, self.filename, new_filename, e))
+
+        self.update_info()
+
+        return result
+
+    def convert_reference_to_absolute_path(self):
+        """
+        Updates the current path the stored reference is pointing to from relative to absolute relative to the Artella Project path
+        :return: str
+        """
+
+        fix_path = self._project.fix_path(self.filename.lower())
+        if os.path.exists(fix_path):
+            self.change_filename(fix_path)
+        else:
+            artellapipe.logger.warning('Impossible to convert "{0}" to absolute path: "{1}", because new file does not exists!'.format( self.filename, fix_path))
+
+        self.update_info()
+
+    def import_objects(self, with_absolute_path=False):
+        """
+        Import objects pointed by the stored reference node
+        :param with_absolute_path: str, Whether the imported objects should be imported using a relative or an absolute path
+        :return: str
+        """
+
+        result = None
+
+        try:
+            if with_absolute_path:
+                fix_path = self._project.fix_path(self.filename.lower())
+                if os.path.exists(fix_path):
+                    self.change_filename(fix_path)
+
+            result = tp.Dcc.import_reference(self.filename)
+        except Exception as e:
+            artellapipe.logger.error('Impossible to import objects from reference node: "{0}" --> {1}'.format(self.node, e))
+
+        if result:
+            artellapipe.logger.info('Imported objects from node: "{}" successfully!'.format(self.node))
+
+        self.update_info()
+
+        return result
+
+    def get_tag_node(self):
+        """
+        Returns tag node associated to this Artella DCC node
+        :return: ArtellaTagNode
+        """
+
+        if tp.Dcc.attribute_exists(node=self.node, attribute_name='tag_data'):
+            tag_data_node = tp.Dcc.list_connections(node=self.node, attribute_name='tag_data')
+            if tag_data_node:
+                tag_data_node = tag_data_node[0]
+                tag_type = tp.Dcc.get_attribute_value(node=tag_data_node, attribute_name='tag_type')
+                if tag_type and tag_type == '{}_TAG'.format(self._project.name.upper()):
+                    tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=tag_data_node)
+                    return tag_node
+
+    def get_tag_info_node(self):
+        """
+        Returns tag node associated to this Artella DCC node retrieved from tag info attribute
+        :return: ArtellaTagDataNode
+        """
+
+        if tp.Dcc.attribute_exists(node=self.node, attribute_name='tag_info'):
+            tag_info = tp.Dcc.get_attribute_value(node=self.node, attribute_name='tag_info')
+            tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=self.node, tag_info=tag_info)
+            return tag_node
 
 
 class ArtellaAssetNode(ArtellaDCCNode, object):
