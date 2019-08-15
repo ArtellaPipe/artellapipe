@@ -116,6 +116,9 @@ ARTELLA_PROGRESS_BAR_COLOR_0_ATTRIBUTE_NAME = 'PROGRESS_BAR_COLOR_0'
 # Defines the attribute name used to define progress bar color 1
 ARTELLA_PROGRESS_BAR_COLOR_1_ATTRIBUTE_NAME = 'PROGRESS_BAR_COLOR_1'
 
+# Defines the attribute name used to define the extension of the shaders files
+ARTELLA_SHADERS_EXTENSION_ATTRIBUTE_NAME = 'SHADERS_EXTENSION'
+
 # Defines the name of the Artella plugin
 ARTELLA_MAYA_PLUGIN_NAME = 'Artella.py'
 
@@ -211,3 +214,4 @@ ARTELLA_DEFAULT_ASSET_FILES_EXTENSION = '.ma'
 
 # Defines the name of the attribute for tag info
 ARTELLA_TAG_INFO_ATTRIBUTE_NAME = 'tag_info'
+

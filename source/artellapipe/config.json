@@ -13,14 +13,15 @@
   "ASSET_TYPES": [],
   "ASSET_FILES": [],
   "ASSET_MUST_FILES": [],
-  "ASSET_WIP_STATUS": "working",
-  "ASSET_PUBLISH_STATUS": "published",
   "ASSET_IGNORED_PATHS": [],
   "ASSETS_LIBRARY_SUPPORTED_FILES": {},
+  "ASSET_WIP_STATUS": "working",
+  "ASSET_PUBLISH_STATUS": "published",
   "PATHS_TO_REGISTER": ["pipeline", "pipeline/externals"],
   "PROGRESS_BAR_COLOR_0": "255, 255, 255",
   "PROGRESS_BAR_COLOR_1": "255, 255, 255",
   "TAG_TYPES": [],
   "OUTLINER_CATEGORIES": [],
-  "SHOT_REGEX": "*"
+  "SHOT_REGEX": "*",
+  "SHADERS_EXTENSION": ".ashader"
 }

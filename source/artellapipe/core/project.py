@@ -80,6 +80,7 @@ class ArtellaProject(object):
         self._tag_types = list()
         self._outliner_categories = dict()
         self._shot_regex = None
+        self._shaders_extension = None
 
         self._registered_asset_classes = list()
         self._asset_classes_types = dict()
@@ -354,6 +355,15 @@ class ArtellaProject(object):
 
         return '{}_TAG'.format(self.get_clean_name().upper())
 
+    @property
+    def shaders_extension(self):
+        """
+        Returns extension usded by shaders files
+        :return: str
+        """
+
+        return self._shaders_extension
+
     # ==========================================================================================================
     # INITIALIZATION & CONFIG
     # ==========================================================================================================
@@ -447,6 +457,7 @@ class ArtellaProject(object):
         self._tag_types = project_config_data.get(defines.ARTELLA_CONFIG_TAG_TYPES, list())
         self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES, dict())
         self._shot_regex = project_config_data.get(defines.ARTELLA_CONFIG_SHOT_REGEX, '*')
+        self._shaders_extension = project_config_data.get(defines.ARTELLA_SHADERS_EXTENSION_ATTRIBUTE_NAME, None)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -1096,6 +1107,18 @@ class ArtellaProject(object):
         return [
             path_utils.clean_path(os.path.join(artellapipe.get_project_path(), 'tools', 'publisher', 'plugins'))
         ]
+
+    # ==========================================================================================================
+    # SHADERS
+    # ==========================================================================================================
+
+    def get_shaders_path(self):
+        """
+        Returns path where shareds are located in the project
+        :return: str
+        """
+
+        return path_utils.clean_path(os.path.join(self.get_assets_path(), 'shaders'))
 
     # ==========================================================================================================
     # PRIVATE

@@ -12,9 +12,12 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+from functools import partial
+
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+from tpQtLib.core import base, qtutils
 from tpQtLib.widgets import grid
 
 import artellapipe
@@ -143,3 +146,72 @@ class AssetsViewer(grid.GridWidget, object):
         row, col = self.first_empty_cell()
         self.addWidget(row, col, widget)
         self.resizeRowsToContents()
+
+
+class CategorizedAssetViewer(base.BaseWidget, object):
+
+    ASSETS_VIEWER_CLASS = AssetsViewer
+
+    def __init__(self, project, column_count=4, parent=None):
+
+        self._project = project
+        self._column_count = column_count
+
+        super(CategorizedAssetViewer, self).__init__(parent=parent)
+
+        self._assets_viewer.update_assets()
+
+    def ui(self):
+        super(CategorizedAssetViewer, self).ui()
+
+        self._assets_viewer = self.ASSETS_VIEWER_CLASS(
+            project=self._project,
+            column_count=self._column_count,
+            parent=self
+        )
+        self._assets_viewer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self._categories_menu_layout = QHBoxLayout()
+        self._categories_menu_layout.setContentsMargins(0, 0, 0, 0)
+        self._categories_menu_layout.setSpacing(0)
+        self._categories_menu_layout.setAlignment(Qt.AlignTop)
+        self.main_layout.addLayout(self._categories_menu_layout)
+
+        self._categories_btn_grp = QButtonGroup(self)
+        self._categories_btn_grp.setExclusive(True)
+        asset_categories = self._project.asset_types if self._project else list()
+
+        self.main_layout.addWidget(self._assets_viewer)
+
+        self.update_asset_categories(asset_categories)
+
+    def update_asset_categories(self, asset_categories):
+        """
+        Updates current categories with the given ones
+        :param asset_categories: list(str)
+        """
+
+        for btn in self._categories_btn_grp.buttons():
+            self._categories_btn_grp.removeButton(btn)
+
+        qtutils.clear_layout(self._categories_menu_layout)
+
+        all_asset_categories = [defines.ARTELLA_ALL_CATEGORIES_NAME]
+        all_asset_categories.extend(asset_categories)
+        for category in all_asset_categories:
+            new_btn = QPushButton(category)
+            new_btn.setCheckable(True)
+            self._categories_menu_layout.addWidget(new_btn)
+            self._categories_btn_grp.addButton(new_btn)
+            if category == defines.ARTELLA_ALL_CATEGORIES_NAME:
+                new_btn.setChecked(True)
+            new_btn.toggled.connect(partial(self._on_change_category, category))
+
+    def _on_change_category(self, category, flag):
+        """
+        Internal callback function that is called when the user presses an Asset Category button
+        :param category: str
+        """
+
+        if flag:
+            self._assets_viewer.change_category(category=category)

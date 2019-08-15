@@ -32,7 +32,7 @@ class AlembicManager(window.ArtellaWindow, object):
     def __init__(self, project):
         super(AlembicManager, self).__init__(
             project=project,
-            name='SolsticeAlembicManager',
+            name='ArtellaAlembicManager',
             title='Alembic Manager',
             size=(550, 650)
         )
