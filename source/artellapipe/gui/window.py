@@ -99,7 +99,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
     LOGO_NAME = None
     STATUS_BAR_WIDGET = ArtellaWindowStatusBar
 
-    def __init__(self, project, name='Window', title='Window', size=(800, 535), fixed_size=False, parent=None):
+    def __init__(self, project, name='Window', title='Window', size=(800, 535), fixed_size=False, parent=None, *args, **kwargs):
 
         self._project = project
 
@@ -118,7 +118,9 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
             auto_run=True,
             frame_less=True,
             use_style=False,
-            parent=parent
+            parent=parent,
+            *args,
+            **kwargs
         )
 
         if self.parent():
@@ -137,7 +139,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(0)
         title_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self.main_layout.addLayout(title_layout)
+        self.main_layout.insertLayout(0, title_layout)
 
         self._logo_view = QGraphicsView()
         self._logo_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -170,6 +172,15 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         # TODO: Take the width from the QGraphicsView not hardcoded :)
         self._logo_view.centerOn(1000, 0)
         return super(ArtellaWindow, self).resizeEvent(event)
+
+    @property
+    def project(self):
+        """
+        Returns Artella project this window is linked to
+        :return: ArtellaProject
+        """
+
+        return self._project
 
     def set_info_url(self, url):
         """

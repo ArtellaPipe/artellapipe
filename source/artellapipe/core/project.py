@@ -862,6 +862,28 @@ class ArtellaProject(object):
     # FILES
     # ==========================================================================================================
 
+    def save_scene(self, notify=False):
+        """
+        Saves current scene and cleans invalid data
+        :param notify: bool
+        """
+
+        tp.Dcc.clean_scene()
+        tp.Dcc.save_current_scene(force=False)
+        scene_name = tp.Dcc.scene_name()
+        if not scene_name:
+            artellapipe.logger.warning('File was not saved!')
+            return False
+
+        if tp.is_maya():
+            from tpMayaLib.core import helpers
+            helpers.clean_student_line()
+
+        if notify:
+            self.tray.show_message(title='Save File', msg='File saved successfully!')
+
+        return True
+
     def lock_file(self, file_path=None, notify=False):
         """
         Locks given file in Artella
@@ -869,6 +891,9 @@ class ArtellaProject(object):
         :param notify: bool
         :return: bool
         """
+
+        if not file_path:
+            return
 
         file_path = self.fix_path(file_path)
         valid_path = self._check_file_path(file_path)
@@ -892,6 +917,9 @@ class ArtellaProject(object):
         :param warn_user: bool
         :return: bool
         """
+
+        if not file_path:
+            return
 
         file_path = self.fix_path(file_path)
         valid_path = self._check_file_path(file_path)
@@ -920,6 +948,9 @@ class ArtellaProject(object):
         :param force: bool
         :return: bool
         """
+
+        if not file_path:
+            return
 
         file_path = self.fix_path(file_path)
         valid_path = self._check_file_path(file_path)
