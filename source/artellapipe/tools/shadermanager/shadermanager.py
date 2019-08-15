@@ -14,6 +14,10 @@ __email__ = "tpovedatd@gmail.com"
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+from tpPyUtils import osplatform
+
+import tpDccLib as tp
+
 from artellapipe.core import assetsviewer, shadersviewer
 from artellapipe.gui import window
 
@@ -77,11 +81,13 @@ class ShaderManager(window.ArtellaWindow, object):
         self.main_layout.addWidget(shader_splitter)
 
         shader_widget = QWidget()
+        shader_widget.setFixedWidth(700)
+        shader_widget.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
         shader_scroll = QScrollArea()
         shader_scroll.setWidgetResizable(True)
         shader_scroll.setWidget(shader_widget)
-        self.shader_viewer = shadersviewer.ShaderViewer(project=self._project, grid_size=2)
-        shader_scroll.setMinimumWidth(900)
+        self.shader_viewer = shadersviewer.ShaderViewer(project=self._project, grid_size=6)
+        # shader_scroll.setMinimumWidth(900)
         self.shader_viewer.setAlignment(Qt.AlignTop)
         shader_widget.setLayout(self.shader_viewer)
 
@@ -97,11 +103,10 @@ class ShaderManager(window.ArtellaWindow, object):
         shader_splitter.addWidget(shader_scroll)
 
     def setup_signals(self):
-        pass
-        # self._export_sel_btn.clicked.connect(self._export_selected_shaders)
-        # self._export_all_btn.clicked.connect(self._export_all_shaders)
-        # self._sync_shaders_btn.clicked.connect(self.update_shaders_from_artella)
-        # self._open_shaders_path_btn.clicked.connect(self._open_shaders_path)
+        self._export_sel_btn.clicked.connect(self._on_export_selected_shaders)
+        self._export_all_btn.clicked.connect(self._export_all_shaders)
+        self._sync_shaders_btn.clicked.connect(self._on_update_shaders)
+        self._open_shaders_path_btn.clicked.connect(self._open_shaders_path)
 
     def _init(self):
         """
@@ -109,9 +114,57 @@ class ShaderManager(window.ArtellaWindow, object):
         :return:
         """
 
+        pass
+
+    def _on_export_selected_shaders(self):
+        """
+        Internal callback function that is called when the user clicks on Export Selected Shaders button
+        """
+
+        from artellapipe.tools.shadermanager.widgets import shaderexporter
+
+        shaders = tp.Dcc.list_materials()
+        exporter = shaderexporter.ShaderExporter(project=self._project, shaders=shaders, parent=self)
+        exporter.exportFinished.connect(self.update_shader_library)
+        exporter.exec_()
+
+    def _export_all_shaders(self):
+        """
+        Internal callback function that is called when the user clicks on Export All Shaders button
+        """
+
+        from artellapipe.tools.shadermanager.widgets import shaderexporter
+
+        shaders = tp.Dcc.list_materials()
+        exporter = shaderexporter.ShaderExporter(project=self._project, shaders=shaders, parent=self)
+        exporter.exportFinished.connect(self.update_shader_library)
+        exporter.exec_()
+
+    def _on_update_shaders(self):
+        """
+        Internal callback function that is called when the user clicks Sync Shaders button
+        """
+
+        if not self._project:
+            return
+
+        self._project.update_shaders()
+
+    def _open_shaders_path(self):
+        """
+       Internal callback function that is called when the user clicks on Open Shaders Path button
+       """
+
+        if not self._project:
+            return
+
+        osplatform.open_folder(self._project.get_shaders_path())
+
 
 def run(project):
     win = ShaderManager(project=project)
     win.show()
 
     return win
+
+

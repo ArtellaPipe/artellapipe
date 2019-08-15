@@ -134,6 +134,8 @@ class ShaderViewer(QGridLayout, object):
 
         self.setHorizontalSpacing(0)
         self.setVerticalSpacing(0)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setSpacing(0)
 
         self.refresh()
 
@@ -146,7 +148,7 @@ class ShaderViewer(QGridLayout, object):
         row = 0
         col = 0
         while self.itemAtPosition(row, col) is not None:
-            if col == self._grid_size:
+            if col == self._grid_size - 1:
                 row += 1
                 col = 0
             else:

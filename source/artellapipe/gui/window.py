@@ -129,6 +129,18 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
                     if widget.objectName() == self.objectName():
                         widget.close()
 
+        screen_geo = QApplication.desktop().screenGeometry()
+        screen_width = screen_geo.width()
+        screen_height = screen_geo.height()
+        new_width = self.width()
+        new_height = self.height()
+        if self.width() > screen_width:
+            new_width = 500
+        if self.height() > screen_height:
+            new_height = 500
+        self.resize(new_width, new_height)
+        self.center()
+
     def ui(self):
         super(ArtellaWindow, self).ui()
 
