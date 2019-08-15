@@ -25,10 +25,10 @@ except ImportError:
 from collections import OrderedDict
 
 import tpDccLib as tp
-from tpPyUtils import strings, decorators, osplatform, jsonio, path as path_utils, folder as folder_utils
+from tpPyUtils import python, strings, decorators, osplatform, jsonio, path as path_utils, folder as folder_utils
 
 import artellapipe
-from artellapipe.core import defines, artellalib, asset, node
+from artellapipe.core import defines, artellalib, asset, node, syncdialog
 from artellapipe.gui import tray
 
 from artellapipe.tools.namemanager import namemanager
@@ -42,6 +42,8 @@ class ArtellaProject(object):
     SHELF_CLASS = tp.Shelf
     ASSET_CLASS = asset.ArtellaAsset
     ASSET_NODE_CLASS = node.ArtellaAssetNode
+    SYNC_FILES_DIALOG_CLASS = syncdialog.ArtellaSyncFileDialog
+    SYNC_PATHS_DIALOG_CLASS = syncdialog.ArtellaSyncPathDialog
     TAG_NODE_CLASS = asset.ArtellaTagNode
     PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
@@ -817,6 +819,32 @@ class ArtellaProject(object):
         folder_utils.open_folder(project_path)
 
     # ==========================================================================================================
+    # SYNC
+    # ==========================================================================================================
+
+    def sync_files(self, files):
+        """
+        Creates an return a new instance of the Artella paths sync dialog
+        :param files: list(str)
+        """
+
+        files = python.force_list(files)
+
+        sync_dialog = syncdialog.ArtellaSyncFileDialog(project=self, files=files)
+        sync_dialog.sync()
+
+    def sync_paths(self, paths):
+        """
+        Creates an return a new instance of the Artella paths sync dialog
+        :param paths: list(str)
+        """
+
+        paths = python.force_list(paths)
+
+        sync_dialog = syncdialog.ArtellaSyncPathDialog(project=self, paths=paths)
+        sync_dialog.sync()
+
+    # ==========================================================================================================
     # ASSETS
     # ==========================================================================================================
 
@@ -1119,6 +1147,17 @@ class ArtellaProject(object):
         """
 
         return path_utils.clean_path(os.path.join(self.get_assets_path(), 'shaders'))
+
+    def update_shaders(self):
+        """
+        Updates shaders from Artella
+        """
+
+        shaders_path = self.get_shaders_path()
+        if not shaders_path:
+            return
+
+        self.sync_files(files=shaders_path)
 
     # ==========================================================================================================
     # PRIVATE

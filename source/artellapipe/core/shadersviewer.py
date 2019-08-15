@@ -185,8 +185,10 @@ class ShaderViewer(QGridLayout, object):
         if not os.path.exists(shaders_library_path):
             result = qtutils.show_question(None, 'Shaders Library Path not found!', 'Shaders Library Path is not sync! To start using this tool you should sync this folder first. Do you want to do it?')
             if result == QMessageBox.Yes:
-                valid_state = False
-                raise NotImplementedError('Not implemented yet!')
+                self._project.update_shaders()
+                if not os.path.exists(shaders_library_path):
+                    artellapipe.logger.debug('Shader Library Path not found after sync. Something is wrong, please contact TD!')
+                    valid_state = False
             else:
                 valid_state = False
 

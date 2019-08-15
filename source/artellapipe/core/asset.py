@@ -264,10 +264,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
             return
 
-        sync_dialog = syncdialog.ArtellaSyncFileDialog(project=self._project, files=paths_to_sync)
-        sync_dialog.sync()
-
-        # print(paths_to_sync)
+        self._project.sync_files(files=paths_to_sync)
 
     @decorators.timestamp
     def sync_latest_published_files(self, file_type=None, ask=False):

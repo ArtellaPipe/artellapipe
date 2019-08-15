@@ -91,7 +91,7 @@ class ArtellaSyncDialog(QDialog, object):
         """
 
         self.raise_()
-        self._timer.start(10)
+        self._timer.start(200)
 
     def _on_update_progress_bar(self):
 
@@ -112,23 +112,23 @@ class ArtellaSyncFileDialog(ArtellaSyncDialog, object):
 
         super(ArtellaSyncFileDialog, self).__init__(project=project)
 
-    def _update_progress_bar(self):
-        super(ArtellaSyncFileDialog, self)._update_progress_bar()
+    def _on_update_progress_bar(self):
+        super(ArtellaSyncFileDialog, self)._on_update_progress_bar()
 
         if self._event.is_set():
             self._timer.stop()
             self.close()
 
     def sync(self):
-        # if not self._files:
-        #     self.close()
+        if not self._files:
+            self.close()
         super(ArtellaSyncFileDialog, self).sync()
-        # self._event = threading.Event()
-        # try:
-        #     threading.Thread(target=self.sync_files, args=(self._event,), name='ArtellaSyncFilesThread').start()
-        # except Exception as e:
-        #     artellapipe.logger.debug(str(e))
-        #     artellapipe.logger.debug(traceback.format_exc())
+        self._event = threading.Event()
+        try:
+            threading.Thread(target=self.sync_files, args=(self._event,), name='ArtellaSyncFilesThread').start()
+        except Exception as e:
+            artellapipe.logger.debug(str(e))
+            artellapipe.logger.debug(traceback.format_exc())
         self.exec_()
 
     def sync_files(self, event):
@@ -148,8 +148,8 @@ class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
 
         super(ArtellaSyncPathDialog, self).__init__(project=project)
 
-    def _update_progress_bar(self):
-        super(ArtellaSyncPathDialog, self)._update_progress_bar()
+    def _on_update_progress_bar(self):
+        super(ArtellaSyncPathDialog, self)._on_update_progress_bar()
 
         if self._event.is_set():
             self._timer.stop()
@@ -180,12 +180,12 @@ class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
         event.set()
 
 
-class SolsticeSyncGetDepsDialog(ArtellaSyncDialog, object):
+class ArtellaSyncGetDepsDialog(ArtellaSyncDialog, object):
     def __init__(self, project):
-        super(SolsticeSyncGetDepsDialog, self).__init__(project=project)
+        super(ArtellaSyncGetDepsDialog, self).__init__(project=project)
 
     def ui(self):
-        super(SolsticeSyncGetDepsDialog, self).ui()
+        super(ArtellaSyncGetDepsDialog, self).ui()
 
         self._splash_layout.addItem(QSpacerItem(0, 5))
 
@@ -203,7 +203,7 @@ class SolsticeSyncGetDepsDialog(ArtellaSyncDialog, object):
         self._cancel_btn.clicked.connect(self._cancel_sync)
 
     def _update_progress_bar(self):
-        super(SolsticeSyncGetDepsDialog, self)._update_progress_bar()
+        super(ArtellaSyncGetDepsDialog, self)._update_progress_bar()
 
         if self._canceled:
             self._event.set()
