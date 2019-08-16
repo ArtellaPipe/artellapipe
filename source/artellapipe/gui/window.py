@@ -194,6 +194,17 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
 
         return self._project
 
+    def add_logo(self, logo_pixmap, offset_x, offset_y):
+        """
+        Adds a new logo into the title with the given offset
+        :param logo_pixmap: QPixmap
+        :param offset_x: int
+        :param offset_y: int
+        """
+
+        win_logo = self._logo_scene.addPixmap(logo_pixmap)
+        win_logo.setOffset(offset_x, offset_y)
+
     def set_info_url(self, url):
         """
         Sets the info URL of the current window
