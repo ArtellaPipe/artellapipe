@@ -99,7 +99,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
     LOGO_NAME = None
     STATUS_BAR_WIDGET = ArtellaWindowStatusBar
 
-    def __init__(self, project, name='Window', title='Window', size=(800, 535), fixed_size=False, parent=None, *args, **kwargs):
+    def __init__(self, project=None, name='Window', title='Window', size=(800, 535), fixed_size=False, parent=None, *args, **kwargs):
 
         self._project = project
 
