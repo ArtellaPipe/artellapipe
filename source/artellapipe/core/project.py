@@ -583,12 +583,12 @@ class ArtellaProject(object):
         if self.resource and self._shelf_icon:
             shelf_category_icon = self.resource.icon(self._shelf_icon, theme=None)
         project_shelf = self.SHELF_CLASS(name=self._name.replace(' ', ''), category_icon=shelf_category_icon)
+        project_shelf.ICONS_PATHS = os.path.join(self.resource.RESOURCES_FOLDER, 'icons', 'shelf')
         project_shelf.create(delete_if_exists=True)
         shelf_file = self.PROJECT_SHELF_FILE_PATH
         if not shelf_file or not os.path.isfile(shelf_file):
             self.logger.warning('Shelf File for Project {} is not valid: {}'.format(self._name, shelf_file))
             return
-
         project_shelf.build(shelf_file=shelf_file)
         project_shelf.set_as_active()
 
