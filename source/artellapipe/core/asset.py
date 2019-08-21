@@ -27,7 +27,7 @@ from tpPyUtils import python, decorators, strings, path as path_utils
 from tpQtLib.core import base, image, qtutils, menu
 
 import artellapipe
-from artellapipe.core import abstract, defines, artellalib, assetinfo, syncdialog
+from artellapipe.core import abstract, defines, artellalib, assetinfo
 from artellapipe.tools.tagger.core import defines as tagger_defines
 
 
@@ -197,7 +197,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             return None
 
         asset_name = self.get_name()
-        file_name = self._project.solve_name('asset_file', asset_name, asset_file_type=file_type)
+        file_name = self._get_file_name(asset_name, asset_file_type=file_type)
         file_name += extension
 
         file_path = None
@@ -266,22 +266,22 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param ask: bool, Whether user will be informed of the sync operation before starting or not
         """
 
-        self.export_shaders()
+        # self.export_shaders()
 
-        # if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
-        #     if sync_type not in self.ASSET_FILES:
-        #         artellapipe.logger.warning('Impossible to sync "{}" because current Asset {} does not support it!'.format(file_type, self.__class__.__name__))
-        #         return
-        #     if sync_type not in self.project:
-        #         artellapipe.logger.warning('Impossible to sync "{}" because project "{}" does not support it!'.format(file_type, self.project.name.title()))
-        #         return
-        #
-        # paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
-        # if not paths_to_sync:
-        #     artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
-        #     return
-        #
-        # self._project.sync_files(files=paths_to_sync)
+        if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
+            if sync_type not in self.ASSET_FILES:
+                artellapipe.logger.warning('Impossible to sync "{}" because current Asset {} does not support it!'.format(file_type, self.__class__.__name__))
+                return
+            if sync_type not in self.project:
+                artellapipe.logger.warning('Impossible to sync "{}" because project "{}" does not support it!'.format(file_type, self.project.name.title()))
+                return
+
+        paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
+        if not paths_to_sync:
+            artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
+            return
+
+        self._project.sync_files(files=paths_to_sync)
 
     @decorators.timestamp
     def sync_latest_published_files(self, file_type=None, ask=False):
@@ -402,12 +402,19 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         all_shading_groups = list()
         json_data = dict()
 
-        asset
-
-
     # ==========================================================================================================
     # PRIVATE
     # ==========================================================================================================
+
+    def _get_file_name(self, asset_name, **kwargs):
+        """
+        Returns asset file name without extension
+        :param asset_name: str
+        :param kwargs: dict
+        :return: str
+        """
+
+        return self._project.solve_name('asset_file', asset_name, **kwargs)
 
     def _get_paths_to_sync(self, file_type, sync_type):
         """

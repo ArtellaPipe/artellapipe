@@ -140,10 +140,10 @@ def get_project_menu_path():
     return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_MENU_FILE_NAME))
 
 
-def get_project_version_relative_path():
+def get_project_version_path():
     """
     Returns path where version file is located
     :return: str
     """
 
-    return ''
+    return path_utils.clean_path(os.path.join(get_project_path(), defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME))

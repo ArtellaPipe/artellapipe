@@ -28,7 +28,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 import tpDccLib as tp
-from tpPyUtils import python, strings, decorators, osplatform, jsonio, path as path_utils, folder as folder_utils
+from tpPyUtils import python, strings, decorators, osplatform, jsonio, fileio, path as path_utils, folder as folder_utils
 from tpQtLib.core import qtutils
 
 import artellapipe
@@ -55,6 +55,7 @@ class ArtellaProject(object):
     PROJECT_CHANGELOG_PATH = artellapipe.get_project_changelog_path()
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
     PROJECT_MENU_FILE_PATH = artellapipe.get_project_menu_path()
+    PROJECT_VERSION_FILE_PATH = artellapipe.get_project_version_path()
 
     def __init__(self, resource, naming_file, settings=None):
         super(ArtellaProject, self).__init__()
@@ -76,7 +77,6 @@ class ArtellaProject(object):
         self._shelf_icon = None
         self._tray_icon = None
         self._project_icon = None
-        self._version_file = None
         self._folders_to_register = list()
         self._emails = list()
         self._progress_bar_color0 = None
@@ -129,15 +129,6 @@ class ArtellaProject(object):
         """
 
         return self._settings
-
-    @property
-    def version_file_path(self):
-        """
-        Returns version file path
-        :return: str
-        """
-
-        return path_utils.clean_path(os.path.join(self.get_clean_name(), self._folders_to_register[0], self._version_file))
 
     @property
     def naming_file(self):
@@ -402,6 +393,30 @@ class ArtellaProject(object):
             self.create_menu()
             self._tray = self.create_tray()
             self.update_project()
+
+    def get_version(self):
+        """
+        Returns the current version of the tools
+        :return: str
+        """
+
+        version_file_path = self.PROJECT_VERSION_FILE_PATH
+        if not os.path.isfile(version_file_path):
+            self.logger.warning('No Version File found "{}" for project "{}"!'.format(version_file_path, self.name))
+            return
+
+        version_data = fileio.get_file_lines(version_file_path)
+        if not version_data:
+            self.logger.warning('Version File "{}" does not contain any version information!'.format(version_file_path))
+            return
+
+        version_file = version_data[0]
+        version_split = version_file.split('=')
+        if not version_split:
+            self.logger.warning('Version data in file "{}" is not formatted properly!'.format(version_file_path))
+            return
+        
+        return version_split[-1].strip()[1:-1]
 
     def solve_name(self, rule_name, *args, **kwargs):
         """
@@ -1073,9 +1088,13 @@ class ArtellaProject(object):
         """
 
         if not self.is_valid_asset_file_type(file_type):
-            return None
+            return
 
         asset_classes = self._asset_classes_file_types[file_type]
+        if not asset_classes:
+            artellapipe.logger.warning('No Asset Class found for file of type: "{}"'.format(file_type))
+            return
+
         if len(asset_classes) == 0:
             return asset_classes[0]
         else:

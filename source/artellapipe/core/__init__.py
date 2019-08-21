@@ -4,6 +4,6 @@ order = [
     'artellapipe.core.artellalib',
     'artellapipe.core.assetinfo',
     'artellapipe.core.assetfile',
-    'artellapipe.core.asset'
+    'artellapipe.core.asset',
     'artellapipe.core.syncdialog'
 ]

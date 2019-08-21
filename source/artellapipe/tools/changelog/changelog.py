@@ -15,6 +15,7 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import json
 from collections import OrderedDict
+from distutils.version import LooseVersion
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
@@ -92,12 +93,23 @@ class ArtellaChangelog(window.ArtellaWindow, object):
         if not changelog_data:
             return
 
-        changelog_versions = [float(key) for key in changelog_data.keys()]
-        for version in reversed(sorted(changelog_versions)):
+        changelog_versions = [key for key in changelog_data.keys()]
+        ordered_versions = self._order_changelog_versions(changelog_versions)
+
+        for version in reversed(ordered_versions):
             self._create_version(str(version), changelog_data[str(version)])
 
         last_version_item = self.version_accordion.item_at(0)
         last_version_item.set_collapsed(False)
+
+    def _order_changelog_versions(self, versions):
+        """
+        Returns an ordered list of versions
+        :param versions:
+        :return:
+        """
+
+        return sorted(versions, key=LooseVersion)
 
     def _create_version(self, version, elements):
         """

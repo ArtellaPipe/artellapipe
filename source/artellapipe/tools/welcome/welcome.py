@@ -107,6 +107,9 @@ class ShortcutsWidget(base.BaseWidget, object):
 
 
 class FinalWidget(base.BaseWidget, object):
+
+    showChangelog = Signal(object)
+
     def __init__(self, project, parent=None):
         self._project = project
 
@@ -173,9 +176,8 @@ class FinalWidget(base.BaseWidget, object):
         """
 
         from artellapipe.tools.changelog import changelog
-
         changelog_win = changelog.run(self._project)
-        changelog_win.show()
+        self.showChangelog.emit(changelog_win)
 
 
 class WelcomeDialog(dialog.ArtellaDialog, object):
@@ -322,6 +324,7 @@ class WelcomeDialog(dialog.ArtellaDialog, object):
         self._stack.setGraphicsEffect(self._tab_opacity_effect)
 
         self._setup_pages()
+        self._update_version()
 
         self._set_index(0)
 
@@ -335,9 +338,22 @@ class WelcomeDialog(dialog.ArtellaDialog, object):
         self._shortcuts_widget = ShortcutsWidget(project=self._project)
         self._final_widget = FinalWidget(project=self._project)
 
+        self._final_widget.showChangelog.connect(self._on_show_changelog)
+
         self._add_page(self._welcome_widget)
         self._add_page(self._shortcuts_widget)
         self._add_page(self._final_widget)
+
+    def _update_version(self):
+        """
+        Internal function that sets the current version of the tools
+        """
+
+        current_version = self._project.get_version()
+        if not current_version:
+            return
+
+        self._version_lbl.setText('Version: {}'.format(current_version))
 
     def _get_welcome_pixmap(self):
         """
@@ -410,8 +426,6 @@ class WelcomeDialog(dialog.ArtellaDialog, object):
         skip_text = 'Skip'
         close_text = 'Finish'
 
-        print(index, self._stack.count() - 1, index==self._stack.count() - 1)
-
         if index == 0:
             self._left_btn.setText(skip_text)
             self._right_btn.setText(next_text)
@@ -454,6 +468,14 @@ class WelcomeDialog(dialog.ArtellaDialog, object):
             self._increment_index(input)
         elif action == 'close':
             self._launch_project()
+
+    def _on_show_changelog(self, changelog_window):
+        """
+        Internal callback function that is called when show changelog button is pressed in the final widget
+        """
+
+        self.close()
+        changelog_window.show()
 
 
 def run(project):

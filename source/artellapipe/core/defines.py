@@ -25,11 +25,11 @@ ARTELLA_PROJECT_SHELF_FILE_NAME = 'shelf.json'
 # Defines the name of the menu file used by artellapipe to setup project shelf
 ARTELLA_PROJECT_MENU_FILE_NAME = 'menu.json'
 
-# Defines the name of the version file used by artellapipe to check current tools version
-ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME = 'version.json'
-
 # Defines the name of the naing file used by artellapipe for pipeline naming
 ARTELLA_PROJECT_DEFAULT_NAMING_FILE_NAME = 'naming.json'
+
+# Defines the name of the version file used by artellapipe to check current tools version
+ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME = '__version__.py'
 
 # Defines the name of the attribute that defines the Artella project name
 ARTELLA_CONFIG_PROJECT_NAME = 'PROJECT_NAME'
