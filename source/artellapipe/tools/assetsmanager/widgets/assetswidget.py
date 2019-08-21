@@ -20,12 +20,10 @@ from Qt.QtWidgets import *
 from tpQtLib.core import base, qtutils
 
 import artellapipe
-from artellapipe.core import defines, assetsviewer
+from artellapipe.core import defines
 
 
 class AssetsWidget(base.BaseWidget, object):
-
-    ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
 
     assetAdded = Signal(object)
 
@@ -63,7 +61,7 @@ class AssetsWidget(base.BaseWidget, object):
         asset_splitter = QSplitter(Qt.Horizontal)
         main_categories_menu_layout.addWidget(asset_splitter)
 
-        self._assets_viewer = self.ASSETS_VIEWER_CLASS(project=self._project, parent=self)
+        self._assets_viewer = self._project.ASSETS_VIEWER_CLASS(project=self._project, parent=self)
         asset_splitter.addWidget(self._assets_viewer)
         self._assets_viewer.first_empty_cell()
 

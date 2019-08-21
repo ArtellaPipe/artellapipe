@@ -15,13 +15,14 @@ __email__ = "tpovedatd@gmail.com"
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import  qtutils
+from tpQtLib.core import qtutils
 from tpQtLib.widgets import stack
 
 import artellapipe
 from artellapipe.utils import worker
 from artellapipe.gui import window, waiter
-from artellapipe.tools.assetsmanager.widgets import userinfo, assetswidget
+from artellapipe.tools.assetsmanager.widgets import assetswidget
+from artellapipe.core import userinfo
 
 
 class ArtellaAssetsManager(window.ArtellaWindow, object):

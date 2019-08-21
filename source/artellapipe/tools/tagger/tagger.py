@@ -41,7 +41,7 @@ class ArtellaTagger(window.ArtellaWindow, object):
 
         super(ArtellaTagger, self).__init__(
             project=project,
-            name='SolsticeTagger',
+            name='ArtellaTagger',
             title='Tagger',
             size=(550, 650)
         )
@@ -64,9 +64,9 @@ class ArtellaTagger(window.ArtellaWindow, object):
 
         self.resize(300, 300)
 
-        self._error_pixmap = artellapipe.solstice.resource.pixmap('error', category='icons').scaled(QSize(24, 24))
-        self._warning_pixmap = artellapipe.solstice.resource.pixmap('warning', category='icons').scaled(QSize(24, 24))
-        self._ok_pixmap = artellapipe.solstice.resource.pixmap('ok', category='icons').scaled(QSize(24, 24))
+        self._error_pixmap = artellapipe.resource.pixmap('error', category='icons').scaled(QSize(24, 24))
+        self._warning_pixmap = artellapipe.resource.pixmap('warning', category='icons').scaled(QSize(24, 24))
+        self._ok_pixmap = artellapipe.resource.pixmap('ok', category='icons').scaled(QSize(24, 24))
 
         top_layout = QHBoxLayout()
         top_layout.setContentsMargins(2, 2, 2, 2)
@@ -189,7 +189,7 @@ class ArtellaTagger(window.ArtellaWindow, object):
 
     def _update_current_info(self):
         """
-        Internal callback function that updates the widget that is showed in the SolsticeTagger UI
+        Internal callback function that updates the widget that is showed in the Artella Tagger UI
         :return:
         """
 

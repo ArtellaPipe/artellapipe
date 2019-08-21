@@ -172,7 +172,10 @@ class FinalWidget(base.BaseWidget, object):
         Internal callback function that is called when Show Changelog button is pressed
         """
 
-        pass
+        from artellapipe.tools.changelog import changelog
+
+        changelog_win = changelog.run(self._project)
+        changelog_win.show()
 
 
 class WelcomeDialog(dialog.ArtellaDialog, object):

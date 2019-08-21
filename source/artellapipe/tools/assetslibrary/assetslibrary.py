@@ -23,7 +23,7 @@ import tpDccLib as tp
 
 from tpQtLib.core import qtutils
 
-from artellapipe.core import defines, assetsviewer
+from artellapipe.core import defines
 from artellapipe.gui import window
 
 
@@ -34,8 +34,6 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
     title = 'Artella Assets Viewer'
 
     _instances = list()
-
-    ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
 
     def __init__(self, project, parent=None):
 
@@ -79,36 +77,43 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
         else:
             self.setLayout(self.main_layout)
 
-        self._assets_viewer = self.ASSETS_VIEWER_CLASS(
+        self._main_widget = QWidget()
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        self._main_widget.setLayout(main_layout)
+        self.main_layout.addWidget(self._main_widget)
+
+        self._assets_viewer = self._project.ASSETS_VIEWER_CLASS(
             project=self._project,
             column_count=2,
             parent=self
         )
         self._assets_viewer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        top_layout = QHBoxLayout()
-        top_layout.setContentsMargins(0, 0, 0, 0)
-        top_layout.setSpacing(2)
-        top_layout.setAlignment(Qt.AlignCenter)
-        self.main_layout.addLayout(top_layout)
+        self._top_layout = QHBoxLayout()
+        self._top_layout.setContentsMargins(0, 0, 0, 0)
+        self._top_layout.setSpacing(2)
+        self._top_layout.setAlignment(Qt.AlignCenter)
+        main_layout.addLayout(self._top_layout)
 
         self._categories_menu_layout = QHBoxLayout()
         self._categories_menu_layout.setContentsMargins(0, 0, 0, 0)
         self._categories_menu_layout.setSpacing(0)
         self._categories_menu_layout.setAlignment(Qt.AlignTop)
-        top_layout.addLayout(self._categories_menu_layout)
+        self._top_layout.addLayout(self._categories_menu_layout)
 
         self._categories_btn_grp = QButtonGroup(self)
         self._categories_btn_grp.setExclusive(True)
         asset_categories = self._project.asset_types if self._project else list()
 
-        self.main_layout.addWidget(self._assets_viewer)
+        main_layout.addWidget(self._assets_viewer)
 
         self._supported_types_layout = QHBoxLayout()
         self._supported_types_layout.setContentsMargins(2, 2, 2, 2)
         self._supported_types_layout.setSpacing(2)
         self._supported_types_layout.setAlignment(Qt.AlignTop)
-        self.main_layout.addLayout(self._supported_types_layout)
+        main_layout.addLayout(self._supported_types_layout)
 
         self._supported_types_btn_grp = QButtonGroup(self)
         self._supported_types_btn_grp.setExclusive(True)

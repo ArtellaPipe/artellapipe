@@ -17,7 +17,10 @@ from Qt.QtWidgets import *
 
 
 class UserInfo(QFrame, object):
-    def __init__(self, parent=None):
+    def __init__(self, project, parent=None):
+
+        self._project = project
+
         super(UserInfo, self).__init__(parent)
 
         # self.setFixedHeight(25)

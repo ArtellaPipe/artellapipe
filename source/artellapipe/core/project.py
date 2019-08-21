@@ -24,6 +24,7 @@ except ImportError:
     from urllib2 import quote
 from collections import OrderedDict
 
+from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 import tpDccLib as tp
@@ -31,7 +32,7 @@ from tpPyUtils import python, strings, decorators, osplatform, jsonio, path as p
 from tpQtLib.core import qtutils
 
 import artellapipe
-from artellapipe.core import defines, artellalib, asset, node, syncdialog
+from artellapipe.core import defines, artellalib, asset, node, syncdialog, assetsviewer
 from artellapipe.gui import tray
 
 from artellapipe.tools.namemanager import namemanager
@@ -44,6 +45,7 @@ class ArtellaProject(object):
     TRAY_CLASS = tray.ArtellaTray
     SHELF_CLASS = tp.Shelf
     ASSET_CLASS = asset.ArtellaAsset
+    ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
     ASSET_NODE_CLASS = node.ArtellaAssetNode
     SYNC_FILES_DIALOG_CLASS = syncdialog.ArtellaSyncFileDialog
     SYNC_PATHS_DIALOG_CLASS = syncdialog.ArtellaSyncPathDialog
@@ -54,7 +56,7 @@ class ArtellaProject(object):
     PROJECT_SHELF_FILE_PATH = artellapipe.get_project_shelf_path()
     PROJECT_MENU_FILE_PATH = artellapipe.get_project_menu_path()
 
-    def __init__(self, resource, naming_file):
+    def __init__(self, resource, naming_file, settings=None):
         super(ArtellaProject, self).__init__()
 
         self._name = None
@@ -94,11 +96,13 @@ class ArtellaProject(object):
 
         self._resource = resource
         self._naming_file = naming_file
+        self._settings = settings
 
         self._nameit = namemanager.NameWidget(self)
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
+        self.init_settings()
         self._logger = self.create_logger()[1]
 
         self._register_asset_classes()
@@ -116,6 +120,15 @@ class ArtellaProject(object):
         """
 
         return self._name
+
+    @property
+    def settings(self):
+        """
+        Returns the settings of the project
+        :return: ArtellaProjectSettings
+        """
+
+        return self._settings
 
     @property
     def version_file_path(self):
@@ -370,7 +383,7 @@ class ArtellaProject(object):
         return self._shaders_extension
 
     # ==========================================================================================================
-    # INITIALIZATION & CONFIG
+    # INITIALIZATION, CONFIG & SETTINGS
     # ==========================================================================================================
 
     def init(self, force_skip_hello=False):
@@ -468,6 +481,13 @@ class ArtellaProject(object):
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
             return False
 
+    def init_settings(self):
+        """
+        Function that initializes project settings file
+        """
+
+        self._settings = self._settings if self._settings else self._create_new_settings()
+
     def get_clean_name(self):
         """
         Returns a cleaned version of the project name (without spaces and in lowercase)
@@ -488,6 +508,14 @@ class ArtellaProject(object):
             os.makedirs(data_path)
 
         return data_path
+
+    def get_settings_file(self):
+        """
+        Returns file path of the window settings file
+        :return: str
+        """
+
+        return os.path.expandvars(os.path.join(self.get_data_path(), '{}.cfg'.format(self.get_clean_name())))
 
     def create_logger(self):
         """
@@ -1302,6 +1330,14 @@ class ArtellaProject(object):
     # PRIVATE
     # ==========================================================================================================
 
+    def _create_new_settings(self):
+        """
+        Creates new empty settings file
+        :return: QtSettings
+        """
+
+        return ArtellaProjectSettings(project=self, filename=self.get_settings_file())
+
     def _check_file_path(self, file_path):
         """
         Returns whether given path is a valid project path or not
@@ -1355,3 +1391,56 @@ class ArtellaProject(object):
         for asset_file in self.asset_files:
             if asset_file not in self._asset_classes_file_types:
                 self.logger.warning('Asset File Type {} has not associated asset file class!'.format(asset_file))
+
+
+class ArtellaProjectSettings(QSettings, object):
+    def __init__(self, project, filename, max_files=10):
+        super(ArtellaProjectSettings, self).__init__(filename, QSettings.IniFormat)
+
+        self._project = project
+        self._max_files = max_files
+
+        self.setFallbacksEnabled(False)
+
+        self._initialize()
+
+    def has_setting(self, setting_name):
+        """
+        Returns whether given settings name is currently stored in the settings or not
+        :param setting_name: str
+        :return: bool
+        """
+
+        return self.get(setting_name)
+
+    def get(self, setting_name, default_value=None):
+        """
+        Returns the setting stored with the given name
+        :param setting_name: str
+        :param default_value: variant
+        :return:
+        """
+
+        val = self.value(setting_name)
+        if not val:
+            return default_value
+
+        return val
+
+    def set(self, setting_name, setting_value):
+        """
+        Stores a new settings with the given name and the given value
+        If the given setting already exists, it will be overwrite
+        :param setting_name: str, setting name we want store
+        :param setting_value: variant, setting value we want to store
+        """
+
+        self.setValue(setting_name, setting_value)
+
+    def _initialize(self):
+        """
+        Internal function that initializes project settings
+        """
+
+        project_name = self._project.get_clean_name()
+        self.setValue('{}/name'.format(project_name), project_name)

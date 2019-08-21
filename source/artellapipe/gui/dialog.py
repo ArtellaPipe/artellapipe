@@ -23,7 +23,7 @@ class ArtellaDialog(tpQtLib.Dialog, object):
 
     LOGO_NAME = None
 
-    def __init__(self, name='ArtellaDialog', title='Artella - Dialog', show_dragger=True, fixed_size=False, parent=None):
+    def __init__(self, name='ArtellaDialog', title='Artella - Dialog', show_dragger=True, size=(200, 125), fixed_size=False, parent=None):
 
         title_pixmap = artellapipe.resource.pixmap(name='artella_title', extension='png')
 
@@ -32,6 +32,7 @@ class ArtellaDialog(tpQtLib.Dialog, object):
             title=title,
             parent=parent,
             show_dragger=show_dragger,
+            size=size,
             fixed_size=fixed_size,
             title_pixmap=title_pixmap
         )

@@ -22,7 +22,8 @@ from Qt.QtWidgets import *
 from tpQtLib.widgets import accordion
 
 from artellapipe.gui import window
-from artellapipe.tools.assetsmanager.widgets import userinfo, assetswidget
+from artellapipe.tools.assetsmanager.widgets import assetswidget
+from artellapipe.core import userinfo
 
 
 class ArtellaChangelog(window.ArtellaWindow, object):
