@@ -15,6 +15,7 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import weakref
 import traceback
+import webbrowser
 from copy import deepcopy
 from functools import partial
 
@@ -46,6 +47,9 @@ class ArtellaLocalTreeModel(QFileSystemModel, object):
 class ArtellaLocalTreeView(QTreeView, object):
 
     selectedItems = Signal(list)
+    lockItem = Signal(str)
+    unlockItem = Signal(str)
+    makeNewVersion = Signal(str)
 
     def __init__(self, project, parent=None):
         super(ArtellaLocalTreeView, self).__init__(parent=parent)
@@ -126,7 +130,6 @@ class ArtellaLocalTreeView(QTreeView, object):
         self.setAnimated(True)
         self.setIndentation(20)
         self.setSortingEnabled(True)
-        print('Setting path: {}'.format(root_path))
         index = self._model.setRootPath(root_path)
         self.setRootIndex(index)
         self.setItemsExpandable(True)
@@ -143,11 +146,50 @@ class ArtellaLocalTreeView(QTreeView, object):
 
         contextual_menu = QMenu(self)
 
+        artella_icon = artellapipe.resource.icon('artella')
+        artella_action = QAction(artella_icon, 'Open in Artella', contextual_menu)
+        artella_action.triggered.connect(partial(self._on_open_item_in_artella, item_path))
+        contextual_menu.addAction(artella_action)
+
         eye_icon = artellapipe.resource.icon('eye')
         view_locally_action = QAction(eye_icon, 'View Locally', contextual_menu)
         view_locally_action.triggered.connect(partial(self._on_open_item_folder, item_path))
-
         contextual_menu.addAction(view_locally_action)
+
+        contextual_menu.addSeparator()
+
+        if os.path.isfile(item_path):
+            is_locked, locked_by_current_user = artellalib.is_locked(item_path)
+            history = artellalib.get_asset_history(item_path)
+            file_versions = history.versions
+            if file_versions:
+                if is_locked:
+                    unlock_icon = artellapipe.resource.icon('unlock')
+                    unlock_action = QAction(unlock_icon, 'Unlock File', contextual_menu)
+                    unlock_action.triggered.connect(partial(self._on_unlock_item, item_path))
+                    contextual_menu.addAction(unlock_action)
+                    if not locked_by_current_user:
+                        unlock_action.setEnabled(False)
+                        unlock_action.setText('Locked by other user')
+                else:
+                    lock_icon = artellapipe.resource.icon('lock')
+                    lock_action = QAction(lock_icon, 'Lock File', contextual_menu)
+                    lock_action.triggered.connect(partial(self._on_lock_item, item_path))
+                    contextual_menu.addAction(lock_action)
+
+            if file_versions:
+                upload_icon = artellapipe.resource.icon('upload')
+                new_version_action = QAction(upload_icon, 'Make New Version', contextual_menu)
+                new_version_action.triggered.connect(partial(self._on_make_new_version, item_path))
+                if not is_locked:
+                    new_version_action.setText('Make New Version | Lock File first!')
+                    new_version_action.setEnabled(False)
+                contextual_menu.addAction(new_version_action)
+            else:
+                add_icon = artellapipe.resource.icon('add')
+                add_file_action = QAction(add_icon, 'Local Only | Add File', contextual_menu)
+                add_file_action.triggered.connect(partial(self._on_make_new_version, item_path))
+                contextual_menu.addAction(add_file_action)
 
         return contextual_menu
 
@@ -196,6 +238,55 @@ class ArtellaLocalTreeView(QTreeView, object):
             fileio.open_browser(os.path.dirname(item_path))
         else:
             fileio.open_browser(item_path)
+
+    def _on_open_item_in_artella(self, item_path):
+        """
+        Internal callback function that is called when Open in Artella item context menu is opened
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        if os.path.isfile(item_path):
+            item_path = os.path.dirname(item_path)
+
+        relative_path = os.path.relpath(item_path, self._project.get_path())
+        artella_url = '{}/{}'.format(self._project.get_artella_url(), relative_path)
+        webbrowser.open(artella_url)
+
+    def _on_lock_item(self, item_path):
+        """
+        Internal callback function that is called when Lock Button is pressed
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        self.lockItem.emit(item_path)
+
+    def _on_unlock_item(self, item_path):
+        """
+        Internal callback function that is called when Unlock Button is pressed
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        self.unlockItem.emit(item_path)
+
+    def _on_make_new_version(self, item_path):
+        """
+        Internal callback function that is called when Make New Version Button is pressed
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        self.makeNewVersion.emit(item_path)
 
 
 class ArtellaLocalListViewDelegateRowPainter(object):
@@ -585,6 +676,7 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
         self._sync_subfolders_cbx = QCheckBox('Sync Subfolders?')
         self._sync_subfolders_cbx.setMaximumWidth(110)
         self._sync_btn = QPushButton('Sync')
+        self._sync_btn.setIcon(artellapipe.resource.icon('sync'))
         buttons_layout.addWidget(self._sync_subfolders_cbx)
         buttons_layout.addWidget(self._sync_btn)
         list_layout.addLayout(buttons_layout)
@@ -599,6 +691,9 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
 
     def setup_signals(self):
         self._tree.selectedItems.connect(self._on_selected_items)
+        self._tree.lockItem.connect(self._on_lock_item)
+        self._tree.unlockItem.connect(self._on_unlock_item)
+        self._tree.makeNewVersion.connect(self._on_make_new_version)
         self._sync_btn.clicked.connect(self._on_sync)
         self._list_filter.textChanged.connect(self._on_update_name)
 
@@ -639,6 +734,114 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
             self._list_stack.slide_in_index(0)
 
         self._list.set_items(selected_items)
+
+    def _on_lock_item(self, item_path):
+        """
+        Internal callback function that is called when Lock Button is pressed
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        self._progress.set_minimum(0)
+        self._progress.set_maximum(2)
+        self._progress.setVisible(True)
+        self._progress.set_value(1)
+        self._progress.set_text('Locking file: "{}". Please wait ...'.format(os.path.basename(item_path)))
+        self.repaint()
+        try:
+            valid = artellalib.lock_file(item_path, force=True)
+            if valid:
+                self.syncOk.emit('File {} locked successfully!'.format(os.path.basename(item_path)))
+            else:
+                self.syncFailed.emit('Error while locking file "{}"'.format(os.path.basename(item_path)))
+        except Exception as e:
+            self.repaint()
+            msg = 'Error while locking item "{}"'.format(item_path)
+            artellapipe.logger.error(msg)
+            artellapipe.logger.error('{} | {}'.format(e, traceback.format_exc()))
+            bugtracker.ArtellaBugTracker.run(self._project, traceback.format_exc())
+            self._progress.set_value(0)
+            self._progress.set_text('')
+            self.syncFailed.emit(msg)
+
+        self._progress.set_value(0)
+        self._progress.set_text('')
+        self._progress.setVisible(False)
+
+    def _on_unlock_item(self, item_path):
+        """
+        Internal callback function that is called when Unlock Button is pressed
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        self._progress.set_minimum(0)
+        self._progress.set_maximum(2)
+        self._progress.setVisible(True)
+        self._progress.set_value(1)
+        self._progress.set_text('Unlocking file: "{}". Please wait ...'.format(os.path.basename(item_path)))
+        self.repaint()
+        try:
+            valid = artellalib.unlock_file(item_path)
+            if valid:
+                self.syncOk.emit('File {} unlocked successfully!'.format(os.path.basename(item_path)))
+            else:
+                self.syncFailed.emit('Error while unlocking file "{}"'.format(os.path.basename(item_path)))
+        except Exception as e:
+            self.repaint()
+            msg = 'Error while unlocking item "{}"'.format(item_path)
+            artellapipe.logger.error(msg)
+            artellapipe.logger.error('{} | {}'.format(e, traceback.format_exc()))
+            bugtracker.ArtellaBugTracker.run(self._project, traceback.format_exc())
+            self._progress.set_value(0)
+            self._progress.set_text('')
+            self.syncFailed.emit(msg)
+
+        self._progress.set_value(0)
+        self._progress.set_text('')
+        self._progress.setVisible(False)
+
+    def _on_make_new_version(self, item_path):
+        """
+        Internal callback function that is called when Make New Version Button is pressed
+        :param item_path: str
+        """
+
+        if not os.path.exists(item_path):
+            return
+
+        self._progress.set_minimum(0)
+        self._progress.set_maximum(2)
+        self._progress.setVisible(True)
+        self._progress.set_value(1)
+        self._progress.set_text('Uploading new version to Artella: "{}". Please wait ...'.format(os.path.basename(item_path)))
+        self.repaint()
+        try:
+            valid = self._project.upload_working_version(
+                file_path=item_path,
+                skip_saving=True
+            )
+            if valid:
+                self.syncOk.emit('New version for {} created successfully!'.format(os.path.basename(item_path)))
+            else:
+                self.syncFailed.emit('Error while creating new file version for "{}"'.format(os.path.basename(item_path)))
+        except Exception as e:
+            self.repaint()
+            msg = 'Error while creating new file version for "{}"'.format(item_path)
+            artellapipe.logger.error(msg)
+            artellapipe.logger.error('{} | {}'.format(e, traceback.format_exc()))
+            bugtracker.ArtellaBugTracker.run(self._project, traceback.format_exc())
+            self._progress.set_value(0)
+            self._progress.set_text('')
+            self.syncFailed.emit(msg)
+
+        self._progress.set_value(0)
+        self._progress.set_text('')
+        self._progress.setVisible(False)
 
     def _on_sync(self):
         """

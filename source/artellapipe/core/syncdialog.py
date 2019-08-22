@@ -132,6 +132,8 @@ class ArtellaSyncFileDialog(ArtellaSyncDialog, object):
 
     def sync_files(self, event):
         for p in self._files:
+            if not p:
+                continue
             file_path = os.path.relpath(p, self._project.get_assets_path())
             self._progress_text.setText('Syncing file: {0} ... Please wait!'.format(file_path))
             valid_sync = artellalib.synchronize_file(p)

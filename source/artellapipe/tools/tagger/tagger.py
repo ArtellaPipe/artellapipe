@@ -33,6 +33,7 @@ class ArtellaTagger(window.ArtellaWindow, object):
 
     tagDataCreated = Signal()
 
+    VERSION = '0.0.1'
     LOGO_NAME = 'tagger_logo'
 
     def __init__(self, project):

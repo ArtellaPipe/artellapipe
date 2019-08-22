@@ -26,7 +26,8 @@ class NameWidget(nameit.NameIt, object):
 
 class NameManager(window.ArtellaWindow, object):
 
-    LOGO_NAME = 'manager_logo'
+    VERSION = '0.0.1'
+    LOGO_NAME = 'namemanager_logo'
 
     def __init__(self, project):
         super(NameManager, self).__init__(

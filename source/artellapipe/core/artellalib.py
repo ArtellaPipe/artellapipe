@@ -769,7 +769,7 @@ def is_locked(file_path):
     Returns whether an absolute file path refers to a locked asset in edit mode, and if the file is locked
     by the current storage workspace
     :param file_path: str, absolute path to a file
-    :return: bool
+    :return: bool, bool
     """
 
     rsp = get_status(file_path=file_path)

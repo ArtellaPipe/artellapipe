@@ -1002,7 +1002,7 @@ class ArtellaProject(object):
 
         short_path = file_path.replace(self.get_assets_path(), '')[1:]
 
-        history = artellalib.get_asset_history(short_path)
+        history = artellalib.get_asset_history(file_path)
         file_versions = history.versions
         if not file_versions:
             current_version = -1
@@ -1011,7 +1011,7 @@ class ArtellaProject(object):
             for v in file_versions:
                 if int(v[0]) > current_version:
                     current_version = int(v[0])
-            current_version += 1
+        current_version += 1
 
         if comment:
             comment = str(comment)
@@ -1019,7 +1019,7 @@ class ArtellaProject(object):
             comment = qtutils.get_comment(text_message='Make New Version ({}) : {}'.format(current_version, short_path), title='Comment', parent=tp.Dcc.get_main_window())
 
         if comment:
-            artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving, force=force)
+            artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving)
             if notify:
                 self.tray.show_message(title='New Working Version', msg='Version {} uploaded to Artella server successfully!'.format(current_version))
             return True

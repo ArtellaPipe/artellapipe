@@ -29,6 +29,7 @@ from artellapipe.core import userinfo
 
 class ArtellaChangelog(window.ArtellaWindow, object):
 
+    VERSION = '0.0.1'
     LOGO_NAME = 'changelog_logo'
     USER_INFO_CLASS = userinfo.UserInfo
     ASSET_WIDGET_CLASS = assetswidget.AssetsWidget

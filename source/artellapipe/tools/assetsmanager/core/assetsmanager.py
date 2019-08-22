@@ -63,7 +63,7 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         super(ArtellaAssetsManager, self).ui()
 
         # Add User Info widget
-        self._user_info = self.USER_INFO_CLASS()
+        self._user_info = self.USER_INFO_CLASS(project=self._project)
         self.main_layout.addWidget(self._user_info)
 
         # Create Top Menu Bar
