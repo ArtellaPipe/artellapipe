@@ -67,8 +67,6 @@ class ArtellaURLWidget(base.BaseWidget, object):
         self.main_layout.addWidget(self._progress)
         self.main_layout.addLayout(buttons_layout)
 
-        self._url_line.setText('https://www.artella.com/project/973a70a7-1494-422b-b8c1-696587030e59/files/Assets/Sets/MAIN_Town_Square/__working__/model/Props_SetDressing/BarrelA')
-
     def setup_signals(self):
         self._sync_btn.clicked.connect(self._on_sync)
 

@@ -266,17 +266,10 @@ class ArtellaDCCNode(object):
                 if tag_type and tag_type == '{}_TAG'.format(self._project.name.upper()):
                     tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=tag_data_node)
                     return tag_node
-
-    def get_tag_info_node(self):
-        """
-        Returns tag node associated to this Artella DCC node retrieved from tag info attribute
-        :return: ArtellaTagDataNode
-        """
-
-        if tp.Dcc.attribute_exists(node=self.node, attribute_name='tag_info'):
-            tag_info = tp.Dcc.get_attribute_value(node=self.node, attribute_name='tag_info')
-            tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=self.node, tag_info=tag_info)
-            return tag_node
+        elif tp.Dcc.attribute_exists(node=self.node, attribute_name='tag_info'):
+                tag_info = tp.Dcc.get_attribute_value(node=self.node, attribute_name='tag_info')
+                tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=self.node, tag_info=tag_info)
+                return tag_node
 
 
 class ArtellaAssetNode(ArtellaDCCNode, object):
@@ -326,7 +319,7 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         :return: str
         """
 
-        return tp.Dcc.node_short_name(self._name).rstrip(string.digits) if clean else self._name
+        return tp.Dcc.node_short_name(self._name).rstrip(string.digits) if clean else tp.Dcc.node_short_name(self._name)
 
     def _get_asset_path(self):
         """

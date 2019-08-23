@@ -119,6 +119,9 @@ ARTELLA_PROGRESS_BAR_COLOR_1_ATTRIBUTE_NAME = 'PROGRESS_BAR_COLOR_1'
 # Defines the attribute name used to define the extension of the shaders files
 ARTELLA_SHADERS_EXTENSION_ATTRIBUTE_NAME = 'SHADERS_EXTENSION'
 
+# Defines the attribute name used to define the URL where Playblast presets are located
+ARTELLA_PLAYBLAST_PRESETS_URL_ATTRIBUTE_NAME = 'PLAYBLAST_PRESETS_URL'
+
 # Defines the name of the Artella plugin
 ARTELLA_MAYA_PLUGIN_NAME = 'Artella.py'
 

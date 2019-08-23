@@ -16,6 +16,8 @@ import os
 import re
 import sys
 import json
+import locale
+import tempfile
 import traceback
 import webbrowser
 try:
@@ -23,6 +25,8 @@ try:
 except ImportError:
     from urllib2 import quote
 from collections import OrderedDict
+
+import six
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
@@ -88,6 +92,7 @@ class ArtellaProject(object):
         self._outliner_categories = dict()
         self._shot_regex = None
         self._shaders_extension = None
+        self._playblast_presets_url = None
 
         self._registered_asset_classes = list()
         self._asset_classes_types = dict()
@@ -373,6 +378,15 @@ class ArtellaProject(object):
 
         return self._shaders_extension
 
+    @property
+    def playblast_presets_url(self):
+        """
+        Returns the URL where playblast presets are located
+        :return: str
+        """
+
+        return self._playblast_presets_url
+
     # ==========================================================================================================
     # INITIALIZATION, CONFIG & SETTINGS
     # ==========================================================================================================
@@ -491,6 +505,7 @@ class ArtellaProject(object):
         self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES, dict())
         self._shot_regex = project_config_data.get(defines.ARTELLA_CONFIG_SHOT_REGEX, '*')
         self._shaders_extension = project_config_data.get(defines.ARTELLA_SHADERS_EXTENSION_ATTRIBUTE_NAME, None)
+        self._playblast_presets_url = project_config_data.get(defines.ARTELLA_PLAYBLAST_PRESETS_URL_ATTRIBUTE_NAME, None)
 
         if self._id_number == -1 or self._id == -1 or not self._wip_status or not self._publish_status:
             tp.Dcc.error('Project Configuration File for Project: {} is not valid!'.format(self.name))
@@ -762,6 +777,16 @@ class ArtellaProject(object):
             raise RuntimeError('{} Project not setup properly. Please contact TD to fix this problem'.format(self.name.title()))
 
         return os.environ.get(self._project_env_var)
+
+    def get_temp_path(self, *args):
+        """
+        Returns temporary folder path of the project
+        :return: str
+        """
+
+        temp_path = '{temp}/' + self.get_clean_name() + '/pipeline/{user}'
+
+        return path_utils.clean_path(os.path.join(self._format_path(temp_path), *args))
 
     def get_changelog_path(self):
         """
@@ -1346,6 +1371,22 @@ class ArtellaProject(object):
         self.sync_files(files=shaders_path)
 
     # ==========================================================================================================
+    #  PLAYBLAST
+    # ==========================================================================================================
+
+    def get_playblast_presets_folder(self):
+        """
+        Returns path where Playblas Presets are loated
+        :return: str
+        """
+
+        presets_url = self.playblast_presets_url
+        if not presets_url:
+            return
+
+        return '{}{}'.format(self.get_path(), presets_url)
+
+    # ==========================================================================================================
     # PRIVATE
     # ==========================================================================================================
 
@@ -1410,6 +1451,51 @@ class ArtellaProject(object):
         for asset_file in self.asset_files:
             if asset_file not in self._asset_classes_file_types:
                 self.logger.warning('Asset File Type {} has not associated asset file class!'.format(asset_file))
+
+    def _format_path(self, format_string, path='', **kwargs):
+        """
+        Resolves the given string with the given path and keyword arguments
+        :param format_string: str
+        :param path: str
+        :param kwargs: dict
+        :return: str
+        """
+
+        self.logger.debug('Format String: {}'.format(format_string))
+
+        dirname, name, extension = path_utils.split_path(path)
+        encoding = locale.getpreferredencoding()
+        temp = tempfile.gettempdir()
+        if temp:
+            temp = temp.decode(encoding)
+
+        username = osplatform.get_user().lower()
+        if username:
+            username = username.decode(encoding)
+
+        local = os.getenv('APPDATA') or os.getenv('HOME')
+        if local:
+            local = local.decode(encoding)
+
+        kwargs.update(os.environ)
+
+        labels = {
+            "name": name,
+            "path": path,
+            "user": username,
+            "temp": temp,
+            "local": local,
+            "dirname": dirname,
+            "extension": extension,
+        }
+
+        kwargs.update(labels)
+
+        resolved_string = six.u(str(format_string)).format(**kwargs)
+
+        artellapipe.logger.debug('Resolved string: {}'.format(resolved_string))
+
+        return path_utils.clean_path(resolved_string)
 
 
 class ArtellaProjectSettings(QSettings, object):

@@ -179,13 +179,13 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     # FILES
     # ==========================================================================================================
 
-    def get_file(self, file_type, status, extension=None, resolve_path=False):
+    def get_file(self, file_type, status, extension=None, fix_path=False):
         """
         Returns file path of the given file type and status
         :param file_type: str
         :param status: str
         :param extension: str
-        :param resolve_path: str
+        :param fix_path: str
         """
 
         if not extension:
@@ -211,25 +211,25 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if not file_path:
             raise RuntimeError('Impossible to retrieve file because asset path for {} is not valid!'.format(asset_name))
 
-        if resolve_path:
-            file_path = self._project.resolve_path(file_path)
+        if fix_path:
+            file_path = self._project.fix_path(file_path)
 
         return file_path
 
-    def open_file(self, file_type, status, extension=None, resolve_path=True):
+    def open_file(self, file_type, status, extension=None, fix_path=True):
         """
         Opens asset file with the given type and status (if exists)
         :param file_type: str
         :param status: str
         :param extension: str
-        :param resolve_path: bool
+        :param fix_path: bool
         :return:
         """
 
-        file_path = self.get_file(file_type=file_type, status=status, extension=extension, resolve_path=resolve_path)
+        file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=fix_path)
         if os.path.isfile(file_path):
-            if resolve_path:
-                file_path = self._project.resolve_path(file_path)
+            if fix_path:
+                file_path = self._project.fix_path(file_path)
             artellalib.open_file_in_maya(file_path)
             return True
         else:
@@ -237,18 +237,18 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return False
 
-    def reference_file(self, file_type, status, extension=None, resolve_path=True):
+    def reference_file(self, file_type, status, extension=None, fix_path=True):
         """
         References asset file with the given type and status
         :param file_type: str
         :param status: str
-        :param resolve_path: bool
+        :param fix_path: bool
         """
 
-        file_path = self.get_file(file_type=file_type, status=status, extension=extension, resolve_path=False)
+        file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
         if os.path.isfile(file_path):
-            if resolve_path:
-                file_path = self._project.resolve_path(file_path)
+            if fix_path:
+                file_path = self._project.fix_path(file_path)
             artellalib.reference_file_in_maya(file_path=file_path)
         else:
             artellapipe.logger.warning('Impossible to reference asset file of type "{}": {}'.format(file_type, file_path))
@@ -693,6 +693,15 @@ class ArtellaTagNode(object):
         """
 
         return self._node
+
+    @property
+    def tag_info(self):
+        """
+        Returns tag info data stored in this node
+        :return: dict
+        """
+
+        return self._tag_info_dict
 
     def get_clean_node(self):
         """

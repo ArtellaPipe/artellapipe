@@ -23,5 +23,6 @@
   "TAG_TYPES": [],
   "OUTLINER_CATEGORIES": [],
   "SHOT_REGEX": "*",
-  "SHADERS_EXTENSION": ".ashader"
+  "SHADERS_EXTENSION": ".ashader",
+  "PLAYBLAST_PRESETS_URL": ""
 }
