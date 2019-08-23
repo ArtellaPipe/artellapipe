@@ -60,16 +60,19 @@ ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME = 'PROJECT_ASSET_DATA_FILENAME'
 
 # Defines the name of the attribute that defines the asset files types that must be published to consider
 # an asset ready for production
-ARTELLA_CONFIG_ASSET_MUST_FILES = 'ASSET_MUST_FILES'
+ARTELLA_CONFIG_ASSET_MUST_FILES_ATTRIBUTE_NAME = 'ASSET_MUST_FILES'
 
-# Defines the list of types that can be used to tag all the elements of the short
-ARTELLA_CONFIG_TAG_TYPES = 'TAG_TYPES'
+# Define attribute name used to define the list of types that can be used to tag all the elements of the short
+ARTELLA_CONFIG_TAG_TYPES_ATTRIBUTE_NAME = 'TAG_TYPES'
 
-# Defines a dictionary that maps tag types with categories in the Artella Outliner
-ARTELLA_CONFIG_OUTLINER_CATEGORIES = 'OUTLINER_CATEGORIES'
+# Defines attribute name used to define a dictionary that maps tag types with categories in the Artella Outliner
+ARTELLA_CONFIG_OUTLINER_CATEGORIES_ATTRIBUTE_NAME = 'OUTLINER_CATEGORIES'
 
 # Defines attribute name used to define project shot regex
-ARTELLA_CONFIG_SHOT_REGEX = 'SHOT_REGEX'
+ARTELLA_CONFIG_SHOT_REGEX_ATTRIBUTE_NAME = 'SHOT_REGEX'
+
+# Defiens the attribute name used to define shot project file types
+ARTELLA_SHOT_FILE_TYPES_ATTRIBUTE_NAME = 'SHOT_FILE_TYPES'
 
 # Defines the name of the attribute that defines the working status of an asset
 ARTELLA_CONFIG_ASSET_WIP_STATUS = 'ASSET_WIP_STATUS'

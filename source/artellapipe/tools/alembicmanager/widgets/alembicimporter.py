@@ -461,10 +461,17 @@ class MayaAlembicImporter(AlembicImporter, object):
             artellapipe.logger.warning('No Alembic Info file found! Take into account that imported Alembic is not supported by our current pipeline!')
             valid_tag_info = False
 
+        if not parent:
+            parent = tp.Dcc.create_empty_group(name=os.path.basename(alembic_path))
+        else:
+            if not tp.Dcc.object_exists(parent):
+                parent = tp.Dcc.create_empty_group(name=parent)
+            else:
+                artellapipe.logger.warning('Impossible to import Alembic into scene because node named "{}" already exists in the scene!'.format(parent))
+                return
+
         if parent and valid_tag_info:
             cls._add_tag_info_data(project=project, tag_info=tag_info, attr_node=parent)
-
-        parent = tp.Dcc.create_empty_group(name=os.path.basename(alembic_path))
 
         track_nodes = maya_scene.TrackNodes()
         track_nodes.load()
@@ -474,7 +481,7 @@ class MayaAlembicImporter(AlembicImporter, object):
             return
         res = track_nodes.get_delta()
 
-        maya.cmds.viewFit(res, animate=True)
+        # maya.cmds.viewFit(res, animate=True)
 
         return res
 
@@ -490,7 +497,7 @@ class MayaAlembicImporter(AlembicImporter, object):
 
         res = AlembicImporter.reference_alembic(project=project, alembic_path=alembic_path, namespace=namespace, fix_path=fix_path)
 
-        maya.cmds.viewFit(res, animate=True)
+        # maya.cmds.viewFit(res, animate=True)
 
         return res
 

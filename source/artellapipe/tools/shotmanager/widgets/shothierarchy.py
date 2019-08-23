@@ -25,17 +25,24 @@ class ShotHierarchy(base.BaseWidget, object):
 
     def __init__(self, parent=None):
 
-        self.widgets = list()
+        self._widgets = list()
 
         super(ShotHierarchy, self).__init__(parent=parent)
 
-    def custom_ui(self):
+    def get_main_layout(self):
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        return main_layout
+
+    def ui(self):
         super(ShotHierarchy, self).ui()
 
         self.setMouseTracking(True)
 
         self._grid_layout = QGridLayout()
-        self._grid_layout.setSpacing(2)
+        self._grid_layout.setSpacing(0)
         self._grid_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(self._grid_layout)
 
@@ -47,7 +54,7 @@ class ShotHierarchy(base.BaseWidget, object):
         scroll_area.setWidget(scroll_widget)
 
         self._hierarchy_layout = QVBoxLayout()
-        self._hierarchy_layout.setContentsMargins(1, 1, 1, 1)
+        self._hierarchy_layout.setContentsMargins(0, 0, 0, 0)
         self._hierarchy_layout.setSpacing(0)
         self._hierarchy_layout.addStretch()
         scroll_widget.setLayout(self._hierarchy_layout)
@@ -63,7 +70,7 @@ class ShotHierarchy(base.BaseWidget, object):
         return all_hierarhcy
 
     def clear_hierarchy(self):
-        del self.widgets[:]
+        del self._widgets[:]
         while self._hierarchy_layout.count():
             child = self._hierarchy_layout.takeAt(0)
             if child.widget() is not None:
@@ -73,7 +80,7 @@ class ShotHierarchy(base.BaseWidget, object):
         self._hierarchy_layout.addStretch()
 
     def add_asset(self, asset):
-        self.widgets.append(asset)
+        self._widgets.append(asset)
         self._hierarchy_layout.insertWidget(0, asset)
         asset.clicked.connect(self._on_item_clicked)
 
@@ -84,7 +91,7 @@ class ShotHierarchy(base.BaseWidget, object):
             self.updateProperties.emit(None)
             return
         else:
-            for asset_widget in self.widgets:
+            for asset_widget in self._widgets:
                 if asset_widget != widget:
                     asset_widget.deselect()
                 else:

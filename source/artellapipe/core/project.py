@@ -91,6 +91,7 @@ class ArtellaProject(object):
         self._tag_types = list()
         self._outliner_categories = dict()
         self._shot_regex = None
+        self._shot_file_types = list()
         self._shaders_extension = None
         self._playblast_presets_url = None
 
@@ -370,6 +371,15 @@ class ArtellaProject(object):
         return '{}_TAG'.format(self.get_clean_name().upper())
 
     @property
+    def shot_file_types(self):
+        """
+        Returns of shot files supported by the project
+        :return: list(str)
+        """
+
+        return self._shot_file_types
+
+    @property
     def shaders_extension(self):
         """
         Returns extension usded by shaders files
@@ -488,7 +498,7 @@ class ArtellaProject(object):
         self._version_file = project_config_data.get(defines.ARTELLA_VERSION_FILE_NAME_ATTRIBUTE_NAME, defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME)
         self._asset_types = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_TYPES, list())
         self._asset_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_FILES, list())
-        self._asset_must_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_MUST_FILES, list())
+        self._asset_must_files = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_MUST_FILES_ATTRIBUTE_NAME, list())
         self._wip_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_WIP_STATUS, None)
         self._publish_status = project_config_data.get(defines.ARTELLA_CONFIG_ASSET_PUBLISH_STATUS, None)
         self._project_icon = project_config_data.get(defines.ARTELLA_PROJECT_ICON, defines.ARTELLA_PROJECT_DEFAULT_ICON)
@@ -501,9 +511,10 @@ class ArtellaProject(object):
         self._asset_ignored_paths = project_config_data.get(defines.ARTELLA_ASSETS_IGNORED_PATHS_ATTRIBUTE_NAME, list())
         self._assets_library_file_types = project_config_data.get(defines.ARTELLA_ASSETS_LIBRARY_SUPPORTED_TYPES_ATTRIBUTE_NAME, dict())
         self._asset_data_filename = project_config_data.get(defines.ARTELLA_ASSET_DATA_FILENAME_ATTRIBUTE_NAME, None)
-        self._tag_types = project_config_data.get(defines.ARTELLA_CONFIG_TAG_TYPES, list())
-        self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES, dict())
-        self._shot_regex = project_config_data.get(defines.ARTELLA_CONFIG_SHOT_REGEX, '*')
+        self._tag_types = project_config_data.get(defines.ARTELLA_CONFIG_TAG_TYPES_ATTRIBUTE_NAME, list())
+        self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES_ATTRIBUTE_NAME, dict())
+        self._shot_regex = project_config_data.get(defines.ARTELLA_CONFIG_SHOT_REGEX_ATTRIBUTE_NAME, '*')
+        self._shot_file_types = project_config_data.get(defines.ARTELLA_SHOT_FILE_TYPES_ATTRIBUTE_NAME, list())
         self._shaders_extension = project_config_data.get(defines.ARTELLA_SHADERS_EXTENSION_ATTRIBUTE_NAME, None)
         self._playblast_presets_url = project_config_data.get(defines.ARTELLA_PLAYBLAST_PRESETS_URL_ATTRIBUTE_NAME, None)
 

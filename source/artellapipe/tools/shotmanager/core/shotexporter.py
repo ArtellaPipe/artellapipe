@@ -37,6 +37,8 @@ class ShotExporter(window.ArtellaWindow, object):
             size=(550, 650)
         )
 
+        self._init()
+
     def ui(self):
         super(ShotExporter, self).ui()
 
@@ -55,14 +57,19 @@ class ShotExporter(window.ArtellaWindow, object):
         self.main_layout.addLayout(splitters.SplitterLayout())
         self.main_layout.addWidget(self._main_stack)
 
-        self._update_registered_exporters()
-
     def setup_signals(self):
         self._main_stack.animFinished.connect(self._on_stack_anim_finished)
 
+    def _init(self):
+        """
+        Internal function that initializes Short Exporter widgets
+        :return:
+        """
+        self._update_registered_exporters()
+
     def _update_registered_exporters(self):
         """
-        Updates current categories with the given ones
+        Internal function that updates current categories with the given ones
         """
 
         for btn in self._exporters_btn_grp.buttons():
@@ -75,18 +82,19 @@ class ShotExporter(window.ArtellaWindow, object):
         i = 0
         registered_exporters = self.get_registered_exporters()
         for exporter_name, exporter in reversed(registered_exporters.items()):
-            new_btn = QPushButton(exporter_name)
-            new_btn.setIcon(exporter.EXPORTER_ICON)
-            new_btn.setMinimumWidth(80)
-            new_btn.setCheckable(True)
-            self._exporters_menu_layout.addWidget(new_btn)
-            self._exporters_btn_grp.addButton(new_btn)
-            exporter_widget = exporter(project=self._project)
-            new_btn.clicked.connect(partial(self._on_change_exporter, exporter_widget))
-            self._main_stack.addWidget(exporter_widget)
-            if i == 0:
-                new_btn.setChecked(True)
-            i += 1
+            if exporter.EXPORTER_FILE in self._project.shot_file_types:
+                new_btn = QPushButton(exporter_name)
+                new_btn.setIcon(exporter.EXPORTER_ICON)
+                new_btn.setMinimumWidth(80)
+                new_btn.setCheckable(True)
+                self._exporters_menu_layout.addWidget(new_btn)
+                self._exporters_btn_grp.addButton(new_btn)
+                exporter_widget = exporter(project=self._project)
+                new_btn.clicked.connect(partial(self._on_change_exporter, exporter_widget))
+                self._main_stack.addWidget(exporter_widget)
+                if i == 0:
+                    new_btn.setChecked(True)
+                i += 1
 
         self._exporters_menu_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
 

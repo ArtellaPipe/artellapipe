@@ -18,11 +18,13 @@ from Qt.QtCore import *
 from tpQtLib.core import base
 from tpQtLib.widgets import splitters
 
+import artellapipe
+
 
 class ShotOverrides(base.BaseWidget, object):
     def __init__(self, parent=None):
 
-        self.widgets = list()
+        self._overrides = list()
 
         super(ShotOverrides, self).__init__(parent=parent)
 
@@ -34,6 +36,7 @@ class ShotOverrides(base.BaseWidget, object):
         self.setMouseTracking(True)
 
         self._add_btn = QPushButton('Add Override')
+        self._add_btn.setIcon(artellapipe.resource.icon('add'))
         self.main_layout.addWidget(self._add_btn)
         self.main_layout.addLayout(splitters.SplitterLayout())
         self._overrides_menu = QMenu()
@@ -57,6 +60,16 @@ class ShotOverrides(base.BaseWidget, object):
         self._assets_layout.addStretch()
         scroll_widget.setLayout(self._assets_layout)
         self._grid_layout.addWidget(scroll_area, 1, 0, 1, 4)
+
+    def set_overrides(self, overrides):
+        """
+        self._setup_menubar()
+        :param overrides: list
+        :return:
+        """
+
+        self._overrides = overrides
+        print('Overrides: {}'.format(overrides))
 
     def _update_menu(self):
         pass

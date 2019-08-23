@@ -28,6 +28,8 @@ class BaseExporter(base.BaseWidget, object):
 
     EXPORTER_NAME = ''
     EXPORTER_ICON = None
+    EXPORTER_FILE = None
+    EXPORTER_EXTENSION = None
     EXPORT_BUTTON_TEXT = 'Save'
     EXPORTER_LIST_WIDGET_CLASS = None
     EXPORTER_PROPERTIES_WIDGET_CLASS = None
@@ -55,7 +57,7 @@ class BaseExporter(base.BaseWidget, object):
 
         self._progress = progressbar.ArtellaProgressBar(project=self._project)
         self._progress.setVisible(False)
-        self.main_layout.addWidget(self._progress)
+        self.main_layout.addWidget(self._progress   )
 
         self._save_btn = QPushButton(str(self.EXPORT_BUTTON_TEXT))
         self._save_btn.setIcon(artellapipe.resource.icon('save'))
