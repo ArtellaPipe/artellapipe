@@ -130,18 +130,16 @@ class BaseAttributeWidget(base.BaseWidget, object):
         self.toggled.emit(self.name, flag)
 
 
-class BasePropertiesListWidget(attributes.AttributeEditor, object):
-    def __init__(self, name, label, title, parent=None):
+class AssetPropetiesEditor(attributes.AttributeEditor, object):
+    def __init__(self, parent=None):
 
         self._current_asset = None
 
-        super(BasePropertiesListWidget, self).__init__(
-            name=name,
-            label=label,
+        super(AssetPropetiesEditor, self).__init__(
+            name='AssetPropertiesEditor',
+            label='Asset Properties',
             parent=parent
         )
-
-        self.set_title(title)
 
     def get_attributes_layout(self):
         """

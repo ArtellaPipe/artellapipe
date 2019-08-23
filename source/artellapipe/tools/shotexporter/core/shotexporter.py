@@ -30,7 +30,6 @@ class ShotExporter(window.ArtellaWindow, object):
     LOGO_NAME = 'shotexporter_logo'
 
     def __init__(self, project):
-
         super(ShotExporter, self).__init__(
             project=project,
             name='ShotExporter',
