@@ -934,7 +934,7 @@ class ArtellaProject(object):
 
     def sync_files(self, files):
         """
-        Creates an return a new instance of the Artella paths sync dialog
+        Creates an return a new instance of the Artella files sync dialog
         :param files: list(str)
         """
 
@@ -1397,6 +1397,18 @@ class ArtellaProject(object):
             return
 
         self.sync_files(files=shaders_path)
+
+    # ==========================================================================================================
+    # LIGHT RIGS
+    # ==========================================================================================================
+
+    def get_light_rigs_path(self):
+        """
+        Returns path where light rigs are located in the project
+        :return: str
+        """
+
+        return path_utils.clean_path(os.path.join(self.get_assets_path(), 'lightrigs'))
 
     # ==========================================================================================================
     #  PLAYBLAST

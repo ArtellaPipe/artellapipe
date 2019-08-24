@@ -30,6 +30,7 @@ from tpQtLib.widgets import splitters
 
 import artellapipe
 from artellapipe.gui import window, progressbar
+from artellapipe.utils import shader
 from artellapipe.tools.shotmanager.widgets import shothierarchy, shotproperties, shotassetslist, shotoverrides
 from artellapipe.tools.shotmanager.utils import json_include
 
@@ -334,6 +335,12 @@ class ShotAssembler(window.ArtellaWindow, object):
         tp.Dcc.clear_selection()
 
         tp.Dcc.fit_view(animation=True)
+
+        self._progress.set_value(len(all_hierarchy))
+        self._progress.set_text('Loading Shaders ...')
+        self.repaint()
+
+        shader.load_all_scene_shaders(project=self._project)
 
         self._progress.set_value(0)
         self._progress.set_text('')

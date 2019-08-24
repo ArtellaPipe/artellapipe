@@ -15,7 +15,7 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import json
 
-from tpPyUtils import  path as path_utils
+from tpPyUtils import decorators, path as path_utils
 
 import tpDccLib as tp
 
@@ -23,6 +23,7 @@ from tpQtLib.core import image
 
 import artellapipe
 from artellapipe.core import artellalib
+from artellapipe.tools.tagger.core import taggerutils
 
 IGNORED_SHADERS = list()
 IGNORE_ATTRS = list()
@@ -31,8 +32,12 @@ if tp.is_maya():
     import tpMayaLib as maya
     from tpMayaLib.core import shader as maya_shaders
     from tpMayaLib.core import transform as maya_transform
+    from tpMayaLib.core import decorators as maya_decorators
+    undo_decorator = maya_decorators.undo_chunk
     IGNORE_SHADERS = ['particleCloud1', 'shaderGlow1', 'defaultColorMgtGlobals', 'lambert1']
     IGNORE_ATTRS = ['computedFileTextureNamePattern']
+else:
+    undo_decorator = decorators.empty_decorator
 
 
 class ShadingNetwork(object):
@@ -295,8 +300,13 @@ class ShadingNetwork(object):
 def load_shader(project, shader_name):
     """
     Loads shader with given name in current DCC
+    :param project: ArtellaProject
     :param shader_name: str
     """
+
+    if not tp.is_maya():
+        artellapipe.logger.warning('Shaders loading is only supported in Maya!')
+        return
 
     shader_library_path = project.get_shaders_path()
     if not os.path.exists(shader_library_path):
@@ -319,3 +329,248 @@ def load_shader(project, shader_name):
         return False
 
     return True
+
+
+@undo_decorator
+def load_scene_shaders(project, load=True, apply=True, tag_nodes=None, tag_info_nodes=None):
+    """
+    Loops through all tag data scene nodes and loads all necessary shaders into the current scene
+    If a specific shader is already loaded, that shader is skipeed
+    :return: list<str>, list of loaded shaders
+    """
+    
+    if not tp.is_maya():
+        artellapipe.logger.warning('Shaders loading is only supported in Maya!')
+        return
+
+    if apply:
+        all_panels = maya.cmds.getPanel(type='modelPanel')
+        for p in all_panels:
+            maya.cmds.modelEditor(p, edit=True, displayTextures=False)
+
+    applied_data = list()
+    updated_textures = list()
+
+    if tag_nodes is None:
+        tag_nodes = list()
+    if tag_info_nodes is None:
+        tag_info_nodes = list()
+
+    if not tag_nodes and not tag_info_nodes:
+        artellapipe.logger.error('No tag nodes found in the current scene. Aborting shaders loading ...')
+        return None
+
+    added_mats = list()
+
+    found_nodes = list()
+    found_nodes.extend(tag_nodes)
+    found_nodes.extend(tag_info_nodes)
+
+    for tag in found_nodes:
+        shaders = tag.get_shaders()
+        if not shaders:
+            artellapipe.logger.error('No shaders found for asset: {}'.format(tag.get_asset().node))
+            continue
+
+        asset = tag.get_asset_node()
+
+        hires_group = tag.get_hires_group()
+        if not hires_group or not maya.cmds.objExists(hires_group):
+            hires_group = tag.get_asset().node
+
+        if not hires_group or not maya.cmds.objExists(hires_group):
+            artellapipe.logger.error('No Hires group found for asset: {}'.format(tag.get_asset().node))
+            continue
+
+        hires_meshes = [obj for obj in
+                        maya.cmds.listRelatives(hires_group, allDescendents=True, type='transform', shapes=False, noIntermediate=True, fullPath=True) if
+                        maya.cmds.objExists(obj) and maya.cmds.listRelatives(obj, shapes=True)]
+        if not hires_meshes or len(hires_meshes) <= 0:
+            artellapipe.logger.error('No Hires meshes found for asset: {}'.format(tag.get_asset().node))
+            continue
+
+        if asset.node != hires_group:
+            is_referenced = maya.cmds.referenceQuery(asset.node, isNodeReferenced=True)
+            if is_referenced:
+                namespace = maya.cmds.referenceQuery(asset.node, namespace=True)
+                if not namespace or not namespace.startswith(':'):
+                    artellapipe.logger.error(
+                        'Node {} has not a valid namespace!. Please contact TD!'.format(asset.node))
+                    continue
+                else:
+                    namespace = namespace[1:] + ':'
+
+        valid_meshes = list()
+        for mesh in hires_meshes:
+            is_referenced = maya.cmds.referenceQuery(mesh, isNodeReferenced=True)
+            if is_referenced:
+                namespace = maya.cmds.referenceQuery(mesh, namespace=True)
+                if not namespace or not namespace.startswith(':'):
+                    continue
+                else:
+                    namespace = namespace[1:] + ':'
+            else:
+                namespace = ''
+
+            mesh_no_namespace = mesh.replace(namespace, '')
+            asset_group = mesh_no_namespace.split('|')[1]
+
+            hires_grp_no_namespace = hires_group.replace(namespace, '')
+            hires_split = mesh_no_namespace.split(hires_grp_no_namespace)
+
+            group_mesh_name = hires_split[-1]
+            group_mesh_name = '|{0}{1}'.format(asset_group, group_mesh_name)
+
+            for shader_mesh in shaders.keys():
+                if shader_mesh == group_mesh_name:
+                    valid_meshes.append(mesh)
+                    break
+
+            for shader_mesh in shaders.keys():
+                shader_short = tp.Dcc.node_short_name(shader_mesh)
+                group_short = tp.Dcc.node_short_name(group_mesh_name)
+                if shader_short == group_short:
+                    if mesh not in valid_meshes:
+                        valid_meshes.append(mesh)
+                        break
+
+        if len(valid_meshes) <= 0:
+            artellapipe.logger.error('No valid meshes found on asset. Please contact TD!'.format(tag.get_asset()))
+            continue
+
+        meshes_shading_groups = list()
+        for mesh in valid_meshes:
+            mesh_shapes = maya.cmds.listRelatives(mesh, shapes=True, noIntermediate=True)
+            if not mesh_shapes or len(mesh_shapes) <= 0:
+                artellapipe.logger.error('Mesh {} has not valid shapes!'.format(mesh))
+                continue
+            for shape in mesh_shapes:
+                shape_name = shape.split(':')[-1]
+                if shape_name.endswith('Deformed'):
+                    shape_name = shape_name.replace('Deformed', '')
+                for shader_mesh, shader_data in shaders.items():
+                    for shader_shape, shader_group in shader_data.items():
+                        shader_shape_name = shader_shape.split('|')[-1]
+                        if shape_name == shader_shape_name:
+                            meshes_shading_groups.append([mesh, shader_group])
+        if len(meshes_shading_groups) <= 0:
+            artellapipe.logger.error(
+                'No valid shading groups found on asset. Please contact TD!'.format(tag.get_asset()))
+            continue
+
+        for mesh_info in meshes_shading_groups:
+            mesh = mesh_info[0]
+            shading_info = mesh_info[1]
+            for shading_grp, materials in shading_info.items():
+                if not materials or len(materials) <= 0:
+                    artellapipe.logger.error(
+                        'No valid materials found on mesh {0} of asset {1}'.format(mesh, tag.get_asset()))
+                    continue
+
+                # If shading group already exists we do not create the material
+                if maya.cmds.objExists(shading_grp):
+                    continue
+
+                for mat in materials:
+                    if not mat or mat in added_mats:
+                        continue
+                    added_mats.append(mat)
+
+                    if load:
+                        artellapipe.logger.debug('Loading Shader: {}'.format(mat))
+                        valid_shader = load_shader(project=project, shader_name=mat)
+                        if not valid_shader:
+                            artellapipe.logger.error('Error while loading shader {}'.format(mat))
+
+            # After materials are created we try to apply to the meshes
+            try:
+                for shading_grp, materials in shading_info.items():
+                    if not tp.Dcc.object_exists(shading_grp):
+                        for mat in materials:
+                            if not materials or len(materials) <= 0:
+                                continue
+                            artellapipe.logger.error('Shading group {}  loaded from shader info does not exists!'.format(shading_grp))
+                            shading_grp = mat + 'SG'
+                            artellapipe.logger.error('Applying shading group based on nomenclature: {}'.format(shading_grp))
+                            if tp.Dcc.object_exists(shading_grp):
+                                artellapipe.logger.error('Impossible to set shading group {0} to mesh {1}'.format(shading_grp, mesh))
+                                break
+
+                    if apply:
+                        maya.cmds.sets(mesh, edit=True, forceElement=shading_grp)
+                        maya.cmds.ogs(reset=True)
+                        file_nodes = maya.cmds.ls(type='file')
+                        for f in file_nodes:
+                            if f not in updated_textures:
+                                updated_textures.append(f)
+                                maya.cmds.ogs(regenerateUVTilePreview=f)
+                        artellapipe.logger.debug('Shading set {0} applied to mesh {1}'.format(shading_grp, mesh))
+                    applied_data.append([mesh, shading_grp])
+
+            except Exception as e:
+                artellapipe.logger.error('Impossible to set shading group {0} to mesh {1}'.format(shading_grp, mesh))
+                artellapipe.logger.error(str(e))
+
+    return applied_data
+
+
+def load_all_scene_shaders(project, load=True, apply=True):
+    """
+    Loops through all tag data scene nodes and loads all necessary shaders into the current scene
+    If a specific shader is already loaded, that shader is skip
+    :return: list<str>, list of loaded shaders
+    """
+
+    if not tp.is_maya():
+        artellapipe.logger.warning('Shaders loading is only supported in Maya!')
+        return
+
+    tag_nodes = taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
+    tag_info_nodes = project.get_tag_info_nodes(as_tag_nodes=True)
+    return load_scene_shaders(project=project, load=load, apply=apply, tag_nodes=tag_nodes, tag_info_nodes=tag_info_nodes)
+
+
+@undo_decorator
+def unload_shaders(project, tag_nodes=None, tag_info_nodes=None):
+    """
+    Unload shaders applied to assets loaded in current DCC scene or to given ones
+    :param tag_nodes:
+    :param tag_info_nodes:
+    """
+
+    if not tp.is_maya():
+        artellapipe.logger.warning('Shaders unloading is only supported in Maya!')
+        return
+
+    tag_nodes = tag_nodes if tag_nodes else taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
+    tag_info_nodes = tag_info_nodes if tag_info_nodes else project.get_tag_info_nodes(as_tag_nodes=True)
+
+    found_nodes = list()
+    found_nodes.extend(tag_nodes)
+    found_nodes.extend(tag_info_nodes)
+
+    for tag in found_nodes:
+        shaders = tag.get_shaders()
+        if not shaders:
+            artellapipe.logger.error('No shaders found for asset: {}'.format(tag.get_asset().node))
+            continue
+
+        for shader_geo, shader_shapes in shaders.items():
+            for shader_shp, shader_data in shader_shapes.items():
+                for shader_sg, shader_names in shader_data.items():
+                    found_meshes = list()
+                    if not tp.Dcc.object_exists(shader_sg):
+                        continue
+                    cns = maya.cmds.listConnections(shader_sg)
+                    for cnt in cns:
+                        cnt_type = maya.cmds.nodeType(cnt, i=True)
+                        if 'dagNode' in cnt_type:
+                            found_meshes.append(cnt)
+                    for mesh in found_meshes:
+                        maya.cmds.sets(mesh, edit=True, forceElement='initialShadingGroup')
+
+                    for shd in shader_names:
+                        if tp.Dcc.object_exists(shd) and shd not in ['lambert1', 'particleCloud1']:
+                            tp.Dcc.delete_object(shd)
+                    if shader_sg not in ['initialShadingGroup', 'initialParticleSE']:
+                        tp.Dcc.delete_object(shader_sg)
