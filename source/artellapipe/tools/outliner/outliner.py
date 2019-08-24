@@ -134,6 +134,8 @@ class ArtellaOutlinerWidget(QWidget, object):
         for category in reversed(outliner_categories):
             new_btn = QPushButton(category.title())
             new_btn.category = category
+            category_icon = self._project.resource.icon(category.strip().lower(), theme='outliner')
+            new_btn.setIcon(category_icon)
             new_btn.setCheckable(True)
             self._tags_menu_layout.addWidget(new_btn)
             self._tags_btn_grp.addButton(new_btn)

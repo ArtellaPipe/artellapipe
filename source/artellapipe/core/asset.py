@@ -103,6 +103,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return self._category
 
+    def get_icon(self):
+        """
+        Returns the icon of the asset depending of the category
+        :return: QIcon
+        """
+
+        return self._project.resource.icon(self.get_category())
+
     def get_file_type(self, file_type, extension=None):
         """
         Returns asset file object of the current asset and given file type
@@ -136,6 +144,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         asset_files = self.ASSET_FILES.keys()
         return [i for i in asset_files if i in self._project.asset_files]
+
+    def get_current_extension(self):
+        """
+        Returns the extension of the current asset file loaded
+        :return: str
+        """
+
+        return None
 
     # ==========================================================================================================
     # ARTELLA

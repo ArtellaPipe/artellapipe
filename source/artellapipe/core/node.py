@@ -327,7 +327,6 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         :return: str
         """
 
-
         assets_path = self._project.get_assets_path()
         if assets_path is None or not os.path.exists(assets_path):
             raise RuntimeError('Assets Path is not valid: {}'.format(assets_path))

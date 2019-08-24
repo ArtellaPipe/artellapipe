@@ -41,6 +41,10 @@ class ExporterAssetItem(QObject):
         self._update_attrs()
 
     @property
+    def asset(self):
+        return self._asset
+
+    @property
     def name(self):
         return self._asset.name
 
@@ -158,21 +162,30 @@ class AbstractItemWidget(base.BaseWidget, object):
 
 
 class ShotAssetItem(AbstractItemWidget, object):
-    def __init__(self, asset_file, parent=None):
+    def __init__(self, asset_file, type=None, parent=None):
+
+        self._type = type
+
         super(ShotAssetItem, self).__init__(asset_file=asset_file, parent=parent)
 
     def ui(self):
         super(ShotAssetItem, self).ui()
 
         self._asset_icon = QLabel()
+        self._type_icon = QLabel()
         self._asset_lbl = QLabel(os.path.basename(self._asset_file))
         self._asset_lbl.setToolTip(self._asset_file)
 
         self._item_layout.addWidget(self._asset_icon, 0, 1, 1, 1)
-        self._item_layout.addWidget(self._asset_lbl, 0, 2, 1, 1)
+        self._item_layout.addWidget(self._type_icon, 0, 2, 1, 1)
+        self._item_layout.addWidget(self._asset_lbl, 0, 3, 1, 1)
 
-        self._item_layout.setColumnStretch(2, 5)
+        self._item_layout.setColumnStretch(3, 5)
         self._item_layout.setAlignment(Qt.AlignLeft)
+
+        if self._type:
+            item_icon = self._get_type_icon()
+            self._type_icon.setPixmap(item_icon.pixmap(item_icon.actualSize(QSize(20, 20))))
 
     def set_icon(self, item_icon):
         """
@@ -189,6 +202,14 @@ class ShotAssetItem(AbstractItemWidget, object):
         """
 
         pass
+
+    def _get_type_icon(self):
+        """
+        Internal function that returns the icon depending of the asset file type being used
+        :return: QIcon
+        """
+
+        return None
 
 
 class ShotAssetFileItem(AbstractItemWidget, object):

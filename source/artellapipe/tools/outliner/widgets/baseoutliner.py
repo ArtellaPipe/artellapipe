@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains different outliners for Solstice Outliner
+Module that contains different outliners for Artella Outliner
 """
 
 from __future__ import print_function, division, absolute_import

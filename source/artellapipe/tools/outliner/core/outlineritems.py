@@ -60,6 +60,33 @@ class OutlinerTreeItemWidget(base.BaseWidget, object):
         self._child_widget.setLayout(self.child_layout)
         self.main_layout.addWidget(self._child_widget)
 
+    @property
+    def name(self):
+        """
+        Retursn the name of the item
+        :return: str
+        """
+
+        return self._name
+
+    @property
+    def long_name(self):
+        """
+        Returns the long name of the item
+        :return: str
+        """
+
+        return self._long_name
+
+    @property
+    def is_selected(self):
+        """
+        Returns whether the item is selected or not
+        :return: bool
+        """
+
+        return self._is_selected
+
     def add_child(self, widget, category):
         widget.parent_elem = self
         self._child_elem[category] = widget
@@ -153,10 +180,10 @@ class OutlinerAssetItem(OutlinerTreeItemWidget, object):
         else:
             self._expand_btn.setVisible(False)
 
-        project_icon = self._asset_node.project.resource.icon(self.ICON_NAME)
-        if project_icon.isNull():
-            project_icon = artellapipe.resource.icon(self.ICON_NAME)
-        pixmap = project_icon.pixmap(project_icon.availableSizes()[-1]).scaled(20, 20, Qt.KeepAspectRatio)
+        asset_icon = self._asset_node.get_current_extension_icon()
+        if not asset_icon or asset_icon.isNull():
+            asset_icon = artellapipe.resource.icon(self.ICON_NAME)
+        pixmap = asset_icon.pixmap(asset_icon.availableSizes()[-1]).scaled(20, 20, Qt.KeepAspectRatio)
         self._icon_lbl = QLabel()
         self._icon_lbl.setMaximumWidth(18)
         self._icon_lbl.setPixmap(pixmap)
@@ -211,9 +238,8 @@ class OutlinerAssetItem(OutlinerTreeItemWidget, object):
         Selects wrapped DCC node in DCC viewport
         """
 
-        pass
-        # self.is_selected = True
-        # self.item_widget.setStyleSheet('QFrame { background-color: rgb(21,60,97);}')
+        self._is_selected = True
+        self._item_widget.setStyleSheet('QFrame { background-color: rgb(21,60,97);}')
 
     def deselect(self):
         """
