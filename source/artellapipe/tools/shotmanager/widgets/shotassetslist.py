@@ -12,6 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import os
 from functools import partial
 
 from Qt.QtCore import *
@@ -106,6 +107,27 @@ class ShotAssets(base.BaseWidget, object):
         self.widgets.append(asset)
         self._assets_layout.insertWidget(0, asset)
         self.updateHierarchy.emit(asset)
+
+    def load_shot_files(self, shot_files):
+        for file_name, file_info in shot_files.items():
+            file_path = os.path.join(self._project.get_path(), file_name)
+            if not os.path.isfile(file_path):
+                artellapipe.logger.warning('Asset File "{}" does not exists in your computer!'.format(file_path))
+                continue
+            file_data = file_info.get('data', None)
+            extra_data = file_info.get('extra', None)
+            if not file_data:
+                artellapipe.logger.warning('Asset File "{}" does not contains any data!'.format(file_path))
+                continue
+            file_extension = os.path.splitext(file_path)[-1]
+            for _, file_type in reversed(self._file_types.items()):
+                if file_type and file_type.FILE_EXTENSION == file_extension:
+                    new_asset_file = file_type(asset_file=file_path, asset_data=file_data, extra_data=extra_data)
+                    if not new_asset_file:
+                        artellapipe.logger.warning('Impossible to generate {} asset from {}! Skipping ...'.format(file_type, file_path))
+                        break
+                    self.add_asset(new_asset_file)
+                    break
 
     def _update_menu(self):
         """

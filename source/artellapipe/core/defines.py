@@ -71,7 +71,10 @@ ARTELLA_CONFIG_OUTLINER_CATEGORIES_ATTRIBUTE_NAME = 'OUTLINER_CATEGORIES'
 # Defines attribute name used to define project shot regex
 ARTELLA_CONFIG_SHOT_REGEX_ATTRIBUTE_NAME = 'SHOT_REGEX'
 
-# Defiens the attribute name used to define shot project file types
+# Defines the attribute name used to define shot file extension
+ARTELLA_SHOT_EXTENSION_ATTRIBUTE_NAME = 'SHOT_EXTENSION'
+
+# Defines the attribute name used to define shot project file types
 ARTELLA_SHOT_FILE_TYPES_ATTRIBUTE_NAME = 'SHOT_FILE_TYPES'
 
 # Defines the name of the attribute that defines the working status of an asset

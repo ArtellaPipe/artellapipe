@@ -197,7 +197,11 @@ class ShotAssetFileItem(AbstractItemWidget, object):
     FILE_ICON = None
     FILE_EXTENSION = None
 
-    def __init__(self, asset_file, parent=None):
+    def __init__(self, asset_file, asset_data=None, extra_data=None, parent=None):
+
+        self._asset_data = asset_data
+        self._extra_data = extra_data
+
         super(ShotAssetFileItem, self).__init__(asset_file=asset_file, parent=parent)
 
     def ui(self):
@@ -220,6 +224,9 @@ class ShotAssetFileItem(AbstractItemWidget, object):
         Override in custom file types
         :return: dict
         """
+
+        if self._asset_data:
+            return self._asset_data
 
         try:
             with open(self._asset_file) as f:

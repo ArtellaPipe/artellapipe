@@ -53,7 +53,7 @@ class ArtellaAssetType(object):
 
         self._open_file(path=file_path)
 
-    def import_file(self, status):
+    def import_file(self, status, *args, **kwargs):
         """
         References current file into DCC
         :return:
@@ -64,7 +64,7 @@ class ArtellaAssetType(object):
         else:
             file_path = self.get_latest_local_published_path()
 
-        self._import_file(path=file_path)
+        self._import_file(path=file_path, *args, **kwargs)
 
     def reference_file(self, status, fix_path=True):
         """
@@ -454,7 +454,7 @@ class ArtellaAssetType(object):
 
         pass
 
-    def _import_file(self, path, fix_path=True):
+    def _import_file(self, path, fix_path=True, *args, **kwargs):
         """
         Internal function that imports current file in DCC
         Overrides in custom asset file

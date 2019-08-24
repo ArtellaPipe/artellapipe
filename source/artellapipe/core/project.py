@@ -61,6 +61,12 @@ class ArtellaProject(object):
     PROJECT_MENU_FILE_PATH = artellapipe.get_project_menu_path()
     PROJECT_VERSION_FILE_PATH = artellapipe.get_project_version_path()
 
+    class DataVersions(object):
+        SHOT = '0.0.1'
+
+    class DataExtensions(object):
+        pass
+
     def __init__(self, resource, naming_file, settings=None):
         super(ArtellaProject, self).__init__()
 
@@ -92,6 +98,7 @@ class ArtellaProject(object):
         self._outliner_categories = dict()
         self._shot_regex = None
         self._shot_file_types = list()
+        self._shot_extension = None
         self._shaders_extension = None
         self._playblast_presets_url = None
 
@@ -380,6 +387,15 @@ class ArtellaProject(object):
         return self._shot_file_types
 
     @property
+    def shot_extension(self):
+        """
+        Returns extesnsion used to stored shot files
+        :return: str
+        """
+
+        return self._shot_extension
+
+    @property
     def shaders_extension(self):
         """
         Returns extension usded by shaders files
@@ -515,6 +531,7 @@ class ArtellaProject(object):
         self._outliner_categories = project_config_data.get(defines.ARTELLA_CONFIG_OUTLINER_CATEGORIES_ATTRIBUTE_NAME, dict())
         self._shot_regex = project_config_data.get(defines.ARTELLA_CONFIG_SHOT_REGEX_ATTRIBUTE_NAME, '*')
         self._shot_file_types = project_config_data.get(defines.ARTELLA_SHOT_FILE_TYPES_ATTRIBUTE_NAME, list())
+        self._shot_extension = project_config_data.get(defines.ARTELLA_SHOT_EXTENSION_ATTRIBUTE_NAME, '.shot')
         self._shaders_extension = project_config_data.get(defines.ARTELLA_SHADERS_EXTENSION_ATTRIBUTE_NAME, None)
         self._playblast_presets_url = project_config_data.get(defines.ARTELLA_PLAYBLAST_PRESETS_URL_ATTRIBUTE_NAME, None)
 

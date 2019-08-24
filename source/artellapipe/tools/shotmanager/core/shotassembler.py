@@ -14,9 +14,14 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import sys
+import ast
+import json
+import traceback
 
 from Qt.QtWidgets import *
 from Qt.QtCore import *
+
+from tpPyUtils import python
 
 import tpDccLib as tp
 
@@ -26,6 +31,58 @@ from tpQtLib.widgets import splitters
 import artellapipe
 from artellapipe.gui import window, progressbar
 from artellapipe.tools.shotmanager.widgets import shothierarchy, shotproperties, shotassetslist, shotoverrides
+from artellapipe.tools.shotmanager.utils import json_include
+
+
+class ShotFile(object):
+    def __init__(self, project, file_path):
+        super(ShotFile, self).__init__()
+
+        self._project = project
+        self._file_path = file_path
+
+    def load(self):
+        """
+        Loads Shot File
+        """
+
+        file_dir = os.path.dirname(self._file_path)
+        file_name = os.path.basename(self._file_path)
+
+        out_str = json_include.build_json_include(file_dir, file_name)
+        out_dict = ast.literal_eval(out_str)
+
+        return out_dict
+
+    def save(self, asset_files):
+        """
+        Saves shot
+        :return: bool
+        """
+
+        asset_files = python.force_list(asset_files)
+
+        shot_data = {
+            'data_version': self._project.DataVersions.SHOT,
+            'assembler_version': ShotAssembler.VERSION,
+            'files': {}
+        }
+
+        for asset_file in asset_files:
+            asset_file_path = asset_file.asset_file
+            if not os.path.isfile(asset_file_path):
+                artellapipe.logger.warning('Asset File {} does not exists!'.format(asset_file_path))
+                continue
+            rel_path = os.path.relpath(asset_file_path, os.path.dirname(self._file_path))
+            project_path = os.path.relpath(asset_file_path, self._project.get_path())
+            shot_data['files'][project_path] = dict()
+            shot_data['files'][project_path]['...'] = '<{}>'.format(rel_path)
+
+        try:
+            with open(self._file_path, 'w') as f:
+                json.dump(shot_data, f)
+        except Exception as e:
+            artellapipe.logger.error('{} | {}'.format(e, traceback.format_exc()))
 
 
 class ShotAssembler(window.ArtellaWindow, object):
@@ -33,9 +90,12 @@ class ShotAssembler(window.ArtellaWindow, object):
     VERSION = '0.0.1'
     LOGO_NAME = 'shotassembler_logo'
 
+    SHOT_FILE_CLASS = ShotFile
+
     def __init__(self, project):
 
         self._assets = dict()
+        self._shot = None
 
         super(ShotAssembler, self).__init__(
             project=project,
@@ -78,6 +138,7 @@ class ShotAssembler(window.ArtellaWindow, object):
         self._dock_window.main_layout.addWidget(self._shot_hierarchy)
         self._shot_assets_dock = self._dock_window.add_dock(widget=self._shot_assets, name='Assets', pos=Qt.LeftDockWidgetArea)
         self._shot_overrides_dock = self._dock_window.add_dock(widget=self._shot_overrides, name='Overrides', tabify=False, pos=Qt.RightDockWidgetArea)
+        self._shot_overrides_dock.setEnabled(False)
         self.main_layout.addLayout(splitters.SplitterLayout())
         self.main_layout.addWidget(self._generate_btn)
 
@@ -154,12 +215,15 @@ class ShotAssembler(window.ArtellaWindow, object):
         load_icon = artellapipe.resource.icon('open')
         save_icon = artellapipe.resource.icon('save')
         file_menu = menubar.addMenu('File')
-        self.load_action = QAction(load_icon, 'Load', menubar_widget)
-        self.save_action = QAction(save_icon, 'Save', menubar_widget)
-        file_menu.addAction(self.load_action)
-        file_menu.addAction(self.save_action)
+        load_action = QAction(load_icon, 'Load', menubar_widget)
+        save_action = QAction(save_icon, 'Save', menubar_widget)
+        file_menu.addAction(load_action)
+        file_menu.addAction(save_action)
         menubar_layout.addWidget(menubar)
         self.main_layout.addWidget(menubar_widget)
+
+        load_action.triggered.connect(self._on_load_shot)
+        save_action.triggered.connect(self._on_save_shot)
 
         return menubar
 
@@ -177,6 +241,54 @@ class ShotAssembler(window.ArtellaWindow, object):
         asset_nodes = asset.get_nodes()
         for asset_node in asset_nodes:
             self._shot_hierarchy.add_asset(asset_node)
+
+    def _on_load_shot(self):
+        """
+        Internal callback function that is called when Load Shot action is clicked
+        """
+
+        pattern = 'Shot Files (*{})'.format(self._project.shot_extension)
+        shot_file = tp.Dcc.select_file_dialog(title='Select Shot to Load', start_directory=self._project.get_path(), pattern=pattern)
+        if not shot_file:
+            return
+
+        shot_data = self.SHOT_FILE_CLASS(project=self._project, file_path=shot_file).load()
+        if not shot_data:
+            artellapipe.logger.warning('Shot File has no data: {}!'.format(shot_file))
+            return
+
+        shot_files = shot_data.get('files', None)
+        if not shot_files:
+            artellapipe.logger.warning('Shot File has no files: {}!'.format(shot_file))
+            return
+
+        shot_data_version = shot_data['data_version']
+        assembler_version = shot_data['assembler_version']
+        if shot_data_version != self._project.DataVersions.SHOT:
+            artellapipe.logger.warning('Shot File {} is not compatible with current format. Please contact TD!'.format(shot_file))
+            return
+        if assembler_version != self.VERSION:
+            artellapipe.logger.warning('Shot File {} was exported with an older/newer version. Please contact TD!'.format(shot_file))
+            return
+
+        self._shot_assets.load_shot_files(shot_files)
+
+    def _on_save_shot(self):
+        """
+        Internal callback function that is called when Open Shot action is clicked
+        """
+
+        pattern = 'Shot Files (*{})'.format(self._project.shot_extension)
+        shot_file = tp.Dcc.save_file_dialog(title='Save Shot', start_directory=self._project.get_path(), pattern=pattern)
+        if not shot_file:
+            return
+
+        asset_files = self._shot_assets.all_assets()
+        if not asset_files:
+            artellapipe.logger.warning('No Asset Paths to export for Shot. Shot export aborted!')
+            return
+
+        return self.SHOT_FILE_CLASS(project=self._project, file_path=shot_file).save(asset_files=asset_files)
 
     def _on_update_hierarchy(self):
         """
@@ -257,3 +369,4 @@ def run(project):
     win.show()
 
     return win
+

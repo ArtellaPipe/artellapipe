@@ -24,6 +24,7 @@
   "OUTLINER_CATEGORIES": [],
   "SHOT_REGEX": "*",
   "SHOT_FILE_TYPES": [],
+  "SHOT_EXTENSION": ".shot",
   "SHADERS_EXTENSION": ".ashader",
   "PLAYBLAST_PRESETS_URL": ""
 }
