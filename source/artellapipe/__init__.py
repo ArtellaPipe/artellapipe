@@ -92,6 +92,7 @@ def set_project(project_class, project_resource, project_naming_file):
 
     project = project_class(resource=project_resource, naming_file=project_naming_file)
     artellapipe.__dict__[project_class.__name__.lower()] = project
+
     project.init()
 
 

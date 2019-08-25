@@ -131,7 +131,7 @@ class BaseExportList(base.BaseWidget, object):
         if not item:
             return None
 
-        return item.asset
+        return item.asset_item
 
     def _refresh_exporter(self):
         """

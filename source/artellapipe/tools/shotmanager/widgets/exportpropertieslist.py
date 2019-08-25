@@ -161,14 +161,14 @@ class BasePropertiesListWidget(attributes.AttributeEditor, object):
         :param asset_widget: QWidget
         """
 
-        if asset_widget.asset == self._current_asset:
+        if asset_widget.asset_item == self._current_asset:
             return
 
         self.clear_layout(reset_title=False)
 
-        self._current_asset = asset_widget.asset
+        self._current_asset = asset_widget.asset_item
 
-        xform_attrs = tp.Dcc.list_attributes(asset_widget.asset.name)
+        xform_attrs = tp.Dcc.list_attributes(asset_widget.asset_item.name)
         for attr in xform_attrs:
             new_attr = self.add_attribute(attr)
             if self._current_asset.attrs[new_attr.name] is True:
@@ -235,7 +235,7 @@ class BasePropertiesListWidget(attributes.AttributeEditor, object):
             return
 
         if attr_name not in self._current_asset.attrs.keys():
-            artellapipe.logger.warning('Impossible to udpate attribute {} because node {} has no that attribute!'.format(attr_name, self._current_asset.asset))
+            artellapipe.logger.warning('Impossible to udpate attribute {} because node {} has no that attribute!'.format(attr_name, self._current_asset.asset_item))
             return
 
         self._current_asset.attrs[attr_name] = flag

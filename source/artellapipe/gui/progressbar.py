@@ -56,6 +56,14 @@ class ArtellaProgressBar(base.BaseWidget, object):
 
         self._progress.setMaximum(max_value)
 
+    def value(self):
+        """
+        Returns vaue of the progress bar
+        :return: float
+        """
+
+        return self._progress.value()
+
     def set_value(self, value):
         """
         Sets the value of the progress bar

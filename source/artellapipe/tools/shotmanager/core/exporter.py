@@ -100,10 +100,10 @@ class BaseExporter(base.BaseWidget, object):
             return
         asset_widget = asset_widget[0]
 
-        if asset_widget and tp.Dcc.object_exists(asset_widget.asset.name):
+        if asset_widget and tp.Dcc.object_exists(asset_widget.asset_item.name):
             self._properties_widget.update_attributes(asset_widget)
         else:
-            artellapipe.logger.warning('Impossible to update properties because object {} does not exists!'.format(asset_widget.asset))
+            artellapipe.logger.warning('Impossible to update properties because object {} does not exists!'.format(asset_widget.asset_item))
             self._properties_widget.clear_properties()
 
     def _on_clear_properties(self):

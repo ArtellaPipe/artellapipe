@@ -1179,10 +1179,11 @@ class ArtellaProject(object):
         else:
             return self.ASSET_CLASS(project=self, asset_data=asset_data)
 
-    def find_all_assets(self, asset_name=None):
+    def find_all_assets(self, asset_name=None, asset_path=None):
         """
         Returns a list of all assets in the project
         :param asset_name: str, If given, a list with the given item will be returned instead
+        :param asset_path: str, If given, asset will be found in given path
         :return: variant, ArtellaAsset or list(ArtellaAsset)
         """
 
@@ -1201,58 +1202,79 @@ class ArtellaProject(object):
 
         found_assets = list()
 
-        for root, dirs, files in os.walk(assets_path):
-            if dirs and defines.ARTELLA_WORKING_FOLDER in dirs:
-                asset_path = path_utils.clean_path(root)
-                _asset_name = os.path.basename(root)
-
+        if asset_path:
+            if not os.path.isdir(asset_path):
+                artellapipe.logger.warning('Impossible to retrieve asset from non-existent path: {}!'.format(asset_path))
+                return
+            if asset_name:
+                _asset_name = os.path.basename(asset_path)
                 if asset_name and asset_name != _asset_name:
-                    continue
-
-                asset_data_file = self.get_asset_data_file_path(asset_path)
-
-                is_ignored = False
-                for ignored in self._asset_ignored_paths:
-                    if ignored in asset_data_file:
-                        is_ignored = True
-                        break
-
-                if is_ignored:
-                    continue
-
-                if not os.path.isfile(asset_data_file):
-                    artellapipe.logger.warning('Impossible to get info of asset "{}". Please sync it! Skipping it ...'.format(_asset_name))
-                    continue
-
-                asset_data = jsonio.read_file(asset_data_file)
-                asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_NAME_ATTR] = _asset_name
-                asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_PATH_ATTR] = asset_path
-                asset_category = strings.camel_case_to_string(os.path.basename(os.path.dirname(asset_path)))
-
-                if asset_category in self._asset_types:
-                    new_asset = self.create_asset(asset_data=asset_data, category=asset_category)
-                else:
-                    new_asset = self.create_asset(asset_data=asset_data)
-
+                    return
+            new_asset = self.get_asset_from_path(asset_path=asset_path)
+            if new_asset:
                 found_assets.append(new_asset)
+        else:
+            for root, dirs, files in os.walk(assets_path):
+                if dirs and defines.ARTELLA_WORKING_FOLDER in dirs:
+                    _asset_name = os.path.basename(root)
+                    if asset_name and asset_name != _asset_name:
+                        continue
+                    new_asset = self.get_asset_from_path(asset_path=root)
+                    if new_asset:
+                        found_assets.append(new_asset)
 
         return found_assets
 
-    def find_asset(self, asset_name):
+    def find_asset(self, asset_name=None, asset_path=None):
         """
         Returns asset of the project if found
         :param asset_name: str, name of the asset to find
+        :param asset_path: str, path where asset is located in disk
         :return: Asset or None
         """
 
-        asset_founds = self.find_all_assets(asset_name=asset_name)
-        if not asset_founds:
-            return None
-
-        if len(asset_founds) > 0:
-            artellapipe.logger.warning('Found Multiple instances of Asset "{}"'.format(asset_name))
+        asset_founds = self.find_all_assets(asset_name=asset_name, asset_path=asset_path)
+        if len(asset_founds) > 1:
+            artellapipe.logger.warning('Found Multiple instances of Asset "{} | {}"'.format(asset_name, asset_path))
 
         return asset_founds[0]
+
+    def get_asset_from_path(self, asset_path):
+        """
+        Returns asset from the given path
+        :param asset_path: str
+        :return: ArtellaAsset
+        """
+
+        asset_path = path_utils.clean_path(asset_path)
+        _asset_name = os.path.basename(asset_path)
+
+        asset_data_file = self.get_asset_data_file_path(asset_path)
+
+        is_ignored = False
+        for ignored in self._asset_ignored_paths:
+            if ignored in asset_data_file:
+                is_ignored = True
+                break
+
+        if is_ignored:
+            return
+
+        if not os.path.isfile(asset_data_file):
+            artellapipe.logger.warning('Impossible to get info of asset "{}". Please sync it! Skipping it ...'.format(_asset_name))
+            return
+
+        asset_data = jsonio.read_file(asset_data_file)
+        asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_NAME_ATTR] = _asset_name
+        asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_PATH_ATTR] = asset_path
+        asset_category = strings.camel_case_to_string(os.path.basename(os.path.dirname(asset_path)))
+
+        if asset_category in self._asset_types:
+            new_asset = self.create_asset(asset_data=asset_data, category=asset_category)
+        else:
+            new_asset = self.create_asset(asset_data=asset_data)
+
+        return new_asset
 
     def get_tag_info_nodes(self, as_tag_nodes=False):
         """

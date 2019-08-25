@@ -12,8 +12,6 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-from functools import partial
-
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
@@ -50,6 +48,7 @@ class OutlinerTreeItemWidget(base.BaseWidget, object):
         self._item_widget = QFrame()
         self._item_layout = QGridLayout()
         self._item_layout.setContentsMargins(0, 0, 0, 0)
+        self._item_layout.setSpacing(0)
         self._item_widget.setLayout(self._item_layout)
         self.main_layout.addWidget(self._item_widget)
 
@@ -87,13 +86,30 @@ class OutlinerTreeItemWidget(base.BaseWidget, object):
 
         return self._is_selected
 
-    def add_child(self, widget, category):
+    def add_child(self, widget, name):
+        """
+        Adds a new child widget in the item
+        :param widget: QWidget
+        :param name: str
+        """
+
         widget.parent_elem = self
-        self._child_elem[category] = widget
+        self._child_elem[name] = widget
         self.child_layout.addWidget(widget)
 
+    def remove_child(self, name):
+        """
+        Removes child with given name
+        :param name: str
+        """
 
-class OutlinerAssetItem(OutlinerTreeItemWidget, object):
+        if name in self._child_elem:
+            widget = self._child_elem[name]
+            widget.setParent(None)
+            widget.deleteLater()
+
+
+class OutlinerItem(OutlinerTreeItemWidget, object):
 
     ICON_NAME = 'teapot'
     DISPLAY_BUTTONS = None
@@ -106,7 +122,7 @@ class OutlinerAssetItem(OutlinerTreeItemWidget, object):
         self._expand_enable = True
         self._display_buttons = None
 
-        super(OutlinerAssetItem, self).__init__(name=asset_node.get_short_name(), parent=parent)
+        super(OutlinerItem, self).__init__(name=asset_node.get_short_name(), parent=parent)
 
     @property
     def asset_node(self):
@@ -126,18 +142,38 @@ class OutlinerAssetItem(OutlinerTreeItemWidget, object):
 
         return self._expand_enable
 
+    @property
+    def display_buttons(self):
+        """
+        Returns display buttons widget
+        :return: AssetDisplayButtons
+        """
+
+        return self._display_buttons
+
     def mousePressEvent(self, event):
         """
         Overrides base OutlinerTreeItemWidget mousePressEvent function
         :param event: QMouseEvent
         """
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton or event.button() == Qt.RightButton:
             if self.is_selected:
                 self.deselect()
             else:
                 self.select()
             self.clicked.emit(self, event)
+
+    def mouseDoubleClickEvent(self, event):
+        """
+        Overrides base OutlinerTreeItemWidget mouseDoubleClickEvent function
+        :param event: QMouseEvent
+        """
+
+        if event.button() == Qt.LeftButton:
+            if self._display_buttons:
+                self._expand_btn.setChecked(not self._expand_btn.isChecked())
+                self._toggle_children()
 
     def contextMenuEvent(self, event):
         """
@@ -155,7 +191,7 @@ class OutlinerAssetItem(OutlinerTreeItemWidget, object):
         self.contextRequested.emit(self, action)
 
     def ui(self):
-        super(OutlinerAssetItem, self).ui()
+        super(OutlinerItem, self).ui()
 
         self._item_widget.setFrameStyle(QFrame.Raised | QFrame.StyledPanel)
         self._item_widget.setStyleSheet('QFrame { background-color: rgb(55,55,55);}')
@@ -205,8 +241,6 @@ class OutlinerAssetItem(OutlinerTreeItemWidget, object):
 
     def setup_signals(self):
         self._expand_btn.clicked.connect(self._on_toggle_children)
-        if self._display_buttons:
-            self._display_buttons.view_btn.toggled.connect(partial(self.viewToggled.emit, self))
 
     def get_file_widget(self, category):
         """

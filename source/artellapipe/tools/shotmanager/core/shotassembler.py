@@ -31,6 +31,7 @@ from tpQtLib.widgets import splitters
 import artellapipe
 from artellapipe.gui import window, progressbar
 from artellapipe.utils import shader
+from artellapipe.tools.shotmanager.core import override
 from artellapipe.tools.shotmanager.widgets import shothierarchy, shotproperties, shotassetslist, shotoverrides
 from artellapipe.tools.shotmanager.utils import json_include
 
@@ -66,7 +67,8 @@ class ShotFile(object):
         shot_data = {
             'data_version': self._project.DataVersions.SHOT,
             'assembler_version': ShotAssembler.VERSION,
-            'files': {}
+            'files': {},
+            'overrides': {}
         }
 
         for asset_file in asset_files:
@@ -126,7 +128,7 @@ class ShotAssembler(window.ArtellaWindow, object):
         self._shots_props = shotproperties.ShotProps()
         self._shot_hierarchy = shothierarchy.ShotHierarchy()
         self._shot_assets = shotassetslist.ShotAssets(project=self._project)
-        self._shot_overrides = shotoverrides.ShotOverrides()
+        self._shot_overrides = shotoverrides.ShotOverrides(project=self._project)
 
         self._generate_btn = QPushButton('GENERATE SHOT')
         self._generate_btn.setIcon(artellapipe.resource.icon('magic'))
@@ -151,7 +153,8 @@ class ShotAssembler(window.ArtellaWindow, object):
         self._shot_assets.updateHierarchy.connect(self._on_update_hierarchy)
         self._generate_btn.clicked.connect(self._on_generate_shot)
 
-    def get_registered_file_types(self):
+    @staticmethod
+    def registered_file_types():
         """
         Returns a list of registered file types classes
         :return: list
@@ -162,7 +165,8 @@ class ShotAssembler(window.ArtellaWindow, object):
 
         return sys.modules[__name__].__dict__['file_types']
 
-    def get_registered_overrides(self):
+    @staticmethod
+    def registered_overrides():
         """
         Returns a list of registered overrides
         :return: list
@@ -180,8 +184,8 @@ class ShotAssembler(window.ArtellaWindow, object):
 
         self._update_assets()
 
-        file_types = self.get_registered_file_types()
-        overrides = self.get_registered_overrides()
+        file_types = self.registered_file_types()
+        overrides = self.registered_overrides()
 
         if file_types:
             self._shot_assets.set_file_types(file_types)
@@ -272,7 +276,9 @@ class ShotAssembler(window.ArtellaWindow, object):
             artellapipe.logger.warning('Shot File {} was exported with an older/newer version. Please contact TD!'.format(shot_file))
             return
 
-        self._shot_assets.load_shot_files(shot_files)
+        assets_added = self._shot_assets.load_shot_files(shot_files)
+        if assets_added:
+            self._shot_overrides_dock.setEnabled(True)
 
     def _on_save_shot(self):
         """
@@ -318,29 +324,58 @@ class ShotAssembler(window.ArtellaWindow, object):
             artellapipe.logger.warning('No items added to ShotAssembler list!')
             return
 
+        pre_overrides = list()
+        post_overrides = list()
+        for shot_override in self._shot_overrides.get_loaded_overrides():
+            if shot_override.OVERRIDE_STEP == override.OverrideExecutionStep.POST:
+                post_overrides.append(shot_override)
+            else:
+                pre_overrides.append(pre_overrides)
+
         tp.Dcc.new_file()
 
         self._progress.set_minimum(0)
-        self._progress.set_maximum(len(all_hierarchy))
+        self._progress.set_maximum(len(all_hierarchy) + len(pre_overrides) + len(post_overrides) + 3)
+        self._progress.set_value(0)
         self._progress.setVisible(True)
         self._progress.set_text('Generating Shot ...')
         self.repaint()
 
+        self._progress.set_value(self._progress.value() + 1)
+        self._progress.set_text('Applying Pre Load Overrides ...')
+        self.repaint()
+
+        for pre_override in pre_overrides:
+            self._progress.set_value(self._progress.value() + 1)
+            self._progress.set_text('Applying Pre Load Override: {}'.format(pre_override.OVERRIDE_NAME))
+            self.repaint()
+            pre_override.apply(all_hierarchy)
+
         for i, node_asset in enumerate(all_hierarchy):
-            self._progress.set_value(i)
+            self._progress.set_value(self._progress.value() + 1)
             self._progress.set_text('Loading Asset: {}'.format(node_asset.asset_file))
             self.repaint()
             node_asset.load()
+
+        self._progress.set_value(self._progress.value() + 1)
+        self._progress.set_text('Applying Post Load Overrides ...')
+        self.repaint()
+
+        for post_override in post_overrides:
+            self._progress.set_value(self._progress.value() + 1)
+            self._progress.set_text('Applying Post Load Override: {}'.format(post_override.OVERRIDE_NAME))
+            self.repaint()
+            post_override.apply()
 
         tp.Dcc.clear_selection()
 
         tp.Dcc.fit_view(animation=True)
 
-        self._progress.set_value(len(all_hierarchy))
+        self._progress.set_value(self._progress.value() + 1)
         self._progress.set_text('Loading Shaders ...')
         self.repaint()
 
-        shader.load_all_scene_shaders(project=self._project)
+        # shader.load_all_scene_shaders(project=self._project)
 
         self._progress.set_value(0)
         self._progress.set_text('')
@@ -368,7 +403,7 @@ def register_override(cls):
     if 'overrides' not in sys.modules[__name__].__dict__:
         sys.modules[__name__].__dict__['overrides'] = dict()
 
-    sys.modules[__name__].__dict__['overrides'][cls.OVERRIDE_NAME] = cls
+    sys.modules[__name__].__dict__['overrides'][cls.get_clean_name()] = cls
 
 
 def run(project):

@@ -14,10 +14,14 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import string
+import inspect
 
 import tpDccLib as tp
 
 import artellapipe
+from artellapipe.core import defines
+from artellapipe.utils import shader
+from artellapipe.tools.shotmanager.core import shotassembler
 
 
 class ArtellaDCCNode(object):
@@ -271,6 +275,147 @@ class ArtellaDCCNode(object):
                 tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=self.node, tag_info=tag_info)
                 return tag_node
 
+    def load_shaders(self):
+        """
+        Loads all the shaders of current asset node
+        """
+
+        tag_node = self.get_tag_node()
+        if tag_node:
+            shader.load_scene_shaders(project=self._project, tag_nodes=[tag_node])
+        else:
+            artellapipe.logger.warning('Impossible to load shaders on asset: {}'.format(self.base_name))
+
+    def unload_shaders(self):
+        """
+        Unloads all the shaders of current asset node
+        """
+
+        tag_node = self.get_tag_node()
+        if tag_node:
+            shader.unload_shaders(project=self._project, tag_nodes=[tag_node])
+        else:
+            artellapipe.logger.warning('Impossible to unload shaders on asset: {}'.format(self.base_name))
+
+    def has_overrides(self):
+        """
+        Returns whether current node has overrides or not
+        :return: bool
+        """
+
+        user_attrs = tp.Dcc.list_user_attributes(self._node)
+        if not user_attrs:
+            return False
+
+        for user_attr in user_attrs:
+            if user_attr.startswith('{}'.format(defines.ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_PREFX)):
+                return True
+
+        return False
+
+    def get_overrides(self):
+        """
+        Returns overrides of the current asset node
+        :return: list
+        """
+
+        if not self.has_overrides():
+            return None
+
+        overrides = list()
+
+        user_attrs = tp.Dcc.list_user_attributes(self._node)
+        if not user_attrs:
+            return None
+
+        registered_overrides = shotassembler.ShotAssembler.registered_overrides()
+        for user_attr in user_attrs:
+            if user_attr.startswith(defines.ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_PREFX):
+                override_name = user_attr.split(defines.ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_SEPARATOR)
+                if not override_name:
+                    continue
+                override_name = override_name[-1]
+                if override_name in registered_overrides:
+                    override_class = registered_overrides[override_name]
+                    overrides.append(override_class(project=self._project, asset_node=self))
+
+        return overrides
+
+    def has_override(self, override):
+        """
+        Returns current asset node already ahs given override or not
+        :param override: ArtellaBaseOverride
+        :return: bool
+        """
+
+        overrides = self.get_overrides()
+        if not overrides:
+            return False
+
+        for ov in overrides:
+            if ov.OVERRIDE_NAME == override.OVERRIDE_NAME:
+                return True
+
+        return False
+
+    def add_override(self, override_class=None):
+        """
+        Adds a new override to current asset node
+        :param override_class: cls
+        """
+
+        if not override_class:
+            artellapipe.logger.warning('Override creation tool is not working yet. Use Outliner to add overrides for now.')
+            return
+
+        new_override = override_class(project=self._project, asset_node=self)
+        override_added = new_override.add_to_node()
+        if not override_added:
+            return None
+
+        return new_override
+
+    def remove_override(self, override_to_remove):
+        """
+        Removes given override from current asset node
+        :param override_to_remove: variant, cls or ArtellaBaseOverride
+        """
+
+        if not override_to_remove:
+            artellapipe.logger.warning('No override to remove given!')
+            return
+
+        if inspect.isclass(override_to_remove):
+            override_to_remove = override_to_remove(project=self._project, asset_node=self)
+
+        override_removed = override_to_remove.remove_from_node()
+        if override_removed:
+            return override_to_remove
+
+        return False
+
+    def save_override(self, override_to_save, save_path=None):
+        """
+        Exports given override to disk
+        :param override_to_save: variant, cls or ArtellaBaseOverride
+        :param save_path: str
+        """
+
+        if not override_to_save:
+            artellapipe.logger.warning('No Override to save!')
+            return
+
+        override_to_save.save(save_path=save_path)
+
+    def save_all_overrides(self, save_path=None):
+        """
+        Stores all overrides to disk
+        :param save_path: str
+        :return:
+        """
+
+        print('Saving all overrides ...')
+
 
 class ArtellaAssetNode(ArtellaDCCNode, object):
     def __init__(self, project, node=None, **kwargs):
@@ -283,6 +428,7 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         self._asset_path = kwargs.get('path', -1)               # We use -1, to force the asset path update in first use
         self._category = kwargs.get('category', None)
         self._description = kwargs.get('description', '')
+        self._asset = None
 
         self._current_version = None
         self._latest_version = None
@@ -311,6 +457,18 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
             self._asset_path = self._get_asset_path()
 
         return self._asset_path
+
+    @property
+    def asset(self):
+        """
+        Returns asset linked to this node
+        :return: ArtellaAsset
+        """
+
+        if not self._asset:
+            self._asset = self._project.find_asset(asset_path=self._asset_path)
+
+        return self._asset
 
     def get_short_name(self, clean=False):
         """

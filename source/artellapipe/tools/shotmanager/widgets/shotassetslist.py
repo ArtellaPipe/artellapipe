@@ -109,6 +109,7 @@ class ShotAssets(base.BaseWidget, object):
         self.updateHierarchy.emit(asset)
 
     def load_shot_files(self, shot_files):
+        assets_added = False
         for file_name, file_info in shot_files.items():
             file_path = os.path.join(self._project.get_path(), file_name)
             if not os.path.isfile(file_path):
@@ -126,8 +127,11 @@ class ShotAssets(base.BaseWidget, object):
                     if not new_asset_file:
                         artellapipe.logger.warning('Impossible to generate {} asset from {}! Skipping ...'.format(file_type, file_path))
                         break
+                    assets_added = True
                     self.add_asset(new_asset_file)
                     break
+
+        return assets_added
 
     def _update_menu(self):
         """

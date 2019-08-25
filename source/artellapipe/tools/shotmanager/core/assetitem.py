@@ -32,29 +32,29 @@ class ExporterAssetItem(QObject):
     clicked = Signal(QObject, QEvent)
     contextRequested = Signal(QObject, QAction)
 
-    def __init__(self, asset):
+    def __init__(self, asset_node):
         super(ExporterAssetItem, self).__init__()
 
-        self._asset = asset
+        self._asset_node = asset_node
         self._attrs = dict()
 
         self._update_attrs()
 
     @property
-    def asset(self):
-        return self._asset
+    def asset_node(self):
+        return self._asset_node
 
     @property
     def name(self):
-        return self._asset.name
+        return self._asset_node.name
 
     @property
     def short_name(self):
-        return self._asset.get_short_name()
+        return self._asset_node.get_short_name()
 
     @property
     def path(self):
-        return self._asset.asset_path
+        return self._asset_node.asset_path
 
     @property
     def attrs(self):
@@ -68,7 +68,7 @@ class ExporterAssetItem(QObject):
         if self._attrs:
             return
 
-        xform_attrs = tp.Dcc.list_attributes(self._asset.name)
+        xform_attrs = tp.Dcc.list_attributes(self._asset_node.name)
         for attr in xform_attrs:
             if attr in defines.MUST_ATTRS:
                 self._attrs[attr] = True

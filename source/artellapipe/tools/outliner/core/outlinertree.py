@@ -39,17 +39,6 @@ class OutlinerTree(base.BaseWidget, object):
 
         super(OutlinerTree, self).__init__(parent=parent)
 
-    @staticmethod
-    def get_file_widget_by_category(category, parent=None):
-        """
-        Returns file widget by the given categoyr
-        Overrides in specific outliners
-        :param category: str
-        :param parent:
-        """
-
-        return None
-
     def mousePressEvent(self, event):
         """
         Overrides BaseWidget mousePressEvent function
@@ -134,7 +123,7 @@ class OutlinerTree(base.BaseWidget, object):
         self._outliner_layout.setSpacing(0)
         self._outliner_layout.addStretch()
 
-    def refresh_outliner(self):
+    def refresh(self):
         """
         Refresh the items in the outliner
         """
@@ -164,7 +153,7 @@ class OutlinerTree(base.BaseWidget, object):
         :return:
         """
 
-        self.refresh_outliner()
+        self.refresh()
 
     def _on_expand_all_assets(self):
         """
@@ -181,38 +170,3 @@ class OutlinerTree(base.BaseWidget, object):
 
         for asset_widget in self._widget_tree.keys():
             asset_widget.collapse()
-
-    def _on_item_clicked(self, widget, event):
-        if widget is None:
-            artellapipe.solstice.logger.warning('Selected Asset is not valid!')
-            return
-
-        asset_name = widget.asset.name
-        item_state = widget.is_selected
-        if tp.Dcc.object_exists(asset_name):
-            is_modified = event.modifiers() == Qt.ControlModifier
-            if not is_modified:
-                tp.Dcc.clear_selection()
-
-            for asset_widget, file_items in self._widget_tree.items():
-                if asset_widget != widget:
-                    continue
-                if is_modified and widget.is_selected:
-                    tp.Dcc.select_object(asset_widget.asset.name, add=True)
-                else:
-                    asset_widget.deselect()
-                    tp.Dcc.select_object(asset_widget.asset.name, deselect=True)
-
-            widget.set_select(item_state)
-            if not is_modified:
-                tp.Dcc.select_object(asset_name)
-        else:
-            self._on_refresh_outliner()
-
-    def _on_selection_changed(self, *args):
-        selection = tp.Dcc.selected_nodes(full_path=True)
-        for asset_widget, file_items in self._widget_tree.items():
-            if '|{}'.format(asset_widget.asset.name) in selection:
-                asset_widget.select()
-            else:
-                asset_widget.deselect()

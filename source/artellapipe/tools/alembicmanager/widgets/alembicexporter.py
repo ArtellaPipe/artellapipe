@@ -570,7 +570,7 @@ class AlembicExporter(base.BaseWidget, object):
 
     def _on_set_export_path(self):
         """
-        Internal function that is calledd when the user selects the folder icon
+        Internal function that is called when the user selects the folder icon
         Allows the user to select a path to export Alembic group contents
         """
 

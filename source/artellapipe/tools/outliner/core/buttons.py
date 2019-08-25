@@ -13,7 +13,10 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 from Qt.QtWidgets import *
-from Qt.QtGui import *
+
+from tpQtLib.widgets import splitters
+
+import artellapipe
 
 
 class DisplayButtonsWidget(QWidget, object):
@@ -41,6 +44,9 @@ class DisplayButtonsWidget(QWidget, object):
 
 class AssetDisplayButtons(DisplayButtonsWidget, object):
 
+    open_eye_icon = artellapipe.resource.icon('eye')
+    closed_eye_icon = artellapipe.resource.icon('eye_closed')
+
     def __init__(self, parent=None):
         super(AssetDisplayButtons, self).__init__(parent=parent)
 
@@ -49,10 +55,24 @@ class AssetDisplayButtons(DisplayButtonsWidget, object):
         self.setMinimumWidth(25)
 
         self.view_btn = QPushButton()
-        self.view_btn.setIcon(QIcon(QPixmap(':/eye.png')))
+        self.view_btn.setIcon(artellapipe.resource.icon('eye'))
         self.view_btn.setFlat(True)
         self.view_btn.setFixedWidth(25)
-        self.view_btn.setCheckable(True)
-        self.view_btn.setChecked(True)
         self.view_btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
         self.main_layout.addWidget(self.view_btn)
+
+        self.main_layout.addWidget(splitters.get_horizontal_separator_widget())
+
+    def show(self):
+        """
+        Updates icon of the button to show
+        """
+
+        self.view_btn.setIcon(self.open_eye_icon)
+
+    def hide(self):
+        """
+        Updates icon of the button to hide
+        """
+
+        self.view_btn.setIcon(self.closed_eye_icon)

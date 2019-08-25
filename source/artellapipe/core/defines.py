@@ -224,3 +224,8 @@ ARTELLA_DEFAULT_ASSET_FILES_EXTENSION = '.ma'
 # Defines the name of the attribute for tag info
 ARTELLA_TAG_INFO_ATTRIBUTE_NAME = 'tag_info'
 
+# Defines the prefix used to store shot override attributes
+ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_PREFX = 'shot_overrides'
+
+# Defines the split used to separate shot override prefix and shot override name in shot override attributes
+ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_SEPARATOR = '__'

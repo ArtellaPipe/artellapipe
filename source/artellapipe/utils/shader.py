@@ -332,10 +332,10 @@ def load_shader(project, shader_name):
 
 
 @undo_decorator
-def load_scene_shaders(project, load=True, apply=True, tag_nodes=None, tag_info_nodes=None):
+def load_scene_shaders(project, load=True, apply=True, tag_nodes=None):
     """
     Loops through all tag data scene nodes and loads all necessary shaders into the current scene
-    If a specific shader is already loaded, that shader is skipeed
+    If a specific shader is already loaded, that shader is skip
     :return: list<str>, list of loaded shaders
     """
     
@@ -351,22 +351,18 @@ def load_scene_shaders(project, load=True, apply=True, tag_nodes=None, tag_info_
     applied_data = list()
     updated_textures = list()
 
-    if tag_nodes is None:
-        tag_nodes = list()
-    if tag_info_nodes is None:
-        tag_info_nodes = list()
+    if not tag_nodes:
+        tag_nodes = taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
+        tag_info_nodes = project.get_tag_info_nodes(as_tag_nodes=True)
+        tag_nodes.extend(tag_info_nodes)
 
-    if not tag_nodes and not tag_info_nodes:
+    if not tag_nodes:
         artellapipe.logger.error('No tag nodes found in the current scene. Aborting shaders loading ...')
         return None
 
     added_mats = list()
 
-    found_nodes = list()
-    found_nodes.extend(tag_nodes)
-    found_nodes.extend(tag_info_nodes)
-
-    for tag in found_nodes:
+    for tag in tag_nodes:
         shaders = tag.get_shaders()
         if not shaders:
             artellapipe.logger.error('No shaders found for asset: {}'.format(tag.get_asset().node))
@@ -525,29 +521,27 @@ def load_all_scene_shaders(project, load=True, apply=True):
         artellapipe.logger.warning('Shaders loading is only supported in Maya!')
         return
 
-    tag_nodes = taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
-    tag_info_nodes = project.get_tag_info_nodes(as_tag_nodes=True)
-    return load_scene_shaders(project=project, load=load, apply=apply, tag_nodes=tag_nodes, tag_info_nodes=tag_info_nodes)
+    return load_scene_shaders(project=project, load=load, apply=apply)
 
 
 @undo_decorator
-def unload_shaders(project, tag_nodes=None, tag_info_nodes=None):
+def unload_shaders(project, tag_nodes=None):
     """
     Unload shaders applied to assets loaded in current DCC scene or to given ones
     :param tag_nodes:
-    :param tag_info_nodes:
     """
 
     if not tp.is_maya():
         artellapipe.logger.warning('Shaders unloading is only supported in Maya!')
         return
 
-    tag_nodes = tag_nodes if tag_nodes else taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
-    tag_info_nodes = tag_info_nodes if tag_info_nodes else project.get_tag_info_nodes(as_tag_nodes=True)
+    if not tag_nodes:
+        tag_nodes = taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
+        tag_info_nodes = project.get_tag_info_nodes(as_tag_nodes=True)
+        tag_nodes.extend(tag_info_nodes)
 
     found_nodes = list()
     found_nodes.extend(tag_nodes)
-    found_nodes.extend(tag_info_nodes)
 
     for tag in found_nodes:
         shaders = tag.get_shaders()

@@ -26,7 +26,7 @@ import artellapipe
 from artellapipe.gui import window
 
 from artellapipe.tools.outliner.widgets import settings
-
+from artellapipe.utils import shader
 
 class ArtellaOutlinerWidget(QWidget, object):
 
@@ -53,6 +53,7 @@ class ArtellaOutlinerWidget(QWidget, object):
 
         self.ui()
         self._create_outliners()
+        self._init_outliners()
 
     @staticmethod
     def _delete_instances():
@@ -178,6 +179,13 @@ class ArtellaOutlinerWidget(QWidget, object):
         update_refs_action.setIcon(artellapipe.resource.icon('sync_cloud'))
         update_refs_action.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
+        export_overrides_action = QToolButton(self)
+        export_overrides_action.setText('Save Overrides')
+        export_overrides_action.setToolTip('Stores overrides into disk')
+        export_overrides_action.setStatusTip('Stores overrides into disk')
+        export_overrides_action.setIcon(artellapipe.resource.icon('save'))
+        export_overrides_action.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
         settings_action = QToolButton(self)
         settings_action.setText('Settings')
         settings_action.setToolTip('Outliner Settings')
@@ -190,10 +198,12 @@ class ArtellaOutlinerWidget(QWidget, object):
         self._toolbar.addSeparator()
         self._toolbar.addWidget(update_refs_action)
         self._toolbar.addSeparator()
+        self._toolbar.addWidget(export_overrides_action)
+        self._toolbar.addSeparator()
         self._toolbar.addWidget(settings_action)
 
-        # load_scene_shaders_action.clicked.connect(sp.load_shaders)
-        # unload_scene_shaders_action.clicked.connect(sp.unload_shaders)
+        load_scene_shaders_action.clicked.connect(self._on_load_scene_shaders)
+        unload_scene_shaders_action.clicked.connect(self._on_unload_scene_shaders)
         # settings_action.clicked.connect(self.open_settings)
 
     def _create_outliners(self):
@@ -202,6 +212,28 @@ class ArtellaOutlinerWidget(QWidget, object):
         """
 
         pass
+
+    def _init_outliners(self):
+        """
+        Internal function that initializes current outliners
+        """
+
+        for outliner in self._outliners:
+            outliner.refresh()
+
+    def _on_load_scene_shaders(self):
+        """
+        Internal callback function that is called when Load Scene Shaders menubar button is pressed
+        """
+
+        shader.load_scene_shaders(project=self._project)
+
+    def _on_unload_scene_shaders(self):
+        """
+        Internal callback function that is called when Unload Scene Shaders menubar button is pressed
+        """
+
+        shader.unload_shaders(project=self._project)
 
 
 class ArtellaOutliner(window.ArtellaWindow, object):
@@ -220,7 +252,7 @@ class ArtellaOutliner(window.ArtellaWindow, object):
     def ui(self):
         super(ArtellaOutliner, self).ui()
 
-        self._outliner = ArtellaOutlinerWidget()
+        self._outliner = ArtellaOutlinerWidget(project=self._project)
         self.main_layout.addWidget(self._outliner)
 
 
