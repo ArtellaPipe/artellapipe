@@ -105,7 +105,7 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
 
         self._categories_btn_grp = QButtonGroup(self)
         self._categories_btn_grp.setExclusive(True)
-        asset_categories = self._project.asset_types if self._project else list()
+        asset_categories = self._get_asset_categories()
 
         main_layout.addWidget(self._assets_viewer)
 
@@ -196,6 +196,14 @@ class ArtellaAssetsLibraryWidget(QWidget, object):
             return
 
         self._setup_asset_signals(asset_widget)
+
+    def _get_asset_categories(self):
+        """
+        Returns a list with the asset categories supported
+        :return: list(str)
+        """
+
+        return self._project.asset_types if self._project else list()
 
     def _on_asset_clicked(self, asset_widget):
         """

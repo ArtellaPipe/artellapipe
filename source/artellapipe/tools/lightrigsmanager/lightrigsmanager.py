@@ -163,6 +163,7 @@ class LightRig(base.BaseWidget, object):
 
 class ArtellaLightRigManager(window.ArtellaWindow, object):
 
+    VERSION = '0.0.1'
     LOGO_NAME = 'lightrigsmanager_logo'
     LIGHT_RIG_CLASS = LightRig
 

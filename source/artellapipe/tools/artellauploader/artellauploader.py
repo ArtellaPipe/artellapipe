@@ -30,7 +30,8 @@ from artellapipe.gui import window
 
 class ArtellaUploader(window.ArtellaWindow, object):
 
-    LOGO_NAME = 'artella_uploader'
+    VERSION = '0.0.1'
+    LOGO_NAME = 'artellauploader_logo'
 
     def __init__(self, project):
         super(ArtellaUploader, self).__init__(

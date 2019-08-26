@@ -48,7 +48,7 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         super(ArtellaSyncer, self).__init__(
             project=project,
             name='SyncerWindow',
-            title='Artella Syncer',
+            title='Artella Manager',
             size=(800, 1100)
         )
 
