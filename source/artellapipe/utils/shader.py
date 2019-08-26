@@ -105,12 +105,12 @@ class ShadingNetwork(object):
                 #     temp_file, temp_filename = tempfile.mkstemp()
                 #     cls.write(shader_network, temp_filename)
                 #     if filecmp.cmp(out_file, temp_filename):
-                #         sys.solstice.logger.debug('Shader file already exists and have same size. No new shader file will be generated!')
-                #         result = solstice_qt_utils.show_question(None, 'New Shader File Version', 'Shader File {} already exists with same file size! Do you want to upload it to Artella anyways?'.format(shader))
+                #         artellapipe.logger.debug('Shader file already exists and have same size. No new shader file will be generated!')
+                #         result = qtutils.show_question(None, 'New Shader File Version', 'Shader File {} already exists with same file size! Do you want to upload it to Artella anyways?'.format(shader))
                 #         if result == QMessageBox.No:
                 #             upload_new_version = False
                 #     else:
-                #         sys.solstice.logger.debug('Writing shader file: {}'.format(out_file))
+                #         artellapipe.logger.debug('Writing shader file: {}'.format(out_file))
                 #         cls.write(shader_network, out_file)
                 # else:
                 artellalib.lock_file(out_file, force=True)
@@ -259,7 +259,7 @@ class ShadingNetwork(object):
             try:
                 maya.cmds.connectAttr('{0}.{1}'.format(con_node, con_attr), '{0}.{1}'.format(shader_node, attr), force=True)
             except Exception:
-                # sys.solstice.logger.debug('ShaderLibrary: Attribute Connection {0} skipped!'.format(attr))
+                # artellapipe.logger.debug('ShaderLibrary: Attribute Connection {0} skipped!'.format(attr))
                 continue
 
         if 'notes' not in attrs['attr'] and maya.cmds.objExists(shader_node) and maya.cmds.attributeQuery('notes', node=shader_node, exists=True):
@@ -310,7 +310,7 @@ def load_shader(project, shader_name):
 
     shader_library_path = project.get_shaders_path()
     if not os.path.exists(shader_library_path):
-        artellapipe.logger.debug('Solstice Shaders Library folder is not synchronized in your PC. Syncronize it please!')
+        artellapipe.logger.debug('{} Shaders Library folder is not synchronized in your PC. Syncronize it please!'.format(project.name.title()))
         return False
 
     shaders_extension = str(project.shaders_extension)

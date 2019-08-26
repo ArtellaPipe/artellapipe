@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains implementation for Solstice Alembic Groups
+Module that contains implementation for Alembic Groups
 """
 
 from __future__ import print_function, division, absolute_import
@@ -97,7 +97,7 @@ class AlembicGroup(base.BaseWidget, object):
         """
 
         if not tp.is_maya():
-            artellapipe.solstice.logger.warning(
+            artellapipe.logger.warning(
                 'DCC {} does not supports the creation of Alembic groups!'.format(tp.Dcc.get_name()))
             return None
 
@@ -128,7 +128,7 @@ class AlembicGroup(base.BaseWidget, object):
             if res and res == 'Yes':
                 tp.Dcc.delete_object(name)
 
-        artellapipe.solstice.logger.debug('Creating Alembic Group with name: {}'.format(name))
+        artellapipe.logger.debug('Creating Alembic Group with name: {}'.format(name))
 
         full_sel = tp.Dcc.list_relatives(node=sel, all_hierarchy=True, full_path=True) or []
         main_sel = list()
@@ -150,7 +150,6 @@ class AlembicGroup(base.BaseWidget, object):
 
         return cmds.sets(sel, n=name)
 
-    # @solstice_maya_utils.maya_undo
     @staticmethod
     def clean_alembic_groups():
         """
@@ -158,7 +157,7 @@ class AlembicGroup(base.BaseWidget, object):
         """
 
         if not tp.is_maya():
-            artellapipe.solstice.logger.warning(
+            artellapipe.logger.warning(
                 'DCC {} does not supports the creation of Alembic groups!'.format(tp.Dcc.get_name()))
             return None
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains settings widget for Solstice Outliner
+Module that contains settings widget for Artella Outliner
 """
 
 from __future__ import print_function, division, absolute_import
@@ -31,7 +31,7 @@ class ArtellaOutlinerSettings(base.BaseWidget, object):
         super(ArtellaOutlinerSettings, self).ui()
 
         self.save_btn = QPushButton('Save')
-        self.save_btn.setIcon(artellapipe.solstice.resource.icon('save'))
+        self.save_btn.setIcon(artellapipe.resource.icon('save'))
         self.main_layout.addWidget(self.save_btn)
 
     def setup_signals(self):

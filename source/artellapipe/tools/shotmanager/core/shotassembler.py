@@ -233,7 +233,7 @@ class ShotAssembler(window.ArtellaWindow, object):
         self._dock_window = tpQtLib.DockWindow(use_scrollbar=True)
         self._dock_window.centralWidget().show()
 
-        self._shots_props = shotproperties.ShotProps()
+        self._shots_props = shotproperties.ShotProps(project=self._project)
         self._shot_hierarchy = shothierarchy.ShotHierarchy()
         self._shot_assets = shotassetslist.ShotAssets(project=self._project)
         self._shot_overrides = shotoverrides.ShotOverrides(project=self._project)

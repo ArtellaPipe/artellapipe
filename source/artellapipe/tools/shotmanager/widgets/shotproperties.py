@@ -44,7 +44,10 @@ class ShotImage(QWidget, object):
 
 
 class ShotProps(QFrame, object):
-    def __init__(self, parent=None):
+    def __init__(self, project, parent=None):
+
+        self._project = project
+
         super(ShotProps, self).__init__(parent=parent)
 
         self.setMinimumHeight(80)
@@ -55,8 +58,8 @@ class ShotProps(QFrame, object):
         self.setLayout(self.main_layout)
 
         self.shot_img = ShotImage()
-        # self.shot_img.setPixmap(resource.pixmap('solstice_logo', category='images').scaled(QSize(125, 125), Qt.KeepAspectRatio))
-        self.prop_lbl = splitters.Splitter('Solstice')
+        # self.shot_img.setPixmap(resource.pixmap('project_logo', category='images').scaled(QSize(125, 125), Qt.KeepAspectRatio))
+        self.prop_lbl = splitters.Splitter(self._project.name.title())
         self.user_lbl = QLabel(osplatform.get_user())
 
         self.main_layout.addWidget(self.shot_img)

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains outliner item core widgets for Solstice
+Module that contains outliner item core widgets for Artella Outliner
 """
 
 from __future__ import print_function, division, absolute_import
@@ -73,7 +73,7 @@ class OutlinerAssetItem(outlineritems.OutlinerItem, object):
         #         elif 'type' in plug.name():
         #             model_widget = self.get_file_widget(category='model')
         #             if model_widget is None:
-        #                 sys.solstice.logger.warning('Impossible to update type attribute because model wigdet is available!')
+        #                 artellapipe.logger.warning('Impossible to update type attribute because model wigdet is available!')
         #                 return
         #             model_widget.model_buttons.proxy_hires_cbx.setCurrentIndex(plug.asInt())
 

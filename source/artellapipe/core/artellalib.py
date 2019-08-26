@@ -1289,4 +1289,4 @@ if tp.is_maya():
             artellapipe.logger.error('Impossible to load Artella Plugin!')
 else:
     artella = AbstractArtella
-    artellapipe.logger.debug('Using Solstice Abstract Artella Class')
+    artellapipe.logger.debug('Using Abstract Artella Class')

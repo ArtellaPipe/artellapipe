@@ -30,7 +30,7 @@ class StandinManager(window.ArtellaWindow, object):
     def __init__(self, project):
         super(StandinManager, self).__init__(
             project=project,
-            name='SolsticeStandinManager',
+            name='ArtellaStandinManager',
             title='Standin Manager',
             size=(400, 600)
         )

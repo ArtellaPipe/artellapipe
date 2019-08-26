@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains item buttons for Solstice Outliner
+Module that contains item buttons for Outliner
 """
 
 from __future__ import print_function, division, absolute_import

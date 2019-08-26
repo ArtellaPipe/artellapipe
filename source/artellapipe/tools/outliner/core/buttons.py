@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains widget buttons for Solstice Outliners
+Module that contains widget buttons for Artella Outliners
 """
 
 from __future__ import print_function, division, absolute_import

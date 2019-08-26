@@ -42,14 +42,11 @@ class PlayblastPreset(base.BaseWidget, object):
         self._inputs_getter = inputs_getter
 
         super(PlayblastPreset, self).__init__(parent=parent)
-
         presets_folder = project.get_playblast_presets_folder()
         print('PRESETS FOLDER: {}'.format(presets_folder))
-
-        # solstice_presets_folder = os.path.normpath(os.path.join(sp.get_solstice_project_path(), 'Assets', 'Scripts', 'PIPELINE', '__working__', 'PlayblastPresets'))
-        # if not os.path.exists(solstice_presets_folder):
+        # if not os.path.exists(presets_folder):
         #     project.logger.debug('Presets Path not found! Trying to sync through Artella!')
-        #     syncdialog.SolsticeSyncPath(paths=[os.path.dirname(os.path.dirname(solstice_presets_folder))]).sync()
+        #     syncdialog.SyncPath(paths=[os.path.dirname(os.path.dirname(presets_folder))]).sync()
         self.register_preset_path(presets_folder)
 
         self._process_presets()

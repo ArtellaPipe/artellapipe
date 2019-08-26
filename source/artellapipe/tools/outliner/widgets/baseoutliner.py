@@ -81,7 +81,7 @@ class BaseOutliner(outlinertree.OutlinerTree, object):
 
     def _on_item_clicked(self, widget, event):
         if widget is None:
-            artellapipe.solstice.logger.warning('Selected Asset is not valid!')
+            artellapipe.logger.warning('Selected Asset is not valid!')
             return
 
         asset_name = widget.asset_node.name

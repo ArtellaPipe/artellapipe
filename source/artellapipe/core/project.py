@@ -626,7 +626,7 @@ class ArtellaProject(object):
             else:
                 self.logger.warning('Impossible to set Artella environment variable!')
         except Exception as e:
-            self.logger.debug('Error while setting Solstice Environment Variables. Solstice Tools may not work properly!')
+            self.logger.debug('Error while setting {0} Environment Variables. {0} Pipeline Tools may not work properly!'.format(self._name.title()))
             self.logger.error('{} | {}'.format(e, traceback.format_exc()))
 
         icons_paths = [
@@ -1197,7 +1197,7 @@ class ArtellaProject(object):
             return list()
 
         if not self._asset_data_filename:
-            self.logger.warning('Impossible to retrieve Solstice assets because asset data file name is not defined!')
+            self.logger.warning('Impossible to retrieve {} assets because asset data file name is not defined!'.format(self._name.title()))
             return
 
         found_assets = list()

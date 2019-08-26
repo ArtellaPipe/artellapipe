@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains core widgets for Solstice Outliner
+Module that contains core widgets for Artella Outliner
 """
 
 from __future__ import print_function, division, absolute_import

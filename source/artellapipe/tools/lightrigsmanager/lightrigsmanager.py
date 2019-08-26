@@ -177,8 +177,6 @@ class ArtellaLightRigManager(window.ArtellaWindow, object):
     def ui(self):
         super(ArtellaLightRigManager, self).ui()
 
-        self.set_info_url('https://tpoveda.github.io/solstice/solsticepipeline/solsticetools/solsticelightrigmanager/')
-
         buttons_layout = QHBoxLayout()
         buttons_layout.setContentsMargins(0, 0, 0, 0)
         buttons_layout.setSpacing(0)

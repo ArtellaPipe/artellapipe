@@ -135,7 +135,7 @@ class ShaderExporter(QDialog, object):
 
         super(ShaderExporter, self).__init__(parent=parent)
 
-        self.setWindowTitle('Solstice Tools - Shader Exporter')
+        self.setWindowTitle('Shader Exporter')
 
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
