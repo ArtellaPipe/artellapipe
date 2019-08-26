@@ -41,20 +41,51 @@ class ArtellaBaseOverride(object):
     OVERRIDE_EXTENSION = None
     OVERRIDE_STEP = OverrideExecutionStep.POST
 
-    def __init__(self, project, asset_node=None, data=None):
+    def __init__(self, project, asset_node=None, data=None, file_path=None):
         self._project = project
         self._asset_node = asset_node
         self._data = data
+        self._file_path = file_path
 
     @classmethod
-    def create_from_data(cls, data):
+    def create_from_data(cls, project, data, file_path=None):
         """
         Creates a new instance of the override by a given data
+        :param project: ArtellaProject
         :param data: dict
+        :param file_path: str
         :return: ArtellaBaseOverride
         """
 
         raise NotImplementedError('create_from_data not implemented in {}!'.format(cls.__name__))
+
+    @classmethod
+    def create_from_file(cls, project, file_path):
+        """
+        Creates a new instance of the override with the contents of the given file
+        :param project: ArtellaProject
+        :param file_path: str
+        :return:ArtellaBaseOverride
+        """
+
+        file_extension = os.path.splitext(file_path)[-1]
+        if not file_extension:
+            artellapipe.logger.warning('Impossible to load Override File: {}'.format(file_path))
+            return
+
+        if file_extension != cls.OVERRIDE_EXTENSION:
+            return None
+
+        try:
+            with open(file_path, 'r') as f:
+                file_data = json.loads(f.read())
+        except Exception as e:
+            artellapipe.logger.error('Error while loading Override File: {} | {} | {}'.format(file_path, e, traceback.format_exc()))
+            return
+
+        new_override = cls.create_from_data(project=project, data=file_data, file_path=file_path)
+
+        return new_override
 
     @classmethod
     def get_clean_name(cls):
@@ -73,6 +104,15 @@ class ArtellaBaseOverride(object):
         """
 
         return '{}__{}'.format(defines.ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_PREFX, cls.get_clean_name())
+
+    @property
+    def file_path(self):
+        """
+        Returns file path of the current override
+        :return: str
+        """
+
+        return self._file_path
 
     def get_data(self):
         """

@@ -22,6 +22,7 @@ from Qt.QtCore import *
 import tpDccLib as tp
 
 from tpQtLib.core import base
+from tpQtLib.widgets import splitters
 
 import artellapipe
 from artellapipe.tools.shotmanager.core import defines
@@ -178,9 +179,10 @@ class ShotAssetItem(AbstractItemWidget, object):
 
         self._item_layout.addWidget(self._asset_icon, 0, 1, 1, 1)
         self._item_layout.addWidget(self._type_icon, 0, 2, 1, 1)
-        self._item_layout.addWidget(self._asset_lbl, 0, 3, 1, 1)
+        self._item_layout.addWidget(splitters.get_horizontal_separator_widget(), 0, 3, 1, 1)
+        self._item_layout.addWidget(self._asset_lbl, 0, 4, 1, 1)
 
-        self._item_layout.setColumnStretch(3, 5)
+        self._item_layout.setColumnStretch(5, 6)
         self._item_layout.setAlignment(Qt.AlignLeft)
 
         if self._type:

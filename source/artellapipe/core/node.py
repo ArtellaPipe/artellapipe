@@ -256,6 +256,35 @@ class ArtellaDCCNode(object):
 
         return result
 
+    def remove(self):
+
+        if tp.Dcc.node_is_referenced(node=self._node):
+            tp.Dcc.node_unreference(self._node)
+        else:
+            referenced_nodes = list()
+            non_referenced_nodes = list()
+            for n in self.nodes_list:
+                if not tp.Dcc.object_exists(n):
+                    artellapipe.logger.warning('Impossible to remove child node: {}!'.format(n))
+                    continue
+                if tp.Dcc.node_is_referenced(n):
+                    referenced_nodes.append(n)
+                else:
+                    non_referenced_nodes.append(n)
+            non_referenced_nodes.append(self._node)
+
+            for ref_node in referenced_nodes:
+                if not tp.Dcc.object_exists(ref_node):
+                    continue
+                tp.Dcc.node_unreference(ref_node)
+
+            for non_ref_node in non_referenced_nodes:
+                if not tp.Dcc.object_exists(non_ref_node):
+                    continue
+                tp.Dcc.delete_object(non_ref_node)
+
+        return True
+
     def get_tag_node(self):
         """
         Returns tag node associated to this Artella DCC node

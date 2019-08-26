@@ -93,22 +93,38 @@ class ShotAssets(base.BaseWidget, object):
 
         return all_assets
 
-    # def clear_assets(self):
-    #     del self.widgets[:]
-    #     while self._assets_layout.count():
-    #         child = self._assets_layout.takeAt(0)
-    #         if child.widget() is not None:
-    #             child.widget().deleteLater()
-    #
-    #     self._assets_layout.setSpacing(0)
-    #     self._assets_layout.addStretch()
+    def clear_assets(self):
+        """
+        Clears all the assets from the list
+        """
+
+        del self.widgets[:]
+        while self._assets_layout.count():
+            child = self._assets_layout.takeAt(0)
+            if child.widget() is not None:
+                child.widget().deleteLater()
+
+        self._assets_layout.setSpacing(0)
+        self._assets_layout.addStretch()
 
     def add_asset(self, asset):
+        """
+        Adds a new asset into the list
+        :param asset:
+        :return:
+        """
+
         self.widgets.append(asset)
         self._assets_layout.insertWidget(0, asset)
         self.updateHierarchy.emit(asset)
 
     def load_shot_files(self, shot_files):
+        """
+        Loads given files into the Shot Assets List
+        :param shot_files: list
+        :return: list
+        """
+
         assets_added = False
         for file_name, file_info in shot_files.items():
             file_path = os.path.join(self._project.get_path(), file_name)
@@ -116,7 +132,11 @@ class ShotAssets(base.BaseWidget, object):
                 artellapipe.logger.warning('Asset File "{}" does not exists in your computer!'.format(file_path))
                 continue
             file_data = file_info.get('data', None)
-            extra_data = file_info.get('extra', None)
+            if not file_data:
+                file_data = file_info
+                extra_data = None
+            else:
+                extra_data = file_info.get('extra', None)
             if not file_data:
                 artellapipe.logger.warning('Asset File "{}" does not contains any data!'.format(file_path))
                 continue

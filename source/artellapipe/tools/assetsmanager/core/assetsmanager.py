@@ -322,8 +322,6 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
         if not asset_widget or self._is_blocked:
             return
 
-        print(asset_widget.asset.__class__.__name__)
-
         if skip_sync:
             self._show_asset_info(asset_widget)
         else:

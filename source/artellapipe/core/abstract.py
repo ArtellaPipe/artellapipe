@@ -73,23 +73,25 @@ class AbstractAsset(object):
         raise NotImplementedError('get_category function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_file(self, file_type, status, extension=None):
+    def get_file(self, file_type, status, extension=None, fix_path=False):
         """
         Returns file path of the given file type and status
         :param file_type: str
         :param status: str
         :param extension: str
+        :param fix_path: bool
         """
 
         raise NotImplementedError('get_file function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_file(self, file_type, status, extension=None):
+    def get_file(self, file_type, status, extension=None, fix_path=False):
         """
         Returns file path of the given file type and status
         :param file_type: str
         :param status: str
         :param extension: str
+        :param fix_path: bool
         """
 
         raise NotImplementedError('get_file function for {} is not implemented!'.format(self.__class__.__name__))

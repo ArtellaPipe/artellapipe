@@ -41,6 +41,7 @@ class OutlinerAssetItem(outlineritems.OutlinerItem, object):
 
     viewToggled = Signal(object)
     viewSolo = Signal(object, bool)
+    removed = Signal(object)
     overrideAdded = Signal(object, object)
     overrideRemoved = Signal(object, object)
 
@@ -196,6 +197,7 @@ class OutlinerAssetItem(outlineritems.OutlinerItem, object):
         menu.addAction(load_shaders_action)
         menu.addAction(unload_shaders_action)
 
+        remove_action.triggered.connect(self._on_remove)
         load_shaders_action.triggered.connect(self._on_load_shaders)
         unload_shaders_action.triggered.connect(self._on_unload_shaders)
 
@@ -229,21 +231,30 @@ class OutlinerAssetItem(outlineritems.OutlinerItem, object):
 
     def _on_save_all_overrides(self):
         """
-        Internal callback function that is called when Save All Overrides context button is pressed
+        Internal callback function that is called when Save All Overrides context action is triggered
         """
 
         self._asset_node.save_all_overrides()
 
+    def _on_remove(self):
+        """
+        Internal callback function that is called when Delete context action is triggered
+        """
+
+        valid_remove = self._asset_node.remove()
+        if valid_remove:
+            self.removed.emit(self)
+
     def _on_load_shaders(self):
         """
-        Internal callback function that is called when Load Shaders context button is pressed
+        Internal callback function that is called when Load Shaders context action is triggered
         """
 
         self._asset_node.load_shaders()
 
     def _on_unload_shaders(self):
         """
-        Internal callback function that is called when Unload Shaders context button is pressed
+        Internal callback function that is called when Unload Shaders context action is triggered
         """
 
         self._asset_node.unload_shaders()

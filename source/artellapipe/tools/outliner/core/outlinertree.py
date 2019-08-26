@@ -107,7 +107,15 @@ class OutlinerTree(base.BaseWidget, object):
         :param asset: OutlinerItem
         """
 
-        raise NotImplementedError('remove_widget function is not implemente yet!')
+        if asset in self._widgets:
+            for i in range(self._outliner_layout.count()):
+                child = self._outliner_layout.itemAt(i)
+                if child.widget() == asset:
+                    child.widget().deleteLater()
+                    self._widgets.pop(self._widgets.index(asset))
+                    self._widget_tree.pop(asset)
+                    self._outliner_layout.removeItem(child)
+                    break
 
     def clear_items(self):
         """

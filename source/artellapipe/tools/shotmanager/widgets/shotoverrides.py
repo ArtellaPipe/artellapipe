@@ -13,8 +13,6 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-import json
-import traceback
 
 from Qt.QtWidgets import *
 from Qt.QtCore import *
@@ -88,6 +86,69 @@ class ShotOverrides(base.BaseWidget, object):
 
         self._overrides = overrides
 
+    def clear_overrides(self):
+        """
+        Clears all the overrides from the list
+        """
+
+        del self._loaded_overrides[:]
+        while self._overrides_layout.count():
+            child = self._overrides_layout.takeAt(0)
+            if child.widget() is not None:
+                child.widget().deleteLater()
+
+    def add_override(self, override):
+        """
+        Adds a new override into the list
+        :param override:
+        :return:
+        """
+
+        override_widget = ShotOverrideWidget(override=override)
+        override_widget.removed.connect(self._on_remove_override)
+        self._overrides_layout.addWidget(override_widget)
+        self._loaded_overrides.append(override_widget)
+
+    def delete_override(self, override):
+        """
+        Deletes given override from the list
+        :param override:
+        """
+
+        if override in self._loaded_overrides:
+            self._loaded_overrides.pop(self._loaded_overrides.index(override))
+            override.setParent(None)
+            override.deleteLater()
+
+    def load_override_files(self, override_files):
+        """
+        Loads given files into the Shot Overrides List
+        :param shot_files: list
+        :return: list
+        """
+
+        overrides_added = False
+        for file_name, file_data in override_files.items():
+            file_path = os.path.join(self._project.get_path(), file_name)
+            if not os.path.isfile(file_path):
+                artellapipe.logger.warning('Override File "{}" does not exists in your computer!'.format(file_path))
+                continue
+            if not file_data:
+                artellapipe.logger.warning('Override File "{}" does not contains any data!'.format(file_path))
+                continue
+            file_extension = os.path.splitext(file_path)[-1]
+            for override_name, override in self._overrides.items():
+                if override.OVERRIDE_EXTENSION == file_extension:
+                    new_override_file = override.create_from_file(project=self._project, file_path=file_path)
+                    if not new_override_file:
+                        artellapipe.logger.warning('Impossible to generate {} override from {}! Skipping ...'.format(override_name, file_path))
+                        break
+                    overrides_added = True
+                    self.add_override(new_override_file)
+                    break
+
+        return overrides_added
+
     def _on_load_overrides(self):
         """
         Internal callback function that is called when Load Overrides button is clicked
@@ -111,22 +172,21 @@ class ShotOverrides(base.BaseWidget, object):
 
         override_files = overrides_dlg.selectedFiles()
         for override_file in override_files:
-            try:
-                with open(override_file, 'r') as f:
-                    file_data = json.loads(f.read())
-            except Exception as e:
-                artellapipe.logger.error('Error while loading Override File: {} | {} | {}'.format(override_file, e, traceback.format_exc()))
-
-            file_extension = os.path.splitext(override_file)[-1]
-            if not file_extension:
-                artellapipe.logger.warning('Impossible to load Override File: {}'.format(override_file))
-                continue
             for override_name, override in self._overrides.items():
-                if override.OVERRIDE_EXTENSION == file_extension:
-                    new_override = override.create_from_data(project=self._project, data=file_data)
-                    override_widget = ShotOverrideWidget(override=new_override)
-                    self._overrides_layout.addWidget(override_widget)
-                    self._loaded_overrides.append(override_widget)
+                new_override = override.create_from_file(project=self._project, file_path=override_file)
+                if not new_override:
+                    continue
+                self.add_override(override=new_override)
+
+    def _on_remove_override(self, override_to_delete):
+        """
+        Internal callback function that is called when an overrides needs to be deleted
+        """
+
+        if not override_to_delete:
+            return
+
+        self.delete_override(override_to_delete)
 
     def _update_menu(self):
         pass
@@ -144,6 +204,8 @@ class ShotOverrides(base.BaseWidget, object):
 
 
 class ShotOverrideWidget(base.BaseWidget, object):
+
+    removed = Signal(object)
 
     def __init__(self, override, parent=None):
 
@@ -176,9 +238,6 @@ class ShotOverrideWidget(base.BaseWidget, object):
         self._editor_btn = QPushButton('Editor')
         self._editor_btn.setFlat(True)
         self._editor_btn.setIcon(artellapipe.resource.icon('editor'))
-        self._save_btn = QPushButton()
-        self._save_btn.setFlat(True)
-        self._save_btn.setIcon(artellapipe.resource.icon('save'))
         self._delete_btn = QPushButton()
         self._delete_btn.setFlat(True)
         self._delete_btn.setIcon(artellapipe.resource.icon('delete'))
@@ -189,12 +248,10 @@ class ShotOverrideWidget(base.BaseWidget, object):
         self._item_layout.addWidget(splitters.get_horizontal_separator_widget(), 0, 4, 1, 1)
         self._item_layout.addWidget(self._editor_btn, 0, 5, 1, 1)
         self._item_layout.setColumnStretch(6, 7)
-        self._item_layout.addWidget(self._save_btn, 0, 8, 1, 1)
-        self._item_layout.addWidget(self._delete_btn, 0, 9, 1, 1)
+        self._item_layout.addWidget(self._delete_btn, 0, 8, 1, 1)
 
     def setup_signals(self):
         self._editor_btn.clicked.connect(self._on_open_override_editor)
-        self._save_btn.clicked.connect(self._on_save_override)
         self._delete_btn.clicked.connect(self._on_remove_override)
 
     def _on_open_override_editor(self):
@@ -202,26 +259,11 @@ class ShotOverrideWidget(base.BaseWidget, object):
         Internal callback function that is called when Editor button is pressed
         """
 
-        pass
-        # self._override.show_editor()
-
-    def _on_save_override(self):
-        """
-        Internal callback function that is called when Save button is pressed
-        """
-
-        pass
-        # return self._override.save()
+        self._override.show_editor()
 
     def _on_remove_override(self):
         """
         Internal callback function that is called when Remove button is pressed
         """
 
-        pass
-
-        # valid_remove = self._override.remove_from_node()
-        # if valid_remove:
-        #     self.removed.emit()
-        #
-        # return self._override
+        self.removed.emit(self)
