@@ -1257,6 +1257,7 @@ class ArtellaSyncQueueWidget(base.BaseWidget, object):
         buttons_layout.setContentsMargins(0, 0, 0, 0)
         buttons_layout.setSpacing(2)
         self._sync_subfolders_cbx = QCheckBox('Sync Subfolders?')
+        self._sync_subfolders_cbx.setChecked(True)
         self._sync_subfolders_cbx.setMaximumWidth(110)
         self._sync_btn = QPushButton('Sync')
         buttons_layout.addWidget(self._sync_subfolders_cbx)

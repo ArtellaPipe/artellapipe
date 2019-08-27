@@ -27,6 +27,7 @@ from artellapipe.core import userinfo
 
 class ArtellaAssetsManager(window.ArtellaWindow, object):
 
+    VERSION = '0.0.1'
     LOGO_NAME = 'assetsmanager_logo'
     USER_INFO_CLASS = userinfo.UserInfo
     ASSET_WIDGET_CLASS = assetswidget.AssetsWidget

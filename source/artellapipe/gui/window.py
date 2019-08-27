@@ -104,7 +104,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         self._project = project
 
         if self._project:
-            name = '{}{}'.format(self._project.name.title(), name)
+            name = '{}{}'.format(self._project.name.title(), name).replace(' ', '')
             title = '{} - {} - {}'.format(self._project.name.title(), title, self.VERSION)
         else:
             name = 'ArtellaWindow'

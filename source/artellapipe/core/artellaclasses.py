@@ -443,6 +443,8 @@ class ArtellaFileMetaData(object):
 
         if file_dict['data']:
             for name, data in file_dict['data'].items():
+                if type(data) != dict:
+                    continue
                 self._name = data['name']
                 self._relative_path = data['relative_path']
 
