@@ -107,6 +107,10 @@ class PlayblastPreset(base.BaseWidget, object):
         self._presets.currentIndexChanged.connect(self.load_active_preset)
         self._open_templates_folder_btn.clicked.connect(self.open_templates_folder)
 
+    @property
+    def presets(self):
+        return self._presets
+
     def get_inputs(self, as_preset=False):
         if as_preset:
             return {}
