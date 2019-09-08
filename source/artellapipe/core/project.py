@@ -16,8 +16,10 @@ import os
 import re
 import sys
 import json
+import time
 import locale
 import tempfile
+import datetime
 import traceback
 import webbrowser
 try:
@@ -54,6 +56,7 @@ class ArtellaProject(object):
     SYNC_FILES_DIALOG_CLASS = syncdialog.ArtellaSyncFileDialog
     SYNC_PATHS_DIALOG_CLASS = syncdialog.ArtellaSyncPathDialog
     TAG_NODE_CLASS = asset.ArtellaTagNode
+    LAUNCHER_PLUGINS_PATH = list()
     PROJECT_PATH = artellapipe.get_project_path()
     PROJECT_CONFIG_PATH = artellapipe.get_project_config_path()
     PROJECT_CHANGELOG_PATH = artellapipe.get_project_changelog_path()
@@ -426,13 +429,15 @@ class ArtellaProject(object):
         if force_skip_hello:
             os.environ['ARTELLA_PIPELINE_SHOW'] = ''
 
+        self.update_paths()
+        self.set_environment_variables()
+
         if tp.Dcc.get_name() != tp.Dccs.Unknown:
-            self.update_paths()
-            self.set_environment_variables()
             self.create_shelf()
             self.create_menu()
             self._tray = self.create_tray()
-            self.update_project()
+
+        self.update_project()
 
     def get_version(self):
         """
@@ -618,6 +623,10 @@ class ArtellaProject(object):
         self.logger.debug('Initializing environment variables for: {}'.format(self.name))
 
         try:
+            if tp.Dcc.get_name() == tp.Dccs.Unknown:
+                mtime = time.time()
+                date_value = datetime.datetime.fromtimestamp(mtime)
+                artellalib.get_spigot_client(app_identifier='{}.{}'.format(self._name.title(), date_value.year))
             artellalib.update_local_artella_root()
             artella_var = os.environ.get(defines.ARTELLA_ROOT_PREFIX, None)
             self.logger.debug('Artella environment variable is set to: {}'.format(artella_var))
@@ -633,7 +642,7 @@ class ArtellaProject(object):
             artellapipe.resource.RESOURCES_FOLDER,
             self.resource.RESOURCES_FOLDER
         ]
-
+        
         current_paths = list()
         if os.environ.get('XBMLANGPATH'):
             if osplatform.is_mac():
