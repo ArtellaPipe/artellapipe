@@ -235,7 +235,7 @@ def close_all_artella_app_processes(console):
         artellapipe.logger.error('Impossible to close Artella app instances because psutil library is not available!')
         return False
 
-def connect_artella_app_to_spigot(cli=None):
+def connect_artella_app_to_spigot(cli=None, app_identifier=None):
     """
     Creates a new Spigot Client instance and makes it to listen
     to our current installed (and launched) Artella app
@@ -256,6 +256,8 @@ def connect_artella_app_to_spigot(cli=None):
         cli = get_spigot_client()
 
     artella_app_identifier = get_artella_app_identifier()
+    if not artella_app_identifier and app_identifier:
+        artella_app_identifier = app_identifier
 
     if tp.is_maya():
         pass_msg_fn = artella.passMsgToMainThread
@@ -264,11 +266,11 @@ def connect_artella_app_to_spigot(cli=None):
             from tpHoudiniLib.core import helpers
             main_thread_fn = helpers.get_houdini_pass_main_thread_function()
             main_thread_fn(get_handle_msg, json_msg)
-
         pass_msg_fn = pass_msg_to_main_thread
     else:
-        artellapipe.logger.error('Impossible to connect Artella to Spigot!')
-        return
+        def pass_msg(json_msg):
+            get_handle_msg(json_msg)
+        pass_msg_fn = pass_msg
 
     cli.listen(artella_app_identifier, pass_msg_fn)
 
@@ -293,7 +295,7 @@ def load_artella_maya_plugin():
     return False
 
 
-def get_spigot_client():
+def get_spigot_client(app_identifier=None):
     """
     Creates, connects and returns an instance of the Spigot client
     :return: SpigotClient
@@ -306,7 +308,7 @@ def get_spigot_client():
             gui.force_stack_trace_on()
         from am.artella.spigot.spigot import SpigotClient
         spigot_client = SpigotClient()
-        connect_artella_app_to_spigot(spigot_client)
+        connect_artella_app_to_spigot(spigot_client, app_identifier=app_identifier)
     return spigot_client
 
 
@@ -451,19 +453,7 @@ def get_cms_uri(path):
         return path
 
     path = os.path.normpath(path)
-
-    cms_uri = None
-    if tp.is_maya():
-        cms_uri = artella.getCmsUri(path)
-    elif tp.is_houdini():
-        path_parts = re.split(r'[/\\]', path)
-        while len(path_parts):
-            path_part = path_parts.pop(0)
-            if path_part == '_art':
-                relative_path = '/'.join(path_parts)
-                cms_uri = relative_path
-                break
-
+    cms_uri = artella.getCmsUri(path)
     if not cms_uri:
         artellapipe.logger.error('Unable to get CMS uri from path: {0}'.format(path))
         return False
