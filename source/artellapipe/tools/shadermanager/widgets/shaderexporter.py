@@ -55,7 +55,7 @@ class ArtellaShaderExporterWidget(QWidget, object):
         main_layout.setAlignment(Qt.AlignLeft)
         self.setLayout(main_layout)
 
-        if tp.Dcc.objExists(shader_name):
+        if tp.Dcc.object_exists(shader_name):
             self._shader_swatch = maya_shader.get_shader_swatch(self._name)
             main_layout.addWidget(self._shader_swatch)
 
