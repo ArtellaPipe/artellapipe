@@ -30,11 +30,11 @@ class CollectAssetsPlugin(pyblish.api.ContextPlugin):
             tag_types = tag_node.get_types()
             if not tag_types:
                 continue
-            tag_types_split = tag_types.split()
-            if not tag_types_split:
-                continue
+            # tag_types_split = tag_types.split()
+            #             # if not tag_types_split:
+            #             #     continue
 
-            for tag_type in tag_types_split:
+            for tag_type in tag_types:
                 instance = context.create_instance(asset_node.name)
                 instance.data['node'] = asset_node
                 instance.data['family'] = tag_type

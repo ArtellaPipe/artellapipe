@@ -134,8 +134,17 @@ class ArtellaLocalTreeView(QTreeView, object):
         self.setRootIndex(index)
         self.setItemsExpandable(True)
 
-        self.selectionModel().selectionChanged.connect(self._on_selection_changed)
         self._model.directoryLoaded.connect(self._on_data_loaded)
+
+    def selectionChanged(self, selected, deselected):
+        """
+        Overrides base QTreeView selectionChanged function
+        This function is called anytime model selection changes
+        :param selected: QItemSelection
+        :param deselected: QItemSelection
+        """
+
+        self._on_selection_changed()
 
     def _create_item_menu(self, item_path):
         """
