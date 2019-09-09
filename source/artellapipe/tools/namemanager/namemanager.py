@@ -155,6 +155,30 @@ class Template(object):
     def data(self):
         return self.__dict__
 
+    def parse(self, path_to_parse):
+        """
+        Parses given path
+        :param path_to_parse: str
+        :return: list(str)
+        """
+
+        try:
+            temp = lucidity.Template(self.name, self.pattern)
+            return temp.parse(path_to_parse)
+        except Exception:
+            artellapipe.logger.warning('Given Path: {} does not match template pattern: {} | {}!'.format(path_to_parse, self.name, self.pattern))
+            return None
+
+    def format(self, template_data):
+        """
+        Returns proper path with the given dict data
+        :param template_data: dict(str, str)
+        :return: str
+        """
+
+        temp = lucidity.Template(self.name, self.pattern)
+        return temp.format(template_data)
+
 
 class NameWidget(nameit.NameIt, object):
 
@@ -283,8 +307,6 @@ class NameWidget(nameit.NameIt, object):
         while self.template_tokens_layout.itemAtPosition(row, 0) is not None:
             row += 1
 
-        print(template_token_name, template_token_data)
-
         self.template_tokens_layout.addWidget(QLabel(template_token_name), row, 0)
         self.template_tokens_layout.addWidget(QLabel(template_token_data.get('description', '') if template_token_data else '< NOT FOUND >'), row, 1)
 
@@ -306,16 +328,11 @@ class NameWidget(nameit.NameIt, object):
 
         self._clear_template_tokens()
 
-        found_tokens = list()
-        not_found_tokens = list()
         for token in temp_tokens:
             if token in template_tokens_names:
                 self._add_template_token(token, template_tokens_dict[token])
             else:
                 self._add_template_token(token)
-
-
-
 
     def on_change_tab(self, tab_index):
         """
@@ -428,6 +445,40 @@ class NameManager(window.ArtellaWindow, object):
     @property
     def nameit(self):
         return self._name_widget
+
+
+def parse_template(template_name, path_to_parse):
+    """
+    Parses given path in the given template
+    :param template_name: str
+    :param path_to_parse: str
+    :return: list(str)
+    """
+
+    templates = NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
+    if not templates:
+        return False
+
+    for template in templates:
+        if template.name == template_name:
+            return template.parse(path_to_parse)
+
+    return None
+
+
+def check_template_validity(template_name, path_to_check):
+    """
+    Returns whether given path matches given pattern or not
+    :param template_name: str
+    :param path_to_check: str
+    :return: bool
+    """
+
+    parse = parse_template(template_name, path_to_check)
+    if parse is not None and type(parse) is dict:
+        return True
+
+    return False
 
 
 def run(project):
