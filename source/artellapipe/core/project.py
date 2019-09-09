@@ -989,6 +989,8 @@ class ArtellaProject(object):
         """
 
         if not file_path:
+            file_path = tp.Dcc.scene_name()
+        if not file_path:
             return
 
         file_path = self.fix_path(file_path)
@@ -1015,6 +1017,8 @@ class ArtellaProject(object):
         """
 
         if not file_path:
+            file_path = tp.Dcc.scene_name()
+        if not file_path:
             return
 
         file_path = self.fix_path(file_path)
@@ -1024,13 +1028,51 @@ class ArtellaProject(object):
 
         if warn_user:
             msg = 'If changes in file: \n\n{}\n\n are not submitted to Artella yet, submit them before unlocking the file please. \n\n Do you want to continue?'.format(file_path)
-            res = tp.Dcc.confirm_dialog(title='Unlock File', message=msg, button=['Yes', 'No'], cancel_button='No', dismiss_string='No')
+            res = tp.Dcc.confirm_dialog(title='Unlock File', message=msg, button=['Yes', 'No'], default_button='Yes', cancel_button='No', dismiss_string='No')
             if res != tp.Dcc.DialogResult.Yes:
                 return False
 
         artellalib.unlock_file(file_path=file_path)
         if notify:
             self.tray.show_message(title='Unlock File', msg='File unlocked successfully!')
+
+        return True
+
+    def check_lock_status(self, file_path=None, show_message=False):
+        """
+        Returns the current lock status of the file in Artella
+        :param file_path: stro
+        :param show_message: bool
+        :return: bool
+        """
+
+        if not file_path:
+            file_path = tp.Dcc.scene_name()
+        if not file_path:
+            return
+
+        file_path = self.fix_path(file_path)
+        valid_path = self._check_file_path(file_path)
+        if not valid_path:
+            return False
+
+        in_edit_mode, is_locked_by_me = artellalib.is_locked(file_path=file_path)
+        if not in_edit_mode:
+            msg = 'File is not locked!'
+            color = 'white'
+        else:
+            if is_locked_by_me:
+                msg = 'File locked by you!'
+                color = 'green'
+            else:
+                msg = 'File locked by other user!'
+                color = 'red'
+
+        if show_message:
+            tp.Dcc.show_message_in_viewport(msg=msg, color=color)
+
+        if not in_edit_mode:
+            return False
 
         return True
 
