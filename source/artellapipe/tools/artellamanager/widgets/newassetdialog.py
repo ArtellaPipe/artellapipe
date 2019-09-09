@@ -116,14 +116,15 @@ class ArtellaNewAssetDialog(dialog.ArtellaDialog, object):
         if not asset_name:
             return
 
-        artellalib.create_asset(asset_name, self._asset_path)
-
-        for file_name, cbx in self._folders_to_create.items():
+        self._project.create_asset(asset_name, self._asset_path)
+        folders_to_create = list()
+        for folder_name, cbx in self._folders_to_create.items():
             if cbx.isChecked():
-                file_path = path_utils.clean_path(os.path.join(self._asset_path, asset_name, defines.ARTELLA_WORKING_FOLDER))
-                artellalib.new_folder(file_path, file_name)
+                folders_to_create.append(folder_name)
 
-        return True
+        valid_create = self._project.create_asset_in_artella(asset_name, self._asset_path, folders_to_create=folders_to_create)
+
+        return valid_create
 
     def _on_create_asset(self):
         """

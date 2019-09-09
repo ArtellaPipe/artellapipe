@@ -614,7 +614,7 @@ class ArtellaLocalSyncTree(QTreeWidget, object):
         return data
 
 
-class ArtellaPathSyncWidget(base.BaseWidget, object):
+class ArtellaLocalManagerWidget(base.BaseWidget, object):
 
     syncOk = Signal(str)
     syncFailed = Signal(str)
@@ -624,10 +624,10 @@ class ArtellaPathSyncWidget(base.BaseWidget, object):
 
         self._project = project
 
-        super(ArtellaPathSyncWidget, self).__init__(parent=parent)
+        super(ArtellaLocalManagerWidget, self).__init__(parent=parent)
 
     def ui(self):
-        super(ArtellaPathSyncWidget, self).ui()
+        super(ArtellaLocalManagerWidget, self).ui()
 
         self._toolbar = QToolBar()
         self.main_layout.addWidget(self._toolbar)

@@ -24,7 +24,7 @@ from artellapipe.gui import window
 
 import artellapipe
 from artellapipe.tools.bugtracker import bugtracker
-from artellapipe.tools.artellamanager.widgets import localsync, serversync, urlsync, newassetdialog
+from artellapipe.tools.artellamanager.widgets import localmanager, servermanager, urlsync, newassetdialog
 
 
 class ArtellaSyncerMode(object):
@@ -34,10 +34,15 @@ class ArtellaSyncerMode(object):
     URL = 'url'
 
 
-class ArtellaSyncer(window.ArtellaWindow, object):
+class ArtellaManager(window.ArtellaWindow, object):
 
     VERSION = '0.0.1'
     LOGO_NAME = 'manager_logo'
+
+    LOCAL_MANAGER = localmanager.ArtellaLocalManagerWidget
+    SERVER_MANAGER = servermanager.ArtellaServerManagerwidget
+    URL_SYNC = urlsync.ArtellaURLSyncWidget
+    NEW_ASSET_DIALOG = newassetdialog.ArtellaNewAssetDialog
 
     def __init__(self, project, mode=ArtellaSyncerMode.ALL):
 
@@ -46,7 +51,7 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         self._server_widget = None
         self._url_widget = None
 
-        super(ArtellaSyncer, self).__init__(
+        super(ArtellaManager, self).__init__(
             project=project,
             name='SyncerWindow',
             title='Artella Manager',
@@ -62,28 +67,28 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         return main_layout
 
     def ui(self):
-        super(ArtellaSyncer, self).ui()
+        super(ArtellaManager, self).ui()
 
         self._tab = QTabWidget()
         self.main_layout.addWidget(self._tab)
 
         if ArtellaSyncerMode.ALL in self._mode:
-            self._local_widget = localsync.ArtellaPathSyncWidget(project=self._project)
-            self._server_widget = serversync.ArtellaSyncWidget(project=self._project)
-            self._url_widget = urlsync.ArtellaURLWidget(project=self._project)
+            self._local_widget = self.LOCAL_MANAGER(project=self._project)
+            self._server_widget = self.SERVER_MANAGER(project=self._project)
+            self._url_widget = self.URL_SYNC(project=self._project)
             self._tab.addTab(self._local_widget, 'Local')
             self._tab.addTab(self._server_widget, 'Server')
             self._tab.addTab(self._url_widget, 'URL')
         else:
             widgets_to_add = list()
             if ArtellaSyncerMode.LOCAL in self._mode:
-                self._local_widget = localsync.ArtellaPathSyncWidget(project=self._project)
+                self._local_widget = self.LOCAL_MANAGER(project=self._project)
                 widgets_to_add.append(('Local', self._local_widget))
             if ArtellaSyncerMode.SERVER in self._mode:
-                self._server_widget = serversync.ArtellaSyncWidget(project=self._project)
+                self._server_widget = self.SERVER_MANAGER(project=self._project)
                 widgets_to_add.append(('Server', self._server_widget))
             if ArtellaSyncerMode.URL in self._mode:
-                self._url_widget = urlsync.ArtellaURLWidget(project=self._project)
+                self._url_widget = self.URL_SYNC(project=self._project)
                 widgets_to_add.append(('URL', self._url_widget))
 
             for widget in widgets_to_add:
@@ -145,7 +150,7 @@ class ArtellaSyncer(window.ArtellaWindow, object):
         self.show_error_message(error_msg)
 
     def _on_create_new_asset(self, item):
-        new_asset_dlg = newassetdialog.ArtellaNewAssetDialog(project=self._project, asset_path=item.get_path())
+        new_asset_dlg = self.NEW_ASSET_DIALOG(project=self._project, asset_path=item.get_path())
         self._lightbox = lightbox.Lightbox(self)
         self._lightbox.set_widget(new_asset_dlg)
         self._lightbox.show()
@@ -153,7 +158,7 @@ class ArtellaSyncer(window.ArtellaWindow, object):
 
 
 def run(project, mode=ArtellaSyncerMode.ALL):
-    win = ArtellaSyncer(project=project, mode=mode)
+    win = ArtellaManager(project=project, mode=mode)
     win.show()
 
     return win

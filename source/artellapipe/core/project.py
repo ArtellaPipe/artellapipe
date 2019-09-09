@@ -1221,6 +1221,26 @@ class ArtellaProject(object):
         else:
             return self.ASSET_CLASS(project=self, asset_data=asset_data)
 
+    def create_asset_in_artella(self, asset_name, asset_path, folders_to_create=None):
+        """
+        Creates a new asset in Artella
+        :param asset_name: str
+        :param asset_path: str
+        :param folders_to_create: list(str) or None
+        """
+
+        valid_create = artellalib.create_asset(asset_name, asset_path)
+        if not valid_create:
+            artellapipe.logger.warning('Impossible to create Asset {} in Path: {}!'.format(asset_name, asset_path))
+            return
+
+        if folders_to_create:
+            for folder_name in folders_to_create:
+                file_path = path_utils.clean_path(os.path.join(asset_path, asset_name, defines.ARTELLA_WORKING_FOLDER))
+                artellalib.new_folder(file_path, folder_name)
+
+        return True
+
     def find_all_assets(self, asset_name=None, asset_path=None):
         """
         Returns a list of all assets in the project

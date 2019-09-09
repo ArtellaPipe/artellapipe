@@ -25,7 +25,7 @@ from artellapipe.gui import progressbar
 from artellapipe.tools.bugtracker import bugtracker
 
 
-class ArtellaURLWidget(base.BaseWidget, object):
+class ArtellaURLSyncWidget(base.BaseWidget, object):
 
     syncOk = Signal(str)
     syncFailed = Signal(str)
@@ -35,10 +35,10 @@ class ArtellaURLWidget(base.BaseWidget, object):
 
         self._project = project
 
-        super(ArtellaURLWidget, self).__init__(parent=parent)
+        super(ArtellaURLSyncWidget, self).__init__(parent=parent)
 
     def ui(self):
-        super(ArtellaURLWidget, self).ui()
+        super(ArtellaURLSyncWidget, self).ui()
 
         url_layout = QHBoxLayout()
         url_layout.setContentsMargins(2, 2, 2, 2)

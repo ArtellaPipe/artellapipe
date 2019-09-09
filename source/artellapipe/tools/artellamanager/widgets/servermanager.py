@@ -22,6 +22,8 @@ from Qt.QtWidgets import *
 
 from tpPyUtils import python
 
+import tpDccLib as tp
+
 from tpQtLib.core import base
 from tpQtLib.widgets import stack, breadcrumb, treewidgets
 
@@ -40,7 +42,7 @@ class ArtellaSyncWaiter(waiter.ArtellaWaiter, object):
         return None
 
 
-class ArtellaSyncWidget(base.BaseWidget, object):
+class ArtellaServerManagerwidget(base.BaseWidget, object):
 
     workerFailed = Signal(str, str)
     syncOk = Signal(str)
@@ -59,10 +61,10 @@ class ArtellaSyncWidget(base.BaseWidget, object):
         self._trees = dict()
         self._last_add = None
 
-        super(ArtellaSyncWidget, self).__init__(parent=parent)
+        super(ArtellaServerManagerwidget, self).__init__(parent=parent)
 
     def ui(self):
-        super(ArtellaSyncWidget, self).ui()
+        super(ArtellaServerManagerwidget, self).ui()
 
         self._toolbar = QToolBar()
         self.main_layout.addWidget(self._toolbar)
@@ -661,6 +663,9 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
         queue_icon = artellapipe.resource.icon('queue')
         teapot_icon = artellapipe.resource.icon('teapot')
         eye_icon = artellapipe.resource.icon('eye')
+        open_icon = artellapipe.resource.icon('open')
+        import_icon = artellapipe.resource.icon('import')
+        reference_icon = artellapipe.resource.icon('reference')
 
         open_in_artella_action = QAction(artella_icon, 'Open in Artella', context_menu, statusTip='Open Item in Artella')
         add_to_sync_queue_action = QAction(queue_icon, 'Add to Sync Queue', context_menu, statusTip='Add item to Artella Syncer queue')
@@ -673,10 +678,30 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
         view_locally_action.triggered.connect(partial(self._on_view_locally, item))
 
         context_menu.addAction(open_in_artella_action)
+
+        dcc_name = tp.Dcc.get_name()
+        if dcc_name != tp.Dccs.Unknown and item.is_file():
+            dcc_version = tp.Dcc.get_version_name()
+            dcc_icon = artellapipe.resource.icon(dcc_name)
+            dcc_menu = QMenu(context_menu)
+            dcc_menu.setTitle('{} {}'.format(dcc_name.title(), dcc_version))
+            dcc_menu.setIcon(dcc_icon)
+            open_in_dcc_action = QAction(open_icon, 'Open', dcc_menu, statusTip='Open Item in {}'.format(dcc_name.title()), )
+            import_in_dcc_action = QAction(import_icon, 'Import', dcc_menu, statusTip='Import Item in {}'.format(dcc_name.title()))
+            reference_in_dcc_action = QAction(reference_icon, 'Reference', dcc_menu, statusTip='Reference Item in {}'.format(dcc_name.title()))
+            context_menu.addMenu(dcc_menu)
+            dcc_menu.addAction(open_in_dcc_action)
+            dcc_menu.addAction(import_in_dcc_action)
+            dcc_menu.addAction(reference_in_dcc_action)
+            open_in_dcc_action.triggered.connect(partial(self._on_open_item_in_dcc, item))
+            import_in_dcc_action.triggered.connect(partial(self._on_import_item_in_dcc, item))
+            reference_in_dcc_action.triggered.connect(partial(self._on_reference_item_in_dcc, item))
+
+        context_menu.addSeparator()
         context_menu.addAction(add_to_sync_queue_action)
         context_menu.addAction(view_locally_action)
 
-        if not item.is_asset():
+        if not item.is_asset() and item.can_create_assets():
             context_menu.addSeparator()
             context_menu.addAction(create_asset_action)
 
@@ -714,6 +739,30 @@ class ArtellaSyncTree(treewidgets.TreeWidget, object):
         """
 
         item.open_in_artella()
+
+    def _on_open_item_in_dcc(self, item):
+        """
+        Internal callback function that opens item in DCC
+        :param item: ArtellaSyncItem
+        """
+
+        item.open_in_dcc()
+
+    def _on_import_item_in_dcc(self, item):
+        """
+        Internal callback function that imports item in DCC
+        :param item: ArtellaSyncItem
+        """
+
+        item.import_in_dcc()
+
+    def _on_reference_item_in_dcc(self, item):
+        """
+        Internal callback function that references item in DCC
+        :param item: ArtellaSyncItem
+        """
+
+        item.reference_in_dcc()
 
     def _on_create_new_asset(self, item):
         """
@@ -845,6 +894,31 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
 
         return isinstance(self._artella_data, artellaclasses.ArtellaAssetMetaData)
 
+    def is_file(self):
+        """
+        Returns whether current item is a file or not
+        :return: bool
+        """
+
+        if not self._artella_data:
+            return False
+
+        return isinstance(self._artella_data, artellaclasses.ArtellaFileMetaData)
+
+    def can_create_assets(self):
+        """
+        Returns whether this item can create or not assets
+        :return: bool
+        """
+
+        if not isinstance(self._artella_data, artellaclasses.ArtellaDirectoryMetaData):
+            return False
+
+        item_path = self._artella_data.path
+        rel_path = os.path.dirname(os.path.relpath(item_path, os.path.dirname(self._project.get_assets_path())))
+
+        return rel_path == defines.ARTELLA_ASSETS_FOLDER_NAME
+
     def get_icon(self):
         """
         Returns item icon depending of the wrapped Artella object
@@ -901,6 +975,57 @@ class ArtellaSyncItem(QTreeWidgetItem, object):
 
         artella_url = self.get_artella_url()
         webbrowser.open(artella_url)
+
+    def open_in_dcc(self):
+        """
+        Opens item file in current DCC
+        :return: bool
+        """
+
+        item_path = self.get_path()
+        path_ext = os.path.splitext(item_path)[-1]
+        supported_extensions = tp.Dcc.get_extensions()
+        if path_ext in supported_extensions:
+            tp.Dcc.open_file(file_path=item_path)
+            return True
+        else:
+            artellapipe.logger.warning('Impossible to open file: {} in {} because extension {} is not supported in DCC [{}]'.format(item_path, tp.Dcc.get_name(), supported_extensions))
+
+        return False
+
+    def import_in_dcc(self):
+        """
+        Imports item file in current DCC
+        :return: bool
+        """
+
+        item_path = self.get_path()
+        path_ext = os.path.splitext(item_path)[-1]
+        supported_extensions = tp.Dcc.get_extensions()
+        if path_ext in supported_extensions:
+            tp.Dcc.import_file(file_path=item_path)
+            return True
+        else:
+            artellapipe.logger.warning('Impossible to import file: {} in {} because extension {} is not supported in DCC [{}]'.format(item_path, tp.Dcc.get_name(), supported_extensions))
+
+        return False
+
+    def reference_in_dcc(self):
+        """
+        Imports item file in current DCC
+        :return: bool
+        """
+
+        item_path = self.get_path()
+        path_ext = os.path.splitext(item_path)[-1]
+        supported_extensions = tp.Dcc.get_extensions()
+        if path_ext in supported_extensions:
+            tp.Dcc.reference_file(file_path=item_path)
+            return True
+        else:
+            artellapipe.logger.warning('Impossible to reference file: {} in {} because extension {} is not supported in DCC [{}]'.format(item_path, tp.Dcc.get_name(), supported_extensions))
+
+        return False
 
     def view_locally(self):
         """
