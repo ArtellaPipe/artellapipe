@@ -58,7 +58,7 @@ class Worker(QThread, object):
         with self._queue_mutex:
             self._queue = list()
 
-    def queue_work(self, worker_fn, params, asap=False):
+    def queue_work(self, worker_fn, params=None, asap=False):
         """
         Queues up some work returning a unique id to identify this worker
         :param worker_fn:
@@ -68,7 +68,10 @@ class Worker(QThread, object):
         """
 
         uid = uuid.uuid4().hex
-        work = {'id': uid, 'fn': worker_fn, 'params': params}
+        if params:
+            work = {'id': uid, 'fn': worker_fn, 'params': params}
+        else:
+            work = {'id': uid, 'fn': worker_fn}
         with self._queue_mutex:
             if asap:
                 self._queue.insert(0, work)
@@ -95,7 +98,10 @@ class Worker(QThread, object):
                 break
 
             try:
-                data = item_to_process['fn'](item_to_process['params'])
+                if item_to_process.get('params', None):
+                    data = item_to_process['fn'](item_to_process['params'])
+                else:
+                    data = item_to_process['fn']()
             except Exception as e:
                 if self._execute_tasks:
                     import traceback
