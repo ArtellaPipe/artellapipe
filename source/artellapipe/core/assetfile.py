@@ -79,7 +79,7 @@ class ArtellaAssetType(object):
         else:
             file_path = self.get_latest_local_published_path()
 
-        self._reference_file(path=file_path, fix_path=fix_path)
+        return self._reference_file(path=file_path, fix_path=fix_path)
 
     @property
     def asset(self):
