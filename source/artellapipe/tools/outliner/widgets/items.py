@@ -26,7 +26,7 @@ from tpQtLib.widgets import splitters
 import artellapipe
 
 from artellapipe.tools.outliner.core import outlineritems, buttons
-from artellapipe.tools.shotmanager.core import shotassembler
+from artellapipe.tools.shotmanager.apps import shotassembler
 
 if tp.is_maya():
     from tpMayaLib.core import decorators as maya_decorators
@@ -78,11 +78,11 @@ class OutlinerAssetItem(outlineritems.OutlinerItem, object):
         #             model_widget.model_buttons.proxy_hires_cbx.setCurrentIndex(plug.asInt())
 
     def _create_replace_actions(self, replace_menu):
-        # replace_abc = replace_menu.addAction('Alembic')
-        # replace_rig = replace_menu.addAction('Rig')
-        # replace_standin = replace_menu.addAction('Standin')
-        # replace_abc.triggered.connect(self._on_replace_alembic)
-        # replace_rig.triggered.connect(self._on_replace_rig)
+        """
+        Internal function that creates replacement options for current file
+        :param replace_menu: QMenu
+        :return: bool
+        """
 
         return False
 

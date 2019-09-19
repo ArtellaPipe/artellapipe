@@ -446,39 +446,58 @@ class NameManager(window.ArtellaWindow, object):
     def nameit(self):
         return self._name_widget
 
+    @staticmethod
+    def parse_template(template_name, path_to_parse):
+        """
+        Parses given path in the given template
+        :param template_name: str
+        :param path_to_parse: str
+        :return: list(str)
+        """
 
-def parse_template(template_name, path_to_parse):
-    """
-    Parses given path in the given template
-    :param template_name: str
-    :param path_to_parse: str
-    :return: list(str)
-    """
+        templates = NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
+        if not templates:
+            return False
 
-    templates = NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
-    if not templates:
+        for template in templates:
+            if template.name == template_name:
+                return template.parse(path_to_parse)
+
+        return None
+
+    @classmethod
+    def check_template_validity(cls, template_name, path_to_check):
+        """
+        Returns whether given path matches given pattern or not
+        :param template_name: str
+        :param path_to_check: str
+        :return: bool
+        """
+
+        parse = cls.parse_template(template_name, path_to_check)
+        if parse is not None and type(parse) is dict:
+            return True
+
         return False
 
-    for template in templates:
-        if template.name == template_name:
-            return template.parse(path_to_parse)
+    @staticmethod
+    def format_template(template_name, template_tokens):
+        """
+        Returns template path filled with tempalte tokens data
+        :param template_name: str
+        :param template_tokens: dict
+        :return: str
+        """
 
-    return None
+        templates = NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
+        if not templates:
+            return False
 
+        for template in templates:
+            if template.name == template_name:
+                return template.format(template_tokens)
 
-def check_template_validity(template_name, path_to_check):
-    """
-    Returns whether given path matches given pattern or not
-    :param template_name: str
-    :param path_to_check: str
-    :return: bool
-    """
-
-    parse = parse_template(template_name, path_to_check)
-    if parse is not None and type(parse) is dict:
-        return True
-
-    return False
+        return None
 
 
 def run(project):
