@@ -194,6 +194,19 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
 
         return self._project
 
+    def add_toolbar(self, name, area=Qt.TopToolBarArea):
+        """
+        Overrides base MainWindow add_toolbar function
+        :param name: str
+        :param area:
+        :return:
+        """
+
+        new_toolbar = QToolBar(name)
+        # The 0 widget is always the header view of the window
+        self.main_layout.insertWidget(1, new_toolbar)
+        return new_toolbar
+
     def add_logo(self, logo_pixmap, offset_x, offset_y):
         """
         Adds a new logo into the title with the given offset

@@ -170,6 +170,9 @@ ARTELLA_ALL_CATEGORIES_NAME = 'All'
 # Defines the name of Assets Artella folder
 ARTELLA_ASSETS_FOLDER_NAME = 'Assets'
 
+# Defines the name of the Production Artella folder
+ARTELLA_PRODUCTION_FOLDER_NAME = 'Production'
+
 # Defines the default name used for assets
 ARTELLA_DEFAULT_ASSET_NAME = 'New_Asset'
 
@@ -193,6 +196,9 @@ ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR = 'icon_format'
 
 # Defines sync operation that should sync all asset types
 ARTELLA_SYNC_ALL_ASSET_TYPES = 'all'
+
+# Defines of art asset type
+ARTELLA_ART_ASSET_TYPE = 'art'
 
 # Defines of textures asset type
 ARTELLA_TEXTURES_ASSET_TYPE = 'textures'
