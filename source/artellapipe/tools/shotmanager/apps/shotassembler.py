@@ -16,7 +16,6 @@ import os
 import sys
 import ast
 import json
-import tempfile
 import traceback
 
 from Qt.QtWidgets import *
@@ -122,7 +121,6 @@ class ShotFile(object):
             'files': {},
             'overrides': {}
         }
-
 
         # Store Asset Files
         for asset_file in asset_files:
@@ -582,7 +580,7 @@ class ShotAssembler(window.ArtellaWindow, object):
         self._progress.set_text('Loading Shaders ...')
         self.repaint()
 
-        # shader.load_all_scene_shaders(project=self._project)
+        shader.load_all_scene_shaders(project=self._project)
 
         self._progress.set_value(0)
         self._progress.set_text('')
