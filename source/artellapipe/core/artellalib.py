@@ -31,7 +31,7 @@ except:
 from Qt.QtWidgets import *
 
 import tpDccLib as tp
-from tpPyUtils import osplatform
+from tpPyUtils import osplatform, path as path_utils
 from tpQtLib.core import qtutils
 
 import artellapipe
@@ -551,6 +551,15 @@ def synchronize_path_with_folders(file_path, recursive=False):
                 else:
                     synchronize_file(ref_path)
             return True
+        else:
+            if os.path.isdir(file_path):
+                child_dirs = os.listdir(file_path)
+                if child_dirs:
+                    for child_dir in child_dirs:
+                        full_child_path = path_utils.clean_path(os.path.join(file_path, child_dir))
+                        synchronize_path_with_folders(full_child_path, recursive=recursive)
+                return True
+
     except Exception as e:
         artellapipe.logger.error(str(e))
         artellapipe.logger.error(traceback.format_exc())
