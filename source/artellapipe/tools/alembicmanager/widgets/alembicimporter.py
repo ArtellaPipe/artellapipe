@@ -221,6 +221,8 @@ class AlembicImporter(base.BaseWidget, object):
             tp.Dcc.set_parent(obj, sel[0])
         tp.Dcc.select_object(sel[0])
 
+        return new_nodes
+
     @staticmethod
     def _add_tag_info_data(project, tag_info, attr_node):
         """
