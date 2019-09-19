@@ -36,7 +36,7 @@ from tpPyUtils import python, strings, decorators, osplatform, jsonio, fileio, p
 from tpQtLib.core import qtutils
 
 import artellapipe
-from artellapipe.core import defines, artellalib, asset, node, syncdialog, assetsviewer
+from artellapipe.core import defines, artellalib, artellaclasses, asset, node, syncdialog, assetsviewer, sequence, shot
 from artellapipe.gui import tray
 
 from artellapipe.tools.namemanager import namemanager
@@ -49,6 +49,8 @@ class ArtellaProject(object):
     TRAY_CLASS = tray.ArtellaTray
     SHELF_CLASS = tp.Shelf
     ASSET_CLASS = asset.ArtellaAsset
+    SEQUENCE_CLASS = sequence.ArtellaSequence
+    SHOT_CLASS = shot.ArtellaShot
     ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
     ASSET_NODE_CLASS = node.ArtellaAssetNode
     SYNC_FILES_DIALOG_CLASS = syncdialog.ArtellaSyncFileDialog
@@ -107,11 +109,15 @@ class ArtellaProject(object):
         self._registered_asset_file_type_classes = list()
         self._asset_classes_file_types = dict()
 
+        self._production_info = None
+        self._sequences = list()
+        self._shots = list()
+
         self._resource = resource
         self._naming_file = naming_file
         self._settings = settings
 
-        self._nameit = namemanager.NameWidget(self)
+        self._namemanager = namemanager.NameWidget(self)
 
         # To make sure that all variables are properly initialized we must call init_config first
         self.init_config()
@@ -413,6 +419,15 @@ class ArtellaProject(object):
 
         return self._playblast_presets_url
 
+    @property
+    def namemanager(self):
+        """
+        Returns name manager widget used to manage nomenclature in the project
+        :return: NameWidget
+        """
+
+        return self._namemanager
+
     # ==========================================================================================================
     # INITIALIZATION, CONFIG & SETTINGS
     # ==========================================================================================================
@@ -466,16 +481,46 @@ class ArtellaProject(object):
         :param kwargs: dict
         """
 
-        current_rule = self._nameit.get_active_rule()
-        self._nameit.set_active_rule(rule_name)
-        solved_name = self._nameit.solve(*args, **kwargs)
+        current_rule = self._namemanager.get_active_rule()
+        self._namemanager.set_active_rule(rule_name)
+        solved_name = self._namemanager.solve(*args, **kwargs)
         if current_rule:
             if rule_name != current_rule.name:
-                self._nameit.set_active_rule(current_rule.name)
+                self._namemanager.set_active_rule(current_rule.name)
         else:
-            self._nameit.set_active_rule(None)
+            self._namemanager.set_active_rule(None)
 
         return solved_name
+
+    def parse_template(self, template_name, path_to_parse):
+        """
+        Parses given path in the given template
+        :param template_name: str
+        :param path_to_parse: str
+        :return: list(str)
+        """
+
+        return namemanager.NameManager.parse_template(template_name=template_name, path_to_parse=path_to_parse)
+
+    def check_template_validity(self, template_name, path_to_check):
+        """
+        Returns whether given path matches given pattern or not
+        :param template_name: str
+        :param path_to_check: str
+        :return: bool
+        """
+
+        return namemanager.NameManager.check_template_validity(tepmlate_name=template_name, path_to_check=path_to_check)
+
+    def format_template(self, template_name, template_tokens):
+        """
+        Returns template path filled with tempalte tokens data
+        :param template_name: str
+        :param template_tokens: dict
+        :return: str
+        """
+
+        return namemanager.NameManager.format_template(template_name=template_name, template_tokens=template_tokens)
 
     def get_config_data(self):
         """
@@ -776,7 +821,7 @@ class ArtellaProject(object):
     # PROJECT
     # ==========================================================================================================
 
-    def get_path(self, force_update=True):
+    def get_path(self, force_update=False):
         """
         Returns path where project is located
         :param force_update: bool, Whether to force the update of project path is environment variables are not setup
@@ -785,8 +830,7 @@ class ArtellaProject(object):
 
         env_var = os.environ.get(self._project_env_var, None)
 
-        # If project environment variable is not setup we f
-        if not env_var and force_update:
+        if not env_var or force_update:
             self.update_project()
             env_var = os.environ.get(self._project_env_var, None)
 
@@ -805,6 +849,19 @@ class ArtellaProject(object):
             raise RuntimeError('{} Project not setup properly. Please contact TD to fix this problem'.format(self.name.title()))
 
         return os.environ.get(self._project_env_var)
+
+    def get_production_path(self):
+        """
+        Returns path where Production data for current project is stored
+        :return: str
+        """
+
+        project_path = self.get_path()
+        if not project_path:
+            artellapipe.logger.warning('Impossible to retrieve productoin path because Artella project is not setup!')
+            return
+
+        return path_utils.clean_path(os.path.join(project_path, defines.ARTELLA_PRODUCTION_FOLDER_NAME))
 
     def get_temp_path(self, *args):
         """
@@ -855,6 +912,8 @@ class ArtellaProject(object):
 
         if path_to_fix.startswith('${}/'.format(self._project_env_var)):
             path_to_fix = path_to_fix.replace('${}/'.format(self._project_env_var), project_var)
+        elif path_to_fix.startswith('${}/'.format(defines.ARTELLA_ROOT_PREFIX)):
+            path_to_fix = path_to_fix.replace('${}/'.format(defines.ARTELLA_ROOT_PREFIX), project_var)
 
         return path_to_fix
 
@@ -865,7 +924,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return os.path.relpath(full_path, self.get_path())
+        return path_utils.clean_path(os.path.relpath(full_path, self.get_path()))
 
     def get_artella_url(self):
         """
@@ -1287,17 +1346,20 @@ class ArtellaProject(object):
 
         return found_assets
 
-    def find_asset(self, asset_name=None, asset_path=None):
+    def find_asset(self, asset_name=None, asset_path=None, allow_multiple_instances=True):
         """
         Returns asset of the project if found
         :param asset_name: str, name of the asset to find
         :param asset_path: str, path where asset is located in disk
+        :param allow_multiple_instances: bool, whether to return None if multiple instances of an asset is found; otherwise first asset in the list will be return
         :return: Asset or None
         """
 
         asset_founds = self.find_all_assets(asset_name=asset_name, asset_path=asset_path)
         if len(asset_founds) > 1:
             artellapipe.logger.warning('Found Multiple instances of Asset "{} | {}"'.format(asset_name, asset_path))
+            if not allow_multiple_instances:
+                return None
 
         return asset_founds[0]
 
@@ -1435,8 +1497,105 @@ class ArtellaProject(object):
         return all_abc_roots
 
     # ==========================================================================================================
+    # SEQUENCES
+    # ==========================================================================================================
+
+    @decorators.timestamp
+    def get_sequences(self, force_update=False):
+        """
+        Returns a list of current sequences in Artella
+        :param force_update: bool
+        :return: list(ArtellaSequence)
+        """
+
+        if self._sequences and not force_update:
+            return self._sequences
+
+        if self._production_info and not force_update:
+            production_info = self._production_info
+        else:
+            production_info = self._update_production_info()
+        if not production_info:
+            return
+
+        sequences_dict = dict()
+        sequences_names = dict()
+        for ref_name, ref_data in production_info.references.items():
+            if not ref_data.is_directory:
+                continue
+            rel_path = self.relative_path(ref_data.path)
+            parse_data = self.parse_template('sequence', rel_path)
+            if not parse_data:
+                continue
+            seq_id = parse_data['sequence_index']
+            seq_name = parse_data['sequence_name']
+            if seq_id in sequences_dict:
+                artellapipe.logger.warning('Sequence with name: {} is duplicated. Skipping ...'.format(seq_name))
+                continue
+            sequences_dict[seq_id] = ref_data
+            sequences_names[seq_id] = seq_name
+
+        valid_index_sequences = dict()
+        not_index_sequences = dict()
+        for seq_id in sequences_dict.keys():
+            try:
+                int_id = int(seq_id)
+                valid_index_sequences[seq_id] = sequences_dict[seq_id]
+            except Exception:
+                not_index_sequences[seq_id] = sequences_dict[seq_id]
+
+        sequences_ordered = OrderedDict(sorted(valid_index_sequences.items(), key=lambda x: int(x[0])))
+        for seq_id in not_index_sequences.keys():
+            sequences_ordered[seq_id] = not_index_sequences[seq_id]
+
+        for seq_id, seq_data in sequences_ordered.items():
+            seq_name = sequences_names[seq_id]
+            new_sequence = self.SEQUENCE_CLASS(project=self, sequence_name=seq_name, sequence_id=seq_id, sequence_data=seq_data)
+            self._sequences.append(new_sequence)
+
+        return self._sequences
+
+    # ==========================================================================================================
     # SHOTS
     # ==========================================================================================================
+
+    @decorators.timestamp
+    def get_shots(self, force_update=False):
+        """
+        Returns all shots of the given sequence name
+        :param force_update: bool
+        :return: list(ArtellaShot)
+        """
+
+        if self._shots and not force_update:
+            return self._shots
+
+        if self._production_info and not force_update:
+            production_info = self._production_info
+        else:
+            production_info = self._update_production_info()
+        if not production_info:
+            return
+
+        sequences = self.get_sequences(force_update=force_update)
+        for seq in sequences:
+            sequence_path = seq.get_path()
+            if not sequence_path:
+                artellapipe.logger.warning('Impossible to retrieve path for Sequence: {}!'.format(seq.name))
+                continue
+            sequence_info = seq.get_info()
+            print(sequence_info)
+
+    def get_shots_from_sequence(self, sequence_name, force_update=False):
+        """
+        Returns shots of the given sequence name
+        :param sequence_name: str
+        :param force_update: bool
+        :return:
+        """
+
+        shots = self.get_shots(force_update=force_update)
+
 
     def get_shot_name_regex(self):
         """
@@ -1621,6 +1780,28 @@ class ArtellaProject(object):
 
         return path_utils.clean_path(resolved_string)
 
+    def _update_production_info(self):
+        """
+        Internal callback function that updates current production info of the project
+        :return: ArtellaDirectoryMetaData
+        """
+
+        production_path = self.get_production_path()
+        if not production_path:
+            artellapipe.logger.warning(
+                'Impossible to retrieve sequences because Production path for {} is not valid: {}!'.format(
+                    self.name.title(), production_path))
+            return
+
+        production_info = artellalib.get_status(production_path)
+        if not production_info:
+            artellapipe.logger.warning('Impossible to retrieve sequences data from Artella server!')
+            return
+        if not isinstance(production_info, artellaclasses.ArtellaDirectoryMetaData):
+            artellapipe.logger.warning('Error while retrieving Sequences info from Artella!')
+            return
+
+        return production_info
 
 class ArtellaProjectSettings(QSettings, object):
     def __init__(self, project, filename, max_files=10):
