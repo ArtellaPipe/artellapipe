@@ -24,7 +24,7 @@ from artellapipe.gui import window
 
 import artellapipe
 from artellapipe.tools.bugtracker import bugtracker
-from artellapipe.tools.artellamanager.widgets import localmanager, servermanager, urlsync, newassetdialog
+from artellapipe.tools.artellamanager import localmanager, newassetdialog, servermanager, urlsync
 
 
 class ArtellaSyncerMode(object):
