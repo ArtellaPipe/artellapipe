@@ -20,6 +20,7 @@ from Qt.QtWidgets import *
 import tpDccLib as tp
 
 from tpQtLib.core import base
+from tpQtLib.widgets import search
 
 import artellapipe
 
@@ -73,6 +74,9 @@ class OutlinerTree(base.BaseWidget, object):
         top_layout.addWidget(self._expand_all_btn, 0, 1, 1, 1)
         top_layout.addWidget(self._collapse_all_btn, 0, 2, 1, 1)
 
+        self._search_widget = search.SearchFindWidget()
+        self.main_layout.addWidget(self._search_widget)
+
         scroll_widget = QWidget()
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -91,6 +95,7 @@ class OutlinerTree(base.BaseWidget, object):
         self._refresh_btn.clicked.connect(self._on_refresh_outliner)
         self._expand_all_btn.clicked.connect(self._on_expand_all_assets)
         self._collapse_all_btn.clicked.connect(self._on_collapse_all_assets)
+        self._search_widget.textChanged.connect(self._on_search_text_changed)
 
     def append_widget(self, asset):
         """
@@ -147,6 +152,8 @@ class OutlinerTree(base.BaseWidget, object):
             self._expand_all_btn.setVisible(False)
             self._collapse_all_btn.setVisible(False)
 
+        self._on_search_text_changed(self._search_widget.get_text())
+
     def _init(self):
         """
         Internal callback function that initializes the outliner
@@ -178,3 +185,15 @@ class OutlinerTree(base.BaseWidget, object):
 
         for asset_widget in self._widget_tree.keys():
             asset_widget.collapse()
+
+    def _on_search_text_changed(self, new_text):
+        all_assets = self._widget_tree.keys()
+        if not new_text:
+            for asset in all_assets:
+                asset.setVisible(True)
+        else:
+            for asset in all_assets:
+                if new_text in asset.name or new_text.title() in asset.name:
+                    asset.setVisible(True)
+                else:
+                    asset.setVisible(False)

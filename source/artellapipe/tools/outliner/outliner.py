@@ -28,6 +28,7 @@ from artellapipe.gui import window
 from artellapipe.tools.outliner.widgets import settings
 from artellapipe.utils import shader
 
+
 class ArtellaOutlinerWidget(QWidget, object):
 
     # Necessary to support Maya dock

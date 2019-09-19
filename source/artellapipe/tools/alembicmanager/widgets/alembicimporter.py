@@ -221,6 +221,21 @@ class AlembicImporter(base.BaseWidget, object):
             tp.Dcc.set_parent(obj, sel[0])
         tp.Dcc.select_object(sel[0])
 
+        new_nodes.insert(0, sel[0])
+
+        # After parenting referenced nodes, full path changes, here we update node paths
+        if tp.is_maya():
+            new_paths = list()
+            for n in new_nodes:
+                if tp.Dcc.object_exists(n):
+                    new_paths.append(n)
+                else:
+                    if n.startswith('|'):
+                        new_paths.append('{}{}'.format(sel[0], n))
+                    else:
+                        new_paths.append('{}|{}'.format(sel[0], n))
+            return new_paths
+
         return new_nodes
 
     @staticmethod
