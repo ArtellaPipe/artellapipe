@@ -30,6 +30,9 @@ import artellapipe
 from artellapipe.core import abstract, defines, artellalib, assetinfo
 from artellapipe.tools.tagger.core import defines as tagger_defines
 
+if tp.is_maya():
+    import tpMayaLib as maya
+
 
 class ArtellaAssetFileStatus(object):
 
@@ -231,7 +234,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param status: str
         :param extension: str
         :param fix_path: bool
-        :return:
+        :return: bool
         """
 
         file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=fix_path)
@@ -251,15 +254,26 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param file_type: str
         :param status: str
         :param fix_path: bool
+        :return: bool
         """
 
         file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
         if os.path.isfile(file_path):
             if fix_path:
                 file_path = self._project.fix_path(file_path)
-            artellalib.reference_file_in_maya(file_path=file_path)
+            if tp.is_maya():
+                use_rename = maya.cmds.optionVar(q='referenceOptionsUseRenamePrefix')
+                if use_rename:
+                    namespace = maya.cmds.optionVar(q='referenceOptionsRenamePrefix')
+                else:
+                    filename = os.path.basename(file_path)
+                    namespace, _ = os.path.splitext(filename)
+                return tp.Dcc.reference_file(file_path=file_path, namespace=namespace)
+            else:
+                return tp.Dcc.reference_file(file_path=file_path)
         else:
             artellapipe.logger.warning('Impossible to reference asset file of type "{}": {}'.format(file_type, file_path))
+            return False
 
     # ==========================================================================================================
     # SYNC

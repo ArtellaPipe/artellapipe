@@ -374,7 +374,7 @@ def get_status(file_path, as_json=False, max_tries=10):
 
     uri = get_cms_uri(file_path)
     if not uri:
-        artellapipe.logger.info('Unable to get cmds uri from path: {}'.format(file_path))
+        artellapipe.logger.warning('Unable to get cmds uri from path: {}'.format(file_path))
         return False
 
     spigot = get_spigot_client()
