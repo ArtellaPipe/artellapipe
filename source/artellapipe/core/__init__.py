@@ -5,5 +5,7 @@ order = [
     'artellapipe.core.assetinfo',
     'artellapipe.core.assetfile',
     'artellapipe.core.asset',
-    'artellapipe.core.syncdialog'
+    'artellapipe.core.syncdialog',
+    'artellapipe.core.sequence',
+    'artellapipe.core.shot'
 ]
