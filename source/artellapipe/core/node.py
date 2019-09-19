@@ -21,7 +21,7 @@ import tpDccLib as tp
 import artellapipe
 from artellapipe.core import defines
 from artellapipe.utils import shader
-from artellapipe.tools.shotmanager.core import shotassembler
+from artellapipe.tools.shotmanager.apps import shotassembler
 
 
 class ArtellaDCCNode(object):
@@ -94,7 +94,7 @@ class ArtellaDCCNode(object):
         :return: str
         """
 
-        if not os.path.isfile(self._filename):
+        if not self._filename or not not os.path.isfile(self._filename):
             return None
 
         return self._filename
@@ -106,7 +106,7 @@ class ArtellaDCCNode(object):
         :return: str
         """
 
-        if not os.path.isfile(self._filename):
+        if not self._filename or not os.path.isfile(self._filename):
             return None
 
         return os.path.basename(self._filename)
@@ -118,7 +118,7 @@ class ArtellaDCCNode(object):
         :return: str
         """
 
-        if not os.path.isfile(self._filename):
+        if not self._filename or not os.path.isfile(self._filename):
             return None
 
         return os.path.dirname(self._filename)
@@ -454,7 +454,7 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
             self._name = node
         else:
             self._name = kwargs.get('name', 'New_Asset')
-        self._asset_path = kwargs.get('path', -1)               # We use -1, to force the asset path update in first use
+        self._asset_path = kwargs.get('path', '')               # We use -1, to force the asset path update in first use
         self._category = kwargs.get('category', None)
         self._description = kwargs.get('description', '')
         self._asset = None
@@ -482,7 +482,7 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         """
 
         # Asset path retrieval is an expensive operation, so we only update it if necessary
-        if self._asset_path == -1:
+        if self._asset_path == '':
             self._asset_path = self._get_asset_path()
 
         return self._asset_path
@@ -494,8 +494,10 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         :return: ArtellaAsset
         """
 
+        # NOTE: We must access asset path property through the property getter to make sure that
+        # file path is updated
         if not self._asset:
-            self._asset = self._project.find_asset(asset_path=self._asset_path)
+            self._asset = self._project.find_asset(asset_path=self.asset_path, allow_multiple_instances=False)
 
         return self._asset
 
