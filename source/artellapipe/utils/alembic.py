@@ -28,6 +28,20 @@ else:
     show_wait_cursor_decorator = decorators.empty_decorator
 
 
+def load_alembic_plugin():
+    """
+    Forces the loading of the Alembic plugin if it is not already loaded
+    """
+
+    if not tp.is_maya():
+        return
+
+    if not tp.Dcc.is_plugin_loaded('AbcExport.mll'):
+        tp.Dcc.load_plugin('AbcExport.mll')
+    if not tp.Dcc.is_plugin_loaded('AbcImport.mll'):
+        tp.Dcc.load_plugin('AbcImport.mll')
+
+
 @show_wait_cursor_decorator
 def export(alembicFile,
            eulerFilter=False,
@@ -236,8 +250,8 @@ def export(alembicFile,
     # Alembic exporter does not like back slashes
     jobArg += " -file {0}".format(alembicFile.replace("\\", "/"))
 
-    # Execute export
-    tp.Dcc.load_plugin('AbcExport.mll', quiet=True)
+    # Make sure Alembic plugin is loaded
+    load_alembic_plugin()
 
     export_args = {
         "dontSkipUnwrittenFrames": dontSkipUnwrittenFrames,
@@ -268,6 +282,9 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
             message='Alembic File does not exists:\n{}'.format(alembic_file)
         )
         return None
+
+    # Make sure Alembic plugin is loaded
+    load_alembic_plugin()
 
     artellapipe.logger.debug('Import Alembic File ({}) with job arguments:\n{}\n\n{}'.format(mode, alembic_file, nodes))
 
@@ -307,6 +324,9 @@ def reference_alembic(project, alembic_file, namespace=None, fix_path=False):
         artellapipe.logger.warning('DCC {} does not support Alembic Reference functionality yet!'.format(tp.Dcc.get_name()))
         return
 
+    # Make sure Alembic plugin is loaded
+    load_alembic_plugin()
+
     import maya.cmds as cmds
 
     if not os.path.exists(alembic_file):
@@ -323,7 +343,7 @@ def reference_alembic(project, alembic_file, namespace=None, fix_path=False):
             abc_file = alembic_file
 
         if namespace:
-            new_nodes = cmds.file(abc_file, type='Alembic', reference=True, returnNewNodes=True, namespace=namespace)
+            new_nodes = cmds.file(abc_file, type='Alembic', reference=True, returnNewNodes=True)
         else:
             new_nodes = cmds.file(abc_file, type='Alembic', reference=True, returnNewNodes=True)
 
