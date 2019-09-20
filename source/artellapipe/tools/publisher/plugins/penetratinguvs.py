@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains ngons validation implementation
+Module that contains penetrating uvs validation implementation
 """
 
 from __future__ import print_function, division, absolute_import
@@ -12,17 +12,18 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+
 import tpDccLib as tp
 
 import pyblish.api
 
 
-class ValidateNGons(pyblish.api.InstancePlugin):
+class ValidatePenetratingUVs(pyblish.api.InstancePlugin):
     """
-    Checks if there are geometry with ngons
+    Checks if a geometry node has its UVs penetrating or not
     """
 
-    label = 'Topology - NGons'
+    label = 'Topology - Penetrating UVs'
     order = pyblish.api.ValidatorOrder
     hosts = ['maya']
     families = ['model']
@@ -31,7 +32,6 @@ class ValidateNGons(pyblish.api.InstancePlugin):
     def process(self, instance):
 
         import maya.cmds as cmds
-        import maya.api.OpenMaya as OpenMaya
 
         node = instance.data.get('node', None)
         assert tp.Dcc.object_exists(node), 'No valid node found in current instance: {}'.format(instance)
@@ -39,31 +39,22 @@ class ValidateNGons(pyblish.api.InstancePlugin):
         nodes_to_check = self._nodes_to_check(node)
         assert nodes_to_check, 'No Nodes to check found!'
 
-        meshes_selection_list = OpenMaya.MSelectionList()
+        penetrating_uvs_found = list()
         for node in nodes_to_check:
-            meshes_selection_list.add(node)
+            shape = tp.Dcc.list_shapes(node, full_path=True)
+            convert_to_faces = cmds.ls(cmds.polyListComponentConversion(shape, tf=True), fl=True)
+            overlapping = (cmds.polyUVOverlap(convert_to_faces, oc=True))
+            if overlapping:
+                for obj in overlapping:
+                    penetrating_uvs_found.append(obj)
 
-        ngons_found = list()
-        sel_it = OpenMaya.MItSelectionList(meshes_selection_list)
-        while not sel_it.isDone():
-            face_it = OpenMaya.MItMeshPolygon(sel_it.getDagPath())
-            object_name = sel_it.getDagPath().getPath()
-            while not face_it.isDone():
-                num_of_edges = face_it.getEdges()
-                if len(num_of_edges) > 4:
-                    face_index = face_it.index()
-                    component_name = '{}.f[{}]'.format(object_name, face_index)
-                    ngons_found.append(component_name)
-                face_it.next(None)
-            sel_it.next()
-
-        if ngons_found:
-            msg = 'NGons in the following components: {}'.format(ngons_found)
+        if penetrating_uvs_found:
+            msg = 'Penetrating UVs found in following geometry nodes: {}'.format(penetrating_uvs_found)
             if self.must_pass:
-                cmds.select(ngons_found)
-                self.log.info('Faces with NGons selected in viewport!')
+                cmds.select(penetrating_uvs_found)
+                self.log.info('Geometry nodes with penetrating UVs selected in viewport!')
                 self.log.error(msg)
-                assert not ngons_found, msg
+                assert not penetrating_uvs_found, msg
             else:
                 self.log.warning(msg)
 

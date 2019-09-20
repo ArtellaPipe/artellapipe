@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains ngons validation implementation
+Module that contains lamina validation implementation
 """
 
 from __future__ import print_function, division, absolute_import
@@ -12,17 +12,18 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+
 import tpDccLib as tp
 
 import pyblish.api
 
 
-class ValidateNGons(pyblish.api.InstancePlugin):
+class ValidateLamina(pyblish.api.InstancePlugin):
     """
     Checks if there are geometry with ngons
     """
 
-    label = 'Topology - NGons'
+    label = 'Topology - Lamina'
     order = pyblish.api.ValidatorOrder
     hosts = ['maya']
     families = ['model']
@@ -43,27 +44,27 @@ class ValidateNGons(pyblish.api.InstancePlugin):
         for node in nodes_to_check:
             meshes_selection_list.add(node)
 
-        ngons_found = list()
+        lamina_found = list()
         sel_it = OpenMaya.MItSelectionList(meshes_selection_list)
         while not sel_it.isDone():
             face_it = OpenMaya.MItMeshPolygon(sel_it.getDagPath())
             object_name = sel_it.getDagPath().getPath()
             while not face_it.isDone():
-                num_of_edges = face_it.getEdges()
-                if len(num_of_edges) > 4:
+                lamina_faces = face_it.isLamina()
+                if lamina_faces:
                     face_index = face_it.index()
                     component_name = '{}.f[{}]'.format(object_name, face_index)
-                    ngons_found.append(component_name)
+                    lamina_found.append(component_name)
                 face_it.next(None)
             sel_it.next()
 
-        if ngons_found:
-            msg = 'NGons in the following components: {}'.format(ngons_found)
+        if lamina_found:
+            msg = 'Lamina Faces in the following components: {}'.format(lamina_found)
             if self.must_pass:
-                cmds.select(ngons_found)
-                self.log.info('Faces with NGons selected in viewport!')
+                cmds.select(lamina_found)
+                self.log.info('Lamina faces selected in viewport!')
                 self.log.error(msg)
-                assert not ngons_found, msg
+                assert not lamina_found, msg
             else:
                 self.log.warning(msg)
 

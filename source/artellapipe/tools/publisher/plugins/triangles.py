@@ -26,6 +26,7 @@ class ValidateTriangles(pyblish.api.InstancePlugin):
     order = pyblish.api.ValidatorOrder
     hosts = ['maya']
     families = ['model']
+    must_pass = False
 
     def process(self, instance):
 
@@ -64,8 +65,9 @@ class ValidateTriangles(pyblish.api.InstancePlugin):
             sel_it.next()
 
         if triangles_found:
-            assert tringulated_meshes == total_nodes, 'Not all meshes of {} are triangulated!'.format(instance)
-            self.log.info('All geometry nodes for {} are triangulated.'.format(instance))
+            if self.must_pass:
+                assert tringulated_meshes == total_nodes, 'Not all meshes of {} are triangulated!'.format(instance)
+                self.log.info('All geometry nodes for {} are triangulated.'.format(instance))
 
     def _nodes_to_check(self, node):
 

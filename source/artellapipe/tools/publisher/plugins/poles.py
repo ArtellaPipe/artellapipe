@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains ngons validation implementation
+Module that contains poles validation implementation
 """
 
 from __future__ import print_function, division, absolute_import
@@ -17,12 +17,12 @@ import tpDccLib as tp
 import pyblish.api
 
 
-class ValidateNGons(pyblish.api.InstancePlugin):
+class ValidatePoles(pyblish.api.InstancePlugin):
     """
-    Checks if there are geometry with ngons
+    Checks if there are geometry with poles (a vertex is connected to more than 5 edges)
     """
 
-    label = 'Topology - NGons'
+    label = 'Topology - Vertex Poles'
     order = pyblish.api.ValidatorOrder
     hosts = ['maya']
     families = ['model']
@@ -43,27 +43,26 @@ class ValidateNGons(pyblish.api.InstancePlugin):
         for node in nodes_to_check:
             meshes_selection_list.add(node)
 
-        ngons_found = list()
+        poles_found = list()
         sel_it = OpenMaya.MItSelectionList(meshes_selection_list)
         while not sel_it.isDone():
-            face_it = OpenMaya.MItMeshPolygon(sel_it.getDagPath())
+            vertex_it = OpenMaya.MItMeshVertex(sel_it.getDagPath())
             object_name = sel_it.getDagPath().getPath()
-            while not face_it.isDone():
-                num_of_edges = face_it.getEdges()
-                if len(num_of_edges) > 4:
-                    face_index = face_it.index()
-                    component_name = '{}.f[{}]'.format(object_name, face_index)
-                    ngons_found.append(component_name)
-                face_it.next(None)
+            while not vertex_it.isDone():
+                if vertex_it.numConnectedEdges() > 5:
+                    vertex_index = vertex_it.index()
+                    component_name = '{}.v[{}]'.format(object_name, vertex_index)
+                    poles_found.append(component_name)
+                vertex_it.next()
             sel_it.next()
 
-        if ngons_found:
-            msg = 'NGons in the following components: {}'.format(ngons_found)
+        if poles_found:
+            msg = 'Vertex Poles in the following components: {}'.format(poles_found)
             if self.must_pass:
-                cmds.select(ngons_found)
-                self.log.info('Faces with NGons selected in viewport!')
+                cmds.select(poles_found)
+                self.log.info('Vertex Poles selected in viewport!')
                 self.log.error(msg)
-                assert not ngons_found, msg
+                assert not poles_found, msg
             else:
                 self.log.warning(msg)
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains ngons validation implementation
+Module that contains open edges validation implementation
 """
 
 from __future__ import print_function, division, absolute_import
@@ -17,12 +17,12 @@ import tpDccLib as tp
 import pyblish.api
 
 
-class ValidateNGons(pyblish.api.InstancePlugin):
+class ValidateOpenEdges(pyblish.api.InstancePlugin):
     """
-    Checks if there are geometry with ngons
+    Checks if there are geometry with open edges
     """
 
-    label = 'Topology - NGons'
+    label = 'Topology - Open Edges'
     order = pyblish.api.ValidatorOrder
     hosts = ['maya']
     families = ['model']
@@ -43,27 +43,26 @@ class ValidateNGons(pyblish.api.InstancePlugin):
         for node in nodes_to_check:
             meshes_selection_list.add(node)
 
-        ngons_found = list()
+        open_edges_found = list()
         sel_it = OpenMaya.MItSelectionList(meshes_selection_list)
         while not sel_it.isDone():
-            face_it = OpenMaya.MItMeshPolygon(sel_it.getDagPath())
+            edge_it = OpenMaya.MItMeshEdge(sel_it.getDagPath())
             object_name = sel_it.getDagPath().getPath()
-            while not face_it.isDone():
-                num_of_edges = face_it.getEdges()
-                if len(num_of_edges) > 4:
-                    face_index = face_it.index()
-                    component_name = '{}.f[{}]'.format(object_name, face_index)
-                    ngons_found.append(component_name)
-                face_it.next(None)
+            while not edge_it.isDone():
+                if edge_it.numConnectedEdges() < 2:
+                    edge_index = edge_it.index()
+                    component_name = '{}.e[{}]'.format(object_name, edge_index)
+                    open_edges_found.append(component_name)
+                edge_it.next()
             sel_it.next()
 
-        if ngons_found:
-            msg = 'NGons in the following components: {}'.format(ngons_found)
+        if open_edges_found:
+            msg = 'Open Edges in the following components: {}'.format(open_edges_found)
             if self.must_pass:
-                cmds.select(ngons_found)
-                self.log.info('Faces with NGons selected in viewport!')
+                cmds.select(open_edges_found)
+                self.log.info('Open edges selected in viewport!')
                 self.log.error(msg)
-                assert not ngons_found, msg
+                assert not open_edges_found, msg
             else:
                 self.log.warning(msg)
 

@@ -25,7 +25,8 @@ class ValidateHardEdges(pyblish.api.InstancePlugin):
     label = 'Topology - Hard Edges'
     order = pyblish.api.ValidatorOrder
     hosts = ['maya']
-    families = ['model_file']
+    families = ['model']
+    must_pass = True
 
     def process(self, instance):
 
@@ -56,11 +57,14 @@ class ValidateHardEdges(pyblish.api.InstancePlugin):
             sel_it.next()
 
         if hard_edges_found:
-            cmds.select(hard_edges_found)
-            self.log.info('Edges with hard edges selected in viewport!')
             msg = 'Hard Edges in the following components: {}'.format(hard_edges_found)
-            self.log.error(msg)
-            assert not hard_edges_found, msg
+            if self.must_pass:
+                cmds.select(hard_edges_found)
+                self.log.info('Edges with hard edges selected in viewport!')
+                self.log.error(msg)
+                assert not hard_edges_found, msg
+            else:
+                self.log.warning(msg)
 
     def _nodes_to_check(self, node):
 
