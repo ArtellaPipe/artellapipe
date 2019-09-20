@@ -113,14 +113,7 @@ class ArtellaAssetsManager(window.ArtellaWindow, object):
 
         self._assets_widget = self.ASSET_WIDGET_CLASS(project=self._project)
 
-        sequences_widget = QWidget()
-        sequences_layout = QVBoxLayout()
-        sequences_layout.setContentsMargins(0, 0, 0, 0)
-        sequences_layout.setSpacing(0)
-        sequences_widget.setLayout(sequences_layout)
-
         self._tab_widget.addTab(self._assets_widget, 'Assets')
-        self._tab_widget.addTab(sequences_widget, 'Sequences')
         self._tab_widget.setTabEnabled(1, False)
 
         self.main_layout.addWidget(self._main_stack)

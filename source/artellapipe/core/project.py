@@ -492,6 +492,14 @@ class ArtellaProject(object):
 
         return solved_name
 
+    def get_templates(self):
+        """
+        Returns a list with all available templates
+        :return: list(str)
+        """
+
+        return namemanager.NameManager.get_templates()
+
     def parse_template(self, template_name, path_to_parse):
         """
         Parses given path in the given template

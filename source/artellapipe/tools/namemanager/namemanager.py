@@ -447,6 +447,15 @@ class NameManager(window.ArtellaWindow, object):
         return self._name_widget
 
     @staticmethod
+    def get_templates():
+        """
+        Returns a list with all available templates
+        :return: list(str)
+        """
+
+        return NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
+
+    @staticmethod
     def parse_template(template_name, path_to_parse):
         """
         Parses given path in the given template
@@ -455,7 +464,7 @@ class NameManager(window.ArtellaWindow, object):
         :return: list(str)
         """
 
-        templates = NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
+        templates = NameManager.get_templates()
         if not templates:
             return False
 
@@ -489,7 +498,7 @@ class NameManager(window.ArtellaWindow, object):
         :return: str
         """
 
-        templates = NameWidget.NAMING_DATA.get_templates(data_file=NameWidget.DATA_FILE)
+        templates = NameManager.get_templates()
         if not templates:
             return False
 
