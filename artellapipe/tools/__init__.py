@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Initialization module for artellapipe
+Initialization module for artellapipe-tools
 """
 
 from __future__ import print_function, division, absolute_import
