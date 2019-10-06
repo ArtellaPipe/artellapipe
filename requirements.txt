@@ -1,6 +1,8 @@
 # ===================================================================
 # artellapipe requirements file
 # ===================================================================
+Qt.py
+six
 psutil
 tpPyUtils
 tpDccLib
@@ -9,4 +11,10 @@ tpNameIt
 pyblish-base
 pyblish-lite
 lucidity
-pyyaml
+pytest
+pytest-cov
+coveralls
+sphinx
+sphinx_rtd_theme
+python-json-logger
+sentry-sdk==0.12.2
