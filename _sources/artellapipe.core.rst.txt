@@ -1,0 +1,31 @@
+artellapipe.core package
+========================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.core.abstract
+   artellapipe.core.artellaclasses
+   artellapipe.core.artellalib
+   artellapipe.core.asset
+   artellapipe.core.assetfile
+   artellapipe.core.assetinfo
+   artellapipe.core.assetsviewer
+   artellapipe.core.defines
+   artellapipe.core.node
+   artellapipe.core.project
+   artellapipe.core.sequence
+   artellapipe.core.shadersviewer
+   artellapipe.core.shot
+   artellapipe.core.syncdialog
+   artellapipe.core.userinfo
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.core
+   :members:
+   :undoc-members:
+   :show-inheritance:

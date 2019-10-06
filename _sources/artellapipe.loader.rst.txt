@@ -1,0 +1,7 @@
+artellapipe.loader module
+=========================
+
+.. automodule:: artellapipe.loader
+   :members:
+   :undoc-members:
+   :show-inheritance:

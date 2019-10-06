@@ -1,0 +1,7 @@
+artellapipe.core.artellaclasses module
+======================================
+
+.. automodule:: artellapipe.core.artellaclasses
+   :members:
+   :undoc-members:
+   :show-inheritance:

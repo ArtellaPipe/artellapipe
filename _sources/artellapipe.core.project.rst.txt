@@ -1,0 +1,7 @@
+artellapipe.core.project module
+===============================
+
+.. automodule:: artellapipe.core.project
+   :members:
+   :undoc-members:
+   :show-inheritance:

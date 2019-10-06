@@ -1,0 +1,7 @@
+artellapipe.utils.shader module
+===============================
+
+.. automodule:: artellapipe.utils.shader
+   :members:
+   :undoc-members:
+   :show-inheritance:

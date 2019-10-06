@@ -1,0 +1,7 @@
+artellapipe.utils.worker module
+===============================
+
+.. automodule:: artellapipe.utils.worker
+   :members:
+   :undoc-members:
+   :show-inheritance:

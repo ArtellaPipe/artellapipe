@@ -1,0 +1,7 @@
+artellapipe.gui.tray module
+===========================
+
+.. automodule:: artellapipe.gui.tray
+   :members:
+   :undoc-members:
+   :show-inheritance:

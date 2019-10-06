@@ -1,0 +1,7 @@
+artellapipe.gui.dialog module
+=============================
+
+.. automodule:: artellapipe.gui.dialog
+   :members:
+   :undoc-members:
+   :show-inheritance:

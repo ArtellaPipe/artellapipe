@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>artellapipe.utils.worker module &mdash; artellapipe 0.0.l documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="artellapipe.loader module" href="artellapipe.loader.html" />
+    <link rel="prev" title="artellapipe.utils.tag module" href="artellapipe.utils.tag.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> artellapipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">artellapipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">artellapipe</a> &raquo;</li>
+        
+          <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
+        
+          <li><a href="artellapipe.utils.html">artellapipe.utils package</a> &raquo;</li>
+        
+      <li>artellapipe.utils.worker module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/artellapipe.utils.worker.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-artellapipe.utils.worker">
+<span id="artellapipe-utils-worker-module"></span><h1>artellapipe.utils.worker module<a class="headerlink" href="#module-artellapipe.utils.worker" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains implementation for background workers</p>
+<dl class="class">
+<dt id="artellapipe.utils.worker.QtWorker">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">QtWorker</code><span class="sig-paren">(</span><em class="sig-param">app</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QThread</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Qt based worker</p>
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empties the queue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.queue_work">
+<code class="sig-name descname">queue_work</code><span class="sig-paren">(</span><em class="sig-param">worker_fn</em>, <em class="sig-param">params</em>, <em class="sig-param">asap=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.queue_work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queues up some work
+:param worker_fn: fn
+:param params: dict
+:param asap: bool
+:return: uid, unique identifier to identify the work</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.QtWorker.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.stop">
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the worker, run this before shutdown</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.QtWorker.workCompleted">
+<code class="sig-name descname">workCompleted</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.workCompleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.QtWorker.workFailure">
+<code class="sig-name descname">workFailure</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.workFailure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.utils.worker.Worker">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">Worker</code><span class="sig-paren">(</span><em class="sig-param">app</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QThread</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empties the queue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.queue_work">
+<code class="sig-name descname">queue_work</code><span class="sig-paren">(</span><em class="sig-param">worker_fn</em>, <em class="sig-param">params=None</em>, <em class="sig-param">asap=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.queue_work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queues up some work returning a unique id to identify this worker
+:param worker_fn:
+:param params:
+:param asap:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.Worker.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.Worker.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.stop">
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><em class="sig-param">wait_for_completion=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the worker, run this before shutdown</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.Worker.workCompleted">
+<code class="sig-name descname">workCompleted</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.Worker.workCompleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.Worker.workFailure">
+<code class="sig-name descname">workFailure</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.Worker.workFailure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/ArtellaPipe/artellapipe-core" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="artellapipe.loader.html" class="btn btn-neutral float-right" title="artellapipe.loader module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="artellapipe.utils.tag.html" class="btn btn-neutral float-left" title="artellapipe.utils.tag module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tomas Poveda
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

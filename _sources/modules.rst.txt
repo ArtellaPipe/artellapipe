@@ -1,0 +1,7 @@
+artellapipe
+===========
+
+.. toctree::
+   :maxdepth: 4
+
+   artellapipe

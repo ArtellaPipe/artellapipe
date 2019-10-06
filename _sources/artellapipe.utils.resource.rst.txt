@@ -1,0 +1,7 @@
+artellapipe.utils.resource module
+=================================
+
+.. automodule:: artellapipe.utils.resource
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>artellapipe.utils.alembic module &mdash; artellapipe 0.0.l documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="artellapipe.utils.exceptions module" href="artellapipe.utils.exceptions.html" />
+    <link rel="prev" title="artellapipe.utils package" href="artellapipe.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> artellapipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">artellapipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">artellapipe</a> &raquo;</li>
+        
+          <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
+        
+          <li><a href="artellapipe.utils.html">artellapipe.utils package</a> &raquo;</li>
+        
+      <li>artellapipe.utils.alembic module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/artellapipe.utils.alembic.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-artellapipe.utils.alembic">
+<span id="artellapipe-utils-alembic-module"></span><h1>artellapipe.utils.alembic module<a class="headerlink" href="#module-artellapipe.utils.alembic" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains utilities functions to work with Alembics</p>
+<dl class="function">
+<dt id="artellapipe.utils.alembic.export_alembic">
+<code class="sig-prename descclassname">artellapipe.utils.alembic.</code><code class="sig-name descname">export_alembic</code><span class="sig-paren">(</span><em class="sig-param">alembic_file</em>, <em class="sig-param">euler_filter=False</em>, <em class="sig-param">no_normals=False</em>, <em class="sig-param">pre_roll=False</em>, <em class="sig-param">renderable_only=False</em>, <em class="sig-param">selection=False</em>, <em class="sig-param">uv_write=False</em>, <em class="sig-param">write_color_sets=False</em>, <em class="sig-param">write_face_sets=False</em>, <em class="sig-param">whole_frame_geo=False</em>, <em class="sig-param">world_space=False</em>, <em class="sig-param">write_visibility=False</em>, <em class="sig-param">write_uv_sets=False</em>, <em class="sig-param">write_creases=False</em>, <em class="sig-param">data_format='Ogawa'</em>, <em class="sig-param">step=1.0</em>, <em class="sig-param">mel_per_frame_callback=''</em>, <em class="sig-param">mel_post_job_callback=''</em>, <em class="sig-param">python_per_frame_callback=''</em>, <em class="sig-param">python_post_job_callback=''</em>, <em class="sig-param">user_attr=None</em>, <em class="sig-param">user_attr_prefix=None</em>, <em class="sig-param">attr=None</em>, <em class="sig-param">attr_prefix=None</em>, <em class="sig-param">root=None</em>, <em class="sig-param">frame_relative_sample=None</em>, <em class="sig-param">frame_range=None</em>, <em class="sig-param">strip_namespaces=-1</em>, <em class="sig-param">dont_skip_unwritten_frames=False</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">pre_roll_start_frame=0</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.alembic.export_alembic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports Alembic file with given attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alembic_file</strong> (<em>str</em>) – File location to write the Alembic data.</p></li>
+<li><p><strong>euler_filter</strong> (<em>bool</em><em>, </em><em>optional</em>) – Apply Euler filter while sampling rotations. Defaults to False.</p></li>
+<li><p><strong>no_normals</strong> (<em>bool</em><em>, </em><em>optional</em>) – Present normal data for Alembic poly meshes will not be written. Defaults to False.</p></li>
+<li><p><strong>pre_roll</strong> (<em>bool</em><em>, </em><em>optional</em>) – his frame range will not be sampled. Defaults to False.</p></li>
+<li><p><strong>renderable_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – Non-renderable hierarchy (invisible, or template) will not be written out.
+Defaults to False.</p></li>
+<li><p><strong>selection</strong> (<em>bool</em><em>, </em><em>optional</em>) – Write out all all selected nodes from the active selection list that are descendents of the roots
+specified with -root. Defaults to False.</p></li>
+<li><p><strong>uv_write</strong> – Uv data for PolyMesh and SubD shapes will be written to the Alembic file. Only the current uv map
+is used. Defaults to False.</p></li>
+<li><p><strong>write_color_sets</strong> (<em>bool</em><em>, </em><em>optional</em>) – Write all color sets on MFnMeshes as color 3 or color 4 indexed geometry parameters with
+face varying scope. Defaults to False.</p></li>
+<li><p><strong>write_face_sets</strong> (<em>bool</em><em>, </em><em>optional</em>) – Write all Face sets on MFnMeshes. Defaults to False.</p></li>
+<li><p><strong>whole_frame_geo</strong> (<em>bool</em><em>, </em><em>optional</em>) – Data for geometry will only be written  out on whole frames. Defaults to
+False.</p></li>
+<li><p><strong>world_space</strong> (<em>bool</em><em>, </em><em>optional</em>) – Any root nodes will be stored in world space. Defaults to False.</p></li>
+<li><p><strong>write_visibility</strong> (<em>bool</em><em>, </em><em>optional</em>) – Visibility state will be stored in the Alembic file.
+Otherwise everything written out is treated as visible. Defaults to False.</p></li>
+<li><p><strong>write_uv_sets</strong> (<em>bool</em><em>, </em><em>optional</em>) – Write all uv sets on MFnMeshes as vector 2 indexed geometry parameters with face varying
+scope. Defaults to False.</p></li>
+<li><p><strong>write_creases</strong> (<em>str</em><em>, </em><em>optional</em>) – If the mesh has crease edges or crease vertices, the mesh (OPolyMesh) would
+now be written out as an OSubD and crease info will be stored in the Alembic file. Otherwise, creases info won’t
+be preserved in Alembic file unless a custom Boolean attribute SubDivisionMesh has been added to mesh node and
+its value is true. Defaults to False.</p></li>
+<li><p><strong>data_format</strong> – The data format to use to write the file. Can be either “HDF” or “Ogawa”. Defaults to “Ogawa”.</p></li>
+<li><p><strong>step</strong> (<em>float</em><em>, </em><em>optional</em>) – The time interval (expressed in frames) at which the frame range is sampled.
+Additional samples around each frame can be specified with -frs. Defaults to 1.0.</p></li>
+<li><p><strong>mel_per_frame_callback</strong> (<em>str</em><em>, </em><em>optional</em>) – When each frame (and the static frame) is evaluated the string
+specified is evaluated as a Mel command. See below for special processing rules. Defaults to “”.</p></li>
+<li><p><strong>mel_post_job_callback</strong> (<em>str</em><em>, </em><em>optional</em>) – When the translation has finished the string specified is evaluated
+as a Mel command. See below for special processing rules. Defaults to “”.</p></li>
+<li><p><strong>python_per_frame_callback</strong> (<em>str</em><em>, </em><em>optional</em>) – When each frame (and the static frame) is evaluated the string
+specified is  evaluated as a python command. See below for special processing rules. Defaults to “”.</p></li>
+<li><p><strong>python_post_job_callback</strong> (<em>str</em><em>, </em><em>optional</em>) – When the translation has finished the string specified is evaluated
+as a python command. See below for special processing rules. Defaults to “”.</p></li>
+<li><p><strong>user_attr</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>, </em><em>optional</em>) – Specific user attributes to write out. Defaults to [].</p></li>
+<li><p><strong>user_attr_prefix</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>, </em><em>optional</em>) – Prefix filter for determining which user attributes to write out. Defaults to [].</p></li>
+<li><p><strong>attr</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>, </em><em>optional</em>) – A specific geometric attribute to write out. Defaults to [].</p></li>
+<li><p><strong>attr_prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Prefix filter for determining which geometric attributes to write out. Defaults to [“<a href="#id1"><span class="problematic" id="id2">ABC_</span></a>”].</p></li>
+<li><p><strong>root</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>, </em><em>optional</em>) – Maya dag path which will be parented to the root of the Alembic file. Defaults
+to [], which means the entire scene will be written out.</p></li>
+<li><p><strong>frame_relative_sample</strong> (<em>list</em><em>(</em><em>float</em><em>)</em><em>, </em><em>optional</em>) – Frame relative sample that will be written out along the frame range. Defaults to [].</p></li>
+<li><p><strong>frame_range</strong> (<em>list</em><em>(</em><em>list</em><em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em>) – The frame range to write. Each list of two floats defines a new frame range. step or
+frameRelativeSample will affect the current frame range only.</p></li>
+<li><p><strong>strip_namespaces</strong> (<em>int</em><em>, </em><em>optional</em>) – Namespaces will be stripped off of the node before being written to Alembic.
+The int specifies how many namespaces will be stripped off of the node name. Be careful that the new stripped
+name does not collide with other sibling node names. Defaults to -1, which means namespaces will be preserved.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>taco:foo:bar would be written as just bar with stripNamespaces=0</p>
+<p>taco:foo:bar would be written as foo:bar with stripNamespaces=1</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optional dont_skip_unwritten_frames</strong> (<em>bool</em><em>,</em>) – When evaluating multiple translate jobs, this decides whether to
+evaluate frames between jobs when there is a gap in their frame ranges. Defaults to False.</p></li>
+<li><p><strong>optional verbose</strong> (<em>bool</em><em>,</em>) – Prints the current frame that is being evaluated. Defaults to False.</p></li>
+<li><p><strong>optional pre_roll_start_frame</strong> (<em>float</em><em>,</em>) – The frame to start scene evaluation at.  This is used to set the
+starting frame for time dependent translations and can be used to evaluate run-up that isn’t actually
+translated. Defaults to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether the Alembic operation was successful or not</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Special callback information:
+On the callbacks, special tokens are replaced with other data, these tokens
+and what they are replaced with are as follows:
+#FRAME# replaced with the frame number being evaluated.
+#FRAME# is ignored in the post callbacks.
+#BOUNDS# replaced with a string holding bounding box values in minX minY
+minZ maxX maxY maxZ space separated order.
+#BOUNDSARRAY# replaced with the bounding box values as above, but in
+array form.
+In Mel: {minX, minY, minZ, maxX, maxY, maxZ}
+In Python: [minX, minY, minZ, maxX, maxY, maxZ]</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.utils.alembic.import_alembic">
+<code class="sig-prename descclassname">artellapipe.utils.alembic.</code><code class="sig-name descname">import_alembic</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">alembic_file</em>, <em class="sig-param">mode='import'</em>, <em class="sig-param">nodes=None</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">fix_path=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.alembic.import_alembic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports Alembic into current DCC scene</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<a class="reference internal" href="artellapipe.core.project.html#artellapipe.core.project.ArtellaProject" title="artellapipe.core.project.ArtellaProject"><em>ArtellaProject</em></a>) – Project this Alembic will belong to</p></li>
+<li><p><strong>alembic_file</strong> (<em>str</em>) – file we want to load</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – mode we want to use to import the Alembic File</p></li>
+<li><p><strong>nodes</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – optional list of nodes to import</p></li>
+<li><p><strong>parent</strong> – </p></li>
+<li><p><strong>fix_path</strong> – bool, whether to fix path or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.utils.alembic.load_alembic_plugin">
+<code class="sig-prename descclassname">artellapipe.utils.alembic.</code><code class="sig-name descname">load_alembic_plugin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.alembic.load_alembic_plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forces the loading of the Alembic plugin if it is not already loaded</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.utils.alembic.reference_alembic">
+<code class="sig-prename descclassname">artellapipe.utils.alembic.</code><code class="sig-name descname">reference_alembic</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">alembic_file</em>, <em class="sig-param">namespace=None</em>, <em class="sig-param">fix_path=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.alembic.reference_alembic" title="Permalink to this definition">¶</a></dt>
+<dd><p>References given alembic file in current DCC scene</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>artellapipe.core.ArtellaProject</em>) – Project this Alembic belongs to</p></li>
+<li><p><strong>alembic_file</strong> (<em>str</em>) – </p></li>
+<li><p><strong>optional namespace</strong> (<em>str</em><em>,</em>) – </p></li>
+<li><p><strong>optional fix_path</strong> (<em>bool</em><em>,</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/ArtellaPipe/artellapipe-core" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="artellapipe.utils.exceptions.html" class="btn btn-neutral float-right" title="artellapipe.utils.exceptions module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="artellapipe.utils.html" class="btn btn-neutral float-left" title="artellapipe.utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tomas Poveda
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

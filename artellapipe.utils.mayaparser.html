@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>artellapipe.utils.mayaparser module &mdash; artellapipe 0.0.l documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="artellapipe.utils.resource module" href="artellapipe.utils.resource.html" />
+    <link rel="prev" title="artellapipe.utils.exceptions module" href="artellapipe.utils.exceptions.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> artellapipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">artellapipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">artellapipe</a> &raquo;</li>
+        
+          <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
+        
+          <li><a href="artellapipe.utils.html">artellapipe.utils package</a> &raquo;</li>
+        
+      <li>artellapipe.utils.mayaparser module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/artellapipe.utils.mayaparser.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-artellapipe.utils.mayaparser">
+<span id="artellapipe-utils-mayaparser-module"></span><h1>artellapipe.utils.mayaparser module<a class="headerlink" href="#module-artellapipe.utils.mayaparser" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains utilities functions to work with Shaders</p>
+<dl class="class">
+<dt id="artellapipe.utils.mayaparser.ArtellaMayaAsiiParser">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.mayaparser.</code><code class="sig-name descname">ArtellaMayaAsiiParser</code><span class="sig-paren">(</span><em class="sig-param">stream</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.ArtellaMayaAsiiParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.utils.mayaparser.MayaAsciiParser" title="artellapipe.utils.mayaparser.MayaAsciiParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.utils.mayaparser.MayaAsciiParser</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Parser used to parse Artella Maya ASCII files</p>
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.ArtellaMayaAsiiParser.on_file_reference">
+<code class="sig-name descname">on_file_reference</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.ArtellaMayaAsiiParser.on_file_reference" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.ArtellaMayaAsiiParser.references">
+<em class="property">property </em><code class="sig-name descname">references</code><a class="headerlink" href="#artellapipe.utils.mayaparser.ArtellaMayaAsiiParser.references" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of references found in Maya ASCII
+:return: list(str)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiError">
+<em class="property">exception </em><code class="sig-prename descclassname">artellapipe.utils.mayaparser.</code><code class="sig-name descname">MayaAsciiError</code><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Custom value error used by Maya parsers</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParser">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.mayaparser.</code><code class="sig-name descname">MayaAsciiParser</code><span class="sig-paren">(</span><em class="sig-param">stream</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.utils.mayaparser.MayaAsciiParserBase" title="artellapipe.utils.mayaparser.MayaAsciiParserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.utils.mayaparser.MayaAsciiParserBase</span></code></a></p>
+<p>Class to parse Maya ASCII files</p>
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParser.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParserBase">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.mayaparser.</code><code class="sig-name descname">MayaAsciiParserBase</code><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParserBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.utils.mayaparser.MayaParserBase" title="artellapipe.utils.mayaparser.MayaParserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.utils.mayaparser.MayaParserBase</span></code></a></p>
+<p>Base class for Maya ASCII files parser</p>
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParserBase.exec_command">
+<code class="sig-name descname">exec_command</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParserBase.exec_command" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> – </p></li>
+<li><p><strong>args</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParserBase.has_command">
+<code class="sig-name descname">has_command</code><span class="sig-paren">(</span><em class="sig-param">command</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParserBase.has_command" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>command</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParserBase.on_comment">
+<code class="sig-name descname">on_comment</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParserBase.on_comment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaAsciiParserBase.register_handler">
+<code class="sig-name descname">register_handler</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">handler</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaAsciiParserBase.register_handler" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> – </p></li>
+<li><p><strong>handler</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.mayaparser.</code><code class="sig-name descname">MayaParserBase</code><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class to defines Maya files parser</p>
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_add_attr">
+<code class="sig-name descname">on_add_attr</code><span class="sig-paren">(</span><em class="sig-param">node</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_add_attr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – </p></li>
+<li><p><strong>name</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_connect_attr">
+<code class="sig-name descname">on_connect_attr</code><span class="sig-paren">(</span><em class="sig-param">src_plug</em>, <em class="sig-param">dst_plug</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_connect_attr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_plug</strong> – </p></li>
+<li><p><strong>dst_plug</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_create_node">
+<code class="sig-name descname">on_create_node</code><span class="sig-paren">(</span><em class="sig-param">nodetype</em>, <em class="sig-param">name</em>, <em class="sig-param">parent</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_create_node" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodetype</strong> – </p></li>
+<li><p><strong>name</strong> – </p></li>
+<li><p><strong>parent</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_current_unit">
+<code class="sig-name descname">on_current_unit</code><span class="sig-paren">(</span><em class="sig-param">angle</em>, <em class="sig-param">linear</em>, <em class="sig-param">time</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_current_unit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angle</strong> – </p></li>
+<li><p><strong>linear</strong> – </p></li>
+<li><p><strong>time</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_file_info">
+<code class="sig-name descname">on_file_info</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_file_info" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – </p></li>
+<li><p><strong>value</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_file_reference">
+<code class="sig-name descname">on_file_reference</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_file_reference" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_requires_maya">
+<code class="sig-name descname">on_requires_maya</code><span class="sig-paren">(</span><em class="sig-param">version</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_requires_maya" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>version</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_requires_plugin">
+<code class="sig-name descname">on_requires_plugin</code><span class="sig-paren">(</span><em class="sig-param">plugin</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_requires_plugin" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plugin</strong> – </p></li>
+<li><p><strong>version</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_select">
+<code class="sig-name descname">on_select</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_select" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_set_attr">
+<code class="sig-name descname">on_set_attr</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em>, <em class="sig-param">attr_type</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_set_attr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – </p></li>
+<li><p><strong>value</strong> – </p></li>
+<li><p><strong>attr_type</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.mayaparser.MayaParserBase.on_set_attr_flags">
+<code class="sig-name descname">on_set_attr_flags</code><span class="sig-paren">(</span><em class="sig-param">plug</em>, <em class="sig-param">keyable=None</em>, <em class="sig-param">channel_box=None</em>, <em class="sig-param">lock=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.MayaParserBase.on_set_attr_flags" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plug</strong> – </p></li>
+<li><p><strong>keyable</strong> – </p></li>
+<li><p><strong>channel_box</strong> – </p></li>
+<li><p><strong>lock</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.utils.mayaparser.retrieve_references_recursively">
+<code class="sig-prename descclassname">artellapipe.utils.mayaparser.</code><code class="sig-name descname">retrieve_references_recursively</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">file_path</em>, <em class="sig-param">parent_path=None</em>, <em class="sig-param">found_files=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.mayaparser.retrieve_references_recursively" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> – </p></li>
+<li><p><strong>file_path</strong> – </p></li>
+<li><p><strong>parent_path</strong> – </p></li>
+<li><p><strong>found_files</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/ArtellaPipe/artellapipe-core" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="artellapipe.utils.resource.html" class="btn btn-neutral float-right" title="artellapipe.utils.resource module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="artellapipe.utils.exceptions.html" class="btn btn-neutral float-left" title="artellapipe.utils.exceptions module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tomas Poveda
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

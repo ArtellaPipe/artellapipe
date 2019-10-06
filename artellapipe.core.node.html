@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>artellapipe.core.node module &mdash; artellapipe 0.0.l documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="artellapipe.core.project module" href="artellapipe.core.project.html" />
+    <link rel="prev" title="artellapipe.core.defines module" href="artellapipe.core.defines.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> artellapipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">artellapipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">artellapipe</a> &raquo;</li>
+        
+          <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
+        
+          <li><a href="artellapipe.core.html">artellapipe.core package</a> &raquo;</li>
+        
+      <li>artellapipe.core.node module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/artellapipe.core.node.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-artellapipe.core.node">
+<span id="artellapipe-core-node-module"></span><h1>artellapipe.core.node module<a class="headerlink" href="#module-artellapipe.core.node" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains definitions for DCC nodes in Artella</p>
+<dl class="class">
+<dt id="artellapipe.core.node.ArtellaAssetNode">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.node.</code><code class="sig-name descname">ArtellaAssetNode</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">node=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.core.node.ArtellaDCCNode" title="artellapipe.core.node.ArtellaDCCNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.core.node.ArtellaDCCNode</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.asset">
+<em class="property">property </em><code class="sig-name descname">asset</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.asset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns asset linked to this node
+:return: ArtellaAsset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.asset_path">
+<em class="property">property </em><code class="sig-name descname">asset_path</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.asset_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns asset path
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_short_name">
+<code class="sig-name descname">get_short_name</code><span class="sig-paren">(</span><em class="sig-param">clean=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_short_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the short name of the DCC node
+:param clean: bool
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the asset
+:return: str</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.node.ArtellaDCCNode">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.node.</code><code class="sig-name descname">ArtellaDCCNode</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">node=None</em>, <em class="sig-param">update_at_init=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.add_override">
+<code class="sig-name descname">add_override</code><span class="sig-paren">(</span><em class="sig-param">override_class=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.add_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new override to current asset node
+:param override_class: cls</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.base_name">
+<em class="property">property </em><code class="sig-name descname">base_name</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.base_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the base name of the referenced file of DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.change_filename">
+<code class="sig-name descname">change_filename</code><span class="sig-paren">(</span><em class="sig-param">new_filename</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.change_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the filename that the current stored reference node is pointing to
+:param new_filename: str
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.change_namespace">
+<code class="sig-name descname">change_namespace</code><span class="sig-paren">(</span><em class="sig-param">new_namespace</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.change_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the namespace of the reference stored node
+:param new_namespace: str
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.convert_reference_to_absolute_path">
+<code class="sig-name descname">convert_reference_to_absolute_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.convert_reference_to_absolute_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the current path the stored reference is pointing to from relative to absolute relative to
+the Artella Project path
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.dir_name">
+<em class="property">property </em><code class="sig-name descname">dir_name</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.dir_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the directory name of the refernced file of DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.exists">
+<em class="property">property </em><code class="sig-name descname">exists</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether current DCC node exists in DCC scene or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.filename">
+<em class="property">property </em><code class="sig-name descname">filename</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns filename of the referenced file of DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.get_overrides">
+<code class="sig-name descname">get_overrides</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.get_overrides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns overrides of the current asset node
+:return: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.get_tag_node">
+<code class="sig-name descname">get_tag_node</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.get_tag_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns tag node associated to this Artella DCC node
+:return: ArtellaTagNode</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.has_override">
+<code class="sig-name descname">has_override</code><span class="sig-paren">(</span><em class="sig-param">override</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.has_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns current asset node already ahs given override or not
+:param override: ArtellaBaseOverride
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.has_overrides">
+<code class="sig-name descname">has_overrides</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.has_overrides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether current node has overrides or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.import_objects">
+<code class="sig-name descname">import_objects</code><span class="sig-paren">(</span><em class="sig-param">with_absolute_path=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.import_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import objects pointed by the stored reference node
+:param with_absolute_path: str, Whether the imported objects should be imported using
+a relative or an absolute path
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.is_loaded">
+<em class="property">property </em><code class="sig-name descname">is_loaded</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.is_loaded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether DCC node exists is loaded or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.is_valid">
+<em class="property">property </em><code class="sig-name descname">is_valid</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether DCC node is valid or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.namespace">
+<em class="property">property </em><code class="sig-name descname">namespace</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns namespace of the DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.node">
+<em class="property">property </em><code class="sig-name descname">node</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.nodes_list">
+<em class="property">property </em><code class="sig-name descname">nodes_list</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.nodes_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all children nodes of the DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.parent_namespace">
+<em class="property">property </em><code class="sig-name descname">parent_namespace</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.parent_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the parent namespace of the DCC node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.project">
+<em class="property">property </em><code class="sig-name descname">project</code><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns project attached to this node
+:return: ArtellaProject</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.remove">
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.remove_override">
+<code class="sig-name descname">remove_override</code><span class="sig-paren">(</span><em class="sig-param">override_to_remove</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.remove_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes given override from current asset node
+:param override_to_remove: variant, cls or ArtellaBaseOverride</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.save_all_overrides">
+<code class="sig-name descname">save_all_overrides</code><span class="sig-paren">(</span><em class="sig-param">save_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.save_all_overrides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores all overrides to disk
+:param save_path: str
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.save_override">
+<code class="sig-name descname">save_override</code><span class="sig-paren">(</span><em class="sig-param">override_to_save</em>, <em class="sig-param">save_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.save_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports given override to disk
+:param override_to_save: variant, cls or ArtellaBaseOverride
+:param save_path: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaDCCNode.update_info">
+<code class="sig-name descname">update_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaDCCNode.update_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the info of the current DCC node</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/ArtellaPipe/artellapipe-core" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="artellapipe.core.project.html" class="btn btn-neutral float-right" title="artellapipe.core.project module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="artellapipe.core.defines.html" class="btn btn-neutral float-left" title="artellapipe.core.defines module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tomas Poveda
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

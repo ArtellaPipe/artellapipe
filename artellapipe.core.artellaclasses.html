@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>artellapipe.core.artellaclasses module &mdash; artellapipe 0.0.l documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="artellapipe.core.artellalib module" href="artellapipe.core.artellalib.html" />
+    <link rel="prev" title="artellapipe.core.abstract module" href="artellapipe.core.abstract.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> artellapipe
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">artellapipe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">artellapipe</a> &raquo;</li>
+        
+          <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
+        
+          <li><a href="artellapipe.core.html">artellapipe.core package</a> &raquo;</li>
+        
+      <li>artellapipe.core.artellaclasses module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/artellapipe.core.artellaclasses.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-artellapipe.core.artellaclasses">
+<span id="artellapipe-core-artellaclasses-module"></span><h1>artellapipe.core.artellaclasses module<a class="headerlink" href="#module-artellapipe.core.artellaclasses" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains data classes for manage Artella server information in a more OO approach</p>
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaAppMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaAppMetaData</code><span class="sig-paren">(</span><em class="sig-param">cms_web_root</em>, <em class="sig-param">local_root</em>, <em class="sig-param">storage_id</em>, <em class="sig-param">token</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAppMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAppMetaData.cms_web_root">
+<em class="property">property </em><code class="sig-name descname">cms_web_root</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAppMetaData.cms_web_root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAppMetaData.local_root">
+<em class="property">property </em><code class="sig-name descname">local_root</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAppMetaData.local_root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAppMetaData.storage_id">
+<em class="property">property </em><code class="sig-name descname">storage_id</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAppMetaData.storage_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAppMetaData.token">
+<em class="property">property </em><code class="sig-name descname">token</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAppMetaData.token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAppMetaData.update_local_root">
+<code class="sig-name descname">update_local_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAppMetaData.update_local_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the environment variable that stores the Artella Local Path
+NOTE: This is done by Artella plugin when is loaded, so we should not do it manually again
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaAssetMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaAssetMetaData</code><span class="sig-paren">(</span><em class="sig-param">metadata_path</em>, <em class="sig-param">status_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAssetMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAssetMetaData.get_is_published">
+<code class="sig-name descname">get_is_published</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAssetMetaData.get_is_published" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the current asset is published or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAssetMetaData.get_published_versions">
+<code class="sig-name descname">get_published_versions</code><span class="sig-paren">(</span><em class="sig-param">all=False</em>, <em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAssetMetaData.get_published_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns published versions of the asset
+:param all: str
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAssetMetaData.latest">
+<em class="property">property </em><code class="sig-name descname">latest</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAssetMetaData.latest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaAssetMetaData.path">
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaAssetMetaData.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns path of the asset
+:return:str</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaDirectoryMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaDirectoryMetaData</code><span class="sig-paren">(</span><em class="sig-param">metadata_path</em>, <em class="sig-param">status_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaDirectoryMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.header">
+<em class="property">property </em><code class="sig-name descname">header</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.path">
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.print_info">
+<code class="sig-name descname">print_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.print_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints in logger the info of the current Artella object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.references">
+<em class="property">property </em><code class="sig-name descname">references</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaDirectoryMetaData.references" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaFileMetaData</code><span class="sig-paren">(</span><em class="sig-param">file_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileMetaData.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileMetaData.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileMetaData.relative_path">
+<em class="property">property </em><code class="sig-name descname">relative_path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileMetaData.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileMetaData.versions">
+<em class="property">property </em><code class="sig-name descname">versions</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileMetaData.versions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaFileVerionMetaData</code><span class="sig-paren">(</span><em class="sig-param">version_data</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.comment">
+<em class="property">property </em><code class="sig-name descname">comment</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.comment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.creator">
+<em class="property">property </em><code class="sig-name descname">creator</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.creator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.creator_display">
+<em class="property">property </em><code class="sig-name descname">creator_display</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.creator_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.date_created">
+<em class="property">property </em><code class="sig-name descname">date_created</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.date_created" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.digest">
+<em class="property">property </em><code class="sig-name descname">digest</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.digest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.locked_by">
+<em class="property">property </em><code class="sig-name descname">locked_by</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.locked_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.relative_dir">
+<em class="property">property </em><code class="sig-name descname">relative_dir</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.relative_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.relative_path">
+<em class="property">property </em><code class="sig-name descname">relative_path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.size">
+<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.version">
+<em class="property">property </em><code class="sig-name descname">version</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaFileVerionMetaData.version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaHeaderMetaData</code><span class="sig-paren">(</span><em class="sig-param">header_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.container_uri">
+<em class="property">property </em><code class="sig-name descname">container_uri</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.container_uri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.content_length">
+<em class="property">property </em><code class="sig-name descname">content_length</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.content_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.content_type">
+<em class="property">property </em><code class="sig-name descname">content_type</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.content_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.date">
+<em class="property">property </em><code class="sig-name descname">date</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.file_path">
+<em class="property">property </em><code class="sig-name descname">file_path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.file_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.status">
+<em class="property">property </em><code class="sig-name descname">status</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaHeaderMetaData.workspace_name">
+<em class="property">property </em><code class="sig-name descname">workspace_name</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaHeaderMetaData.workspace_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.artellaclasses.</code><code class="sig-name descname">ArtellaReferencesMetaData</code><span class="sig-paren">(</span><em class="sig-param">ref_name</em>, <em class="sig-param">ref_path</em>, <em class="sig-param">ref_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.deleted">
+<em class="property">property </em><code class="sig-name descname">deleted</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.deleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.is_directory">
+<em class="property">property </em><code class="sig-name descname">is_directory</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.is_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.local_version">
+<em class="property">property </em><code class="sig-name descname">local_version</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.local_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked">
+<em class="property">property </em><code class="sig-name descname">locked</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked_by">
+<em class="property">property </em><code class="sig-name descname">locked_by</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked_by_display">
+<em class="property">property </em><code class="sig-name descname">locked_by_display</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked_by_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked_view">
+<em class="property">property </em><code class="sig-name descname">locked_view</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.locked_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.maximum_version">
+<em class="property">property </em><code class="sig-name descname">maximum_version</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.maximum_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.maximum_version_deleted">
+<em class="property">property </em><code class="sig-name descname">maximum_version_deleted</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.maximum_version_deleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.path">
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.print_info">
+<code class="sig-name descname">print_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.print_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints in logger the info of the current Artella object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.relative_path">
+<em class="property">property </em><code class="sig-name descname">relative_path</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.view_version">
+<em class="property">property </em><code class="sig-name descname">view_version</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.view_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.artellaclasses.ArtellaReferencesMetaData.view_version_digest">
+<em class="property">property </em><code class="sig-name descname">view_version_digest</code><a class="headerlink" href="#artellapipe.core.artellaclasses.ArtellaReferencesMetaData.view_version_digest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+    <a href="https://github.com/ArtellaPipe/artellapipe-core" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+    </a>
+
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="artellapipe.core.artellalib.html" class="btn btn-neutral float-right" title="artellapipe.core.artellalib module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="artellapipe.core.abstract.html" class="btn btn-neutral float-left" title="artellapipe.core.abstract module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tomas Poveda
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

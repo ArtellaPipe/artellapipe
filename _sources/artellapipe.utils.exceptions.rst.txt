@@ -1,0 +1,7 @@
+artellapipe.utils.exceptions module
+===================================
+
+.. automodule:: artellapipe.utils.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:

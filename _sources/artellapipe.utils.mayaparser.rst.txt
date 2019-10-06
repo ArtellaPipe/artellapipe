@@ -1,0 +1,7 @@
+artellapipe.utils.mayaparser module
+===================================
+
+.. automodule:: artellapipe.utils.mayaparser
+   :members:
+   :undoc-members:
+   :show-inheritance:

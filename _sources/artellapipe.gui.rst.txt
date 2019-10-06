@@ -1,0 +1,25 @@
+artellapipe.gui package
+=======================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.gui.button
+   artellapipe.gui.defines
+   artellapipe.gui.dialog
+   artellapipe.gui.label
+   artellapipe.gui.progressbar
+   artellapipe.gui.spinner
+   artellapipe.gui.tray
+   artellapipe.gui.waiter
+   artellapipe.gui.window
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.gui
+   :members:
+   :undoc-members:
+   :show-inheritance:

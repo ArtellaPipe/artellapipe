@@ -1,0 +1,7 @@
+artellapipe.core.sequence module
+================================
+
+.. automodule:: artellapipe.core.sequence
+   :members:
+   :undoc-members:
+   :show-inheritance:

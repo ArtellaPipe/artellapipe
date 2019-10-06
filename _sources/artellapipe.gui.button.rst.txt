@@ -1,0 +1,7 @@
+artellapipe.gui.button module
+=============================
+
+.. automodule:: artellapipe.gui.button
+   :members:
+   :undoc-members:
+   :show-inheritance:

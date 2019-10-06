@@ -1,0 +1,7 @@
+artellapipe.gui.defines module
+==============================
+
+.. automodule:: artellapipe.gui.defines
+   :members:
+   :undoc-members:
+   :show-inheritance:
