@@ -1,2 +1,3 @@
-include source/artellapipe/resources/icons/color/*.*
-include source/artellapipe/*.json
+include artellapipe/__logging__.ini
+include artellapipe/resources/icons/color/*.*
+include artellapipe/*.json

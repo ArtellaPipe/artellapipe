@@ -9,3 +9,4 @@ tpNameIt
 pyblish-base
 pyblish-lite
 lucidity
+pyyaml
