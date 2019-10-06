@@ -114,7 +114,7 @@ def set_project(project_class, project_resource, project_naming_file):
     """
 
     import artellapipe
-    project_inst =project_class(resource=project_resource, naming_file=project_naming_file)
+    project_inst = project_class(resource=project_resource, naming_file=project_naming_file)
     artellapipe.__dict__['project'] = project_inst
     artellapipe.__dict__[project_class.__name__.lower()] = project_inst
     project_inst.init()
