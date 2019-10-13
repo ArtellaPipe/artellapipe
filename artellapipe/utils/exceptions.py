@@ -67,12 +67,14 @@ def capture_sentry_exception(exc):
         scope.user = {'username': str(osplatform.get_user())}
         if artellapipe.project:
             scope.set_extra('project', artellapipe.project.name.title())
+
         if isinstance(exc, (str, unicode)):
             exc = Exception(exc)
             sentry_capture_exception(Exception(exc))
         else:
             sentry_capture_exception(exc)
 
+        traceback.print_exc()
         raise exc
 
 
