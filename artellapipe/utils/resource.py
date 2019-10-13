@@ -67,10 +67,17 @@ class ResourceManager(object):
 
         resources_paths = list()
         for res in self._resources.values():
-            dirname = res.dirname
-            if dirname in resources_paths:
-                continue
-            resources_paths.append(res.dirname)
+            if isinstance(res, Iterable):
+                for r in res:
+                    dirname = r.dirname
+                    if dirname in resources_paths:
+                        continue
+                    resources_paths.append(dirname)
+            else:
+                dirname = res.dirname
+                if dirname in resources_paths:
+                    continue
+                resources_paths.append(res.dirname)
 
         return resources_paths
 
