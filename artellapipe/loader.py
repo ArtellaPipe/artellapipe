@@ -14,7 +14,6 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import inspect
-import logging
 import logging.config
 
 
@@ -25,7 +24,7 @@ def init(do_reload=False):
     """
 
     import sentry_sdk
-    sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
+    sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
 
     from tpPyUtils import importer
 
@@ -68,7 +67,7 @@ def init(do_reload=False):
     create_logger_directory()
 
     from artellapipe.utils import resource
-    resources_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'resources')
+    resources_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
     resource.ResourceManager().register_resource(resources_path)
 
 
@@ -105,16 +104,14 @@ def get_logging_level():
     return os.environ.get('ARTELLAPIPE_LOG_LEVEL', 'WARNING')
 
 
-def set_project(project_class, project_resource, project_naming_file):
+def set_project(project_class):
     """
     This functions sets the given class instance as the current Artella project used
     :param project_class: ArtellaProject
-    :param project_resource: Resource
-    :param project_naming_file: str
     """
 
     import artellapipe
-    project_inst = project_class(resource=project_resource, naming_file=project_naming_file)
+    project_inst = project_class()
     artellapipe.__dict__['project'] = project_inst
     artellapipe.__dict__[project_class.__name__.lower()] = project_inst
     project_inst.init()
