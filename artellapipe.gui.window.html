@@ -172,8 +172,132 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-gui-window-module">
-<h1>artellapipe.gui.window module<a class="headerlink" href="#artellapipe-gui-window-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.gui.window">
+<span id="artellapipe-gui-window-module"></span><h1>artellapipe.gui.window module<a class="headerlink" href="#module-artellapipe.gui.window" title="Permalink to this headline">¶</a></h1>
+<p>Base wrapper classes to create DCC windows</p>
+<dl class="class">
+<dt id="artellapipe.gui.window.ArtellaWindow">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.gui.window.</code><code class="sig-name descname">ArtellaWindow</code><span class="sig-paren">(</span><em class="sig-param">project=None</em>, <em class="sig-param">name='Window'</em>, <em class="sig-param">title='Window'</em>, <em class="sig-param">size=(800</em>, <em class="sig-param">535)</em>, <em class="sig-param">fixed_size=False</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.window.MainWindow</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.gui.window.ArtellaWindow.LOGO_NAME">
+<code class="sig-name descname">LOGO_NAME</code><em class="property"> = None</em><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.LOGO_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.gui.window.ArtellaWindow.STATUS_BAR_WIDGET">
+<code class="sig-name descname">STATUS_BAR_WIDGET</code><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.STATUS_BAR_WIDGET" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#artellapipe.gui.window.ArtellaWindowStatusBar" title="artellapipe.gui.window.ArtellaWindowStatusBar"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArtellaWindowStatusBar</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.gui.window.ArtellaWindow.VERSION">
+<code class="sig-name descname">VERSION</code><em class="property"> = '0.0.0'</em><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindow.add_logo">
+<code class="sig-name descname">add_logo</code><span class="sig-paren">(</span><em class="sig-param">logo_pixmap</em>, <em class="sig-param">offset_x</em>, <em class="sig-param">offset_y</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.add_logo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new logo into the title with the given offset
+:param logo_pixmap: QPixmap
+:param offset_x: int
+:param offset_y: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindow.add_toolbar">
+<code class="sig-name descname">add_toolbar</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">area=PySide2.QtCore.Qt.ToolBarArea.TopToolBarArea</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.add_toolbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides base MainWindow add_toolbar function
+:param name: str
+:param area:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindow.project">
+<em class="property">property </em><code class="sig-name descname">project</code><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Artella project this window is linked to
+:return: ArtellaProject</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindow.resizeEvent">
+<code class="sig-name descname">resizeEvent</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.resizeEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides base tpQtLib.MainWindow resizeEvent function
+:param event: QSizeEvent</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindow.set_info_url">
+<code class="sig-name descname">set_info_url</code><span class="sig-paren">(</span><em class="sig-param">url</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.set_info_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the info URL of the current window
+:param url: str</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.gui.window.ArtellaWindow.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindow.ui">
+<code class="sig-name descname">ui</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindow.ui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to define UI of the window</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.gui.window.</code><code class="sig-name descname">ArtellaWindowStatusBar</code><span class="sig-paren">(</span><em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.statusbar.StatusWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar.has_url">
+<code class="sig-name descname">has_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar.has_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the URL documentation web is set or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar.hide_info">
+<code class="sig-name descname">hide_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar.hide_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hides the info button of the status bar</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar.open_info_url">
+<code class="sig-name descname">open_info_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar.open_info_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens tool documentation URL in user web browser</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar.set_info_url">
+<code class="sig-name descname">set_info_url</code><span class="sig-paren">(</span><em class="sig-param">url</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar.set_info_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the URL used to open tool info documentation web
+:param url: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar.show_info">
+<code class="sig-name descname">show_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar.show_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows the info button of the status bar</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.gui.window.ArtellaWindowStatusBar.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.gui.window.ArtellaWindowStatusBar.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.gui.window.dock_window">
+<code class="sig-prename descclassname">artellapipe.gui.window.</code><code class="sig-name descname">dock_window</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">window_class</em>, <em class="sig-param">min_width=300</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.gui.window.dock_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function to dock Maya window
+:param project: ArtellaProject
+:param window_class: cls</p>
+</dd></dl>
+
 </div>
 
 
