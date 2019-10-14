@@ -503,8 +503,19 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return path_utils.clean_path(
-            os.path.join(self.get_configurations_folder(), defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME))
+        try:
+            import importlib
+            mod = importlib.import_module(self.get_clean_name())
+            mod_path = os.path.join(
+                os.path.dirname(os.path.abspath(mod.__file__)), defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME)
+            if os.path.isfile(mod_path):
+                return mod_path
+            else:
+                return path_utils.clean_path(
+                    os.path.join(self.get_configurations_folder(), defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME))
+        except (RuntimeError, ImportError) as exc:
+            return path_utils.clean_path(
+                os.path.join(self.get_configurations_folder(), defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME))
 
     def get_version(self):
         """
