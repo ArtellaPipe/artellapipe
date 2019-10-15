@@ -172,8 +172,44 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-core-config-module">
-<h1>artellapipe.core.config module<a class="headerlink" href="#artellapipe-core-config-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.core.config">
+<span id="artellapipe-core-config-module"></span><h1>artellapipe.core.config module<a class="headerlink" href="#module-artellapipe.core.config" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains default implementation for Artella project configuration</p>
+<dl class="class">
+<dt id="artellapipe.core.config.ArtellaConfiguration">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.config.</code><code class="sig-name descname">ArtellaConfiguration</code><span class="sig-paren">(</span><em class="sig-param">project_name</em>, <em class="sig-param">config_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.config.ArtellaConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.core.config.ArtellaConfiguration.PARSER_CLASS">
+<code class="sig-name descname">PARSER_CLASS</code><a class="headerlink" href="#artellapipe.core.config.ArtellaConfiguration.PARSER_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#artellapipe.core.config.ArtellaConfigurationParser" title="artellapipe.core.config.ArtellaConfigurationParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArtellaConfigurationParser</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.config.ArtellaConfiguration.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#artellapipe.core.config.ArtellaConfiguration.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.config.ArtellaConfiguration.load">
+<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">project_name</em>, <em class="sig-param">config_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.config.ArtellaConfiguration.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that reads project configuration file and initializes project variables properly
+This function can be extended in new projects</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.config.ArtellaConfigurationParser">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.config.</code><code class="sig-name descname">ArtellaConfigurationParser</code><span class="sig-paren">(</span><em class="sig-param">config_data</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.config.ArtellaConfigurationParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.core.config.ArtellaConfigurationParser.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.config.ArtellaConfigurationParser.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

@@ -177,7 +177,7 @@
 <p>Module that contains basic implementation for Artella Projects</p>
 <dl class="class">
 <dt id="artellapipe.core.project.ArtellaProject">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.project.</code><code class="sig-name descname">ArtellaProject</code><span class="sig-paren">(</span><em class="sig-param">settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.project.</code><code class="sig-name descname">ArtellaProject</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="attribute">
 <dt id="artellapipe.core.project.ArtellaProject.ASSETS_VIEWER_CLASS">
@@ -195,6 +195,12 @@
 <dt id="artellapipe.core.project.ArtellaProject.ASSET_NODE_CLASS">
 <code class="sig-name descname">ASSET_NODE_CLASS</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.ASSET_NODE_CLASS" title="Permalink to this definition">¶</a></dt>
 <dd><p>alias of <a class="reference internal" href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode" title="artellapipe.core.node.ArtellaAssetNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.core.node.ArtellaAssetNode</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.core.project.ArtellaProject.CONFIG_CLASS">
+<code class="sig-name descname">CONFIG_CLASS</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.CONFIG_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="artellapipe.core.config.html#artellapipe.core.config.ArtellaConfiguration" title="artellapipe.core.config.ArtellaConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.core.config.ArtellaConfiguration</span></code></a></p>
 </dd></dl>
 
 <dl class="class">
@@ -261,35 +267,6 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.asset_files">
-<em class="property">property </em><code class="sig-name descname">asset_files</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.asset_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the list of asset files being used by the Artella project
-:return: list(str)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.asset_must_files">
-<em class="property">property </em><code class="sig-name descname">asset_must_files</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.asset_must_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the list of asset files that an asset need to have published to consider the asset ready for
-production
-:return: list(str)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.asset_types">
-<em class="property">property </em><code class="sig-name descname">asset_types</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.asset_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the list of asset types being used by the Artella project
-:return: list(str)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.assets_library_file_types">
-<em class="property">property </em><code class="sig-name descname">assets_library_file_types</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.assets_library_file_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns file types supported by assets library
-:return: dict</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="artellapipe.core.project.ArtellaProject.check_lock_status">
 <code class="sig-name descname">check_lock_status</code><span class="sig-paren">(</span><em class="sig-param">file_path=None</em>, <em class="sig-param">show_message=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.check_lock_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current lock status of the file in Artella
@@ -346,13 +323,6 @@ production
 <dt id="artellapipe.core.project.ArtellaProject.create_tray">
 <code class="sig-name descname">create_tray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.create_tray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates Artella Project tray</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.emails">
-<em class="property">property </em><code class="sig-name descname">emails</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.emails" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns list of emails that will be used when sending an email
-:return: list(str)</p>
 </dd></dl>
 
 <dl class="method">
@@ -473,13 +443,6 @@ otherwise first asset in the list will be return
 <code class="sig-name descname">get_clean_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.get_clean_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a cleaned version of the project name (without spaces and in lowercase)
 :return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.get_config_data">
-<code class="sig-name descname">get_config_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.get_config_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the config data of the project
-:return: dict</p>
 </dd></dl>
 
 <dl class="method">
@@ -671,34 +634,6 @@ This path is mainly located to store tools configuration files and log files
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.icon">
-<em class="property">property </em><code class="sig-name descname">icon</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.icon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the icon used by the Artella project
-:return: QIcon</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.icon_name">
-<em class="property">property </em><code class="sig-name descname">icon_name</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.icon_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the icon by Artella project
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.id">
-<em class="property">property </em><code class="sig-name descname">id</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns ID of the project
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.id_number">
-<em class="property">property </em><code class="sig-name descname">id_number</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.id_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns ID number of the project
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="artellapipe.core.project.ArtellaProject.id_path">
 <em class="property">property </em><code class="sig-name descname">id_path</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.id_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns ID path of this Artella project
@@ -710,13 +645,6 @@ This path is mainly located to store tools configuration files and log files
 <code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">force_skip_hello=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function initializes Artella project
 :param force_skip_hello: bool, Whether the hello window should be showed or not</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.init_config">
-<code class="sig-name descname">init_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.init_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that reads project configuration file and initializes project variables properly
-This function can be extended in new projects</p>
 </dd></dl>
 
 <dl class="method">
@@ -767,13 +695,6 @@ output in the debug logger
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.name">
-<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the Artella project
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="artellapipe.core.project.ArtellaProject.namemanager">
 <em class="property">property </em><code class="sig-name descname">namemanager</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.namemanager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns name manager widget used to manage nomenclature in the project
@@ -799,61 +720,12 @@ output in the debug logger
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.outliner_categories">
-<em class="property">property </em><code class="sig-name descname">outliner_categories</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.outliner_categories" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary that maps tag types with outliner categories
-:return: dict</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="artellapipe.core.project.ArtellaProject.parse_template">
 <code class="sig-name descname">parse_template</code><span class="sig-paren">(</span><em class="sig-param">template_name</em>, <em class="sig-param">path_to_parse</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.parse_template" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses given path in the given template
 :param template_name: str
 :param path_to_parse: str
 :return: list(str)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.playblast_presets_url">
-<em class="property">property </em><code class="sig-name descname">playblast_presets_url</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.playblast_presets_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the URL where playblast presets are located
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.progress_bar_color_0">
-<em class="property">property </em><code class="sig-name descname">progress_bar_color_0</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.progress_bar_color_0" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns color 0 used in progress bar color gradient
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.progress_bar_color_1">
-<em class="property">property </em><code class="sig-name descname">progress_bar_color_1</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.progress_bar_color_1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns color 1 used in progress bar color gradient
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.project_environment_variable">
-<em class="property">property </em><code class="sig-name descname">project_environment_variable</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.project_environment_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns name used to store path to the current project
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.project_url">
-<em class="property">property </em><code class="sig-name descname">project_url</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.project_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns URL to official Plot Twist web page
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.publish_status">
-<em class="property">property </em><code class="sig-name descname">publish_status</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.publish_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the publish status
-:return: str</p>
 </dd></dl>
 
 <dl class="method">
@@ -922,24 +794,10 @@ This function is called during project initialization and can be extended in new
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.shaders_extension">
-<em class="property">property </em><code class="sig-name descname">shaders_extension</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.shaders_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns extension usded by shaders files
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.shot_extension">
-<em class="property">property </em><code class="sig-name descname">shot_extension</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.shot_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns extesnsion used to stored shot files
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.shot_file_types">
-<em class="property">property </em><code class="sig-name descname">shot_file_types</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.shot_file_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns of shot files supported by the project
-:return: list(str)</p>
+<dt id="artellapipe.core.project.ArtellaProject.shelf_icon">
+<em class="property">property </em><code class="sig-name descname">shelf_icon</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.shelf_icon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns icon used by the shelf of the project
+:return: QIcon</p>
 </dd></dl>
 
 <dl class="method">
@@ -966,20 +824,6 @@ This function is called during project initialization and can be extended in new
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.tag_type_id">
-<em class="property">property </em><code class="sig-name descname">tag_type_id</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.tag_type_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns tag name used to identify assets for the current project
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.tag_types">
-<em class="property">property </em><code class="sig-name descname">tag_types</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.tag_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the list of types that can be used to categorize all the elements of the project
-:return: list(str)</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="artellapipe.core.project.ArtellaProject.tray">
 <em class="property">property </em><code class="sig-name descname">tray</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.tray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the tray used by the Artella project
@@ -989,15 +833,8 @@ This function is called during project initialization and can be extended in new
 <dl class="method">
 <dt id="artellapipe.core.project.ArtellaProject.tray_icon">
 <em class="property">property </em><code class="sig-name descname">tray_icon</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.tray_icon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrusn the tray icon used by Artella project tray
+<dd><p>Returns icon used by the tray of the project
 :return: QIcon</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.tray_icon_name">
-<em class="property">property </em><code class="sig-name descname">tray_icon_name</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.tray_icon_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the icon used by Artella project tray
-:return: str</p>
 </dd></dl>
 
 <dl class="method">
@@ -1039,13 +876,6 @@ This function is called during project initialization and can be extended in new
 :param comment: str
 :param force: bool
 :return: bool</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.project.ArtellaProject.working_status">
-<em class="property">property </em><code class="sig-name descname">working_status</code><a class="headerlink" href="#artellapipe.core.project.ArtellaProject.working_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the working status
-:return: str</p>
 </dd></dl>
 
 </dd></dl>
