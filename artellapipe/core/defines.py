@@ -17,7 +17,7 @@ __email__ = "tpovedatd@gmail.com"
 ARTELLA_CONFIGURATION_ENV = 'ARTELLA_PROJECT_CONFIGURATIONS_FOLDER'
 
 # Defines the name of the configuration file used by artellapipe to setup project
-ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.json'
+ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.yml'
 
 # Defines the name of the changelog file used by artellapipe
 ARTELLA_PROJECT_CHANGELOG_FILE_NAME = 'changelog.json'
