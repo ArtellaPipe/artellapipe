@@ -13,6 +13,7 @@ Submodules
    artellapipe.core.assetfile
    artellapipe.core.assetinfo
    artellapipe.core.assetsviewer
+   artellapipe.core.config
    artellapipe.core.defines
    artellapipe.core.node
    artellapipe.core.project
