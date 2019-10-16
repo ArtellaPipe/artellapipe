@@ -140,6 +140,15 @@ class ArtellaProject(object):
         return self._logger
 
     @property
+    def icon(self):
+        """
+        Returns project icon
+        :return: QIcon
+        """
+
+        return self.resource.icon(self.icon_name, theme=self.icon_resources_folder)
+
+    @property
     def tray_icon(self):
         """
         Returns icon used by the tray of the project

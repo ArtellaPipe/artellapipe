@@ -32,10 +32,7 @@ class ArtellaTray(base.BaseWidget, object):
     def ui(self):
         super(ArtellaTray, self).ui()
 
-        if self._project.tray_icon_name:
-            self._tray_icon = self._project.resource.icon(self._project.tray_icon_name, theme=None)
-        else:
-            self._tray_icon = resource.ResourceManager().icon('artella', theme='logos')
+        self._tray_icon = self._project.tray_icon
 
         tray_menu = self.create_menu()
 
