@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.register module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe package" href="artellapipe.html" />
-    <link rel="prev" title="Welcome to artellapipe documentation!" href="index.html" /> 
+    <link rel="prev" title="artellapipe.loader module" href="artellapipe.loader.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,8 +85,17 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">artellapipe</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="artellapipe.html">artellapipe package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.loader.html">artellapipe.loader module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">artellapipe.register module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -135,13 +143,17 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>artellapipe</li>
+          <li><a href="modules.html">artellapipe</a> &raquo;</li>
+        
+          <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
+        
+      <li>artellapipe.register module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.register.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,47 +167,18 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe">
-<h1>artellapipe<a class="headerlink" href="#artellapipe" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html#module-artellapipe.core">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html#module-artellapipe.gui">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html#module-artellapipe.libs">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html#module-artellapipe.tools">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html#module-artellapipe.utils">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.loader.html">artellapipe.loader module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.register.html">artellapipe.register module</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="artellapipe.html#module-artellapipe">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+  <div class="section" id="module-artellapipe.register">
+<span id="artellapipe-register-module"></span><h1>artellapipe.register module<a class="headerlink" href="#module-artellapipe.register" title="Permalink to this headline">¶</a></h1>
+<p>Initialization module for artellapipe</p>
+<dl class="function">
+<dt id="artellapipe.register.register_class">
+<code class="sig-prename descclassname">artellapipe.register.</code><code class="sig-name descname">register_class</code><span class="sig-paren">(</span><em class="sig-param">cls_name</em>, <em class="sig-param">cls</em>, <em class="sig-param">is_unique=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.register.register_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function registers given class
+:param cls_name: str, name of the class we want to register
+:param cls: class, class we want to register
+:param is_unique: bool, Whether if the class should be updated if new class is registered with the same name</p>
+</dd></dl>
+
 </div>
 
 
@@ -210,10 +193,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.html" class="btn btn-neutral float-right" title="artellapipe package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to artellapipe documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.loader.html" class="btn btn-neutral float-left" title="artellapipe.loader module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

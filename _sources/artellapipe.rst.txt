@@ -18,6 +18,7 @@ Submodules
 .. toctree::
 
    artellapipe.loader
+   artellapipe.register
 
 Module contents
 ---------------
