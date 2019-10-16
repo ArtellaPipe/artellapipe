@@ -8,6 +8,7 @@ Subpackages
 
    artellapipe.core
    artellapipe.gui
+   artellapipe.libs
    artellapipe.tools
    artellapipe.utils
 
