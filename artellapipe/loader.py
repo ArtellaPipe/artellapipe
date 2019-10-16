@@ -16,6 +16,11 @@ import os
 import inspect
 import logging.config
 
+import tpDccLib as tp
+from tpPyUtils import dcc
+
+tools_manager = None
+
 
 def init(do_reload=False):
     """
@@ -63,7 +68,7 @@ def init(do_reload=False):
     ]
 
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False)
-    artella_importer.import_packages(order=packages_order, only_packages=False)
+    artella_importer.import_packages(order=packages_order, only_packages=False, skip_modules=['artellapipe.lib'])
     if do_reload:
         artella_importer.reload_all()
 
@@ -72,6 +77,10 @@ def init(do_reload=False):
     from artellapipe.utils import resource
     resources_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
     resource.ResourceManager().register_resource(resources_path)
+
+    if tp.is_maya():
+        from artellapipe.libs import maya as maya_lib
+        maya_lib.init(do_reload=do_reload)
 
 
 def create_logger_directory():
@@ -118,6 +127,23 @@ def set_project(project_class):
     artellapipe.__dict__['project'] = project_inst
     artellapipe.__dict__[project_class.__name__.lower()] = project_inst
     project_inst.init()
+
+
+def run_tools_manager():
+    global tools_manager
+    if tools_manager:
+        return tools_manager
+
+    import artellapipe
+    tools = artellapipe.ToolsManager()
+    if not tp.Dcc.is_batch():
+        if dcc.is_mayapy():
+            return
+        tools.create_menus()
+
+    tools_manager = tools
+
+    return tools
 
 
 # Load logger configuration
