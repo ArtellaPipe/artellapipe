@@ -12,6 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import os
 from collections import Iterable
 
 from Qt.QtGui import (QIcon, QPixmap)
@@ -81,7 +82,7 @@ class ResourceManager(object):
 
         return resources_paths
 
-    def get(self, *args):
+    def get(self, *args, **kwargs):
         """
         Returns path to a resource
         :param args: list
@@ -91,16 +92,36 @@ class ResourceManager(object):
         if not self._resources:
             return None
 
+        if 'key' in kwargs:
+            resources_paths = self.get_resources_paths(kwargs.pop('key'))
+            if resources_paths:
+                for res_path in resources_paths:
+                    res = None
+                    if res_path in self._resources:
+                        res = self._resources[res_path]
+                    if res:
+                        path = res.get(dirname=res_path, *args)
+                        if path:
+                            return path
+
         if self._project_resources:
             for res_path, res in self._project_resources.items():
                 path = res.get(dirname=res_path, *args)
-                if path:
+                if path and os.path.isfile(path):
                     return path
 
         for res_path, res in self._resources.items():
-            path = res.get(dirname=res_path, *args)
-            if path:
-                return path
+            if not os.path.isdir(res_path):
+                continue
+            if isinstance(res, Iterable):
+                for r in res:
+                    path = r.get(dirname=res_path, *args)
+                    if path:
+                        return path
+            else:
+                path = res.get(dirname=res_path, *args)
+                if path and os.path.isfile(path):
+                    return path
 
         return None
 

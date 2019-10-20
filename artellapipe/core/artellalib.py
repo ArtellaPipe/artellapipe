@@ -25,8 +25,10 @@ except ImportError:
     from urllib2 import urlopen, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, build_opener, install_opener
 
 # TODO: We need to manage psutil dependency properly
+PSUTIL_AVAILABLE = False
 try:
     import psutil
+    PSUTIL_AVAILABLE = True
 except ImportError:
     pass
 
@@ -236,15 +238,16 @@ def close_all_artella_app_processes(console):
 
     # TODO: This only works with Windows and has a dependency on psutil library
     # TODO: Find a cross-platform way of doing this
-    try:
-        for proc in psutil.process_iter():
-            if proc.name() == defines.ARTELLA_APP_NAME + '.exe':
-                LOGGER.debug('Killing Artella App process: {}'.format(proc.name()))
-                proc.kill()
-        return True
-    except RuntimeError:
-        LOGGER.error('Impossible to close Artella app instances because psutil library is not available!')
-        return False
+    if PSUTIL_AVAILABLE:
+        try:
+            for proc in psutil.process_iter():
+                if proc.name() == defines.ARTELLA_APP_NAME + '.exe':
+                    LOGGER.debug('Killing Artella App process: {}'.format(proc.name()))
+                    proc.kill()
+            return True
+        except RuntimeError:
+            LOGGER.error('Impossible to close Artella app instances because psutil library is not available!')
+            return False
 
 
 def connect_artella_app_to_spigot(cli=None, app_identifier=None):

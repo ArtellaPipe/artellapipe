@@ -21,6 +21,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 from artellapipe.core import artellalib
+from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -58,7 +59,7 @@ class ArtellaSyncDialog(QDialog, object):
         self.main_layout.setSpacing(5)
         self.setLayout(self.main_layout)
 
-        splash_pixmap = self._project.resource.pixmap('sync_splash')
+        splash_pixmap = resource.ResourceManager().pixmap('sync_splash', key='project')
         splash = ArtellaSyncSplash(splash_pixmap)
         self._splash_layout = QVBoxLayout()
         self._splash_layout.setAlignment(Qt.AlignBottom)

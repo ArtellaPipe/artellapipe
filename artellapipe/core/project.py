@@ -60,7 +60,6 @@ class ArtellaProject(object):
     SYNC_FILES_DIALOG_CLASS = syncdialog.ArtellaSyncFileDialog
     SYNC_PATHS_DIALOG_CLASS = syncdialog.ArtellaSyncPathDialog
     TAG_NODE_CLASS = asset.ArtellaTagNode
-    LAUNCHER_PLUGINS_PATH = list()
 
     class DataVersions(object):
         SHOT = '0.0.1'
@@ -149,7 +148,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return self.resource.icon(self.icon_name, theme=self.icon_resources_folder)
+        return resource.ResourceManager().icon(self.icon_name, theme=self.icon_resources_folder)
 
     @property
     def tray_icon(self):
@@ -158,7 +157,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return self.resource.icon(self.tray_icon_name)
+        return resource.ResourceManager().icon(self.tray_icon_name, key='project')
 
     @property
     def shelf_icon(self):
@@ -167,7 +166,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return self.resource.icon(self.shelf_icon_name, theme=None)
+        return resource.ResourceManager().icon(self.shelf_icon_name, theme=None, key='project')
 
     @property
     def tray(self):
@@ -177,15 +176,6 @@ class ArtellaProject(object):
         """
 
         return self._tray
-
-    @property
-    def resource(self):
-        """
-        Returns the class used by the project to load resources (icons, images, fonts, etc)
-        :return: Resource
-        """
-
-        return resource.ResourceManager()
 
     @property
     def namemanager(self):
@@ -524,7 +514,7 @@ class ArtellaProject(object):
         self.logger.debug('Building {} Tools Shelf'.format(self.name.title()))
 
         shelf_category_icon = None
-        if self.resource and self.shelf_icon_name:
+        if self.shelf_icon_name:
             shelf_category_icon = self.shelf_icon
         project_shelf = self.SHELF_CLASS(name=self.name.replace(' ', ''), category_icon=shelf_category_icon)
         icons_paths = resource.ResourceManager().get_resources_paths(key='shelf')
@@ -567,14 +557,14 @@ class ArtellaProject(object):
         :return: list(str)
         """
 
-        if not self._folders_to_register:
+        if not self.paths_to_register:
             return list()
 
         if not full_path:
-            return self._folders_to_register
+            return self.paths_to_register
         else:
             paths_to_return = list()
-            for p in self._folders_to_register:
+            for p in self.paths_to_register:
                 paths_to_return.append(path_utils.clean_path(os.path.join(self.get_project_path(), p)))
             return paths_to_return
 
@@ -630,7 +620,7 @@ class ArtellaProject(object):
         if not title:
             title = self.name.title()
 
-        webbrowser.open("mailto:%s?subject=%s" % (','.join(self._emails), quote(title)))
+        webbrowser.open("mailto:%s?subject=%s" % (','.join(self.emails), quote(title)))
 
     # ==========================================================================================================
     # PROJECT

@@ -126,7 +126,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: QIcon
         """
 
-        return self._project.resource.icon(self.get_category().lower().replace(' ', '_'))
+        return resource.ResourceManager().icon(self.get_category().lower().replace(' ', '_'))
 
     def get_file_type(self, file_type, extension=None):
         """

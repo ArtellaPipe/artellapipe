@@ -249,7 +249,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
 
         if self.LOGO_NAME:
             if self._project:
-                win_logo = self._project.resource.pixmap(self.LOGO_NAME, extension='png')
+                win_logo = resource.ResourceManager().pixmap(self.LOGO_NAME, extension='png')
                 if not win_logo.isNull():
                     return win_logo
                 else:
@@ -290,7 +290,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         """
 
         if self._project:
-            title_pixmap = self._project.resource.pixmap(
+            title_pixmap = resource.ResourceManager().pixmap(
                 name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
             if not title_pixmap.isNull():
                 return title_pixmap
