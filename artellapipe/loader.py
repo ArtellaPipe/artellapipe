@@ -28,6 +28,9 @@ def init(do_reload=False):
     :param do_reload: bool, Whether to reload modules or not
     """
 
+    # Load logger configuration
+    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
+
     import sentry_sdk
     try:
         sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
@@ -144,7 +147,3 @@ def run_tools_manager():
     tools_manager = tools
 
     return tools
-
-
-# Load logger configuration
-logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)

@@ -230,7 +230,7 @@ def launch_artella_app():
         os.startfile(artella_app_file.replace('\\', '//'))
 
 
-def close_all_artella_app_processes(console):
+def close_all_artella_app_processes():
     """
     Closes all Artella app (lifecycler.exe) processes
     :return:

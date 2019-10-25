@@ -787,7 +787,7 @@ class ArtellaProject(object):
             "QProgressBar {border: 0px solid grey; "
             "border-radius:4px; padding:0px} "
             "QProgressBar::chunk {background: qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 "
-            "rgb(" + self.progress_bar_color_0 + "), stop: 1 rgb(" + self.progress_bar_color_1 + ")); }")
+            "rgb(" + self.progress_bar_color0 + "), stop: 1 rgb(" + self.progress_bar_color1 + ")); }")
 
         return new_progress_bar
 
