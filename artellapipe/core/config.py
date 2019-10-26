@@ -97,7 +97,8 @@ class ArtellaConfiguration(object):
         """
 
         if not config_name:
-            tp.Dcc.error('Project Configuration File for {} Project not found! {}'.format(self, project_name, config_name))
+            tp.Dcc.error(
+                'Project Configuration File for {} Project not found! {}'.format(self, project_name, config_name))
             return
 
         module_config_name = config_name + '.yml'
@@ -111,7 +112,8 @@ class ArtellaConfiguration(object):
         try:
             project_config_mod = importlib.import_module('{}.config'.format(project_name))
             project_config_dir = os.path.dirname(project_config_mod.__file__)
-            all_configs = [f for f in os.listdir(project_config_dir) if os.path.isfile(os.path.join(project_config_dir, f))]
+            all_configs = [
+                f for f in os.listdir(project_config_dir) if os.path.isfile(os.path.join(project_config_dir, f))]
             if module_config_name in all_configs:
                 project_config_path = os.path.join(project_config_dir, module_config_name)
         except RuntimeError:
@@ -124,7 +126,8 @@ class ArtellaConfiguration(object):
                 config_data = metayaml.read([project_config_path], config_dict)
         else:
             if not artella_config_path or not os.path.isfile(artella_config_path):
-                raise RuntimeError('Impossible to load configuration "{}" because it does not exists!"'.format(artella_config_path))
+                raise RuntimeError(
+                    'Impossible to load configuration "{}" because it does not exists!"'.format(artella_config_path))
             config_data = metayaml.read([artella_config_path], config_dict)
 
         if not config_data:
