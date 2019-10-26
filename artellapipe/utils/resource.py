@@ -46,7 +46,6 @@ class ResourceManager(object):
         if key:
             if key == 'project':
                 self._project_resources[resources_path] = resource.Resource(resources_path)
-            else:
                 if key in self._resources:
                     self._resources[key].insert(0, resource.Resource(resources_path))
                 else:
@@ -62,6 +61,9 @@ class ResourceManager(object):
         """
         if not self._resources:
             return []
+
+        if key == 'project':
+            return [res.dirname for res in self._project_resources.values()]
 
         if key and key in self._resources:
             return [res.dirname for res in self._resources[key]]

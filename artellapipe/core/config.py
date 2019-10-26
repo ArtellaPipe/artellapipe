@@ -14,6 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import logging
+import importlib
 
 import metayaml
 
@@ -28,6 +29,15 @@ class ArtellaConfigurationParser(object):
 
         self._config_data = config_data
         self._parsed_data = dict()
+
+    def parse(self):
+        self._parsed_data = self._config_data
+        return self._parsed_data
+
+
+class ArtellaProjectConfigurationParser(ArtellaConfigurationParser, object):
+    def __init__(self, config_data):
+        super(ArtellaProjectConfigurationParser, self).__init__(config_data=config_data)
 
     def parse(self):
         if not self._config_data:
@@ -53,57 +63,72 @@ class ArtellaConfigurationParser(object):
 
 
 class ArtellaConfiguration(object):
-
-    PARSER_CLASS = ArtellaConfigurationParser
-
-    def __init__(self, project_name, config_path):
+    def __init__(self, project_name, config_name, config_dict=None, parser_class=ArtellaConfigurationParser):
         super(ArtellaConfiguration, self).__init__()
 
-        self._parsed_data = self.load(project_name=project_name, config_path=config_path)
+        self._parser_class = parser_class
+        self._parsed_data = self.load(project_name=project_name, config_name=config_name, config_dict=config_dict)
 
     @property
     def data(self):
         return self._parsed_data
 
-    def load(self, project_name, config_path):
+    def load(self, project_name, config_name, config_dict=None):
         """
         Function that reads project configuration file and initializes project variables properly
         This function can be extended in new projects
         """
 
-        config_data = self._get_config_data(project_name, config_path)
+        if not config_dict:
+            config_dict = {}
+
+        config_data = self._get_config_data(project_name, config_name, config_dict=config_dict)
         if not config_data:
             return False
 
-        parsed_data = self.PARSER_CLASS(config_data).parse()
+        parsed_data = self._parser_class(config_data).parse()
 
         return parsed_data
 
-    def _get_config_data(self, project_name, config_path):
+    def _get_config_data(self, project_name, config_name, config_dict):
         """
         Returns the config data of the given project name
         :return: dict
         """
 
-        if not config_path or not os.path.isfile(config_path):
-            tp.Dcc.error('Project Configuration File for {} Project not found! {}'.format(self, config_path))
+        if not config_name:
+            tp.Dcc.error('Project Configuration File for {} Project not found! {}'.format(self, project_name, config_name))
             return
+
+        module_config_name = config_name + '.yml'
 
         # We use artellapipe project configuration as base configuration file
         from artellapipe import config
-        artella_config_path = config.ArtellaConfigs().get_project_configuration_file()
+        artella_config_dir = os.path.dirname(config.__file__)
+        artella_config_path = os.path.join(artella_config_dir, module_config_name)
 
-        project_config_data = metayaml.read(
-            [artella_config_path, config_path],
-            {
-                'title': project_name.title(),
-                'project_lower': project_name.replace(' ', '').lower(),
-                'project_upper': project_name.replace(' ', '').upper()
-            }
-        )
+        project_config_path = None
+        try:
+            project_config_mod = importlib.import_module('{}.config'.format(project_name))
+            project_config_dir = os.path.dirname(project_config_mod.__file__)
+            all_configs = [f for f in os.listdir(project_config_dir) if os.path.isfile(os.path.join(project_config_dir, f))]
+            if module_config_name in all_configs:
+                project_config_path = os.path.join(project_config_dir, module_config_name)
+        except RuntimeError:
+            LOGGER.warning('No Configuration Module found for project: {}'.format(project_name))
 
-        if not project_config_data:
-            tp.Dcc.error('Project Configuration File for {} Project is empty! {}'.format(self, config_path))
+        if project_config_path and os.path.isfile(project_config_path):
+            if artella_config_path and os.path.isfile(artella_config_path):
+                config_data = metayaml.read([artella_config_path, project_config_path], config_dict)
+            else:
+                config_data = metayaml.read([project_config_path], config_dict)
+        else:
+            if not artella_config_path or not os.path.isfile(artella_config_path):
+                raise RuntimeError('Impossible to load configuration "{}" because it does not exists!"'.format(artella_config_path))
+            config_data = metayaml.read([artella_config_path], config_dict)
+
+        if not config_data:
+            tp.Dcc.error('Project Configuration File for {} Project is empty! {}'.format(self, project_config_path))
             return
 
-        return project_config_data
+        return config_data

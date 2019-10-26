@@ -48,7 +48,6 @@ LOGGER = logging.getLogger()
 
 class ArtellaProject(object):
 
-    CONFIG_CLASS = config.ArtellaConfiguration
     PROJECT_RESOURCE = None
     TRAY_CLASS = tray.ArtellaTray
     SHELF_CLASS = tp.Shelf
@@ -80,8 +79,17 @@ class ArtellaProject(object):
         self._shots = list()
 
         # To make sure that all variables are properly initialized we must call init_config first
-        config_path = self.get_config_path()
-        self._config = self.CONFIG_CLASS(project_name=name, config_path=config_path)
+        clean_name = self._get_clean_name(name)
+        self._config = config.ArtellaConfiguration(
+            project_name=clean_name,
+            config_name='artellapipe-project',
+            parser_class=config.ArtellaProjectConfigurationParser,
+            config_dict={
+                'title': clean_name.title(),
+                'project_lower': clean_name.replace(' ', '').lower(),
+                'project_upper': clean_name.replace(' ', '').upper()
+            }
+        )
         self._config_data = self._config.data
 
         self._settings = settings
@@ -228,15 +236,6 @@ class ArtellaProject(object):
         else:
             from artellapipe import config
             return os.path.dirname(config.__file__)
-
-    def get_config_path(self):
-        """
-        Returns path where default Artella project config is located
-        :return: str
-        """
-
-        return path_utils.clean_path(
-            os.path.join(self.get_configurations_folder(), defines.ARTELLA_PROJECT_CONFIG_FILE_NAME))
 
     def get_changelog_path(self):
         """
@@ -392,7 +391,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return self.name.replace(' ', '').lower()
+        return self._get_clean_name(self.name)
 
     def get_data_path(self):
         """
@@ -1517,6 +1516,15 @@ class ArtellaProject(object):
     # ==========================================================================================================
     # PRIVATE
     # ==========================================================================================================
+
+    def _get_clean_name(self, name):
+        """
+        Internal function that returns a cleaned version of the given project name
+        :param name: str
+        :return: str
+        """
+
+        return name.replace(' ', '').lower()
 
     def _create_new_settings(self):
         """
