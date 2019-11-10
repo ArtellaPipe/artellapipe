@@ -31,15 +31,7 @@ class ArtellaProgressBar(base.BaseWidget, object):
 
         self._progress_lbl = QLabel('')
         self._progress_lbl.setAlignment(Qt.AlignCenter)
-        gradient_color_0 = self._project.progress_bar_color_0
-        gradient_color_1 = self._project.progress_bar_color_1
-        self._progress = QProgressBar()
-        self._progress.setTextVisible(False)
-        self._progress.setStyleSheet(
-            "QProgressBar {border: 0px solid grey; border-radius:4px; padding:0px} QProgressBar::chunk"
-            " {background: qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 "
-            "rgb(" + gradient_color_0 + "), stop: 1 rgb(" + gradient_color_1 + ")); }")
-
+        self._progress = self._project.get_progress_bar()
         self.main_layout.addWidget(self._progress)
         self.main_layout.addWidget(self._progress_lbl)
 

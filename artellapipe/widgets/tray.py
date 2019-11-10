@@ -12,11 +12,15 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import logging
+
 from Qt.QtWidgets import *
 
 from tpQtLib.core import base
 
-from artellapipe.utils import resource
+import artellapipe.register
+
+LOGGER = logging.getLogger()
 
 
 class ArtellaTray(base.BaseWidget, object):
@@ -42,9 +46,11 @@ class ArtellaTray(base.BaseWidget, object):
         self._tray.setContextMenu(tray_menu)
 
         if not QSystemTrayIcon.isSystemTrayAvailable():
-            raise OSError('Tray Icon is not available!')
+            LOGGER.error('Tray Icon is not available!')
+            return
 
-        self._tray.show()
+        if not self._project.is_dev():
+            self._tray.show()
 
     @property
     def project(self):
@@ -75,3 +81,6 @@ class ArtellaTray(base.BaseWidget, object):
             self._tray.showMessage(title, msg, self._tray_icon)
         except Exception:
             self._tray.showMessage(title, msg)
+
+
+artellapipe.register.register_class('Tray', ArtellaTray)

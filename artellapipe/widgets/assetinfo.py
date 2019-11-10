@@ -21,8 +21,9 @@ from Qt.QtWidgets import *
 from tpQtLib.core import base
 from tpQtLib.widgets import breadcrumb, stack, splitters, grid
 
+import artellapipe.register
 from artellapipe.utils import resource
-from artellapipe.core import defines, artellalib
+from artellapipe.libs.artella.core import artellalib
 
 
 class AssetInfoWidget(base.BaseWidget, object):
@@ -86,7 +87,7 @@ class AssetInfoWidget(base.BaseWidget, object):
 
         self._title_breadcrumb.set([self._asset_widget.asset.get_name()])
         thumb_icon = self._asset_widget.get_thumbnail_icon()
-        thumb_size = self._asset_widget.THUMB_SIZE
+        thumb_size = artellapipe.AssetsMgr().config.get('thumb_size')
         self._asset_icon_lbl.setPixmap(
             thumb_icon.pixmap(thumb_icon.availableSizes()[-1]).scaled(thumb_size[0], thumb_size[1], Qt.KeepAspectRatio))
 
@@ -283,7 +284,7 @@ class AssetFileButton(base.BaseWidget, object):
             return
 
         file_path = self._get_file_path()
-        if not os.path.exists(file_path):
+        if not file_path or not os.path.exists(file_path):
             self._file_btn.setEnabled(False)
             self._versions_btn.setEnabled(False)
 
@@ -322,7 +323,7 @@ class AssetFileButton(base.BaseWidget, object):
             return
 
         file_path = self._get_file_path()
-        asset_history = artellalib.get_asset_history(file_path)
+        asset_history = artellalib.get_file_history(file_path)
         asset_versions = asset_history.versions
         if not asset_versions:
             return
@@ -411,6 +412,8 @@ class WorkingAssetInfo(base.BaseWidget, object):
         Internal function that creates file buttons for the asset
         """
 
+        from artellapipe.core import asset
+
         if not self._asset_widget:
             return
 
@@ -426,9 +429,10 @@ class WorkingAssetInfo(base.BaseWidget, object):
         file_buttons_widget.resizeColumnsToContents()
         file_buttons_widget.setSelectionMode(QAbstractItemView.NoSelection)
 
-        for file_type, file_icon in self._asset_widget.asset.ASSET_FILES.items():
+        for file_type in self._asset_widget.asset.ASSET_FILES:
             file_btn = AssetFileButton(
-                self._asset_widget, defines.ARTELLA_SYNC_WORKING_ASSET_STATUS, file_type, file_icon)
+                self._asset_widget, asset.ArtellaAssetFileStatus.WORKING,
+                file_type, resource.ResourceManager().icon(file_type))
             file_btn.checkVersions.connect(self._on_check_versions)
             self._file_buttons[file_type] = file_btn
             row, col = file_buttons_widget.first_empty_cell()
@@ -479,3 +483,6 @@ class PublishedAssetInfo(base.BaseWidget, object):
         super(PublishedAssetInfo, self).ui()
 
         self.main_layout.addWidget(QPushButton('TEST'))
+
+
+artellapipe.register.register_class('AssetInfo', AssetInfoWidget)

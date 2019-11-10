@@ -14,7 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 from Qt.QtWidgets import *
 
-from artellapipe.gui import spinner
+from artellapipe.widgets import spinner
 
 
 class ArtellaWaiter(QFrame, object):

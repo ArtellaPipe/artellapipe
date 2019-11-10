@@ -20,7 +20,8 @@ import traceback
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from artellapipe.core import artellalib
+import artellapipe.register
+from artellapipe.libs.artella.core import artellalib
 from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
@@ -128,21 +129,28 @@ class ArtellaSyncFileDialog(ArtellaSyncDialog, object):
         self._event = threading.Event()
         try:
             threading.Thread(target=self.sync_files, args=(self._event,), name='ArtellaSyncFilesThread').start()
-        except Exception as e:
-            LOGGER.debug(str(e))
-            LOGGER.debug(traceback.format_exc())
+        except Exception as exc:
+            LOGGER.error(str(exc))
+            LOGGER.error(traceback.format_exc())
+            self.close()
         self.exec_()
 
     def sync_files(self, event):
-        for p in self._files:
-            if not p:
-                continue
-            file_path = os.path.relpath(p, self._project.get_assets_path())
-            self._progress_text.setText('Syncing file: {0} ... Please wait!'.format(file_path))
-            valid_sync = artellalib.synchronize_file(p)
-            if valid_sync is None or valid_sync == {}:
-                event.set()
-        event.set()
+        try:
+            for p in self._files:
+                if not p:
+                    continue
+                file_path = os.path.relpath(p, artellapipe.AssetsMgr().get_assets_path())
+                self._progress_text.setText('Syncing file: {0} ... Please wait!'.format(file_path))
+                valid_sync = artellalib.synchronize_file(p)
+                if valid_sync is None or valid_sync == {}:
+                    event.set()
+                    return
+        except Exception as exc:
+            LOGGER.error(str(exc))
+            LOGGER.error(traceback.format_exc())
+        finally:
+            event.set()
 
 
 class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
@@ -218,3 +226,8 @@ class ArtellaSyncGetDepsDialog(ArtellaSyncDialog, object):
 
     def _cancel_sync(self):
         self._canceled = True
+
+
+artellapipe.register.register_class('SyncFileDialog', ArtellaSyncFileDialog)
+artellapipe.register.register_class('SyncPathDialog', ArtellaSyncPathDialog)
+

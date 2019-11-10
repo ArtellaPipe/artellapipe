@@ -22,7 +22,6 @@ import tpDccLib as tp
 import tpQtLib
 from tpQtLib.core import qtutils, statusbar
 
-from artellapipe.gui import defines
 from artellapipe.utils import resource
 
 
@@ -30,7 +29,9 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
     def __init__(self, parent=None):
         super(ArtellaWindowStatusBar, self).__init__(parent)
 
+        self._project = None
         self._info_url = None
+        self._tool = None
 
         self.setFixedHeight(25)
         self._info_btn = QPushButton()
@@ -38,9 +39,21 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
         self._info_btn.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         self._info_btn.setIcon(resource.ResourceManager().icon('info1'))
         self._info_btn.setStyleSheet('QWidget {background-color: rgba(255, 255, 255, 0); border:0px;}')
+
+        self._bug_btn = QPushButton()
+        self._bug_btn.setIconSize(QSize(25, 25))
+        self._bug_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self._bug_btn.setIcon(resource.ResourceManager().icon('bug'))
+        self._bug_btn.setStyleSheet('QWidget {background-color: rgba(255, 255, 255, 0); border:0px;}')
+
         self.main_layout.insertWidget(0, self._info_btn)
+        self.main_layout.insertWidget(1, self._bug_btn)
 
         self._info_btn.clicked.connect(self._on_open_url)
+        self._bug_btn.clicked.connect(self._on_send_bug)
+
+    def set_project(self, project):
+        self._project = project
 
     def set_info_url(self, url):
         """
@@ -50,13 +63,35 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
 
         self._info_url = url
 
+    def set_tool(self, tool):
+        """
+
+        :param tool:
+        :return:
+        """
+
+        self._tool = tool
+
     def has_url(self):
         """
         Returns whether the URL documentation web is set or not
         :return: bool
         """
 
+        if not self._project:
+            return False
+
         if self._info_url:
+            return True
+
+        return False
+
+    def has_tool(self):
+
+        if not self._project:
+            return False
+
+        if self._tool:
             return True
 
         return False
@@ -75,13 +110,31 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
 
         self._info_btn.setVisible(False)
 
+    def show_bug(self):
+        self._bug_btn.setVisible(True)
+
+    def hide_bug(self):
+        self._bug_btn.setVisible(False)
+
     def open_info_url(self):
         """
         Opens tool documentation URL in user web browser
         """
 
+        if not self._project:
+            return False
+
         if self._info_url:
             webbrowser.open_new_tab(self._info_url)
+
+    def _on_send_bug(self):
+
+        if not self._project:
+            return False
+
+        from artellapipe.core import tool
+
+        tool.ToolsManager().run_tool(self._project, 'bugtracker', extra_args={'tool': self._tool})
 
     def _on_open_url(self):
         """
@@ -92,15 +145,16 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
         self.open_info_url()
 
 
-class ArtellaWindow(tpQtLib.MainWindow, object):
+class ArtellaWindow(tpQtLib.Window, object):
 
-    VERSION = '0.0.0'
+    VERSION = None
     LOGO_NAME = None
     STATUS_BAR_WIDGET = ArtellaWindowStatusBar
 
     def __init__(
             self,
             project=None,
+            tool=None,
             name='Window',
             title='Window',
             size=(800, 535),
@@ -110,13 +164,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
             **kwargs):
 
         self._project = project
-
-        if self._project:
-            name = '{}{}'.format(self._project.name.title(), name).replace(' ', '')
-            title = '{} - {} - {}'.format(self._project.name.title(), title, self.VERSION)
-        else:
-            name = 'ArtellaWindow'
-            title = '{} - {}'.format(title, self.VERSION)
+        self._tool = tool
 
         super(ArtellaWindow, self).__init__(
             name=name,
@@ -180,8 +228,32 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
             win_logo = self._logo_scene.addPixmap(logo_pixmap)
             win_logo.setOffset(910, 0)
 
+        self._status_bar.set_project(self._project)
+        self._status_bar.set_tool(self._tool)
         if not self._status_bar.has_url():
             self._status_bar.hide_info()
+        if not self._status_bar.has_tool():
+            self._status_bar.hide_bug()
+
+        if self._tool:
+            self.main_layout.addWidget(self._tool)
+
+        if self._project.is_dev():
+            int_colors = self._project.dev_color0.split(',')
+            dev_style = "background-color: rgb({}, {}, {})".format(
+                int_colors[0], int_colors[1], int_colors[2], 255)
+            self._dragger.setStyleSheet(dev_style)
+
+    def setWindowTitle(self, title):
+        if self._project.is_dev():
+            title = '{} - [{}]'.format(title, self._project.get_environment())
+
+        super(ArtellaWindow, self).setWindowTitle(title)
+
+    def closeEvent(self, event):
+        if self._tool:
+            self._tool.close_tool()
+        event.accept()
 
     def resizeEvent(self, event):
         """
@@ -282,7 +354,7 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
                     )
                 )
 
-        return resource.ResourceManager().icon(defines.ARTELLA_PROJECT_DEFAULT_ICON)
+        return resource.ResourceManager().icon('artella')
 
     def _get_title_pixmap(self):
         """
@@ -290,16 +362,15 @@ class ArtellaWindow(tpQtLib.MainWindow, object):
         """
 
         if self._project:
-            title_pixmap = resource.ResourceManager().pixmap(
-                name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
+            title_background = self._project.config.get('title_background')
+            title_pixmap = resource.ResourceManager().pixmap(name=title_background, extension='png')
             if not title_pixmap.isNull():
                 return title_pixmap
             else:
                 self._project.logger.warning('{} Project Title Background image not found: {}!'.format(
-                    self._project.name.title(), defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME + '.png'))
+                    self._project.name.title(), title_background + '.png'))
 
-        return resource.ResourceManager().pixmap(
-            name=defines.ARTELLA_TITLE_BACKGROUND_FILE_NAME, extension='png')
+        return resource.ResourceManager().pixmap(name='title_background', extension='png')
 
 
 def dock_window(project, window_class, min_width=300):

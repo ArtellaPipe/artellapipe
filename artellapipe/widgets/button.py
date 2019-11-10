@@ -14,10 +14,10 @@ __email__ = "tpovedatd@gmail.com"
 
 from Qt.QtWidgets import *
 
-from tpQtLib.widgets import button
+from tpQtLib.widgets import buttons
 
 
-class IconButton(button.BaseButton, object):
+class IconButton(buttons.BaseButton, object):
     """
     Class to create simple buttons with icons during normal state and hover state
     """

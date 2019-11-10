@@ -17,18 +17,20 @@ from functools import partial
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
+from Qt.QtGui import *
 
 from tpQtLib.core import base, qtutils
 from tpQtLib.widgets import grid
 
-from artellapipe.core import defines, asset
+import artellapipe
+import artellapipe.register
+from artellapipe.core import asset
+from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
 
 class AssetsViewer(grid.GridWidget, object):
-
-    ASSET_WIDGET_CLASS = asset.ArtellaAssetWidget
 
     assetAdded = Signal(object)
     assetSynced = Signal()
@@ -74,15 +76,24 @@ class AssetsViewer(grid.GridWidget, object):
 
         self.clear_assets()
 
-        all_assets = self._project.find_all_assets()
+        all_assets = artellapipe.AssetsMgr().find_all_assets()
         if not all_assets:
             return
 
         for asset in all_assets:
             if not asset:
                 continue
-            asset_widget = self.ASSET_WIDGET_CLASS(asset)
+            asset_widget = artellapipe.AssetWidget(asset)
             self.add_asset(asset_widget)
+
+    def update_assets_thumbnails(self, force=False):
+        """
+        Updates all the thumbnails of the assets
+        :param force: bool
+        """
+
+        for asset in self.get_assets():
+            asset.update_thumbnail_icon(force=force)
 
     def clear_assets(self):
         """
@@ -99,18 +110,18 @@ class AssetsViewer(grid.GridWidget, object):
         """
 
         if not category:
-            category = defines.ARTELLA_ALL_CATEGORIES_NAME
+            category = asset.ArtellaAssetFileStatus.ALL
 
-        if category != defines.ARTELLA_ALL_CATEGORIES_NAME and category not in self._project.asset_types:
+        if category != asset.ArtellaAssetFileStatus.ALL and category not in artellapipe.AssetsMgr().config.get('types'):
             LOGGER.warning(
                 'Asset Type {} is not a valid asset type for project {}'.format(category, self._project.name.title()))
-            category = defines.ARTELLA_ALL_CATEGORIES_NAME
+            category = asset.ArtellaAssetFileStatus.ALL
 
         self.clear()
 
         new_assets = list()
         for new_asset in reversed(self._assets):
-            if category == defines.ARTELLA_ALL_CATEGORIES_NAME:
+            if category == asset.ArtellaAssetFileStatus.ALL:
                 new_asset.setVisible(True)
                 new_assets.insert(0, new_asset)
             else:
@@ -168,7 +179,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
     def ui(self):
         super(CategorizedAssetViewer, self).ui()
 
-        self._assets_viewer = self.ASSETS_VIEWER_CLASS(
+        self._assets_viewer = artellapipe.AssetsViewer(
             project=self._project,
             column_count=self._column_count,
             parent=self
@@ -200,14 +211,17 @@ class CategorizedAssetViewer(base.BaseWidget, object):
 
         qtutils.clear_layout(self._categories_menu_layout)
 
-        all_asset_categories = [defines.ARTELLA_ALL_CATEGORIES_NAME]
+        all_asset_categories = [asset.ArtellaAssetFileStatus.ALL]
         all_asset_categories.extend(asset_categories)
         for category in all_asset_categories:
             new_btn = QPushButton(category)
+            new_btn.setMinimumWidth(QFontMetrics(new_btn.font()).width(category) + 10)
+            new_btn.setIcon(resource.ResourceManager().icon(category.lower()))
             new_btn.setCheckable(True)
             self._categories_menu_layout.addWidget(new_btn)
             self._categories_btn_grp.addButton(new_btn)
-            if category == defines.ARTELLA_ALL_CATEGORIES_NAME:
+            if category == asset.ArtellaAssetFileStatus.ALL:
+                new_btn.setIcon(resource.ResourceManager().icon('home'))
                 new_btn.setChecked(True)
             new_btn.toggled.connect(partial(self._on_change_category, category))
 
@@ -219,3 +233,6 @@ class CategorizedAssetViewer(base.BaseWidget, object):
 
         if flag:
             self._assets_viewer.change_category(category=category)
+
+
+artellapipe.register.register_class('AssetsViewer', AssetsViewer)

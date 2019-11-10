@@ -17,7 +17,7 @@ from Qt.QtWidgets import *
 
 from tpQtLib.core import resource
 
-from artellapipe.gui import label
+from artellapipe.widgets import label
 
 
 class SpinnerType(object):
