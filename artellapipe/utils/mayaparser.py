@@ -15,6 +15,8 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import json
 
+import artellapipe
+
 
 class MayaParserBase(object):
     """
@@ -482,7 +484,7 @@ def retrieve_references_recursively(project, file_path, parent_path=None,
             found_files[parent_path].append(file_path)
 
     if not os.path.isfile(file_path):
-        file_path = project.fix_path(file_path)
+        file_path = artellapipe.FilesMgr().fix_path(file_path)
         if not os.path.isfile(file_path):
             return None
 
@@ -496,7 +498,7 @@ def retrieve_references_recursively(project, file_path, parent_path=None,
         parser = ArtellaMayaAsiiParser(open_file)
         parser.parse()
         for ref in parser.references:
-            ref = project.fix_path(ref)
+            ref = artellapipe.FilesMgr().fix_path(ref)
             retrieve_references_recursively(
                 project=project,
                 file_path=ref,

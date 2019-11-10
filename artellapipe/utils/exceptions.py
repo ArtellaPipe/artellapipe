@@ -37,11 +37,14 @@ def capture_exception(exc):
     :param exc: str or Exception, Exception to capture
     """
 
-    if SENTRY_AVAILABLE:
-        capture_sentry_exception(exc)
+    if 'SKIP_SENTRY_EXCEPTIONS' not in os.environ:
+        if SENTRY_AVAILABLE:
+            capture_sentry_exception(exc)
+        else:
+            if isinstance(exc, (str, unicode)):
+                exc = Exception(exc)
+            raise exc
     else:
-        if isinstance(exc, (str, unicode)):
-            exc = Exception(exc)
         raise exc
 
 
@@ -51,8 +54,11 @@ def capture_message(msg):
     :param msg: str
     """
 
-    if SENTRY_AVAILABLE:
-        capture_sentry_message(msg)
+    if 'SKIP_SENTRY_EXCEPTIONS' not in os.environ:
+        if SENTRY_AVAILABLE:
+            capture_sentry_message(msg)
+        else:
+            LOGGER.info(msg)
     else:
         LOGGER.info(msg)
 
@@ -63,19 +69,22 @@ def capture_sentry_exception(exc):
     :param exc: str or Exception, Exception to capture
     """
 
-    with push_scope() as scope:
-        scope.user = {'username': str(osplatform.get_user())}
-        if artellapipe.project:
-            scope.set_extra('project', artellapipe.project.name.title())
+    if 'SKIP_SENTRY_EXCEPTIONS' not in os.environ:
+        with push_scope() as scope:
+            scope.user = {'username': str(osplatform.get_user())}
+            if artellapipe.project:
+                scope.set_extra('project', artellapipe.project.name.title())
 
-        if isinstance(exc, (str, unicode)):
-            exc = Exception(exc)
-            sentry_capture_exception(Exception(exc))
-        else:
-            sentry_capture_exception(exc)
+            if isinstance(exc, (str, unicode)):
+                exc = Exception(exc)
+                sentry_capture_exception(Exception(exc))
+            else:
+                sentry_capture_exception(exc)
 
-        traceback.print_exc()
-        raise exc
+            traceback.print_exc()
+            raise exc
+    else:
+        LOGGER.error('{} | {}'.format(exc, traceback.format_exc()))
 
 
 def capture_sentry_message(msg):
@@ -84,11 +93,14 @@ def capture_sentry_message(msg):
     :param msg: str
     """
 
-    with push_scope() as scope:
-        scope.user = {'username': str(osplatform.get_user())}
-        if artellapipe.project:
-            scope.set_extra('project', artellapipe.project.name.title())
-        sentry_capture_message(msg)
+    if 'SKIP_SENTRY_EXCEPTIONS' not in os.environ:
+        with push_scope() as scope:
+            scope.user = {'username': str(osplatform.get_user())}
+            if artellapipe.project:
+                scope.set_extra('project', artellapipe.project.name.title())
+            sentry_capture_message(msg)
+    else:
+        LOGGER.info(msg)
 
 
 def sentry_exception(function):
@@ -116,6 +128,14 @@ def sentry_exception(function):
     return wrapper
 
 
+class ArtellaProjectUndefinedException(Exception):
+    """
+    Exception that is raised when project is not defined
+    """
+
+    pass
+
+
 class ArtellaPipeException(Exception):
     """
     Custom exception that raises Bug Tracker Tool for Artella
@@ -127,7 +147,8 @@ class ArtellaPipeException(Exception):
             msg = 'An error ocurred in Artella Project: {}'.format(
                 project.name.title())
         LOGGER.exception('%s | &s', (msg, traceback.format_exc()))
-        capture_sentry_exception(msg)
+        if 'SKIP_SENTRY_EXCEPTIONS' not in os.environ:
+            capture_sentry_exception(msg)
         super(ArtellaPipeException, self).__init__(msg)
 
 

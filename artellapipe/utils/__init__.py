@@ -1,4 +1,4 @@
 order = [
+    'artellapipe.utils.resource'
     'artellapipe.utils.plugin'
-    'artellapipe.utils.tool'
 ]

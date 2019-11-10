@@ -19,6 +19,7 @@ from tpPyUtils import decorators
 
 import tpDccLib as tp
 
+import artellapipe
 from artellapipe.utils import exceptions
 
 if tp.is_maya():
@@ -330,7 +331,7 @@ def import_alembic(project, alembic_file, mode='import', nodes=None, parent=None
     res = None
     try:
         if fix_path:
-            abc_file = project.fix_path(alembic_file)
+            abc_file = artellapipe.FilesMgr().fix_path(alembic_file)
         else:
             abc_file = alembic_file
 
@@ -387,7 +388,7 @@ def reference_alembic(project, alembic_file, namespace=None, fix_path=False):
     new_nodes = None
     try:
         if fix_path:
-            abc_file = project.fix_path(alembic_file)
+            abc_file = artellapipe.FilesMgr().fix_path(alembic_file)
         else:
             abc_file = alembic_file
 
