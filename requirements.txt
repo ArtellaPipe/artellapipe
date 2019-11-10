@@ -21,3 +21,4 @@ sentry-sdk
 pyyaml
 metayaml
 artellapipe-config
+artellapipe-libs-artella
