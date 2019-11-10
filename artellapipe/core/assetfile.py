@@ -18,29 +18,31 @@ from collections import OrderedDict
 
 from tpPyUtils import decorators, path as path_utils
 
-from artellapipe.core import defines, artellaclasses, artellalib
+from artellapipe.core import asset
+from artellapipe.libs import artella
+from artellapipe.libs.artella.core import artellaclasses, artellalib
 
 LOGGER = logging.getLogger()
 
 
-class ArtellaAssetType(object):
+class ArtellaAssetFile(object):
 
     FILE_TYPE = None
     FILE_EXTENSIONS = list()
 
-    def __init__(self, asset):
+    def __init__(self, file_asset):
 
-        self._asset = asset
+        self._asset = file_asset
 
         self._history = None
         self._working_status = None
         self._working_history = None
         self._latest_server_version = {
-            defines.ARTELLA_SYNC_WORKING_ASSET_STATUS: None,
-            defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS: None
+            asset.ArtellaAssetFileStatus.WORKING: None,
+            asset.ArtellaAssetFileStatus.PUBLISHED: None
         }
 
-        super(ArtellaAssetType, self).__init__()
+        super(ArtellaAssetFile, self).__init__()
 
     def open_file(self, status):
         """
@@ -48,7 +50,7 @@ class ArtellaAssetType(object):
         :return:
         """
 
-        if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+        if status == asset.ArtellaAssetFileStatus.WORKING:
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
@@ -61,7 +63,7 @@ class ArtellaAssetType(object):
         :return:
         """
 
-        if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+        if status == asset.ArtellaAssetFileStatus.WORKING:
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
@@ -76,7 +78,7 @@ class ArtellaAssetType(object):
         :return:
         """
 
-        if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+        if status == asset.ArtellaAssetFileStatus.WORKING:
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
@@ -136,7 +138,7 @@ class ArtellaAssetType(object):
         :return: str
         """
 
-        latest_local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+        latest_local_versions = self.get_latest_local_versions(status=asset.ArtellaAssetFileStatus.PUBLISHED)
         if not latest_local_versions:
             return
 
@@ -157,7 +159,7 @@ class ArtellaAssetType(object):
         :return: str
         """
 
-        latest_local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+        latest_local_versions = self.get_latest_local_versions(status=asset.ArtellaAssetFileStatus.PUBLISHED)
 
         return latest_local_versions
 
@@ -174,6 +176,10 @@ class ArtellaAssetType(object):
         asset_name = self.asset.get_name()
         asset_path = self.asset.get_path()
         version_folder = latest_published_version[1]
+        if not version_folder.startswith('__'):
+            version_folder = '__{}'.format(version_folder)
+        if not version_folder.endswith('__'):
+            version_folder = '{}__'.format(version_folder)
 
         published_path = self._get_published_path(
             asset_name=asset_name, asset_path=asset_path, version_folder=version_folder)
@@ -188,7 +194,7 @@ class ArtellaAssetType(object):
         :return: str
         """
 
-        latest_server_versions = self.get_latest_server_version(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+        latest_server_versions = self.get_latest_server_version(status=asset.ArtellaAssetFileStatus.PUBLISHED)
 
         return latest_server_versions
 
@@ -200,7 +206,7 @@ class ArtellaAssetType(object):
         """
 
         if not status:
-            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+            status = asset.ArtellaAssetFileStatus.WORKING
 
         local_versions = dict()
 
@@ -208,16 +214,18 @@ class ArtellaAssetType(object):
         if not asset_path:
             return local_versions
 
+        working_folder = artella.config.get('server', 'working_folder')
+
         for p in os.listdir(asset_path):
-            if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
-                if p != defines.ARTELLA_WORKING_FOLDER:
+            if status == asset.ArtellaAssetFileStatus.WORKING:
+                if p != working_folder:
                     continue
-                for f in os.listdir(os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER)):
+                for f in os.listdir(os.path.join(asset_path, working_folder)):
                     if f != self.FILE_TYPE:
                         continue
                     # self.get_working_files_for_file_type(self.FILE_TYPE)
             else:
-                if p == defines.ARTELLA_WORKING_FOLDER:
+                if p == working_folder:
                     continue
                 if self.FILE_TYPE in p:
                     version = artellalib.get_asset_version(p)
@@ -234,7 +242,7 @@ class ArtellaAssetType(object):
         """
 
         if not status:
-            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+            status = asset.ArtellaAssetFileStatus.WORKING
 
         latest_local_versions = dict()
 
@@ -257,7 +265,7 @@ class ArtellaAssetType(object):
         """
 
         if not status:
-            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+            status = asset.ArtellaAssetFileStatus.WORKING
 
         server_versions = self.get_server_versions(status=status, all_versions=False)
         if not server_versions:
@@ -279,7 +287,7 @@ class ArtellaAssetType(object):
         working_data = list()
 
         if not status:
-            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+            status = asset.ArtellaAssetFileStatus.WORKING
 
         if not force_update and self._latest_server_version.get(status):
             return self._latest_server_version[status]
@@ -288,7 +296,7 @@ class ArtellaAssetType(object):
         if not asset_path:
             return
 
-        if status == defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS:
+        if status == asset.ArtellaAssetFileStatus.PUBLISHED:
 
             latest_versions = list()
 
@@ -329,7 +337,8 @@ class ArtellaAssetType(object):
             working_data = latest_versions
 
         else:
-            working_path = os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self.FILE_TYPE)
+            working_folder = artella.config.get('server', 'working_folder')
+            working_path = os.path.join(asset_path, working_folder, self.FILE_TYPE)
 
             if not force_update and self._working_status:
                 status = self._working_status
@@ -381,9 +390,9 @@ class ArtellaAssetType(object):
 
         asset_name = self._asset.get_name()
         asset_path = self._asset.get_path()
-        file_path = os.path.join(
-            asset_path, defines.ARTELLA_WORKING_FOLDER, self.FILE_TYPE, asset_name + self.FILE_EXTENSIONS[0])
-        history = artellalib.get_asset_history(file_path=file_path)
+        working_folder = artella.config.get('server', 'working_folder')
+        file_path = os.path.join(asset_path, working_folder, self.FILE_TYPE, asset_name + self.FILE_EXTENSIONS[0])
+        history = artellalib.get_file_history(file_path=file_path)
 
         return history
 
@@ -395,9 +404,9 @@ class ArtellaAssetType(object):
         :return: str
         """
 
+        working_folder = artella.config.get('server', 'working_folder')
         return path_utils.clean_path(
-            os.path.join(
-                asset_path, defines.ARTELLA_WORKING_FOLDER, self.FILE_TYPE, asset_name + self.FILE_EXTENSIONS[0]))
+            os.path.join(asset_path, working_folder, self.FILE_TYPE, asset_name + self.FILE_EXTENSIONS[0]))
 
     def _get_published_path(self, asset_name, asset_path, version_folder):
         """
@@ -449,7 +458,7 @@ class ArtellaAssetType(object):
                 if not force_update and self._working_history:
                     return self._working_history
                 else:
-                    return artellalib.get_asset_history(ref_path)
+                    return artellalib.get_file_history(ref_path)
                 break
 
     def _open_file(self, path, fix_path=True):

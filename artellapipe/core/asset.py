@@ -17,38 +17,47 @@ import ast
 import string
 import logging
 import webbrowser
-from functools import partial
-
-from Qt.QtCore import *
-from Qt.QtWidgets import *
-from Qt.QtGui import *
 
 import tpDccLib as tp
-from tpPyUtils import python, decorators, strings, path as path_utils
-from tpQtLib.core import base, image, qtutils, menu
+from tpPyUtils import python, decorators, osplatform
 
-from artellapipe.core import abstract, defines, artellalib, assetinfo
+import artellapipe.register
+from artellapipe.core import abstract
 from artellapipe.utils import resource
+from artellapipe.libs import artella
+from artellapipe.libs.artella.core import artellalib
+from artellapipe.libs.naming.core import naminglib
 
 LOGGER = logging.getLogger()
+
 if tp.is_maya():
     import tpMayaLib as maya
 
 
 class ArtellaAssetFileStatus(object):
 
-    WORKING = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
-    PUBLISHED = defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS
+    WORKING = 'working'
+    PUBLISHED = 'published'
+    ALL = 'All'
 
-    @staticmethod
-    def is_valid(status):
+    @classmethod
+    def is_valid(cls, status):
         """
         Returns whether given status is valid or not
         :param status: str
         :return: bool
         """
 
-        return status == ArtellaAssetFileStatus.WORKING or status == ArtellaAssetFileStatus.PUBLISHED
+        return status == cls.WORKING or status == cls.PUBLISHED or status == cls.ALL
+
+    @classmethod
+    def supported_statuses(cls):
+        """
+        Returns list of supported Artella Asset File Statuses
+        :return: list(str)
+        """
+
+        return cls.WORKING, cls.PUBLISHED, cls.ALL
 
 
 class ArtellaAsset(abstract.AbstractAsset, object):
@@ -56,11 +65,11 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     ASSET_TYPE = None
     ASSET_FILES = dict()
 
-    def __init__(self, project, asset_data, category=None, node=None):
+    def __init__(self, project, asset_data, node=None):
 
         self._artella_data = None
 
-        super(ArtellaAsset, self).__init__(project=project, asset_data=asset_data, category=category, node=node)
+        super(ArtellaAsset, self).__init__(project=project, asset_data=asset_data, node=node)
 
     @property
     def project(self):
@@ -83,6 +92,23 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return os.path.isdir(asset_path)
 
+    def get_id(self):
+        """
+        Implements abstract get_id function
+        Returns the id of the asset
+        :return: str
+        """
+
+        id_attr = artellapipe.AssetsMgr().config.get('data', 'id_attribute')
+        asset_id = self._asset_data.get(id_attr, None)
+        if not asset_id:
+            LOGGER.warning(
+                'Impossible to retrieve asset ID because asset data does not contains "{}" attribute.'
+                '\nAsset Data: {}'.format(id_attr, self._asset_data))
+            return None
+
+        return asset_id.rstrip()
+
     def get_name(self):
         """
         Implements abstract get_name function
@@ -90,8 +116,15 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: str
         """
 
-        return self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(
-            defines.ARTELLA_ASSET_DATA_NAME_ATTR, defines.ARTELLA_DEFAULT_ASSET_NAME)
+        name_attr = artellapipe.AssetsMgr().config.get('data', 'name_attribute')
+        asset_name = self._asset_data.get(name_attr, None)
+        if not asset_name:
+            LOGGER.warning(
+                'Impossible to retrieve asset name because asset data does not contains "{}" attribute.'
+                '\nAsset Data: {}'.format(name_attr, self._asset_data))
+            return None
+
+        return asset_name.rstrip()
 
     def get_path(self):
         """
@@ -100,25 +133,62 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: str
         """
 
-        return self._asset_data[defines.ARTELLA_ASSET_DATA_ATTR].get(defines.ARTELLA_ASSET_DATA_PATH_ATTR, '')
+        path_template_name = artellapipe.AssetsMgr().config.get('data', 'path_template_name')
+        template = naminglib.ArtellaNameLib().get_template(path_template_name)
+        if not template:
+            LOGGER.warning(
+                'Impossible to retrieve asset path because template "{}" is not in configuration file'.format(
+                    path_template_name))
+            return None
+
+        template_dict = {
+            'project_path': self._project.get_path(),
+            'asset_type': self.get_category(),
+            'asset_name': self.get_name()
+        }
+        asset_path = template.format(template_dict)
+
+        if not asset_path:
+            LOGGER.warning(
+                'Impossible to retrieve asset path from template: "{} | {} | {}"'.format(
+                    template.name, template.pattern, template_dict))
+            return None
+
+        return asset_path
+
+    def get_thumbnail_path(self):
+        """
+        Implements abstract get_path function
+        Returns the path of the asset
+        :return: str
+        """
+
+        thumb_attr = artellapipe.AssetsMgr().config.get('data', 'thumb_attribute')
+
+        thumb_path = self._asset_data.get(thumb_attr, None)
+        if not thumb_path:
+            LOGGER.warning(
+                'Impossible to retrieve thumb path because asset data does not contains "{}" attribute.'
+                '\nAsset Data: {}'.format(thumb_attr, self._asset_data))
+
+        return thumb_path
 
     def get_category(self):
         """
-        Implements abstract get_thumbnail_icon function
+        Implements abstract get_category function
         Returns the category of the asset
         :return: str
         """
 
-        if self._category:
-            return self._category
+        category_attr = artellapipe.AssetsMgr().config.get('data', 'category_attribute')
 
-        asset_path = self.get_path()
-        if not asset_path:
-            return ''
+        category = self._asset_data.get(category_attr, None)
+        if not category:
+            LOGGER.warning(
+                'Impossible to retrieve asset category because asset data does not contains "{}" attribute.'
+                '\nAsset Data: {}'.format(category_attr, self._asset_data))
 
-        self._category = strings.camel_case_to_string(os.path.basename(os.path.dirname(asset_path)))
-
-        return self._category
+        return category
 
     def get_icon(self):
         """
@@ -139,7 +209,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if file_type not in self.ASSET_FILES:
             return None
 
-        asset_file_class = self._project.get_asset_file(file_type=file_type, extension=extension)
+        asset_file_class = artellapipe.AssetsMgr().get_asset_file(file_type=file_type, extension=extension)
         if not asset_file_class:
             LOGGER.warning('File Type: {} | {} not registered in current project!'.format(file_type, extension))
             return
@@ -151,6 +221,14 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         Opens folder where item is located locally
         """
 
+        asset_path = self.get_path()
+        if not os.path.isdir(asset_path):
+            LOGGER.warning(
+                'Impossible to open asset path locally because path for Asset "{}" : "{}" does not exists!'.format(
+                self.get_name(), asset_path
+            ))
+            return None
+
         artellalib.explore_file(self.get_path())
 
     def get_valid_file_types(self):
@@ -159,8 +237,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: list(str)
         """
 
-        asset_files = self.ASSET_FILES.keys()
-        return [i for i in asset_files if i in self._project.asset_files]
+        return [i for i in self.ASSET_FILES if i in artellapipe.AssetsMgr().config.get('files')]
 
     # ==========================================================================================================
     # ARTELLA
@@ -198,6 +275,10 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         artella_url = self.get_artella_url()
+        if not artella_url:
+            LOGGER.warning('Impossible to open Artella URL for asset "{}" : "{}"'.format(self.get_name(), artella_url))
+            return None
+
         webbrowser.open(artella_url)
 
     # ==========================================================================================================
@@ -214,32 +295,52 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         if not extension:
-            extension = defines.ARTELLA_DEFAULT_ASSET_FILES_EXTENSION
+            extension = self.project.default_extension
 
-        if file_type not in self.project.asset_files:
+        asset_files = artellapipe.AssetsMgr().config.get('files', default=dict())
+        if file_type not in asset_files:
+            LOGGER.warning('File Type "{}" is not valid! Supported File Types: {}'.format(file_type, asset_files.keys()))
             return None
         if not ArtellaAssetFileStatus.is_valid(status):
+            LOGGER.warning('Given File Artella Sync Status: {} is not valid! Supported Statuses: {}'.format(
+                status, ArtellaAssetFileStatus.supported_statuses()))
             return None
 
-        asset_name = self.get_name()
-        file_name = self._get_file_name(asset_name, asset_file_type=file_type)
-        file_name += extension
+        file_template_name = file_type.lower()
+        template = naminglib.ArtellaNameLib().get_template(file_template_name)
+        if not template:
+            LOGGER.warning(
+                'Impossible to retrieve asset file path because template "{}" is not in configuration file'.format(
+                    file_template_name))
+            return None
 
-        file_path = None
+        template_dict = {
+            'asset_path': self.get_path(),
+            'asset_name': self.get_name(),
+            'file_extension': extension
+        }
+
+        asset_name = self.get_name()
         if status == ArtellaAssetFileStatus.WORKING:
-            file_path = path_utils.clean_path(
-                os.path.join(self.get_path(), defines.ARTELLA_WORKING_FOLDER, file_type, file_name))
+            template_dict['version_folder'] = artella.config.get('server', 'working_folder')
+            file_path = template.format(template_dict)
         else:
-            latest_local_versions = self.get_latest_local_versions(status=defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
-            if latest_local_versions[file_type]:
-                file_path = os.path.join(self.get_path(), latest_local_versions[file_type][1], file_type, file_name)
+            latest_local_versions = self.get_latest_local_versions(status=ArtellaAssetFileStatus.PUBLISHED)
+            file_type_local_versions = latest_local_versions.get(file_type, None)
+            if not file_type_local_versions:
+                LOGGER.warning(
+                    'No local versions found in Asset "{}" for File Type: "{}"'.format(asset_name, file_type))
+                return None
+            template_dict['version_folder'] = file_type_local_versions[1]
+            file_path = template.format(template_dict)
 
         if not file_path:
-            raise RuntimeError(
-                'Impossible to retrieve file because asset path for {} is not valid!'.format(asset_name))
+            raise RuntimeError('Impossible to retrieve file because asset path for "{}" is not valid!'.format(
+                asset_name
+            ))
 
         if fix_path:
-            file_path = self._project.fix_path(file_path)
+            file_path = artellapipe.FilesMgr().fix_path(file_path)
 
         return file_path
 
@@ -256,40 +357,87 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=fix_path)
         if os.path.isfile(file_path):
             if fix_path:
-                file_path = self._project.fix_path(file_path)
+                file_path = artellapipe.FilesMgr().fix_path(file_path)
             artellalib.open_file_in_maya(file_path)
             return True
+        elif os.path.isdir(file_path):
+            osplatform.open_folder(file_path)
         else:
             LOGGER.warning('Impossible to open asset file of type "{}": {}'.format(file_type, file_path))
 
         return False
 
-    def reference_file(self, file_type, status, extension=None, fix_path=True):
+    def reference_file(self, file_type, status, namespace=None, extension=None, fix_path=True, sync=False):
         """
         References asset file with the given type and status
         :param file_type: str
         :param status: str
+        :param namespace: str
         :param fix_path: bool
+        :param sync: bool
         :return: bool
         """
 
         file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
-        if os.path.isfile(file_path):
-            if fix_path:
-                file_path = self._project.fix_path(file_path)
-            if tp.is_maya():
+        if not file_path or not os.path.isfile(file_path):
+            LOGGER.warning(
+                'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
+                    file_type, file_path))
+            return False
+
+        if sync:
+            artellapipe.FilesMgr().sync_files(files=[file_path])
+
+        if fix_path:
+            file_path = artellapipe.FilesMgr().fix_path(file_path)
+
+        if tp.is_maya():
+            if not namespace:
                 use_rename = maya.cmds.optionVar(q='referenceOptionsUseRenamePrefix')
                 if use_rename:
                     namespace = maya.cmds.optionVar(q='referenceOptionsRenamePrefix')
                 else:
                     filename = os.path.basename(file_path)
                     namespace, _ = os.path.splitext(filename)
-                return tp.Dcc.reference_file(file_path=file_path, namespace=namespace)
-            else:
-                return tp.Dcc.reference_file(file_path=file_path)
+            if tp.Dcc.namespace_exists(namespace):
+                namespace = tp.Dcc.unique_namespace(namespace)
+            return tp.Dcc.reference_file(file_path=file_path, namespace=namespace)
         else:
-            LOGGER.warning('Impossible to reference asset file of type "{}": {}'.format(file_type, file_path))
+            return tp.Dcc.reference_file(file_path=file_path)
+
+    def reference_file_by_extension(self, extension=None, sync=False):
+        """
+        Implements base AbstractAsset reference_file_by_extension function
+        References asset file with the given extension
+        :param extension: str
+        :param sync: bool
+        """
+
+        available_extensions = self._project.extensions
+        if extension not in available_extensions:
+            LOGGER.warning('Impossible to reference file with extension "{}". Supported extensions: {}'.format(
+                extension, available_extensions
+            ))
             return False
+
+        reference_extension_functions = artellapipe.AssetsMgr().config.get('reference_extension_functions') or dict()
+        if extension not in reference_extension_functions:
+            LOGGER.warning('Impossible to reference file with extension "{}". Reference extension functions: {}'.format(
+                extension, reference_extension_functions
+            ))
+            return False
+
+        reference_extension_fn_name = reference_extension_functions[extension].get('reference_function', None)
+        reference_function_file_type = reference_extension_functions[extension].get('file_type', None)
+        if not reference_extension_fn_name or not hasattr(self, reference_extension_fn_name):
+            LOGGER.warning(
+                'Impossible to reference file with extension "{}" because asset class "{}" has no implemented '
+                'reference function: "{}"'.format(extension, self.__class__.__name__, reference_extension_fn_name))
+            return False
+
+        reference_extension_fn = getattr(self, reference_extension_fn_name)
+
+        return reference_extension_fn(reference_function_file_type, sync=sync)
 
     # ==========================================================================================================
     # SYNC
@@ -304,9 +452,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param ask: bool, Whether user will be informed of the sync operation before starting or not
         """
 
-        # self.export_shaders()
-
-        if sync_type != defines.ARTELLA_SYNC_ALL_ASSET_STATUS:
+        if sync_type != ArtellaAssetFileStatus.ALL:
             if sync_type not in self.ASSET_FILES:
                 LOGGER.warning(
                     'Impossible to sync "{}" because current Asset {} does not support it!'.format(
@@ -323,7 +469,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             LOGGER.warning('No Paths to sync for "{}"'.format(self.get_name()))
             return
 
-        self._project.sync_files(files=paths_to_sync)
+        artellapipe.FilesMgr().sync_files(files=paths_to_sync)
 
     @decorators.timestamp
     def sync_latest_published_files(self, file_type=None, ask=False):
@@ -337,7 +483,6 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             return
 
         for valid_type in valid_types:
-            file_type = self.get_file_type(valid_type)
             file_type = self.get_file_type(valid_type)
             if not file_type:
                 continue
@@ -361,7 +506,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         if not status:
-            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+            status = ArtellaAssetFileStatus.WORKING
 
         valid_types = self._get_types_to_check(file_types)
 
@@ -391,7 +536,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         if not status:
-            status = defines.ARTELLA_SYNC_WORKING_ASSET_STATUS
+            status = ArtellaAssetFileStatus.WORKING
 
         valid_types = self._get_types_to_check(file_types)
 
@@ -478,11 +623,9 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             if not file_type:
                 continue
 
-            if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or \
-                    sync_type == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+            if sync_type == ArtellaAssetFileStatus.ALL or sync_type == ArtellaAssetFileStatus.WORKING:
                 paths_to_sync.append(file_type.get_working_path(sync_folder=True))
-            if sync_type == defines.ARTELLA_SYNC_ALL_ASSET_STATUS or \
-                    sync_type == defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS:
+            if sync_type == ArtellaAssetFileStatus.ALL or sync_type == ArtellaAssetFileStatus.PUBLISHED:
                 paths_to_sync.append(file_type.get_latest_server_published_path(sync_folder=True))
 
         return paths_to_sync
@@ -495,7 +638,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         asset_valid_file_types = self.get_valid_file_types()
-        if file_types == defines.ARTELLA_SYNC_ALL_ASSET_TYPES:
+        if file_types == ArtellaAssetFileStatus.ALL:
             file_types = asset_valid_file_types
         else:
             file_types = python.force_list(file_types)
@@ -505,217 +648,6 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                 file_types = [i for i in file_types if i in asset_valid_file_types]
 
         return file_types
-
-
-class ArtellaAssetWidget(base.BaseWidget, object):
-
-    ASSET_INFO_CLASS = assetinfo.AssetInfoWidget
-    DEFAULT_ICON = resource.ResourceManager().icon('default')
-    THUMB_SIZE = (200, 200)
-
-    clicked = Signal(object)
-    startSync = Signal(object, str, str)
-
-    def __init__(self, asset, parent=None):
-
-        self._asset = asset
-        self._thumbnail_icon = None
-
-        super(ArtellaAssetWidget, self).__init__(parent=parent)
-
-        self._init()
-
-    def get_main_layout(self):
-        main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(5, 5, 5, 5)
-        main_layout.setSpacing(0)
-        return main_layout
-
-    def ui(self):
-        super(ArtellaAssetWidget, self).ui()
-
-        self.setFixedWidth(160)
-        self.setFixedHeight(160)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-
-        widget_layout = QVBoxLayout()
-        widget_layout.setContentsMargins(2, 2, 2, 2)
-        widget_layout.setSpacing(0)
-        main_frame = QFrame()
-        main_frame.setFrameStyle(QFrame.StyledPanel | QFrame.Raised)
-        main_frame.setLineWidth(1)
-        main_frame.setLayout(widget_layout)
-        self.main_layout.addWidget(main_frame)
-
-        self._asset_btn = QPushButton('', self)
-        self._asset_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self._asset_btn.setIconSize(QSize(150, 150))
-        self._asset_lbl = QLabel(defines.ARTELLA_DEFAULT_ASSET_NAME)
-        self._asset_lbl.setAlignment(Qt.AlignCenter)
-
-        widget_layout.addWidget(self._asset_btn)
-        widget_layout.addWidget(self._asset_lbl)
-
-    def setup_signals(self):
-        self._asset_btn.clicked.connect(partial(self.clicked.emit, self))
-        self.customContextMenuRequested.connect(self._on_context_menu)
-
-    @property
-    def asset(self):
-        """
-        Returns asset data
-        :return: ArtellaAsset
-        """
-
-        return self._asset
-
-    def get_asset_info(self):
-        """
-        Retruns AssetInfo widget associated to this asset
-        :return: AssetInfoWidget
-        """
-
-        return self.ASSET_INFO_CLASS(self)
-
-    def get_thumbnail_icon(self):
-        """
-        Implements abstract get_thumbnail_icon function
-        Returns the icon of the asset
-        :return: QIcon
-        """
-
-        # If the icon is already cached we return it
-        if self._thumbnail_icon:
-            return self._thumbnail_icon
-
-        str_icon = self.asset.data[defines.ARTELLA_ASSET_DATA_ATTR].get(
-            defines.ARTELLA_ASSET_DATA_ICON_ATTR, None)
-        icon_format = self.asset.data[defines.ARTELLA_ASSET_DATA_ATTR].get(
-            defines.ARTELLA_ASSET_DATA_ICON_FORMAT_ATTR, None)
-        if not str_icon or not icon_format:
-            return self.DEFAULT_ICON
-
-        thumbnail_pixmap = QPixmap.fromImage(image.base64_to_image(str_icon.encode('utf-8'), image_format=icon_format))
-        if not thumbnail_pixmap:
-            self._thumbnail_icon = self.DEFAULT_ICON
-
-        return QIcon(thumbnail_pixmap)
-
-    def _init(self):
-        """
-        Internal function that initializes asset widget
-        Can be extended to add custom initialization functionality to asset widgets
-        """
-
-        if not self._asset:
-            return
-
-        self._asset_lbl.setText(self._asset.get_name())
-
-        thumb_icon = self.get_thumbnail_icon()
-        if thumb_icon:
-            self._asset_btn.setIcon(thumb_icon)
-
-    def _create_context_menu(self, context_menu):
-        """
-        Internal function that generates contextual menu for asset widget
-        Reimplement for custom functionality
-        :param context_menu: Menu
-        """
-
-        sync_icon = resource.ResourceManager().icon('sync')
-        artella_icon = resource.ResourceManager().icon('artella')
-        eye_icon = resource.ResourceManager().icon('eye')
-
-        artella_action = QAction(artella_icon, 'Open in Artella', context_menu)
-        view_locally_action = QAction(eye_icon, 'View Locally', context_menu)
-        sync_action = QAction(sync_icon, 'Synchronize', context_menu)
-        sync_menu = menu.Menu(self)
-        actions_added = self._fill_sync_action_menu(sync_menu)
-        artella_action.triggered.connect(self._on_open_in_artella)
-        view_locally_action.triggered.connect(self._on_view_locally)
-
-        context_menu.addAction(artella_action)
-        context_menu.addAction(view_locally_action)
-
-        if actions_added:
-            sync_action.setMenu(sync_menu)
-            context_menu.addAction(sync_action)
-
-    def _fill_sync_action_menu(self, sync_menu):
-        """
-        Internal function that fills sync menu with proper actions depending of the asset files supported
-        :param sync_menu: Menu
-        """
-
-        if not sync_menu:
-            return
-
-        actions_to_add = list()
-
-        for asset_type_name, asset_type_icon in self.asset.ASSET_FILES.items():
-            asset_type_action = QAction(asset_type_icon, asset_type_name.title(), sync_menu)
-            asset_type_action.triggered.connect(
-                partial(self._on_sync, asset_type_name,
-                        defines.ARTELLA_SYNC_ALL_ASSET_STATUS, False))
-            actions_to_add.append(asset_type_action)
-
-        if actions_to_add:
-            download_icon = resource.ResourceManager().icon('download')
-            all_action = QAction(download_icon, 'All', sync_menu)
-            all_action.triggered.connect(
-                partial(self._on_sync,
-                        defines.ARTELLA_SYNC_ALL_ASSET_TYPES,
-                        defines.ARTELLA_SYNC_ALL_ASSET_STATUS, False))
-            actions_to_add.insert(0, all_action)
-
-            for action in actions_to_add:
-                sync_menu.addAction(action)
-
-        return actions_to_add
-
-    def _on_context_menu(self, pos):
-        """
-        Internal callback function that is called when the user wants to show asset widget contextual menu
-        :param pos: QPoint
-        """
-
-        context_menu = menu.Menu(self)
-        self._create_context_menu(context_menu)
-        context_menu.exec_(self.mapToGlobal(pos))
-
-    def _on_open_in_artella(self):
-        """
-        Internal callback function that is called when the user presses Open in Artella contextual menu action
-        """
-
-        self._asset.open_in_artella()
-
-    def _on_view_locally(self):
-        """
-        Internal callback function that is called when the user presses View Locally contextual menu action
-        """
-
-        self._asset.view_locally()
-
-    def _on_sync(self, file_type, sync_type, ask=False):
-        """
-        Internal callback function that is called when the user tries to Sync an asset through UI
-        :param file_type: str
-        :param sync_type: str
-        :param ask: bool
-        """
-
-        if ask:
-            res = qtutils.show_question(
-                None,
-                'Synchronize "{}" file: {}'.format(self.asset.get_name(), file_type.title()),
-                'Are you sure you want to sync this asset? This can take some time!'
-            )
-            if res != QMessageBox.Yes:
-                return
-
-        self.startSync.emit(self.asset, file_type, sync_type)
 
 
 class ArtellaTagNode(object):
@@ -807,3 +739,6 @@ class ArtellaTagNode(object):
                 return None
 
             return tp.Dcc.get_attribute_value(node=self._node, attribute_name=attribute_name)
+
+
+artellapipe.register.register_class('Asset', ArtellaAsset)

@@ -16,15 +16,16 @@ import os
 
 from tpPyUtils import decorators
 
+import artellapipe
+
 
 class AbstractAsset(object):
 
-    def __init__(self, project, asset_data, category=None, node=None):
+    def __init__(self, project, asset_data, node=None):
         super(AbstractAsset, self).__init__()
 
         self._project = project
         self._asset_data = asset_data
-        self._category = category
         self._node = node
 
     @property
@@ -46,6 +47,16 @@ class AbstractAsset(object):
         return self._node
 
     @decorators.abstractmethod
+    def get_id(self):
+        """
+        Returns the ID of the asset
+        :return: str
+        """
+
+        raise NotImplementedError('get_id function for {} is not implemented!'.format(self.__class__.__name__))
+
+
+    @decorators.abstractmethod
     def get_name(self):
         """
         Returns the name of the asset
@@ -62,6 +73,15 @@ class AbstractAsset(object):
         """
 
         raise NotImplementedError('get_path function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_thumbnail_path(self):
+        """
+        Returns the path where thumbnail path is located
+        :return: str
+        """
+
+        raise NotImplementedError('get_thumbnail_path function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
     def get_category(self):
@@ -132,10 +152,11 @@ class AbstractAsset(object):
         """
         raise NotImplementedError('reference_file function for {} is not implemented!'.format(self.__class__.__name__))
 
-    def reference_file_by_extension(self, extension=None):
+    def reference_file_by_extension(self, extension=None, sync=False):
         """
         References asset file with the given extension
         :param extension: str
+        :param sync: bool
         """
 
         raise NotImplementedError(
@@ -147,4 +168,4 @@ class AbstractAsset(object):
         :return: str
         """
 
-        return os.path.relpath(self.get_path(), self._project.get_assets_path())
+        return os.path.relpath(self.get_path(), artellapipe.AssetsMgr().get_assets_path())
