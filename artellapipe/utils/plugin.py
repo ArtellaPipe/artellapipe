@@ -1,3 +1,18 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Module that contains utils classes to define Artella Plugins
+"""
+
+from __future__ import print_function, division, absolute_import
+
+__author__ = "Tomas Poveda"
+__license__ = "MIT"
+__maintainer__ = "Tomas Poveda"
+__email__ = "tpovedatd@gmail.com"
+
+
 import time
 import inspect
 
@@ -85,5 +100,3 @@ class PluginManager(object):
         self._variable_name = variable_name or ''
         self._loaded_tools = dict()
         self._base_paths = list()
-
-

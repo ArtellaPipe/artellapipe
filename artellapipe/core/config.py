@@ -176,9 +176,9 @@ class ArtellaConfiguration(object):
             project_config_dir = os.path.dirname(project_config_mod.__file__)
             project_config_env_dir = os.path.join(project_config_dir, self._environment.lower())
             if not os.path.isdir(project_config_env_dir):
-                LOGGER.warning('Configuration Folder for Environment "{}" and '
-                               'Project "{}" does not exists: "{}"'.format(
-                    self._environment, project_name, artella_config_env_dir))
+                LOGGER.warning(
+                    'Configuration Folder for Environment "{}" and Project "{}" does not exists: "{}"'.format(
+                        self._environment, project_name, artella_config_env_dir))
                 return config_data
 
             all_configs = [
