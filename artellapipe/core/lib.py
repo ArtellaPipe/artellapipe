@@ -76,12 +76,12 @@ class LibsManager(object):
             pass
 
         config_dict = {
-                'join': os.path.join,
-                'user': os.path.expanduser('~'),
-                'filename': pkg_loader.filename,
-                'fullname': pkg_loader.fullname,
-                'project': project_name
-            }
+            'join': os.path.join,
+            'user': os.path.expanduser('~'),
+            'filename': pkg_loader.filename,
+            'fullname': pkg_loader.fullname,
+            'project': project_name
+        }
         if mod_config_settings:
             config_dict.update(mod_config_settings)
 

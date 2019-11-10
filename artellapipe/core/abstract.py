@@ -55,7 +55,6 @@ class AbstractAsset(object):
 
         raise NotImplementedError('get_id function for {} is not implemented!'.format(self.__class__.__name__))
 
-
     @decorators.abstractmethod
     def get_name(self):
         """
@@ -81,7 +80,8 @@ class AbstractAsset(object):
         :return: str
         """
 
-        raise NotImplementedError('get_thumbnail_path function for {} is not implemented!'.format(self.__class__.__name__))
+        raise NotImplementedError(
+            'get_thumbnail_path function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
     def get_category(self):

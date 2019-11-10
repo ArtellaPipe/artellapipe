@@ -230,4 +230,3 @@ class ArtellaSyncGetDepsDialog(ArtellaSyncDialog, object):
 
 artellapipe.register.register_class('SyncFileDialog', ArtellaSyncFileDialog)
 artellapipe.register.register_class('SyncPathDialog', ArtellaSyncPathDialog)
-

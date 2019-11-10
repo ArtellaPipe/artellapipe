@@ -225,8 +225,8 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if not os.path.isdir(asset_path):
             LOGGER.warning(
                 'Impossible to open asset path locally because path for Asset "{}" : "{}" does not exists!'.format(
-                self.get_name(), asset_path
-            ))
+                    self.get_name(), asset_path
+                ))
             return None
 
         artellalib.explore_file(self.get_path())
@@ -299,7 +299,8 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         asset_files = artellapipe.AssetsMgr().config.get('files', default=dict())
         if file_type not in asset_files:
-            LOGGER.warning('File Type "{}" is not valid! Supported File Types: {}'.format(file_type, asset_files.keys()))
+            LOGGER.warning(
+                'File Type "{}" is not valid! Supported File Types: {}'.format(file_type, asset_files.keys()))
             return None
         if not ArtellaAssetFileStatus.is_valid(status):
             LOGGER.warning('Given File Artella Sync Status: {} is not valid! Supported Statuses: {}'.format(
@@ -422,9 +423,10 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         reference_extension_functions = artellapipe.AssetsMgr().config.get('reference_extension_functions') or dict()
         if extension not in reference_extension_functions:
-            LOGGER.warning('Impossible to reference file with extension "{}". Reference extension functions: {}'.format(
-                extension, reference_extension_functions
-            ))
+            LOGGER.warning(
+                'Impossible to reference file with extension "{}". Reference extension functions: {}'.format(
+                    extension, reference_extension_functions
+                ))
             return False
 
         reference_extension_fn_name = reference_extension_functions[extension].get('reference_function', None)

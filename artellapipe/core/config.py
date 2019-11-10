@@ -61,7 +61,8 @@ class ArtellaConfigurationParser(object):
 
 
 class ArtellaConfiguration(object):
-    def __init__(self, project_name, config_name, environment, config_dict=None, parser_class=ArtellaConfigurationParser):
+    def __init__(self, project_name, config_name, environment, config_dict=None,
+                 parser_class=ArtellaConfigurationParser):
         super(ArtellaConfiguration, self).__init__()
 
         self._project_name = project_name
@@ -175,12 +176,14 @@ class ArtellaConfiguration(object):
             project_config_dir = os.path.dirname(project_config_mod.__file__)
             project_config_env_dir = os.path.join(project_config_dir, self._environment.lower())
             if not os.path.isdir(project_config_env_dir):
-                LOGGER.warning('Configuration Folder for Environment "{}" and Project "{}" does not exists: "{}"'.format(
+                LOGGER.warning('Configuration Folder for Environment "{}" and '
+                               'Project "{}" does not exists: "{}"'.format(
                     self._environment, project_name, artella_config_env_dir))
                 return config_data
 
             all_configs = [
-                f for f in os.listdir(project_config_env_dir) if os.path.isfile(os.path.join(project_config_env_dir, f))]
+                f for f in os.listdir(project_config_env_dir) if os.path.isfile(
+                    os.path.join(project_config_env_dir, f))]
             if module_config_name in all_configs:
                 project_config_path = os.path.join(project_config_env_dir, module_config_name)
         except RuntimeError:
@@ -199,7 +202,8 @@ class ArtellaConfiguration(object):
             project_config_path = artella_config_path
 
         if not config_data:
-            raise RuntimeError('Project Configuration File for {} Project is empty! {}'.format(self, project_config_path))
+            raise RuntimeError(
+                'Project Configuration File for {} Project is empty! {}'.format(self, project_config_path))
 
         # We store path where configuration file is located in disk
         if 'config' in config_data and 'path' in config_data['config']:
@@ -235,5 +239,3 @@ def get_config(project, config_name, config_dict=None, parser_class=ArtellaConfi
     )
 
     return new_cfg
-
-

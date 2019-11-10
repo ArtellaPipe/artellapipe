@@ -147,7 +147,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         if not os.path.isdir(thumbnails_cache_folder):
             os.makedirs(thumbnails_cache_folder)
 
-        return os.path.join(thumbnails_cache_folder, self.asset.get_name()+'.png')
+        return os.path.join(thumbnails_cache_folder, self.asset.get_name() + '.png')
 
     def get_thumbnail_icon(self):
         """
