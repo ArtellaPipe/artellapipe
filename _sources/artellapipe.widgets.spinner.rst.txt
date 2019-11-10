@@ -1,0 +1,7 @@
+artellapipe.widgets.spinner module
+==================================
+
+.. automodule:: artellapipe.widgets.spinner
+   :members:
+   :undoc-members:
+   :show-inheritance:

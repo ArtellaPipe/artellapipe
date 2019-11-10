@@ -6,11 +6,14 @@ Subpackages
 
 .. toctree::
 
+   artellapipe.config
    artellapipe.core
-   artellapipe.gui
+   artellapipe.dccs
    artellapipe.libs
+   artellapipe.managers
    artellapipe.tools
    artellapipe.utils
+   artellapipe.widgets
 
 Submodules
 ----------

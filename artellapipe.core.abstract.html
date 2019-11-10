@@ -89,11 +89,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.config.html">artellapipe.config package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
@@ -178,7 +181,7 @@
 <p>Module that contains abstract definitions for some classes for Artella Pipeline</p>
 <dl class="class">
 <dt id="artellapipe.core.abstract.AbstractAsset">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.abstract.</code><code class="sig-name descname">AbstractAsset</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">asset_data</em>, <em class="sig-param">category=None</em>, <em class="sig-param">node=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.abstract.</code><code class="sig-name descname">AbstractAsset</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">asset_data</em>, <em class="sig-param">node=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="artellapipe.core.abstract.AbstractAsset.data">
@@ -205,6 +208,13 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.core.abstract.AbstractAsset.get_id">
+<code class="sig-name descname">get_id</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.get_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ID of the asset
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.core.abstract.AbstractAsset.get_name">
 <code class="sig-name descname">get_name</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.get_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the asset
@@ -222,6 +232,13 @@
 <dt id="artellapipe.core.abstract.AbstractAsset.get_relative_path">
 <code class="sig-name descname">get_relative_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.get_relative_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns path of the asset relative to the Artella project
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.abstract.AbstractAsset.get_thumbnail_path">
+<code class="sig-name descname">get_thumbnail_path</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.get_thumbnail_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the path where thumbnail path is located
 :return: str</p>
 </dd></dl>
 
@@ -268,9 +285,10 @@
 
 <dl class="method">
 <dt id="artellapipe.core.abstract.AbstractAsset.reference_file_by_extension">
-<code class="sig-name descname">reference_file_by_extension</code><span class="sig-paren">(</span><em class="sig-param">extension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.reference_file_by_extension" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reference_file_by_extension</code><span class="sig-paren">(</span><em class="sig-param">extension=None</em>, <em class="sig-param">sync=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.reference_file_by_extension" title="Permalink to this definition">¶</a></dt>
 <dd><p>References asset file with the given extension
-:param extension: str</p>
+:param extension: str
+:param sync: bool</p>
 </dd></dl>
 
 </dd></dl>

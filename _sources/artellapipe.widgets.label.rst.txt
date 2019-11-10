@@ -1,0 +1,7 @@
+artellapipe.widgets.label module
+================================
+
+.. automodule:: artellapipe.widgets.label
+   :members:
+   :undoc-members:
+   :show-inheritance:

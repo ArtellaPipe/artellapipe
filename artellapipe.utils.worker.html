@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.loader module" href="artellapipe.loader.html" />
+    <link rel="next" title="artellapipe.widgets package" href="artellapipe.widgets.html" />
     <link rel="prev" title="artellapipe.utils.tag module" href="artellapipe.utils.tag.html" /> 
 </head>
 
@@ -89,11 +89,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.config.html">artellapipe.config package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.gui.html">artellapipe.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
@@ -226,6 +229,54 @@
 </dd></dl>
 
 <dl class="class">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">ThumbDownloaderWorker</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QRunnable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="class">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals">
+<em class="property">class </em><code class="sig-name descname">ThumbDownloaderWorkerSignals</code><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.triggered">
+<code class="sig-name descname">triggered</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.triggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.set_force">
+<code class="sig-name descname">set_force</code><span class="sig-paren">(</span><em class="sig-param">flag</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.set_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets whether thumb should be downloaded even if it exists
+:param flag: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.set_path">
+<code class="sig-name descname">set_path</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.set_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the path where image should be downloaded
+:param path: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.set_preview_id">
+<code class="sig-name descname">set_preview_id</code><span class="sig-paren">(</span><em class="sig-param">preview_id</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.set_preview_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the preview ID linked to Kitsu project
+:param preview_id: str</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="artellapipe.utils.worker.Worker">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">Worker</code><span class="sig-paren">(</span><em class="sig-param">app</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QThread</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -287,7 +338,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.loader.html" class="btn btn-neutral float-right" title="artellapipe.loader module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.widgets.html" class="btn btn-neutral float-right" title="artellapipe.widgets package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="artellapipe.utils.tag.html" class="btn btn-neutral float-left" title="artellapipe.utils.tag module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

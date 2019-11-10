@@ -1,0 +1,7 @@
+artellapipe.managers.assets module
+==================================
+
+.. automodule:: artellapipe.managers.assets
+   :members:
+   :undoc-members:
+   :show-inheritance:

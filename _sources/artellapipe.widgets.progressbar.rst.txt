@@ -1,0 +1,7 @@
+artellapipe.widgets.progressbar module
+======================================
+
+.. automodule:: artellapipe.widgets.progressbar
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,7 +1,0 @@
-artellapipe.gui.spinner module
-==============================
-
-.. automodule:: artellapipe.gui.spinner
-   :members:
-   :undoc-members:
-   :show-inheritance:

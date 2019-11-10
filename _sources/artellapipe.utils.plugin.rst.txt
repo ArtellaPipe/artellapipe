@@ -1,0 +1,7 @@
+artellapipe.utils.plugin module
+===============================
+
+.. automodule:: artellapipe.utils.plugin
+   :members:
+   :undoc-members:
+   :show-inheritance:

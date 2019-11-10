@@ -1,7 +1,0 @@
-artellapipe.core.userinfo module
-================================
-
-.. automodule:: artellapipe.core.userinfo
-   :members:
-   :undoc-members:
-   :show-inheritance:

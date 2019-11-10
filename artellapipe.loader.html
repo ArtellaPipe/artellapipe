@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="artellapipe.register module" href="artellapipe.register.html" />
-    <link rel="prev" title="artellapipe.utils.worker module" href="artellapipe.utils.worker.html" /> 
+    <link rel="prev" title="artellapipe.widgets.window module" href="artellapipe.widgets.window.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -193,19 +193,30 @@
 
 <dl class="function">
 <dt id="artellapipe.loader.init">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">do_reload=False</em>, <em class="sig-param">dev=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes module
-:param do_reload: bool, Whether to reload modules or not</p>
+:param do_reload: bool, Whether to reload modules or not
+:param dev: bool, Whether artellapipe is initialized in dev mode or not</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="artellapipe.loader.run_tools_manager">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">run_tools_manager</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.run_tools_manager" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.loader.register_libs">
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_libs</code><span class="sig-paren">(</span><em class="sig-param">project_inst</em>, <em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_libs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.loader.register_tools">
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_tools</code><span class="sig-paren">(</span><em class="sig-param">project_inst</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_tools" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="artellapipe.loader.run_toolbox">
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">run_toolbox</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.run_toolbox" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="artellapipe.loader.set_project">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project_class</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.set_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project_class</em>, <em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>This functions sets the given class instance as the current Artella project used
 :param project_class: ArtellaProject</p>
 </dd></dl>
@@ -227,7 +238,7 @@
         <a href="artellapipe.register.html" class="btn btn-neutral float-right" title="artellapipe.register module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.utils.worker.html" class="btn btn-neutral float-left" title="artellapipe.utils.worker module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.widgets.window.html" class="btn btn-neutral float-left" title="artellapipe.widgets.window module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

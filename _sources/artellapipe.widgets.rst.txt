@@ -1,0 +1,30 @@
+artellapipe.widgets package
+===========================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.widgets.asset
+   artellapipe.widgets.assetinfo
+   artellapipe.widgets.assetsviewer
+   artellapipe.widgets.button
+   artellapipe.widgets.dialog
+   artellapipe.widgets.label
+   artellapipe.widgets.progressbar
+   artellapipe.widgets.shadersviewer
+   artellapipe.widgets.spinner
+   artellapipe.widgets.syncdialog
+   artellapipe.widgets.tray
+   artellapipe.widgets.userinfo
+   artellapipe.widgets.waiter
+   artellapipe.widgets.window
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.widgets
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+artellapipe.widgets.tray module
+===============================
+
+.. automodule:: artellapipe.widgets.tray
+   :members:
+   :undoc-members:
+   :show-inheritance:

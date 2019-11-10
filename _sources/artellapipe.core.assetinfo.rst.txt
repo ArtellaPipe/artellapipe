@@ -1,7 +1,0 @@
-artellapipe.core.assetinfo module
-=================================
-
-.. automodule:: artellapipe.core.assetinfo
-   :members:
-   :undoc-members:
-   :show-inheritance:

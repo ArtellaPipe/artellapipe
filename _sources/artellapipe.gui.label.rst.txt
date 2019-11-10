@@ -1,7 +1,0 @@
-artellapipe.gui.label module
-============================
-
-.. automodule:: artellapipe.gui.label
-   :members:
-   :undoc-members:
-   :show-inheritance:

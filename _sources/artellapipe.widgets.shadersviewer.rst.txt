@@ -1,0 +1,7 @@
+artellapipe.widgets.shadersviewer module
+========================================
+
+.. automodule:: artellapipe.widgets.shadersviewer
+   :members:
+   :undoc-members:
+   :show-inheritance:

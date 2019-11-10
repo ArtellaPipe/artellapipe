@@ -1,7 +1,0 @@
-artellapipe.core.syncdialog module
-==================================
-
-.. automodule:: artellapipe.core.syncdialog
-   :members:
-   :undoc-members:
-   :show-inheritance:

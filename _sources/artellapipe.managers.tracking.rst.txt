@@ -1,0 +1,7 @@
+artellapipe.managers.tracking module
+====================================
+
+.. automodule:: artellapipe.managers.tracking
+   :members:
+   :undoc-members:
+   :show-inheritance:

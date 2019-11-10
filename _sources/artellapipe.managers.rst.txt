@@ -1,0 +1,19 @@
+artellapipe.managers package
+============================
+
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.managers.assets
+   artellapipe.managers.files
+   artellapipe.managers.tracking
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.managers
+   :members:
+   :undoc-members:
+   :show-inheritance:

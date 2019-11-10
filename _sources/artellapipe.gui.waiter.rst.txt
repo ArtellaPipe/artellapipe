@@ -1,7 +1,0 @@
-artellapipe.gui.waiter module
-=============================
-
-.. automodule:: artellapipe.gui.waiter
-   :members:
-   :undoc-members:
-   :show-inheritance:

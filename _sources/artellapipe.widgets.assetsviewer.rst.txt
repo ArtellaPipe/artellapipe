@@ -1,0 +1,7 @@
+artellapipe.widgets.assetsviewer module
+=======================================
+
+.. automodule:: artellapipe.widgets.assetsviewer
+   :members:
+   :undoc-members:
+   :show-inheritance:

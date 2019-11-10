@@ -1,0 +1,10 @@
+artellapipe.config package
+==========================
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.config
+   :members:
+   :undoc-members:
+   :show-inheritance:

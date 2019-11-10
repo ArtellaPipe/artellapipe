@@ -9,17 +9,16 @@ Submodules
    artellapipe.core.abstract
    artellapipe.core.asset
    artellapipe.core.assetfile
-   artellapipe.core.assetinfo
-   artellapipe.core.assetsviewer
    artellapipe.core.config
    artellapipe.core.defines
+   artellapipe.core.lib
    artellapipe.core.node
    artellapipe.core.project
+   artellapipe.core.scene
    artellapipe.core.sequence
-   artellapipe.core.shadersviewer
    artellapipe.core.shot
-   artellapipe.core.syncdialog
-   artellapipe.core.userinfo
+   artellapipe.core.tool
+   artellapipe.core.toolbox
 
 Module contents
 ---------------

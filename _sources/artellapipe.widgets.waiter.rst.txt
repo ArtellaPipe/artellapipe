@@ -1,0 +1,7 @@
+artellapipe.widgets.waiter module
+=================================
+
+.. automodule:: artellapipe.widgets.waiter
+   :members:
+   :undoc-members:
+   :show-inheritance:
