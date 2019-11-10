@@ -12,6 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+
 import os
 import re
 import sys
@@ -20,12 +21,9 @@ import locale
 import logging
 import tempfile
 import datetime
+import importlib
 import traceback
 import webbrowser
-try:
-    from urllib.parse import quote
-except ImportError:
-    from urllib2 import quote
 from collections import OrderedDict
 
 import six
@@ -33,14 +31,22 @@ import six
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+from tpPyUtils import python, decorators, osplatform, fileio, path as path_utils, folder as folder_utils
 import tpDccLib as tp
-from tpPyUtils import python, strings, decorators, osplatform, jsonio, fileio, path as path_utils, \
-    folder as folder_utils
-from tpQtLib.core import qtutils
 
-from artellapipe.core import defines, config, artellalib, artellaclasses, asset, node, syncdialog, assetsviewer, \
-    sequence, shot
-from artellapipe.gui import tray
+if python.is_python2():
+    from urllib2 import quote
+    import pkgutil as loader
+else:
+    from urllib.parse import quote
+    import importlib as loader
+
+import artellapipe
+from artellapipe.libs import artella as artella_lib
+from artellapipe.libs.artella.core import artellalib, artellaclasses
+from artellapipe.libs.naming.core import naminglib
+from artellapipe.core import defines, config, asset, node, sequence, shot
+from artellapipe.widgets import tray
 from artellapipe.utils import resource, tag
 
 LOGGER = logging.getLogger()
@@ -48,31 +54,16 @@ LOGGER = logging.getLogger()
 
 class ArtellaProject(object):
 
-    PROJECT_RESOURCE = None
-    TRAY_CLASS = tray.ArtellaTray
     SHELF_CLASS = tp.Shelf
-    ASSET_CLASS = asset.ArtellaAsset
     SEQUENCE_CLASS = sequence.ArtellaSequence
     SHOT_CLASS = shot.ArtellaShot
-    ASSETS_VIEWER_CLASS = assetsviewer.AssetsViewer
     ASSET_NODE_CLASS = node.ArtellaAssetNode
-    SYNC_FILES_DIALOG_CLASS = syncdialog.ArtellaSyncFileDialog
-    SYNC_PATHS_DIALOG_CLASS = syncdialog.ArtellaSyncPathDialog
     TAG_NODE_CLASS = asset.ArtellaTagNode
-
-    class DataVersions(object):
-        SHOT = '0.0.1'
-
-    class DataExtensions(object):
-        pass
 
     def __init__(self, name, settings=None):
         super(ArtellaProject, self).__init__()
 
-        self._registered_asset_classes = list()
-        self._asset_classes_types = dict()
-        self._registered_asset_file_type_classes = list()
-        self._asset_classes_file_types = dict()
+        self._tray = None
 
         self._production_info = None
         self._sequences = list()
@@ -83,35 +74,48 @@ class ArtellaProject(object):
         self._config = config.ArtellaConfiguration(
             project_name=clean_name,
             config_name='artellapipe-project',
-            parser_class=config.ArtellaProjectConfigurationParser,
+            environment=os.environ.get('{}_env'.format(self._get_clean_name(name)), 'DEVELOPMENT'),
             config_dict={
                 'title': clean_name.title(),
                 'project_lower': clean_name.replace(' ', '').lower(),
-                'project_upper': clean_name.replace(' ', '').upper()
+                'project_upper': clean_name.replace(' ', '').upper(),
             }
         )
         self._config_data = self._config.data
 
         self._settings = settings
         self.init_settings()
-        self._logger = self.create_logger()[1]
-
-        # self._register_asset_classes()
-        self._register_asset_file_types()
 
     def __getattr__(self, attr_name):
-        if attr_name in self._config_data:
-            return self._config_data[attr_name]
-        else:
+        if attr_name not in self._config_data:
             raise AttributeError('{} has no attribute {}'.format(self.__class__.__name__, attr_name))
+
+        attr_data = self._config_data[attr_name]
+        return attr_data
 
     # ==========================================================================================================
     # PROPERTIES
     # ==========================================================================================================
 
     # NOTE: All the properties defined in the project settings file are accessible as properties by the project.
-    # 1) Properties in the project section are accessed using the name of the properties
-    # 2) Properties in other sections are accessed using {section_name}_{property_name}
+
+    @property
+    def config(self):
+        """
+        Returns configuration object of the project
+        :return: ArtellaConfiguration
+        """
+
+        return self._config
+
+    @property
+    def config_data(self):
+        """
+        Returns configuration data of the project
+        :return: dict
+        """
+
+        return self._config_data
 
     @property
     def settings(self):
@@ -129,7 +133,12 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return '{}/{}/{}/'.format(defines.ARTELLA_PRODUCTION_FOLDER, self.id_number, self.id)
+        artella_production_folder = artellalib.config.get('server', {}).get('production_folder')
+        if not artella_production_folder:
+            LOGGER.warning('Impossible to retrieve Artella project ID!')
+            return None
+
+        return '{}/{}/{}/'.format(artella_production_folder, self.id_number, self.id)
 
     @property
     def id_path(self):
@@ -139,15 +148,6 @@ class ArtellaProject(object):
         """
 
         return '{}{}{}'.format(self.id_number, os.sep, self.id)
-
-    @property
-    def logger(self):
-        """
-        Returns the logger used by the Artella project
-        :return: Logger
-        """
-
-        return self._logger
 
     @property
     def icon(self):
@@ -185,15 +185,6 @@ class ArtellaProject(object):
 
         return self._tray
 
-    @property
-    def namemanager(self):
-        """
-        Returns name manager widget used to manage nomenclature in the project
-        :return: NameWidget
-        """
-
-        return self._namemanager
-
     # ==========================================================================================================
     # INITIALIZATION, CONFIG & SETTINGS
     # ==========================================================================================================
@@ -204,18 +195,43 @@ class ArtellaProject(object):
         :param force_skip_hello: bool, Whether the hello window should be showed or not
         """
 
-        if force_skip_hello:
-            os.environ['ARTELLA_PIPELINE_SHOW'] = ''
-
         self.update_paths()
         self.set_environment_variables()
-
-        if tp.Dcc.get_name() != tp.Dccs.Unknown:
-            self.create_shelf()
-            self.create_menu()
-            self._tray = self.create_tray()
-
+        # self.create_shelf()
+        self.create_menu()
+        self._tray = self.create_tray()
+        self.create_assets_manager()
+        self.create_files_manager()
+        self.create_production_tracker()
         self.update_project()
+        self._update_dcc_ui()
+
+    def get_environment(self):
+        """
+        Returns current project environment ("DEVELOPMENT" or "PRODUCTION")
+        :return: str or None
+        """
+
+        tag_env_var = '{}_env'.format(self.get_clean_name())
+        return os.environ.get(tag_env_var, 'DEVELOPMENT')
+
+    def is_dev(self):
+        """
+        Returns current environment is development one or not
+        :return: bool
+        """
+
+        current_environment = self.get_environment()
+        return not current_environment or current_environment == 'DEVELOPMENT'
+
+    def get_tag(self):
+        """
+        Returns the current deployed tag of the project
+        :return: str or None
+        """
+
+        tag_env_var = '{}_tag'.format(self.get_clean_name())
+        return os.environ.get(tag_env_var, None)
 
     def get_project_path(self):
         """
@@ -223,7 +239,12 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return path_utils.clean_path(os.path.dirname(__file__))
+        try:
+            pkg_loader = loader.find_loader('{}.loader'.format(self._get_clean_name(self.name)))
+        except Exception:
+            pkg_loader = loader.find_loader('artellapipe.loader')
+
+        return path_utils.clean_path(os.path.dirname(pkg_loader.filename))
 
     def get_configurations_folder(self):
         """
@@ -231,11 +252,16 @@ class ArtellaProject(object):
         :return: str
         """
 
-        if os.environ.get(defines.ARTELLA_CONFIGURATION_ENV, None):
-            return os.environ[defines.ARTELLA_CONFIGURATION_ENV]
-        else:
-            from artellapipe import config
-            return os.path.dirname(config.__file__)
+        print('bjblblbl')
+
+        try:
+            pkg_loader = loader.find_loader('{}.config'.format(self._get_clean_name(self.name)))
+        except ImportError:
+            pkg_loader = loader.find_loader('artellapipe.config')
+
+        print(pkg_loader.filename)
+
+        return path_utils.clean_path(os.path.dirname(pkg_loader.filename))
 
     def get_changelog_path(self):
         """
@@ -244,16 +270,7 @@ class ArtellaProject(object):
         """
 
         return path_utils.clean_path(
-            os.path.join(self.get_configurations_folder(), defines.ARTELLA_PROJECT_CHANGELOG_FILE_NAME))
-
-    def get_naming_path(self):
-        """
-        Returns path where default Artella naming configuration is located
-        :return: str
-        """
-
-        return path_utils.clean_path(
-            os.path.join(self.get_configurations_folder(), defines.ARTELLA_PROJECT_DEFAULT_NAMING_FILE_NAME))
+            os.path.join(self.get_project_path(), defines.ARTELLA_PROJECT_CHANGELOG_FILE_NAME))
 
     def get_shelf_path(self):
         """
@@ -280,7 +297,6 @@ class ArtellaProject(object):
         """
 
         try:
-            import importlib
             mod = importlib.import_module(self.get_clean_name())
             mod_path = os.path.join(
                 os.path.dirname(os.path.abspath(mod.__file__)), defines.ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME)
@@ -301,12 +317,12 @@ class ArtellaProject(object):
 
         version_file_path = self.get_version_path()
         if not os.path.isfile(version_file_path):
-            self.logger.warning('No Version File found "{}" for project "{}"!'.format(version_file_path, self.name))
+            LOGGER.warning('No Version File found "{}" for project "{}"!'.format(version_file_path, self.name))
             return
 
         version_data = fileio.get_file_lines(version_file_path)
         if not version_data:
-            self.logger.warning('Version File "{}" does not contain any version information!'.format(version_file_path))
+            LOGGER.warning('Version File "{}" does not contain any version information!'.format(version_file_path))
             return
 
         for line in version_data:
@@ -314,7 +330,7 @@ class ArtellaProject(object):
                 continue
             version_split = line.split('=')
             if not version_split:
-                self.logger.warning('Version data in file "{}" is not formatted properly!'.format(version_file_path))
+                LOGGER.warning('Version data in file "{}" is not formatted properly!'.format(version_file_path))
                 return
 
             return version_split[-1].strip()[1:-1]
@@ -329,54 +345,17 @@ class ArtellaProject(object):
         :param kwargs: dict
         """
 
-        current_rule = self._namemanager.get_active_rule()
-        self._namemanager.set_active_rule(rule_name)
-        solved_name = self._namemanager.solve(*args, **kwargs)
+        name_lib = naminglib.ArtellaNameLib()
+        current_rule = name_lib.active_rule()
+        name_lib.set_active_rule(rule_name)
+        solved_name = name_lib.solve(*args, **kwargs)
         if current_rule:
             if rule_name != current_rule.name:
-                self._namemanager.set_active_rule(current_rule.name)
+                name_lib.set_active_rule(current_rule.name)
         else:
-            self._namemanager.set_active_rule(None)
+            name_lib.set_active_rule(None)
 
         return solved_name
-
-    def get_templates(self):
-        """
-        Returns a list with all available templates
-        :return: list(str)
-        """
-
-        return namemanager.NameManager.get_templates()
-
-    def parse_template(self, template_name, path_to_parse):
-        """
-        Parses given path in the given template
-        :param template_name: str
-        :param path_to_parse: str
-        :return: list(str)
-        """
-
-        return namemanager.NameManager.parse_template(template_name=template_name, path_to_parse=path_to_parse)
-
-    def check_template_validity(self, template_name, path_to_check):
-        """
-        Returns whether given path matches given pattern or not
-        :param template_name: str
-        :param path_to_check: str
-        :return: bool
-        """
-
-        return namemanager.NameManager.check_template_validity(tepmlate_name=template_name, path_to_check=path_to_check)
-
-    def format_template(self, template_name, template_tokens):
-        """
-        Returns template path filled with tempalte tokens data
-        :param template_name: str
-        :param template_tokens: dict
-        :return: str
-        """
-
-        return namemanager.NameManager.format_template(template_name=template_name, template_tokens=template_tokens)
 
     def init_settings(self):
         """
@@ -454,7 +433,11 @@ class ArtellaProject(object):
         :return:
         """
 
-        self.logger.debug('Initializing environment variables for: {}'.format(self.name))
+        LOGGER.debug('Initializing environment variables for: {}'.format(self.name))
+
+        # In development mode we do not want to send Sentry exceptions or messages
+        if self.is_dev():
+            os.environ['SKIP_SENTRY_EXCEPTIONS'] = 'True'
 
         try:
             if tp.Dcc.get_name() == tp.Dccs.Unknown:
@@ -462,18 +445,20 @@ class ArtellaProject(object):
                 date_value = datetime.datetime.fromtimestamp(mtime)
                 artellalib.get_spigot_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
             artellalib.update_local_artella_root()
-            artella_var = os.environ.get(defines.ARTELLA_ROOT_PREFIX, None)
-            self.logger.debug('Artella environment variable is set to: {}'.format(artella_var))
+            root_prefix = artella_lib.config.get('app', 'root_prefix')
+            production_folder = artella_lib.config.get('server', 'production_folder')
+            artella_var = os.environ.get(root_prefix, None)
+            LOGGER.debug('Artella environment variable is set to: {}'.format(artella_var))
             if artella_var and os.path.exists(artella_var):
                 os.environ[self.env_var] = '{}{}/{}/{}/'.format(
-                    artella_var, defines.ARTELLA_PRODUCTION_FOLDER, self.id_number, self.id)
+                    artella_var, production_folder, self.id_number, self.id)
             else:
-                self.logger.warning('Impossible to set Artella environment variable!')
+                LOGGER.warning('Impossible to set Artella environment variable!')
         except Exception as e:
-            self.logger.debug(
+            LOGGER.debug(
                 'Error while setting {0} Environment Variables. {0} Pipeline Tools may not work properly!'.format(
                     self.name.title()))
-            self.logger.error('{} | {}'.format(e, traceback.format_exc()))
+            LOGGER.error('{} | {}'.format(e, traceback.format_exc()))
 
         icons_paths = resource.ResourceManager().get_resources_paths()
         # icons_paths = [
@@ -498,19 +483,19 @@ class ArtellaProject(object):
                     else:
                         os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + ';' + root
 
-        self.logger.debug('=' * 100)
-        self.logger.debug("{} Pipeline initialization completed!".format(self.name))
-        self.logger.debug('=' * 100)
-        self.logger.debug('*' * 100)
-        self.logger.debug('-' * 100)
-        self.logger.debug('\n')
+        LOGGER.debug('=' * 100)
+        LOGGER.debug("{} Pipeline initialization completed!".format(self.name))
+        LOGGER.debug('=' * 100)
+        LOGGER.debug('*' * 100)
+        LOGGER.debug('-' * 100)
+        LOGGER.debug('\n')
 
     def create_shelf(self):
         """
         Creates Artella Project shelf
         """
 
-        self.logger.debug('Building {} Tools Shelf'.format(self.name.title()))
+        LOGGER.debug('Building {} Tools Shelf'.format(self.name.title()))
 
         shelf_category_icon = None
         if self.shelf_icon_name:
@@ -521,7 +506,7 @@ class ArtellaProject(object):
         project_shelf.create(delete_if_exists=True)
         shelf_file = self.get_shelf_path()
         if not shelf_file or not os.path.isfile(shelf_file):
-            self.logger.warning('Shelf File for Project {} is not valid: {}'.format(self.name, shelf_file))
+            LOGGER.warning('Shelf File for Project {} is not valid: {}'.format(self.name, shelf_file))
             return
         project_shelf.build(shelf_file=shelf_file)
         project_shelf.set_as_active()
@@ -531,23 +516,52 @@ class ArtellaProject(object):
         Creates Artella Project menu
         """
 
-        self.logger.debug('Building {} Tools Menu ...'.format(self.name.title()))
-        menu_name = self.name.title()
-        if tp.is_maya():
-            from tpMayaLib.core import menu
-            try:
-                menu.remove_menu(menu_name)
-            except Exception:
-                pass
+        if tp.Dcc == tp.Dccs.Unknown:
+            return False
 
-        try:
-            project_menu = tp.Menu(name=menu_name)
-            menu_file = self.get_menu_path()
-            if menu_file and os.path.isfile(menu_file):
-                project_menu.create_menu(file_path=menu_file, parent_menu=menu_name)
-        except Exception as e:
-            self.logger.warning(
-                'Error during {} Tools Menu creation: {} | {}'.format(self.name.title(), e, traceback.format_exc()))
+        from artellapipe.utils import menu
+        project_menu = menu.ArtellaMenu()
+        project_menu.set_project(self)
+        project_menu.create_menus()
+
+    def create_assets_manager(self):
+        """
+        Creates instance of the assets manager used by the project
+        :return: ArtellaAssetsManager
+        """
+
+        if tp.Dcc == tp.Dccs.Unknown:
+            return None
+
+        assets_manager = artellapipe.AssetsMgr()
+        assets_manager.set_project(self)
+
+        return assets_manager
+
+    def create_files_manager(self):
+        """
+        Creates instance of the files manager used by the project
+        :return: ArtellaFilesManager
+        """
+
+        assets_manager = artellapipe.FilesMgr()
+        assets_manager.set_project(self)
+
+        return assets_manager
+
+    def create_production_tracker(self):
+        """
+        Creates instance of the production tracker used by the project
+        :return: ArtellaProductionTracker
+        """
+
+        if tp.Dcc == tp.Dccs.Unknown:
+            return None
+
+        production_tracker = artellapipe.Tracker()
+        production_tracker.set_project(self)
+
+        return production_tracker
 
     def get_folders_to_register(self, full_path=True):
         """
@@ -583,9 +597,9 @@ class ArtellaProject(object):
             if self.tray:
                 self.tray.show_message(title=title, msg=msg)
             else:
-                self.logger.debug(str(msg))
+                LOGGER.debug(str(msg))
         else:
-            self.logger.debug(str(msg))
+            LOGGER.debug(str(msg))
 
     # ==========================================================================================================
     # TRAY
@@ -596,13 +610,32 @@ class ArtellaProject(object):
         Creates Artella Project tray
         """
 
-        if not self.TRAY_CLASS:
-            return
-
-        self.logger.debug('Creating {} Tools Tray ...'.format(self.name.title()))
-        tray = self.TRAY_CLASS(project=self)
+        LOGGER.debug('Creating {} Tools Tray ...'.format(self.name.title()))
+        tray = artellapipe.Tray(project=self)
 
         return tray
+
+    def open_documentation(self):
+        """
+        Opens Plot Twist documentation web page in browser
+        """
+
+        if not self.documentation_url:
+            LOGGER.warning('Project "{}" does not define a Documentation URL!'.format(self.name))
+            return
+
+        webbrowser.open(self.documentation_url)
+
+    def open_webpage(self):
+        """
+        Opens Plot Twist official web page in browser
+        """
+
+        if not self.url:
+            LOGGER.warning('Project "{}" does not define a Project URL!'.format(self.name))
+            return
+
+        webbrowser.open(self.url)
 
     def open_artella_project_url(self):
         """
@@ -668,62 +701,8 @@ class ArtellaProject(object):
             LOGGER.warning('Impossible to retrieve productoin path because Artella project is not setup!')
             return
 
-        return path_utils.clean_path(os.path.join(project_path, defines.ARTELLA_PRODUCTION_FOLDER_NAME))
-
-    def get_temp_path(self, *args):
-        """
-        Returns temporary folder path of the project
-        :return: str
-        """
-
-        temp_path = '{temp}/' + self.get_clean_name() + '/pipeline/{user}'
-
-        return path_utils.clean_path(os.path.join(self._format_path(temp_path), *args))
-
-    def resolve_path(self, path_to_resolve):
-        """
-        Converts path to a valid full path
-        :param path_to_resolve: str
-        :return: str
-        """
-
-        path_to_resolve = path_to_resolve.replace('\\', '/')
-        project_var = os.environ.get(self.env_var)
-        if not project_var:
-            return path_to_resolve
-
-        if path_to_resolve.startswith(project_var):
-            path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(self.env_var))
-
-        return path_to_resolve
-
-    def fix_path(self, path_to_fix):
-        """
-        Converts path to a path relative to project environment variable
-        :param path_to_fix: str
-        :return: str
-        """
-
-        path_to_fix = path_to_fix.replace('\\', '/')
-        project_var = os.environ.get(self.env_var)
-        if not project_var:
-            return path_to_fix
-
-        if path_to_fix.startswith('${}/'.format(self.env_var)):
-            path_to_fix = path_to_fix.replace('${}/'.format(self.env_var), project_var)
-        elif path_to_fix.startswith('${}/'.format(defines.ARTELLA_ROOT_PREFIX)):
-            path_to_fix = path_to_fix.replace('${}/'.format(defines.ARTELLA_ROOT_PREFIX), project_var)
-
-        return path_to_fix
-
-    def relative_path(self, full_path):
-        """
-        Returns relative path of the given path relative to Project path
-        :param full_path: str
-        :return: str
-        """
-
-        return path_utils.clean_path(os.path.relpath(full_path, self.get_path()))
+        production_folder_name = artella_lib.config.get('server', 'production_folder_name')
+        return path_utils.clean_path(os.path.join(project_path, production_folder_name))
 
     def get_artella_url(self):
         """
@@ -731,7 +710,8 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return '{}/project/{}/files'.format(defines.ARTELLA_WEB, self.id)
+        artella_web = artella_lib.config.get('server', 'url')
+        return '{}/project/{}/files'.format(artella_web, self.id)
 
     def get_artella_assets_url(self):
         """
@@ -749,15 +729,15 @@ class ArtellaProject(object):
         try:
             if tp.is_maya():
                 import tpMayaLib as maya
-                self.logger.debug('Setting {} Project ...'.format(self.name))
+                LOGGER.debug('Setting {} Project ...'.format(self.name))
                 project_folder = os.environ.get(self.env_var, 'folder-not-defined')
                 if project_folder and os.path.exists(project_folder):
                     maya.cmds.workspace(project_folder, openWorkspace=True)
-                    self.logger.debug('{} Project setup successfully! => {}'.format(self.name, project_folder))
+                    LOGGER.debug('{} Project setup successfully! => {}'.format(self.name, project_folder))
                 else:
-                    self.logger.warning('Unable to set {} Project! => {}'.format(self.name, project_folder))
+                    LOGGER.warning('Unable to set {} Project! => {}'.format(self.name, project_folder))
         except Exception as e:
-            self.logger.error('{} | {}'.format(str(e), traceback.format_exc()))
+            LOGGER.error('{} | {}'.format(str(e), traceback.format_exc()))
 
     def open_in_artella(self):
         """
@@ -786,35 +766,9 @@ class ArtellaProject(object):
             "QProgressBar {border: 0px solid grey; "
             "border-radius:4px; padding:0px} "
             "QProgressBar::chunk {background: qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 "
-            "rgb(" + self.progress_bar_color0 + "), stop: 1 rgb(" + self.progress_bar_color1 + ")); }")
+            "rgb(" + self.progress_bar.color0 + "), stop: 1 rgb(" + self.progress_bar.color1 + ")); }")
 
         return new_progress_bar
-
-    # ==========================================================================================================
-    # SYNC
-    # ==========================================================================================================
-
-    def sync_files(self, files):
-        """
-        Creates an return a new instance of the Artella files sync dialog
-        :param files: list(str)
-        """
-
-        files = python.force_list(files)
-
-        sync_dialog = self.SYNC_FILES_DIALOG_CLASS(project=self, files=files)
-        sync_dialog.sync()
-
-    def sync_paths(self, paths):
-        """
-        Creates an return a new instance of the Artella paths sync dialog
-        :param paths: list(str)
-        """
-
-        paths = python.force_list(paths)
-
-        sync_dialog = self.SYNC_PATHS_DIALOG_CLASS(project=self, paths=paths)
-        sync_dialog.sync()
 
     # ==========================================================================================================
     # FILES
@@ -842,382 +796,9 @@ class ArtellaProject(object):
 
         return True
 
-    def lock_file(self, file_path=None, notify=False):
-        """
-        Locks given file in Artella
-        :param file_path: str
-        :param notify: bool
-        :return: bool
-        """
-
-        if not file_path:
-            file_path = tp.Dcc.scene_name()
-        if not file_path:
-            return
-
-        file_path = self.fix_path(file_path)
-        valid_path = self._check_file_path(file_path)
-        if not valid_path:
-            return False
-
-        valid_lock = artellalib.lock_file(file_path=file_path, force=True)
-        if not valid_lock:
-            return False
-
-        if notify:
-            self.tray.show_message(title='Lock File', msg='File locked successfully!')
-
-        return True
-
-    def unlock_file(self, file_path=None, notify=False, warn_user=True):
-        """
-        Unlocks current file in Artella
-        :param file_path: str
-        :param notify: bool
-        :param warn_user: bool
-        :return: bool
-        """
-
-        if not file_path:
-            file_path = tp.Dcc.scene_name()
-        if not file_path:
-            return
-
-        file_path = self.fix_path(file_path)
-        valid_path = self._check_file_path(file_path)
-        if not valid_path:
-            LOGGER.warning('File Path "{}" is not valid!'.format(valid_path))
-            return False
-
-        if warn_user:
-            msg = 'If changes in file: \n\n{}\n\n are not submitted to Artella yet, submit them before ' \
-                  'unlocking the file please. \n\n Do you want to continue?'.format(file_path)
-            res = tp.Dcc.confirm_dialog(
-                title='Unlock File', message=msg,
-                button=['Yes', 'No'], default_button='Yes', cancel_button='No', dismiss_string='No')
-            if res != tp.Dcc.DialogResult.Yes:
-                return False
-
-        artellalib.unlock_file(file_path=file_path)
-        if notify:
-            self.tray.show_message(title='Unlock File', msg='File unlocked successfully!')
-
-        return True
-
-    def check_lock_status(self, file_path=None, show_message=False):
-        """
-        Returns the current lock status of the file in Artella
-        :param file_path: stro
-        :param show_message: bool
-        :return: bool
-        """
-
-        if not file_path:
-            file_path = tp.Dcc.scene_name()
-        if not file_path:
-            return
-
-        file_path = self.fix_path(file_path)
-        valid_path = self._check_file_path(file_path)
-        if not valid_path:
-            LOGGER.warning('File Path "{}" is not valid!'.format(valid_path))
-            return False
-
-        in_edit_mode, is_locked_by_me = artellalib.is_locked(file_path=file_path)
-        if not in_edit_mode:
-            msg = 'File is not locked!'
-            color = 'white'
-        else:
-            if is_locked_by_me:
-                msg = 'File locked by you!'
-                color = 'green'
-            else:
-                msg = 'File locked by other user!'
-                color = 'red'
-
-        if show_message:
-            tp.Dcc.show_message_in_viewport(msg=msg, color=color)
-
-        if not in_edit_mode:
-            return False
-
-        return True
-
-    def upload_working_version(self, file_path=None, skip_saving=False, notify=False, comment=None, force=False):
-        """
-        Uploads a new working version of the given file
-        :param file_path: str
-        :param skip_saving: bool
-        :param notify: bool
-        :param comment: str
-        :param force: bool
-        :return: bool
-        """
-
-        if not file_path:
-            file_path = tp.Dcc.scene_name()
-        if not file_path:
-            return
-
-        file_path = self.fix_path(file_path)
-        valid_path = self._check_file_path(file_path)
-        if not valid_path:
-            LOGGER.warning('File Path "{}" is not valid!'.format(valid_path))
-            return False
-
-        short_path = file_path.replace(self.get_assets_path(), '')[1:]
-
-        history = artellalib.get_asset_history(file_path)
-        file_versions = history.versions
-        if not file_versions:
-            current_version = -1
-        else:
-            current_version = 0
-            for v in file_versions:
-                if int(v[0]) > current_version:
-                    current_version = int(v[0])
-        current_version += 1
-
-        if comment:
-            comment = str(comment)
-        else:
-            comment = qtutils.get_comment(
-                text_message='Make New Version ({}) : {}'.format(
-                    current_version, short_path), title='Comment', parent=tp.Dcc.get_main_window())
-
-        if comment:
-            artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving)
-            if notify:
-                self.tray.show_message(
-                    title='New Working Version', msg='Version {} uploaded to Artella server successfully!'.format(
-                        current_version))
-            return True
-
-        return False
-
     # ==========================================================================================================
     # ASSETS
     # ==========================================================================================================
-
-    def register_asset_class(self, asset_class):
-        """
-        Registers a new asset class into the project
-        :param asset_class: cls
-        """
-
-        if asset_class not in self._registered_asset_classes:
-            self._registered_asset_classes.append(asset_class)
-
-    def register_asset_file_type(self, asset_file_type_class):
-        """
-        Registers a new asset file type class into the project
-        :param asset_file_type_class: cls
-        """
-
-        if asset_file_type_class not in self._registered_asset_file_type_classes:
-            self._registered_asset_file_type_classes.append(asset_file_type_class)
-
-    def get_assets_path(self):
-        """
-        Returns path where project assets are located
-        :return: str
-        """
-
-        assets_path = os.path.join(self.get_path(), defines.ARTELLA_ASSETS_FOLDER_NAME)
-
-        return assets_path
-
-    def is_valid_assets_path(self):
-        """
-        Returns whether current asset path exists or not
-        :return: bool
-        """
-
-        assets_path = self.get_assets_path()
-        if not assets_path or not os.path.exists(assets_path):
-            return False
-
-        return True
-
-    def is_valid_asset_file_type(self, file_type):
-        """
-        Returns whether the current file type is valid or not for current project
-        :param file_type: str
-        :return: bool
-        """
-
-        return file_type in self._asset_classes_file_types.keys()
-
-    def get_asset_file(self, file_type, extension=None):
-        """
-        Returns asset file object class linked to given file type for current project
-        :param file_type: str
-        :param extension: str
-        :return: ArtellaAssetType
-        """
-
-        if not self.is_valid_asset_file_type(file_type):
-            return
-
-        asset_classes = self._asset_classes_file_types[file_type]
-        if not asset_classes:
-            LOGGER.warning('No Asset Class found for file of type: "{}"'.format(file_type))
-            return
-
-        if len(asset_classes) == 0:
-            return asset_classes[0]
-        else:
-            if extension:
-                for asset_class in asset_classes:
-                    if extension in asset_class.FILE_EXTENSIONS:
-                        return asset_class
-            else:
-                return asset_classes[0]
-
-    def get_asset_data_file_path(self, asset_path):
-        """
-        Returns asset data file path of given asset
-        :param asset_path: str
-        :return: str
-        """
-
-        return os.path.join(asset_path, defines.ARTELLA_WORKING_FOLDER, self._asset_data_filename)
-
-    def create_asset(self, asset_data, category=None):
-        """
-        Returns a new asset with the given data
-        :param asset_data: dict
-        :param category: str
-        """
-
-        if category and category in self._asset_classes_types:
-            return self._asset_classes_types[category](project=self, asset_data=asset_data)
-        else:
-            return self.ASSET_CLASS(project=self, asset_data=asset_data)
-
-    def create_asset_in_artella(self, asset_name, asset_path, folders_to_create=None):
-        """
-        Creates a new asset in Artella
-        :param asset_name: str
-        :param asset_path: str
-        :param folders_to_create: list(str) or None
-        """
-
-        valid_create = artellalib.create_asset(asset_name, asset_path)
-        if not valid_create:
-            LOGGER.warning('Impossible to create Asset {} in Path: {}!'.format(asset_name, asset_path))
-            return
-
-        if folders_to_create:
-            for folder_name in folders_to_create:
-                file_path = path_utils.clean_path(os.path.join(asset_path, asset_name, defines.ARTELLA_WORKING_FOLDER))
-                artellalib.new_folder(file_path, folder_name)
-
-        return True
-
-    def find_all_assets(self, asset_name=None, asset_path=None):
-        """
-        Returns a list of all assets in the project
-        :param asset_name: str, If given, a list with the given item will be returned instead
-        :param asset_path: str, If given, asset will be found in given path
-        :return: variant, ArtellaAsset or list(ArtellaAsset)
-        """
-
-        assets_path = self.get_assets_path()
-        if not self.is_valid_assets_path():
-            self.logger.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
-            return
-
-        if not assets_path or not os.path.exists(assets_path):
-            self.logger.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
-            return list()
-
-        if not self._asset_data_filename:
-            self.logger.warning(
-                'Impossible to retrieve {} assets because asset data file name is not defined!'.format(
-                    self._name.title()))
-            return
-
-        found_assets = list()
-
-        if asset_path:
-            if not os.path.isdir(asset_path):
-                LOGGER.warning('Impossible to retrieve asset from non-existent path: {}!'.format(asset_path))
-                return
-            if asset_name:
-                _asset_name = os.path.basename(asset_path)
-                if asset_name and asset_name != _asset_name:
-                    return
-            new_asset = self.get_asset_from_path(asset_path=asset_path)
-            if new_asset:
-                found_assets.append(new_asset)
-        else:
-            for root, dirs, files in os.walk(assets_path):
-                if dirs and defines.ARTELLA_WORKING_FOLDER in dirs:
-                    _asset_name = os.path.basename(root)
-                    if asset_name and asset_name != _asset_name:
-                        continue
-                    new_asset = self.get_asset_from_path(asset_path=root)
-                    if new_asset:
-                        found_assets.append(new_asset)
-
-        return found_assets
-
-    def find_asset(self, asset_name=None, asset_path=None, allow_multiple_instances=True):
-        """
-        Returns asset of the project if found
-        :param asset_name: str, name of the asset to find
-        :param asset_path: str, path where asset is located in disk
-        :param allow_multiple_instances: bool, whether to return None if multiple instances of an asset is found;
-        otherwise first asset in the list will be return
-        :return: Asset or None
-        """
-
-        asset_founds = self.find_all_assets(asset_name=asset_name, asset_path=asset_path)
-        if len(asset_founds) > 1:
-            LOGGER.warning('Found Multiple instances of Asset "{} | {}"'.format(
-                asset_name, asset_path))
-            if not allow_multiple_instances:
-                return None
-
-        return asset_founds[0]
-
-    def get_asset_from_path(self, asset_path):
-        """
-        Returns asset from the given path
-        :param asset_path: str
-        :return: ArtellaAsset
-        """
-
-        asset_path = path_utils.clean_path(asset_path)
-        _asset_name = os.path.basename(asset_path)
-
-        asset_data_file = self.get_asset_data_file_path(asset_path)
-
-        is_ignored = False
-        for ignored in self._asset_ignored_paths:
-            if ignored in asset_data_file:
-                is_ignored = True
-                break
-
-        if is_ignored:
-            return
-
-        if not os.path.isfile(asset_data_file):
-            LOGGER.warning('Impossible to get info of asset "{}". Please sync it! Skipping it ...'.format(_asset_name))
-            return
-
-        asset_data = jsonio.read_file(asset_data_file)
-        asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_NAME_ATTR] = _asset_name
-        asset_data[defines.ARTELLA_ASSET_DATA_ATTR][defines.ARTELLA_ASSET_DATA_PATH_ATTR] = asset_path
-        asset_category = strings.camel_case_to_string(os.path.basename(os.path.dirname(asset_path)))
-
-        if asset_category in self._asset_types:
-            new_asset = self.create_asset(asset_data=asset_data, category=asset_category)
-        else:
-            new_asset = self.create_asset(asset_data=asset_data)
-
-        return new_asset
 
     def get_tag_info_nodes(self, as_tag_nodes=False):
         """
@@ -1486,18 +1067,6 @@ class ArtellaProject(object):
         self.sync_files(files=shaders_path)
 
     # ==========================================================================================================
-    # LIGHT RIGS
-    # ==========================================================================================================
-
-    def get_light_rigs_path(self):
-        """
-        Returns path where light rigs are located in the project
-        :return: str
-        """
-
-        return path_utils.clean_path(os.path.join(self.get_assets_path(), 'lightrigs'))
-
-    # ==========================================================================================================
     #  PLAYBLAST
     # ==========================================================================================================
 
@@ -1534,60 +1103,6 @@ class ArtellaProject(object):
 
         return ArtellaProjectSettings(project=self, filename=self.get_settings_file())
 
-    def _check_file_path(self, file_path):
-        """
-        Returns whether given path is a valid project path or not
-        :param file_path: str
-        :return: str
-        """
-
-        if not file_path:
-            file_path = tp.Dcc.scene_name()
-            if not file_path:
-                self.logger.error('File {} cannot be locked because it does not exists!'.format(file_path))
-                return False
-
-        if not file_path.startswith(self.get_path()):
-            self.logger.error('Impossible to lock file that is nos located in {} Project Folder!'.format(self.name))
-            return
-
-        if not os.path.isfile(file_path):
-            self.logger.error('File {} cannot be locked because it does not exists!'.format(file_path))
-            return False
-
-        return True
-
-    def _register_asset_classes(self):
-        """
-        Internal function that can be override to register specific project asset classes
-        """
-
-        for asset_type in self.asset_types:
-            for registered_asset in self._registered_asset_classes:
-                if registered_asset.ASSET_TYPE == asset_type:
-                    self._asset_classes_types[asset_type] = registered_asset
-                    break
-
-        for asset_type in self.asset_types:
-            if asset_type not in self._asset_classes_types:
-                self.logger.warning('Asset Type {} has not an associated asset class!'.format(asset_type))
-
-    def _register_asset_file_types(self):
-        """
-        Internal function that can be override to register specific project file type classes
-        """
-
-        for asset_file in self.asset_files:
-            if asset_file not in self._asset_classes_file_types:
-                self._asset_classes_file_types[asset_file] = list()
-            for registered_file in self._registered_asset_file_type_classes:
-                if registered_file.FILE_TYPE == asset_file:
-                    self._asset_classes_file_types[asset_file].append(registered_file)
-
-        for asset_file in self.asset_files:
-            if asset_file not in self._asset_classes_file_types:
-                self.logger.warning('Asset File Type {} has not associated asset file class!'.format(asset_file))
-
     def _format_path(self, format_string, path='', **kwargs):
         """
         Resolves the given string with the given path and keyword arguments
@@ -1597,7 +1112,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        self.logger.debug('Format String: {}'.format(format_string))
+        LOGGER.debug('Format String: {}'.format(format_string))
 
         dirname, name, extension = path_utils.split_path(path)
         encoding = locale.getpreferredencoding()
@@ -1655,6 +1170,20 @@ class ArtellaProject(object):
             return
 
         return production_info
+
+    def _update_dcc_ui(self):
+        """
+        Internal function that updates DCC update taking into account different project attributes
+        """
+
+        if self.is_dev() and tp.Dcc != tp.Dccs.Unknown:
+            main_win = tp.Dcc.get_main_window()
+            if main_win and hasattr(main_win, 'menuBar'):
+                menubar = main_win.menuBar()
+                menubar.setStyleSheet(
+                    "QMenuBar { background: qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 "
+                    "rgb(" + self.dev_color0 + "), stop: 1 rgb(" + self.dev_color1 + ")); }")
+                # menubar.setStyleSheet('QMenuBar { background-color: rgba(255, 255, 0, 75); }')
 
 
 class ArtellaProjectSettings(QSettings, object):
