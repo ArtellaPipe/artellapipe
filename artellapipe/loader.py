@@ -17,25 +17,27 @@ import inspect
 import logging.config
 
 import tpDccLib as tp
-from tpPyUtils import dcc
+from tpPyUtils import dcc, python
 
-tools_manager = None
+toolbox = None
 
 
-def init(do_reload=False):
+def init(do_reload=False, dev=False):
     """
     Initializes module
     :param do_reload: bool, Whether to reload modules or not
+    :param dev: bool, Whether artellapipe is initialized in dev mode or not
     """
 
     # Load logger configuration
     logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
 
-    import sentry_sdk
-    try:
-        sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
-    except (RuntimeError, ImportError):
-        sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
+    if not dev:
+        import sentry_sdk
+        try:
+            sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
+        except (RuntimeError, ImportError):
+            sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
 
     from tpPyUtils import importer
 
@@ -66,12 +68,12 @@ def init(do_reload=False):
 
     packages_order = [
         'artellapipe.utils',
-        'artellapipe.gui',
-        'artellapipe.core'
+        'artellapipe.core',
+        'artellapipe.widgets'
     ]
 
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False)
-    artella_importer.import_packages(order=packages_order, only_packages=False, skip_modules=['artellapipe.lib'])
+    artella_importer.import_packages(order=packages_order, only_packages=False, skip_modules=['artellapipe.libs'])
     if do_reload:
         artella_importer.reload_all()
 
@@ -82,8 +84,8 @@ def init(do_reload=False):
     resource.ResourceManager().register_resource(resources_path)
 
     if tp.is_maya():
-        from artellapipe.libs import maya as maya_lib
-        maya_lib.init(do_reload=do_reload)
+        from artellapipe.dccs import maya as maya_dcc
+        maya_dcc.init(do_reload=do_reload)
 
 
 def create_logger_directory():
@@ -119,7 +121,7 @@ def get_logging_level():
     return os.environ.get('ARTELLAPIPE_LOG_LEVEL', 'WARNING')
 
 
-def set_project(project_class):
+def set_project(project_class, do_reload=False):
     """
     This functions sets the given class instance as the current Artella project used
     :param project_class: ArtellaProject
@@ -129,21 +131,70 @@ def set_project(project_class):
     project_inst = project_class()
     artellapipe.__dict__['project'] = project_inst
     artellapipe.__dict__[project_class.__name__.lower()] = project_inst
+    register_libs(project_inst, do_reload=do_reload)
+    register_tools(project_inst)
     project_inst.init()
 
 
-def run_tools_manager():
-    global tools_manager
-    if tools_manager:
-        return tools_manager
+def register_libs(project_inst, do_reload=False):
+    from artellapipe.core import lib
+
+    if python.is_python2():
+        import pkgutil as loader
+    else:
+        import importlib as loader
+
+    libs = project_inst.config_data.get('libs', list())
+    libs_to_register = dict()
+    libs_path = '{}.libs.{}'
+    for lib_name in libs:
+        for pkg in ['artellapipe', project_inst.get_clean_name()]:
+            pkg_path = libs_path.format(pkg, lib_name)
+            try:
+                pkg_loader = loader.find_loader(pkg_path)
+            except Exception:
+                pkg_loader = None
+            if pkg_loader is not None:
+                libs_to_register[lib_name] = pkg_loader
+
+    for pkg_loader in libs_to_register.values():
+        lib.LibsManager().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
+
+
+def register_tools(project_inst):
+    from artellapipe.core import tool
+
+    if python.is_python2():
+        import pkgutil as loader
+    else:
+        import importlib as loader
+
+    tools = project_inst.config_data.get('tools', list())
+    tools_to_register = dict()
+    tools_path = '{}.tools.{}'
+    for tool_name in tools:
+        for pkg in ['artellapipe', project_inst.get_clean_name()]:
+            pkg_path = tools_path.format(pkg, tool_name)
+            pkg_loader = loader.find_loader(pkg_path)
+            if pkg_loader is not None:
+                tools_to_register[tool_name] = pkg_loader
+
+    for pkg_loader in tools_to_register.values():
+        tool.ToolsManager().register_tool(project=project_inst, pkg_loader=pkg_loader)
+
+
+def run_toolbox(project):
+    global toolbox
+    if toolbox:
+        return toolbox
 
     import artellapipe
-    tools = artellapipe.ToolsManager()
+    tools = artellapipe.ToolBox(project=project)
     if not tp.Dcc.is_batch():
         if dcc.is_mayapy():
             return
         tools.create_menus()
 
-    tools_manager = tools
+    toolbox = tools
 
     return tools
