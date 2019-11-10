@@ -19,6 +19,7 @@ import logging
 
 import tpDccLib as tp
 
+import artellapipe
 from artellapipe.core import defines
 
 LOGGER = logging.getLogger()
@@ -230,7 +231,7 @@ class ArtellaDCCNode(object):
         :return: str
         """
 
-        fix_path = self._project.fix_path(self.filename.lower())
+        fix_path = artellapipe.FilesMgr().fix_path(self.filename.lower())
         if os.path.exists(fix_path):
             self.change_filename(fix_path)
         else:
@@ -252,7 +253,7 @@ class ArtellaDCCNode(object):
 
         try:
             if with_absolute_path:
-                fix_path = self._project.fix_path(self.filename.lower())
+                fix_path = artellapipe.FilesMgr().fix_path(self.filename.lower())
                 if os.path.exists(fix_path):
                     self.change_filename(fix_path)
 

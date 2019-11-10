@@ -19,7 +19,8 @@ from tpQtLib.core import base
 from tpQtLib.widgets import splitters
 
 from artellapipe.utils import resource
-from artellapipe.core import defines, artellalib, artellaclasses
+from artellapipe.libs.artella.core import artellalib, artellaclasses
+from artellapipe.core import asset
 
 LOGGER = logging.getLogger()
 
@@ -117,7 +118,7 @@ class ArtellaSequence(object):
         return shots
 
     @decorators.timestamp
-    def update_files(self, status=defines.ARTELLA_SYNC_WORKING_ASSET_STATUS, force_update=False):
+    def update_files(self, status=asset.ArtellaAssetFileStatus.WORKING, force_update=False):
         """
         Caches adn returns all the files that belongs to the current sequence
         :param status:
@@ -137,13 +138,13 @@ class ArtellaSequence(object):
             self._files[file_name] = dict()
             self._files[file_name]['path'] = file_folder
 
-            if status == defines.ARTELLA_SYNC_WORKING_ASSET_STATUS:
+            if status == asset.ArtellaAssetFileStatus.WORKING:
                 file_folder_working = self._project.format_template(
                     '{}_working_folder'.format(file_name), {'sequence_name': self._name, 'sequence_index': self._id})
                 if not file_folder_working:
                     LOGGER.warning(
                         'Impossible to retrieve {} folder for Sequence {} File: "{}"'.format(
-                            defines.ARTELLA_SYNC_WORKING_ASSET_STATUS, self._name, file_name))
+                            asset.ArtellaAssetFileStatus.WORKING, self._name, file_name))
                     return
                 file_folder_working_full = path_utils.clean_path(os.path.join(production_path, file_folder_working))
                 file_folder_working_info = artellalib.get_status(file_folder_working_full)
@@ -166,10 +167,10 @@ class ArtellaSequence(object):
 
                 if len(layout_files) > 0:
                     self._files[file_name]['status'] = dict()
-                    self._files[file_name]['status'][defines.ARTELLA_SYNC_WORKING_ASSET_STATUS] = dict()
-                    self._files[file_name]['status'][defines.ARTELLA_SYNC_WORKING_ASSET_STATUS]['path'] = \
+                    self._files[file_name]['status'][asset.ArtellaAssetFileStatus.WORKING] = dict()
+                    self._files[file_name]['status'][asset.ArtellaAssetFileStatus.WORKING]['path'] = \
                         file_folder_working
-                    self._files[file_name]['status'][defines.ARTELLA_SYNC_WORKING_ASSET_STATUS]['file'] = \
+                    self._files[file_name]['status'][asset.ArtellaAssetFileStatus.WORKING]['file'] = \
                         layout_files[0]
             else:
                 raise NotImplementedError('Published Layout Files are not supported yet!')
@@ -258,16 +259,16 @@ class ArtellaSequenceWidget(base.BaseWidget, object):
             if not file_status:
                 continue
             file_statuses = list()
-            if defines.ARTELLA_SYNC_WORKING_ASSET_STATUS in file_status:
-                file_statuses.append(defines.ARTELLA_SYNC_WORKING_ASSET_STATUS)
-            elif defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS in file_status:
-                file_statuses.append(defines.ARTELLA_SYNC_PUBLISHED_ASSET_STATUS)
+            if asset.ArtellaAssetFileStatus.WORKING in file_status:
+                file_statuses.append(asset.ArtellaAssetFileStatus.WORKING)
+            elif asset.ArtellaAssetFileStatus.PUBLISHED in file_status:
+                file_statuses.append(asset.ArtellaAssetFileStatus.PUBLISHED)
             for status in file_statuses:
                 seq_file = ArtellaSequenceFileWidget(
                     status=status,
                     root_path=file_data.get('path', None),
-                    base_path=file_data['status'][defines.ARTELLA_SYNC_WORKING_ASSET_STATUS].get('path', None),
-                    file_path=file_data['status'][defines.ARTELLA_SYNC_WORKING_ASSET_STATUS].get('file', None)
+                    base_path=file_data['status'][asset.ArtellaAssetFileStatus.WORKING].get('path', None),
+                    file_path=file_data['status'][asset.ArtellaAssetFileStatus.WORKING].get('file', None)
                 )
                 files_found.append(seq_file)
 
