@@ -7,8 +7,6 @@ Submodules
 .. toctree::
 
    artellapipe.core.abstract
-   artellapipe.core.artellaclasses
-   artellapipe.core.artellalib
    artellapipe.core.asset
    artellapipe.core.assetfile
    artellapipe.core.assetinfo
