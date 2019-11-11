@@ -35,30 +35,30 @@ class ArtellaAssetButton(QPushButton, object):
     def __init__(self, *args, **kwargs):
         super(ArtellaAssetButton, self).__init__(*args, **kwargs)
 
-        self.setMouseTracking(True)
+        # self.setMouseTracking(True)
 
-        self._tooltip = tooltips.ToolTipWidget(self)
-        self._tooltip_timer = QTimer(self)
-        self._tooltip_timer.setSingleShot(True)
-        self._tooltip_timer.setInterval(800)
-        self._tooltip_timer.timeout.connect(self._on_show_tooltip)
-        self._tooltip_pos = QPoint()
+        # self._tooltip = tooltips.ToolTipWidget(self)
+        # self._tooltip_timer = QTimer(self)
+        # self._tooltip_timer.setSingleShot(True)
+        # self._tooltip_timer.setInterval(800)
+        # self._tooltip_timer.timeout.connect(self._on_show_tooltip)
+        # self._tooltip_pos = QPoint()
 
-    def enterEvent(self, event):
-        self._tooltip_timer.start()
-        super(ArtellaAssetButton, self).enterEvent(event)
-
-    def mouseMoveEvent(self, event):
-        self._tooltip_pos = event.pos()
-        self._tooltip_timer.start()
-        super(ArtellaAssetButton, self).mouseMoveEvent(event)
-
-    def leaveEvent(self, event):
-        self._tooltip_timer.stop()
-        super(ArtellaAssetButton, self).leaveEvent(event)
-
-    def _on_show_tooltip(self):
-        self._tooltip.show_at(self.mapToGlobal(self._tooltip_pos), QLabel('HELLO WORLD'))
+    # def enterEvent(self, event):
+    #     self._tooltip_timer.start()
+    #     super(ArtellaAssetButton, self).enterEvent(event)
+    #
+    # def mouseMoveEvent(self, event):
+    #     self._tooltip_pos = event.pos()
+    #     self._tooltip_timer.start()
+    #     super(ArtellaAssetButton, self).mouseMoveEvent(event)
+    #
+    # def leaveEvent(self, event):
+    #     self._tooltip_timer.stop()
+    #     super(ArtellaAssetButton, self).leaveEvent(event)
+    #
+    # def _on_show_tooltip(self):
+    #     self._tooltip.show_at(self.mapToGlobal(self._tooltip_pos), QLabel('HELLO WORLD'))
 
 
 class ArtellaAssetWidget(base.BaseWidget, object):
