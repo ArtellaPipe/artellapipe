@@ -11,7 +11,6 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import logging
-from collections import  OrderedDict
 
 import tpDccLib as tp
 from tpPyUtils import python, decorators, path as path_utils
@@ -20,7 +19,7 @@ from tpQtLib.core import qtutils
 import artellapipe
 import artellapipe.register
 from artellapipe.libs import artella as artella_lib
-from artellapipe.libs.artella.core import artellalib, artellaclasses
+from artellapipe.libs.artella.core import artellalib
 from artellapipe.utils import exceptions
 
 LOGGER = logging.getLogger()
