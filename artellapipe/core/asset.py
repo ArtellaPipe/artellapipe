@@ -20,6 +20,7 @@ import webbrowser
 
 import tpDccLib as tp
 from tpPyUtils import python, decorators, osplatform
+from tpQtLib.core import qtutils
 
 import artellapipe.register
 from artellapipe.core import abstract
@@ -380,14 +381,18 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
-        if not file_path or not os.path.isfile(file_path):
-            LOGGER.warning(
-                'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
-                    file_type, file_path))
-            return False
 
-        if sync:
-            artellapipe.FilesMgr().sync_files(files=[file_path])
+        if sync or not file_path:
+            files_sync = self.sync_latest_published_files(file_type=file_type)
+            if files_sync:
+                file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
+
+        if not file_path or not os.path.isfile(file_path):
+            msg = 'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
+                file_type, file_path)
+            LOGGER.warning(msg)
+            qtutils.warning_message(msg)
+            return False
 
         if fix_path:
             file_path = artellapipe.FilesMgr().fix_path(file_path)
@@ -431,6 +436,8 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         reference_extension_fn_name = reference_extension_functions[extension].get('reference_function', None)
         reference_function_file_type = reference_extension_functions[extension].get('file_type', None)
+        reference_function_extra_params = reference_extension_functions[extension].get(
+            'reference_function_extra_params', None)
         if not reference_extension_fn_name or not hasattr(self, reference_extension_fn_name):
             LOGGER.warning(
                 'Impossible to reference file with extension "{}" because asset class "{}" has no implemented '
@@ -439,7 +446,17 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         reference_extension_fn = getattr(self, reference_extension_fn_name)
 
-        return reference_extension_fn(reference_function_file_type, sync=sync)
+        if reference_function_extra_params:
+            fn_params = reference_extension_fn.__code__.co_varnames
+            if not all(param in fn_params for param in reference_function_extra_params.keys()):
+                LOGGER.warning(
+                    'Impossible to reference file with extension "{}" because asset class "{}" '
+                    'reference function: "{}" does not support all given parameters: "{}"'.format(
+                        extension, self.__class__.__name__,
+                        reference_extension_fn_name, reference_function_extra_params))
+            return reference_extension_fn(reference_function_file_type, sync=sync, **reference_function_extra_params)
+        else:
+            return reference_extension_fn(reference_function_file_type, sync=sync)
 
     # ==========================================================================================================
     # SYNC
@@ -474,7 +491,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         artellapipe.FilesMgr().sync_files(files=paths_to_sync)
 
     @decorators.timestamp
-    def sync_latest_published_files(self, file_type=None, ask=False):
+    def sync_latest_published_files(self, file_type=None):
         """
         Synchronizes all latest published files for current asset
         :param file_type: str, if not given all files will be synced
@@ -484,16 +501,34 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if not valid_types:
             return
 
+        files_to_sync = list()
+
         for valid_type in valid_types:
             file_type = self.get_file_type(valid_type)
             if not file_type:
                 continue
 
-            latest_published_path = file_type.get_server_versions()
+            latest_published_info = file_type.get_server_versions(status=ArtellaAssetFileStatus.PUBLISHED)
+            if not latest_published_info:
+                continue
+            for version_info in latest_published_info:
+                latest_version_path = version_info.get('version_path', None)
+                if not latest_version_path:
+                    continue
 
-            print(file_type, latest_published_path)
+                # We do not get latest of the file already exists
+                if os.path.isfile(latest_version_path):
+                    continue
+                if os.path.isdir(latest_version_path):
+                    if not len(os.listdir(latest_version_path)) == 0:
+                        continue
 
-            # print('Syncing: {}'.format(latest_published_path))
+                files_to_sync.append(latest_version_path)
+
+        if files_to_sync:
+            artellapipe.FilesMgr().sync_files(files_to_sync)
+
+        return files_to_sync
 
     # ==========================================================================================================
     # VERSIONS

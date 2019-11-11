@@ -14,10 +14,10 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import logging
-from collections import OrderedDict
 
 from tpPyUtils import decorators, path as path_utils
 
+import artellapipe
 from artellapipe.core import asset
 from artellapipe.libs import artella
 from artellapipe.libs.artella.core import artellaclasses, artellalib
@@ -228,7 +228,7 @@ class ArtellaAssetFile(object):
                 if p == working_folder:
                     continue
                 if self.FILE_TYPE in p:
-                    version = artellalib.get_asset_version(p)
+                    version = artellalib.split_version(p)
                     if version:
                         local_versions[str(version[1])] = p
 
@@ -284,7 +284,7 @@ class ArtellaAssetFile(object):
         :return:
         """
 
-        working_data = list()
+        result = list()
 
         if not status:
             status = asset.ArtellaAssetFileStatus.WORKING
@@ -297,45 +297,7 @@ class ArtellaAssetFile(object):
             return
 
         if status == asset.ArtellaAssetFileStatus.PUBLISHED:
-
-            latest_versions = list()
-
-            versions = dict()
-            status = artellalib.get_status(asset_path, as_json=True)
-            status_data = status.get('data')
-            if not status_data:
-                LOGGER.error('Impossible to retrieve sync data from Artella. Try it again!')
-                return
-
-            for name, data in status_data.items():
-                if self.FILE_TYPE not in name:
-                    continue
-                version = artellalib.get_asset_version(name)[1]
-                versions[version] = name
-
-            ordered_versions = OrderedDict(sorted(versions.items()))
-
-            if all_versions:
-                for version, name in ordered_versions.items():
-                    valid_version = self._check_valid_published_version(asset_path, name)
-                    if not valid_version:
-                        continue
-                    else:
-                        latest_versions.append([version, name])
-            else:
-                current_index = -1
-                latest_version = None
-                valid_version = False
-                while not valid_version and current_index >= (len(ordered_versions) * -1):
-                    latest_version = ordered_versions[ordered_versions.keys()[current_index]]
-                    valid_version = self._check_valid_published_version(asset_path, latest_version)
-                    if not valid_version:
-                        current_index -= 1
-                if valid_version:
-                    latest_versions.append([ordered_versions.keys()[current_index], latest_version])
-
-            working_data = latest_versions
-
+            result = artellapipe.AssetsMgr().get_latest_published_versions(asset_path, file_type=self.FILE_TYPE)
         else:
             working_folder = artella.config.get('server', 'working_folder')
             working_path = os.path.join(asset_path, working_folder, self.FILE_TYPE)
@@ -349,28 +311,9 @@ class ArtellaAssetFile(object):
                 for ref_name, ref_data in status.references.items():
                     server_data = self._get_working_server_versions(
                         working_path=working_path, artella_data=ref_data, force_update=force_update)
-                    working_data.append(server_data)
+                    result.append(server_data)
 
-        return working_data
-
-    def _check_valid_published_version(self, asset_path, version):
-        """
-        Returns whether the given version is a valid one or not
-        :return: bool
-        """
-
-        version_valid = True
-        version_path = os.path.join(asset_path, '__{}__'.format(version))
-        version_info = artellalib.get_status(version_path)
-        if version_info:
-            if isinstance(version_info, artellaclasses.ArtellaHeaderMetaData):
-                version_valid = False
-            else:
-                for n, d in version_info.references.items():
-                    if d.maximum_version_deleted and d.deleted:
-                        version_valid = False
-
-        return version_valid
+        return result
 
     def get_extension(self):
         """
