@@ -17,6 +17,7 @@ import logging
 import inspect
 import traceback
 import importlib
+from collections import OrderedDict
 
 from tpPyUtils import python, decorators, path as path_utils
 
@@ -29,7 +30,7 @@ import artellapipe
 from artellapipe.utils import exceptions
 from artellapipe.core import config
 from artellapipe.libs import artella as artella_lib
-from artellapipe.libs.artella.core import artellalib
+from artellapipe.libs.artella.core import artellalib, artellaclasses
 
 LOGGER = logging.getLogger()
 
@@ -99,6 +100,29 @@ class ArtellaAssetsManager(object):
 
         self._registered_asset_file_type_classes.append(asset_file_type_class)
         return True
+
+    def get_file_type_info(self, file_type):
+        """
+        Returns dictionary with the information of the given file type
+        :param file_type: str
+        :return: dict
+        """
+
+        asset_files = self.config.get('files', default=dict())
+        if not asset_files:
+            return None
+
+        return asset_files[file_type] if file_type in asset_files.keys() else dict()
+
+    def get_file_type_extensions(self, file_type):
+        """
+        Returns extensions of the given file type
+        :param file_type: str
+        :return: list(str)
+        """
+
+        file_type_info = self.get_file_type_info(file_type)
+        return file_type_info.get('extensions', list()) if file_type else list()
 
     def get_assets_path(self):
         """
@@ -269,6 +293,53 @@ class ArtellaAssetsManager(object):
         working_folder = artella_lib.config.get('server', 'working_folder')
         return os.path.join(asset_path, working_folder, filename_attr)
 
+    def get_latest_published_versions(self, asset_path, file_type=None):
+        """
+        Returns all published version of the the different files of the given asset
+        file is synchronized
+        :param asset_path: str, path of the asset
+        :param file_type: str, if given only paths of the given file type will be returned (model, rig, etc)
+        :return: list(dict), number of version, name of version and version path
+        """
+
+        latest_version = list()
+
+        versions = dict()
+        status = artellalib.get_status(asset_path, as_json=True)
+
+        status_data = status.get('data')
+        if not status_data:
+            LOGGER.error('Impossible to retrieve data from Artella in file: "{}"'.format(asset_path))
+            return
+
+        for name, data in status_data.items():
+            if name in ['latest', '_latest']:
+                continue
+            if file_type and file_type not in name:
+                continue
+            version = artellalib.split_version(name)[1]
+            versions[version] = name
+
+        ordered_versions = OrderedDict(sorted(versions.items()))
+
+        current_index = -1
+        valid_version = False
+        version_found = None
+        while not valid_version and current_index >= (len(ordered_versions) * -1):
+            version_found = ordered_versions[ordered_versions.keys()[current_index]]
+            valid_version = self._check_valid_published_version(asset_path, version_found)
+            if not valid_version:
+                current_index -= 1
+        if valid_version and version_found:
+            version_path = path_utils.clean_path(os.path.join(asset_path, '__{}__'.format(version_found)))
+            latest_version.append({
+                'version': ordered_versions.keys()[current_index],
+                'version_name': version_found,
+                'version_path': version_path}
+            )
+
+        return latest_version
+
     def _check_project(self):
         """
         Internal function that checks whether or not assets manager has a project set. If not an exception is raised
@@ -278,6 +349,25 @@ class ArtellaAssetsManager(object):
             raise exceptions.ArtellaProjectUndefinedException('Artella Project is not defined!')
 
         return True
+
+    def _check_valid_published_version(self, file_path, version):
+        """
+        Returns whether the given version is a valid one or not
+        :return: bool
+        """
+
+        version_valid = True
+        version_path = os.path.join(file_path, '__{}__'.format(version))
+        version_info = artellalib.get_status(version_path)
+        if version_info:
+            if isinstance(version_info, artellaclasses.ArtellaHeaderMetaData):
+                version_valid = False
+            else:
+                for n, d in version_info.references.items():
+                    if d.maximum_version_deleted and d.deleted:
+                        version_valid = False
+
+        return version_valid
 
     def _register_asset_classes(self):
         """
