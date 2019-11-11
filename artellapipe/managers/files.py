@@ -11,6 +11,7 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import logging
+from collections import  OrderedDict
 
 import tpDccLib as tp
 from tpPyUtils import python, decorators, path as path_utils
@@ -19,7 +20,7 @@ from tpQtLib.core import qtutils
 import artellapipe
 import artellapipe.register
 from artellapipe.libs import artella as artella_lib
-from artellapipe.libs.artella.core import artellalib
+from artellapipe.libs.artella.core import artellalib, artellaclasses
 from artellapipe.utils import exceptions
 
 LOGGER = logging.getLogger()
@@ -105,7 +106,7 @@ class ArtellaFilesManager(object):
 
     def sync_files(self, files):
         """
-        Creates an return a new instance of the Artella files sync dialog
+        Synchronizes given files from Artella server into user hard drive
         :param files: list(str)
         """
 
@@ -118,7 +119,7 @@ class ArtellaFilesManager(object):
 
     def sync_paths(self, paths):
         """
-        Creates an return a new instance of the Artella paths sync dialog
+        Synchronizes given paths from Artella server into user hard drive
         :param paths: list(str)
         """
 
@@ -128,6 +129,22 @@ class ArtellaFilesManager(object):
 
         sync_dialog = artellapipe.SyncPathDialog(project=self._project, paths=paths)
         sync_dialog.sync()
+
+    def sync_latest_published_version(self, file_to_sync):
+        """
+        Synchronizes given files from Artella server into user hard drive and make sure that the last version of the
+        file is synchronized
+        :param file_to_sync: str
+        :return: tuple(str, str, str), tuple containing the version number, version name and version path
+        """
+
+        latest_version = self.get_latest_published_version(file_to_sync)
+        if not latest_version:
+            LOGGER.warning('No published version found for: "{}"'.format(file_to_sync))
+            return None
+
+        latest_publihsed_path = latest_version[2]
+        print(latest_publihsed_path)
 
     def lock_file(self, file_path=None, notify=False):
         """
