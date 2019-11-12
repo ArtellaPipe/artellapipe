@@ -157,18 +157,18 @@ class ArtellaConfiguration(object):
         from artellapipe import config
         artella_config_dir = os.path.dirname(config.__file__)
         artella_config_env_dir = os.path.join(artella_config_dir, self._environment.lower())
-        if not os.path.isdir(artella_config_env_dir):
+        artella_config_path = None
+        if os.path.isdir(artella_config_env_dir):
+            artella_config_path = os.path.join(artella_config_env_dir, module_config_name)
+            if not os.path.isfile(artella_config_path):
+                LOGGER.warning('Configuration File for "{}" for Environment "{}" does not exists: "{}"'.format(
+                    module_config_name,
+                    self._environment,
+                    artella_config_path
+                ))
+        else:
             LOGGER.warning('Configuration Folder for Environment "{}" does not exists: "{}"'.format(
                 self._environment, artella_config_env_dir))
-            return config_data
-        artella_config_path = os.path.join(artella_config_env_dir, module_config_name)
-        if not os.path.isfile(artella_config_path):
-            LOGGER.warning('Configuration File for "{}" for Environment "{}" does not exists: "{}"'.format(
-                module_config_name,
-                self._environment,
-                artella_config_path
-            ))
-            return config_data
 
         project_config_path = None
         try:
