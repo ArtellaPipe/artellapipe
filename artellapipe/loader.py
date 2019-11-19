@@ -137,7 +137,13 @@ def set_project(project_class, do_reload=False):
 
 
 def register_libs(project_inst, do_reload=False):
-    from artellapipe.core import lib
+    """
+    Function that registera all available libs for given project
+    :param project_inst: ArtellaProject
+    :param do_reload: bool
+    """
+
+    import artellapipe
 
     if python.is_python2():
         import pkgutil as loader
@@ -158,11 +164,16 @@ def register_libs(project_inst, do_reload=False):
                 libs_to_register[lib_name] = pkg_loader
 
     for pkg_loader in libs_to_register.values():
-        lib.LibsManager().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
+        artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
 
 
 def register_tools(project_inst):
-    from artellapipe.core import tool
+    """
+    Function that register all available tools for given project
+    :param project_inst: ArtellaProject
+    """
+
+    import artellapipe
 
     if python.is_python2():
         import pkgutil as loader
@@ -180,7 +191,7 @@ def register_tools(project_inst):
                 tools_to_register[tool_name] = pkg_loader
 
     for pkg_loader in tools_to_register.values():
-        tool.ToolsManager().register_tool(project=project_inst, pkg_loader=pkg_loader)
+        artellapipe.ToolsMgr().register_tool(project=project_inst, pkg_loader=pkg_loader)
 
 
 def run_toolbox(project):
