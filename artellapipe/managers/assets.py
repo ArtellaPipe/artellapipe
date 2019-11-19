@@ -35,7 +35,6 @@ from artellapipe.libs.artella.core import artellalib, artellaclasses
 LOGGER = logging.getLogger()
 
 
-@decorators.Singleton
 class ArtellaAssetsManager(object):
     def __init__(self):
         self._project = None
@@ -100,6 +99,43 @@ class ArtellaAssetsManager(object):
 
         self._registered_asset_file_type_classes.append(asset_file_type_class)
         return True
+
+    def get_file_type(self, file_type_name):
+        """
+        Returns file type object with given name
+        :param file_type_name: str
+        :return: ArtellaAssetFile
+        """
+
+        asset_files = self.config.get('files', default=dict())
+        if not asset_files:
+            return None
+
+        for file_type in self._registered_asset_file_type_classes:
+            if file_type.FILE_TYPE != file_type_name:
+                continue
+
+            return file_type
+
+        return None
+
+    def get_file_types_by_extension(self, file_type_extension):
+        """
+        Returns file type by the given extension
+        :param file_type_extension: str
+        :return: list
+        """
+
+        asset_files = self.config.get('files', default=dict())
+        if not asset_files:
+            return None
+
+        valid_file_types = list()
+        for file_type in self._registered_asset_file_type_classes:
+            if file_type_extension in file_type.FILE_EXTENSIONS:
+                valid_file_types.append(file_type)
+
+        return valid_file_types
 
     def get_file_type_info(self, file_type):
         """
@@ -460,4 +496,10 @@ class ArtellaAssetsManager(object):
         return True
 
 
-artellapipe.register.register_class('AssetsMgr', ArtellaAssetsManager)
+@decorators.Singleton
+class ArtellaAssetsManagerSingleton(ArtellaAssetsManager, object):
+    def __init__(self):
+        ArtellaAssetsManager.__init__(self)
+
+
+artellapipe.register.register_class('AssetsMgr', ArtellaAssetsManagerSingleton)

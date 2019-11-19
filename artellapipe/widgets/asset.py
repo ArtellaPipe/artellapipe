@@ -22,7 +22,6 @@ from Qt.QtWidgets import *
 from Qt.QtGui import *
 
 from tpQtLib.core import base, qtutils, menu
-from tpQtLib.widgets import tooltips
 
 import artellapipe.register
 from artellapipe.core import asset, defines
@@ -237,7 +236,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
     def update_thumbnail_icon(self, force=False):
         """
-        Internal function that updates the thumbnail icon
+        Function that updates the thumbnail icon
         :return:
         """
 
@@ -249,14 +248,16 @@ class ArtellaAssetWidget(base.BaseWidget, object):
                 self._thumbnail_icon = thumb_icon
                 return thumb_icon
             else:
+                self._thumbnail_icon = resource.ResourceManager().icon(
+                    artellapipe.AssetsMgr().config.get('default_thumb'))
+                self._asset_btn.setIcon(self._thumbnail_icon)
                 asset_thumbnail_path = self._asset.get_thumbnail_path()
+                if not asset_thumbnail_path:
+                    return self._thumbnail_icon
                 self._worker_started = True
                 self._worker.set_path(thumbnail_path)
                 self._worker.set_force(force)
                 self._worker.set_preview_id(asset_thumbnail_path)
-                self._thumbnail_icon = resource.ResourceManager().icon(
-                    artellapipe.AssetsMgr().config.get('default_thumb'))
-                self._asset_btn.setIcon(self._thumbnail_icon)
                 self.ThreadPool.start(self._worker)
                 return self._thumbnail_icon
         except Exception as exc:
