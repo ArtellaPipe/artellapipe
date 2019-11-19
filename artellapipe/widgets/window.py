@@ -22,6 +22,7 @@ import tpDccLib as tp
 import tpQtLib
 from tpQtLib.core import qtutils, statusbar
 
+import artellapipe
 from artellapipe.utils import resource
 
 
@@ -132,9 +133,7 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
         if not self._project:
             return False
 
-        from artellapipe.core import tool
-
-        tool.ToolsManager().run_tool(self._project, 'bugtracker', extra_args={'tool': self._tool})
+        artellapipe.ToolsMgr().run_tool(self._project, 'bugtracker', extra_args={'tool': self._tool})
 
     def _on_open_url(self):
         """
@@ -147,7 +146,6 @@ class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
 
 class ArtellaWindow(tpQtLib.Window, object):
 
-    VERSION = None
     LOGO_NAME = None
     STATUS_BAR_WIDGET = ArtellaWindowStatusBar
 
@@ -403,3 +401,6 @@ def dock_window(project, window_class, min_width=300):
     win.show()
 
     return win
+
+
+artellapipe.register.register_class('Window', ArtellaWindow)
