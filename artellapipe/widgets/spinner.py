@@ -15,9 +15,8 @@ __email__ = "tpovedatd@gmail.com"
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import resource
-
 from artellapipe.widgets import label
+from artellapipe.utils import resource
 
 
 class SpinnerType(object):
@@ -33,27 +32,25 @@ class WaitSpinner(QWidget, object):
     LOADING_INFO = (7, 'thumb_loading_{}')
     CIRCLE_INFO = (10, 'circle_loading_{}')
 
-    def __init__(self, spinner_type=SpinnerType.Thumb, project=None, parent=None):
+    def __init__(self, spinner_type=SpinnerType.Thumb, parent=None):
         super(WaitSpinner, self).__init__(parent=parent)
 
         self._spin_icons = list()
 
-        if project:
-            res = project.resource
-        else:
-            res = resource.Resource()
-
-        empty_thumb = res.pixmap(self.EMPTY_FILE, category='icons')
+        empty_thumb = resource.ResourceManager().pixmap(self.EMPTY_FILE)
 
         if spinner_type == SpinnerType.Thumb:
             for i in range(self.THUMB_INFO[0]):
-                self._spin_icons.append(res.pixmap(self.THUMB_INFO[1].format(i + 1), category='icons', theme='color'))
+                self._spin_icons.append(
+                    resource.ResourceManager().pixmap(self.THUMB_INFO[1].format(i + 1)))
         elif spinner_type == SpinnerType.Loading:
             for i in range(self.LOADING_INFO[0]):
-                self._spin_icons.append(res.pixmap(self.LOADING_INFO[1].format(i + 1), category='icons', theme='color'))
+                self._spin_icons.append(
+                    resource.ResourceManager().pixmap(self.LOADING_INFO[1].format(i + 1)))
         else:
             for i in range(self.CIRCLE_INFO[0]):
-                self._spin_icons.append(res.pixmap(self.CIRCLE_INFO[1].format(i + 1), category='icons', theme='color'))
+                self._spin_icons.append(
+                    resource.ResourceManager().pixmap(self.CIRCLE_INFO[1].format(i + 1)))
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignTop)
