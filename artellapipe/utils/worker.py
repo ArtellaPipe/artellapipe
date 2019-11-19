@@ -250,7 +250,7 @@ class ThumbDownloaderWorker(QRunnable, object):
                 if not os.path.isfile(self._path) or self._force:
                     artellapipe.Tracker().download_preview_file_thumbnail(self._preview_id, self._path)
                 if not self._path or not os.path.isfile(self._path):
-                    icon = None
+                    icon = QIcon()
                 else:
                     icon_pixmap = QPixmap(self._path)
                     icon = QIcon(icon_pixmap)
