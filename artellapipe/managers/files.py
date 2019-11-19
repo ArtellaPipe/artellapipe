@@ -25,7 +25,6 @@ from artellapipe.utils import exceptions
 LOGGER = logging.getLogger()
 
 
-@decorators.Singleton
 class ArtellaFilesManager(object):
     def __init__(self):
         self._project = None
@@ -340,4 +339,10 @@ class ArtellaFilesManager(object):
         return True
 
 
-artellapipe.register.register_class('FilesMgr', ArtellaFilesManager)
+@decorators.Singleton
+class ArtellaFilesManagerSingleton(ArtellaFilesManager, object):
+    def __init__(self):
+        ArtellaFilesManager.__init__(self)
+
+
+artellapipe.register.register_class('FilesMgr', ArtellaFilesManagerSingleton)
