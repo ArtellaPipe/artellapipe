@@ -70,7 +70,6 @@ class ArtellaConfiguration(object):
         self._environment = environment
         self._parser_class = parser_class
         self._parsed_data = self.load(project_name=project_name, config_name=config_name, config_dict=config_dict)
-        self._config_path = None
 
     @property
     def data(self):
@@ -154,18 +153,22 @@ class ArtellaConfiguration(object):
         module_config_name = config_name + '.yml'
 
         # We use artellapipe project configuration as base configuration file
-        from artellapipe import config
-        artella_config_dir = os.path.dirname(config.__file__)
+        artella_configs_path = os.environ.get('ARTELLA_CONFIGS_PATH', None)
+        if not artella_configs_path or not os.path.isdir(artella_configs_path):
+            from artellapipe import config
+            artella_config_dir = os.path.dirname(config.__file__)
+        else:
+            artella_config_dir = artella_configs_path
         artella_config_env_dir = os.path.join(artella_config_dir, self._environment.lower())
         artella_config_path = None
         if os.path.isdir(artella_config_env_dir):
             artella_config_path = os.path.join(artella_config_env_dir, module_config_name)
-            if not os.path.isfile(artella_config_path):
-                LOGGER.warning('Configuration File for "{}" for Environment "{}" does not exists: "{}"'.format(
-                    module_config_name,
-                    self._environment,
-                    artella_config_path
-                ))
+            # if not os.path.isfile(artella_config_path):
+            #     LOGGER.warning('Configuration File for "{}" for Environment "{}" does not exists: "{}"'.format(
+            #         module_config_name,
+            #         self._environment,
+            #         artella_config_path
+            #     ))
         else:
             LOGGER.warning('Configuration Folder for Environment "{}" does not exists: "{}"'.format(
                 self._environment, artella_config_env_dir))
@@ -180,6 +183,8 @@ class ArtellaConfiguration(object):
                     'Configuration Folder for Environment "{}" and Project "{}" does not exists: "{}"'.format(
                         self._environment, project_name, artella_config_env_dir))
                 return config_data
+
+            project_config_path = project_config_env_dir
 
             all_configs = [
                 f for f in os.listdir(project_config_env_dir) if os.path.isfile(
@@ -197,7 +202,11 @@ class ArtellaConfiguration(object):
         else:
             if not artella_config_path or not os.path.isfile(artella_config_path):
                 raise RuntimeError(
-                    'Impossible to load configuration "{}" because it does not exists!"'.format(artella_config_path))
+                    'Impossible to load configuration "{}" because it does not exists in any of '
+                    'the configuration folders: \n\t{}\n\t{}"'.format(
+                        os.path.basename(artella_config_path),
+                        os.path.dirname(artella_config_path),
+                        project_config_path))
             config_data = metayaml.read([artella_config_path], config_dict)
             project_config_path = artella_config_path
 

@@ -15,6 +15,8 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 
+from Qt.QtCore import *
+
 from tpPyUtils import decorators
 
 import artellapipe.register
@@ -23,13 +25,17 @@ from artellapipe.libs import artella
 LOGGER = logging.getLogger()
 
 
-# decorators.Singleton      #  Child classes MUST be decorated with Singleton decorator
-class TrackingManager(object):
+class TrackingManager(QObject, object):
+
+    logged = Signal()
 
     def __init__(self):
+        super(TrackingManager, self).__init__()
+
         self._project = None
         self._data = dict()
         self._updated = False
+        self._logged = False
 
     @property
     def project(self):
@@ -43,6 +49,14 @@ class TrackingManager(object):
 
         self._project = project
         # self.update_tracking_info()
+
+    def is_logged(self):
+        """
+        Returns whether user is locked into the tracking system or not
+        :return: bool
+        """
+
+        return self._logged
 
     def check_update(self):
         """
@@ -80,8 +94,29 @@ class TrackingManager(object):
         :return: bool
         """
 
+        raise NotImplementedError('login function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def logout(self, *args, **kwargs):
+        """
+        Logout from tracker service
+        :param args:
+        :param kwargs:
+        :return: bool
+        """
+
+        raise NotImplementedError('logout function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def download_preview_file_thumbnail(self, preview_id, file_path):
+        """
+        Downloads given preview file thumbnail and save it at given location
+        :param preview_id:  str or dict, The preview file dict or ID.
+        :param target_path: str, Location on hard drive where to save the file.
+        """
+
         raise NotImplementedError(
-            'login function for {} is not implemented!'.format(self.__class__.__name__))
+            'download_preview_file_thumbnail function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
     def all_project_assets(self):
@@ -90,14 +125,16 @@ class TrackingManager(object):
         :return: list
         """
 
+        # TODO: Default implementation, it will be removed in the future
+
         found_assets = list()
 
         if not self._project:
             LOGGER.warning('Impossible to retrieve assets because project is not defined!')
             return found_assets
 
-        assets_path = self.project.get_assets_path()
-        if not self.project.is_valid_assets_path():
+        assets_path = artellapipe.AssetsMgr().get_assets_path()
+        if not artellapipe.AssetsMgr().is_valid_assets_path():
             LOGGER.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
             return
 
@@ -121,16 +158,11 @@ class TrackingManager(object):
 
         return found_assets
 
-    @decorators.abstractmethod
-    def download_preview_file_thumbnail(self, preview_id, file_path):
-        """
-        Downloads given preview file thumbnail and save it at given location
-        :param preview_id:  str or dict, The preview file dict or ID.
-        :param target_path: str, Location on hard drive where to save the file.
-        """
 
-        raise NotImplementedError(
-            'download_preview_file_thumbnail function for {} is not implemented!'.format(self.__class__.__name__))
+@decorators.Singleton
+class TrackinManagerSingleton(TrackingManager, object):
+    def __init__(self):
+        TrackingManager.__init__(self)
 
 
-artellapipe.register.register_class('Tracker', TrackingManager)
+artellapipe.register.register_class('Tracker', TrackinManagerSingleton)

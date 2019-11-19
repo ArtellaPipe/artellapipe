@@ -519,10 +519,10 @@ class ArtellaProject(object):
         if tp.Dcc == tp.Dccs.Unknown:
             return False
 
-        from artellapipe.utils import menu
-        project_menu = menu.ArtellaMenu()
-        project_menu.set_project(self)
-        project_menu.create_menus()
+        menu_manager = artellapipe.MenuMgr()
+        menu_manager.set_project(self)
+
+        return menu_manager
 
     def create_assets_manager(self):
         """
