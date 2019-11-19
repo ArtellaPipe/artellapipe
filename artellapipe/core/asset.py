@@ -18,6 +18,8 @@ import string
 import logging
 import webbrowser
 
+from Qt.QtWidgets import *
+
 import tpDccLib as tp
 from tpPyUtils import python, decorators, osplatform
 from tpQtLib.core import qtutils
@@ -30,9 +32,6 @@ from artellapipe.libs.artella.core import artellalib
 from artellapipe.libs.naming.core import naminglib
 
 LOGGER = logging.getLogger()
-
-if tp.is_maya():
-    import tpMayaLib as maya
 
 
 class ArtellaAssetFileStatus(object):
@@ -167,10 +166,10 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         thumb_attr = artellapipe.AssetsMgr().config.get('data', 'thumb_attribute')
 
         thumb_path = self._asset_data.get(thumb_attr, None)
-        if not thumb_path:
-            LOGGER.warning(
-                'Impossible to retrieve thumb path because asset data does not contains "{}" attribute.'
-                '\nAsset Data: {}'.format(thumb_attr, self._asset_data))
+        # if not thumb_path:
+        #     LOGGER.warning(
+        #         'Impossible to retrieve thumb path because asset data does not contains "{}" attribute.'
+        #         '\nAsset Data: {}'.format(thumb_attr, self._asset_data))
 
         return thumb_path
 
@@ -286,7 +285,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     # FILES
     # ==========================================================================================================
 
-    def get_file(self, file_type, status, extension=None, fix_path=False):
+    def get_file(self, file_type, status, extension=None, version=None, fix_path=False):
         """
         Returns file path of the given file type and status
         :param file_type: str
@@ -333,7 +332,16 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                 LOGGER.warning(
                     'No local versions found in Asset "{}" for File Type: "{}"'.format(asset_name, file_type))
                 return None
-            template_dict['version_folder'] = file_type_local_versions[1]
+            if version:
+                if version == file_type_local_versions[1]:
+                    template_dict['version_folder'] = version
+                else:
+                    LOGGER.warning(
+                        'No local version "{}" found in Asset "{}" for File Type: "{}"'.format(asset_name, file_type))
+                    return None
+            else:
+                template_dict['version_folder'] = file_type_local_versions[1]
+
             file_path = template.format(template_dict)
 
         if not file_path:
@@ -369,55 +377,16 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return False
 
-    def reference_file(self, file_type, status, namespace=None, extension=None, fix_path=True, sync=False):
-        """
-        References asset file with the given type and status
-        :param file_type: str
-        :param status: str
-        :param namespace: str
-        :param fix_path: bool
-        :param sync: bool
-        :return: bool
-        """
-
-        file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
-
-        if sync or not file_path:
-            files_sync = self.sync_latest_published_files(file_type=file_type)
-            if files_sync:
-                file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=False)
-
-        if not file_path or not os.path.isfile(file_path):
-            msg = 'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
-                file_type, file_path)
-            LOGGER.warning(msg)
-            qtutils.warning_message(msg)
-            return False
-
-        if fix_path:
-            file_path = artellapipe.FilesMgr().fix_path(file_path)
-
-        if tp.is_maya():
-            if not namespace:
-                use_rename = maya.cmds.optionVar(q='referenceOptionsUseRenamePrefix')
-                if use_rename:
-                    namespace = maya.cmds.optionVar(q='referenceOptionsRenamePrefix')
-                else:
-                    filename = os.path.basename(file_path)
-                    namespace, _ = os.path.splitext(filename)
-            if tp.Dcc.namespace_exists(namespace):
-                namespace = tp.Dcc.unique_namespace(namespace)
-            return tp.Dcc.reference_file(file_path=file_path, namespace=namespace)
-        else:
-            return tp.Dcc.reference_file(file_path=file_path)
-
-    def reference_file_by_extension(self, extension=None, sync=False):
+    def reference_file_by_extension(self, status=None, extension=None, file_type=None, sync=False):
         """
         Implements base AbstractAsset reference_file_by_extension function
         References asset file with the given extension
         :param extension: str
         :param sync: bool
         """
+
+        if not status:
+            status = ArtellaAssetFileStatus.PUBLISHED
 
         available_extensions = self._project.extensions
         if extension not in available_extensions:
@@ -426,37 +395,26 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             ))
             return False
 
-        reference_extension_functions = artellapipe.AssetsMgr().config.get('reference_extension_functions') or dict()
-        if extension not in reference_extension_functions:
+        file_types = artellapipe.AssetsMgr().get_file_types_by_extension(extension)
+        if not file_types:
             LOGGER.warning(
-                'Impossible to reference file with extension "{}". Reference extension functions: {}'.format(
-                    extension, reference_extension_functions
-                ))
+                'Impossible to reference file by its extension ({}) because no file types are registered!'.format(
+                    extension))
             return False
 
-        reference_extension_fn_name = reference_extension_functions[extension].get('reference_function', None)
-        reference_function_file_type = reference_extension_functions[extension].get('file_type', None)
-        reference_function_extra_params = reference_extension_functions[extension].get(
-            'reference_function_extra_params', None)
-        if not reference_extension_fn_name or not hasattr(self, reference_extension_fn_name):
+        if len(file_types) > 1 and not file_type:
             LOGGER.warning(
-                'Impossible to reference file with extension "{}" because asset class "{}" has no implemented '
-                'reference function: "{}"'.format(extension, self.__class__.__name__, reference_extension_fn_name))
+                'Multiple file types found with extension: {}. Do not know which file should imported!'.format(
+                    extension))
             return False
+        elif len(file_types) == 1:
+            file_type_to_reference = file_types[0]
+            file_type_to_reference(self).reference_file(status=status, sync=sync)
 
-        reference_extension_fn = getattr(self, reference_extension_fn_name)
-
-        if reference_function_extra_params:
-            fn_params = reference_extension_fn.__code__.co_varnames
-            if not all(param in fn_params for param in reference_function_extra_params.keys()):
-                LOGGER.warning(
-                    'Impossible to reference file with extension "{}" because asset class "{}" '
-                    'reference function: "{}" does not support all given parameters: "{}"'.format(
-                        extension, self.__class__.__name__,
-                        reference_extension_fn_name, reference_function_extra_params))
-            return reference_extension_fn(reference_function_file_type, sync=sync, **reference_function_extra_params)
-        else:
-            return reference_extension_fn(reference_function_file_type, sync=sync)
+        for ft in file_types:
+            if ft.FILE_TYPE != file_type:
+                continue
+            return ft(self).reference_file(status=status, sync=sync)
 
     # ==========================================================================================================
     # SYNC
@@ -491,11 +449,18 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         artellapipe.FilesMgr().sync_files(files=paths_to_sync)
 
     @decorators.timestamp
-    def sync_latest_published_files(self, file_type=None):
+    def sync_latest_published_files(self, file_type=None, ask=False):
         """
         Synchronizes all latest published files for current asset
         :param file_type: str, if not given all files will be synced
         """
+
+        if ask:
+            result = qtutils.show_question(
+                None, 'Synchronizing Latest Published Files: {}'.format(self.get_name()),
+                'Are you sure you want to synchronize latest publishe files? This can take quite some time!')
+            if result == QMessageBox.No:
+                return
 
         valid_types = self._get_types_to_check(file_type)
         if not valid_types:
