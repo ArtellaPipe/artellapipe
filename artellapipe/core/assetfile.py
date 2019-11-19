@@ -16,11 +16,12 @@ import os
 import logging
 
 from tpPyUtils import decorators, path as path_utils
+from tpQtLib.core import qtutils
 
 import artellapipe
 from artellapipe.core import asset
 from artellapipe.libs import artella
-from artellapipe.libs.artella.core import artellaclasses, artellalib
+from artellapipe.libs.artella.core import artellalib
 
 LOGGER = logging.getLogger()
 
@@ -57,33 +58,44 @@ class ArtellaAssetFile(object):
 
         self._open_file(path=file_path)
 
-    def import_file(self, status, *args, **kwargs):
+    def import_file(self, status, fix_path=True, sync=False, *args, **kwargs):
         """
         References current file into DCC
         :return:
         """
 
-        if status == asset.ArtellaAssetFileStatus.WORKING:
-            file_path = self.get_working_path()
-        else:
-            file_path = self.get_latest_local_published_path()
+        file_path = self._get_path(status=status, fix_path=fix_path)
+
+        valid_path = self._check_path(file_path, sync=sync)
+        if not valid_path:
+            msg = 'Impossible to import asset file of type "{}". File Path "{}" does not exists!'.format(
+                self.FILE_TYPE, file_path)
+            LOGGER.warning(msg)
+            qtutils.warning_message(msg)
+            return None
 
         self._import_file(path=file_path, *args, **kwargs)
 
-    def reference_file(self, status, fix_path=True):
+    def reference_file(self, status, fix_path=True, sync=False, *args, **kwargs):
         """
         References current file into DCC
         :param status: str
         :param fix_path: bool
+        :param sync: bool
         :return:
         """
 
-        if status == asset.ArtellaAssetFileStatus.WORKING:
-            file_path = self.get_working_path()
-        else:
-            file_path = self.get_latest_local_published_path()
+        file_path = self._get_path(status=status, fix_path=fix_path)
 
-        return self._reference_file(path=file_path, fix_path=fix_path)
+        valid_path = self._check_path(file_path, sync=sync)
+        if not valid_path:
+            msg = 'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
+                self.FILE_TYPE, file_path)
+            LOGGER.warning(msg)
+            qtutils.warning_message(msg)
+            return None
+
+        return self._reference_file(file_path=file_path, status=status, sync=sync, *args, **kwargs)
 
     @property
     def asset(self):
@@ -123,10 +135,11 @@ class ArtellaAssetFile(object):
         :return: str
         """
 
-        asset_name = self.asset.get_name()
-        asset_path = self.asset.get_path()
+        working_path = self.asset.get_file(
+            file_type=self.FILE_TYPE, status=asset.ArtellaAssetFileStatus.WORKING,
+            extension=self.FILE_EXTENSIONS[0], fix_path=False
+        )
 
-        working_path = self._get_working_path(asset_name=asset_name, asset_path=asset_path)
         if sync_folder:
             return path_utils.clean_path(os.path.dirname(working_path))
 
@@ -142,12 +155,13 @@ class ArtellaAssetFile(object):
         if not latest_local_versions:
             return
 
-        asset_name = self.asset.get_name()
-        asset_path = self.asset.get_path()
         version_folder = latest_local_versions[1]
 
-        published_path = self._get_published_path(
-            asset_name=asset_name, asset_path=asset_path, version_folder=version_folder)
+        published_path = self.asset.get_file(
+            file_type=self.FILE_TYPE, status=asset.ArtellaAssetFileStatus.PUBLISHED,
+            extension=self.FILE_EXTENSIONS[0], fix_path=False, version=version_folder
+        )
+
         if sync_folder:
             return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
 
@@ -211,7 +225,7 @@ class ArtellaAssetFile(object):
         local_versions = dict()
 
         asset_path = self.asset.get_path()
-        if not asset_path:
+        if not asset_path or not os.path.exists(asset_path):
             return local_versions
 
         working_folder = artella.config.get('server', 'working_folder')
@@ -323,6 +337,43 @@ class ArtellaAssetFile(object):
 
         return self.get_project().assets_library_file_types.get()
 
+    def _get_path(self, status, fix_path=True):
+        """
+        Returns asset file path taking into account its status
+        :param status:
+        :param fix_path: bool
+        :return: str
+        """
+
+        if status == asset.ArtellaAssetFileStatus.WORKING:
+            file_path = self.get_working_path()
+        else:
+            file_path = self.get_latest_local_published_path()
+
+        if not file_path:
+            return None
+
+        if fix_path:
+            file_path = artellapipe.FilesMgr().fix_path(file_path)
+
+        return file_path
+
+    def _check_path(self, file_path, sync=False):
+        """
+        Returns whether or not given path exists.
+        :param file_path: str
+        :param sync: bool
+        :return: bool
+        """
+
+        if sync or not file_path:
+            self.asset.sync_latest_published_files(file_type=self.FILE_TYPE)
+
+        if not file_path or not os.path.isfile(file_path):
+            return False
+
+        return True
+
     def _get_history(self, status):
         """
         Internal function that returns the history of the aset files
@@ -338,31 +389,6 @@ class ArtellaAssetFile(object):
         history = artellalib.get_file_history(file_path=file_path)
 
         return history
-
-    def _get_working_path(self, asset_name, asset_path):
-        """
-        Internal function that returns working path of the current asset file
-        :param asset_name: str
-        :param asset_path: str
-        :return: str
-        """
-
-        working_folder = artella.config.get('server', 'working_folder')
-        return path_utils.clean_path(
-            os.path.join(asset_path, working_folder, self.FILE_TYPE, asset_name + self.FILE_EXTENSIONS[0]))
-
-    def _get_published_path(self, asset_name, asset_path, version_folder):
-        """
-        Intenal function that returns published path of the current asset file
-        Overrides to return specific paths in custom file types
-        :param asset_name: str
-        :param asset_path: str
-        :param version_folder: str
-        :return: str
-        """
-
-        return path_utils.clean_path(os.path.join(
-            asset_path, version_folder, self.FILE_TYPE, asset_name + self.FILE_EXTENSIONS[0]))
 
     def _get_published_server_versions(self, all_versions=True, force_update=False):
         """
@@ -404,7 +430,7 @@ class ArtellaAssetFile(object):
                     return artellalib.get_file_history(ref_path)
                 break
 
-    def _open_file(self, path, fix_path=True):
+    def _open_file(self, file_path, fix_path=True):
         """
         Internal function that opens current file in DCC
         Overrides in custom asset file
@@ -415,7 +441,7 @@ class ArtellaAssetFile(object):
 
         pass
 
-    def _import_file(self, path, fix_path=True, *args, **kwargs):
+    def _import_file(self, file_path, fix_path=True, *args, **kwargs):
         """
         Internal function that imports current file in DCC
         Overrides in custom asset file
@@ -426,12 +452,13 @@ class ArtellaAssetFile(object):
 
         pass
 
-    def _reference_file(self, path, fix_path=True):
+    def _reference_file(self, file_path, sync=False, *args, **kwargs):
         """
         Internal function that references current file in DCC
         Overrides in custom asset file
         :param path: str
         :param fix_path: bool
+        :param sync: bool
         :return:
         """
 
