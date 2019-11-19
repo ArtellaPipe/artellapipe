@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains manager to handle resources used in GUIs
+Module that contains manager to handle resources
 """
 
 from __future__ import print_function, division, absolute_import
@@ -20,6 +20,12 @@ from Qt.QtGui import (QIcon, QPixmap)
 from tpPyUtils import decorators
 
 from tpQtLib.core import resource
+
+
+class ResourceTypes(object):
+    ICON = 'icon'
+    PIXMAP = 'pixmap'
+    GUI = 'ui'
 
 
 @decorators.Singleton
@@ -94,6 +100,8 @@ class ResourceManager(object):
         if not self._resources:
             return None
 
+        resource_type = kwargs.pop('resource_type', None)
+
         if 'key' in kwargs:
             resources_paths = self.get_resources_paths(kwargs.pop('key'))
             if resources_paths:
@@ -102,28 +110,48 @@ class ResourceManager(object):
                     if res_path in self._resources:
                         res = self._resources[res_path]
                     if res:
-                        path = res.get(dirname=res_path, *args)
+                        res_fn = self._get_resource_function(res, resource_type)
+                        if not resource_type:
+                            path = res_fn(dirname=res_path, *args)
+                        else:
+                            path = res_fn(dirname=res_path, *args, **kwargs)
                         if path:
                             return path
 
         if self._project_resources:
             for res_path, res in self._project_resources.items():
-                path = res.get(dirname=res_path, *args)
-                if path and os.path.isfile(path):
-                    return path
+                res_fn = self._get_resource_function(res, resource_type)
+                if not resource_type:
+                    path = res_fn(dirname=res_path, *args)
+                    if path and os.path.isfile(path):
+                        return path
+                else:
+                    path = res_fn(dirname=res_path, *args, **kwargs)
+                    if path:
+                        return path
 
         for res_path, res in self._resources.items():
             if not os.path.isdir(res_path):
                 continue
             if isinstance(res, Iterable):
                 for r in res:
-                    path = r.get(dirname=res_path, *args)
+                    res_fn = self._get_resource_function(r, resource_type)
+                    if not resource_type:
+                        path = res_fn(dirname=res_path, *args)
+                    else:
+                        path = res_fn(dirname=res_path, *args, **kwargs)
                     if path:
                         return path
             else:
-                path = res.get(dirname=res_path, *args)
-                if path and os.path.isfile(path):
-                    return path
+                res_fn = self._get_resource_function(res, resource_type)
+                if not resource_type:
+                    path = res_fn(dirname=res_path, *args)
+                    if path and os.path.isfile(path):
+                        return path
+                else:
+                    path = res_fn(dirname=res_path, *args, **kwargs)
+                    if path:
+                        return path
 
         return None
 
@@ -138,36 +166,7 @@ class ResourceManager(object):
         if not self._resources:
             return None
 
-        if 'key' in kwargs:
-            resources_paths = self.get_resources_paths(kwargs.pop('key'))
-            if resources_paths:
-                for res_path in resources_paths:
-                    res = None
-                    if res_path in self._resources:
-                        res = self._resources[res_path]
-                    if res:
-                        path = res.icon(dirname=res_path, *args, **kwargs)
-                        if path:
-                            return path
-
-        if self._project_resources:
-            for res_path, res in self._project_resources.items():
-                path = res.icon(dirname=res_path, *args, **kwargs)
-                if path:
-                    return path
-
-        for res_path, res in self._resources.items():
-            if isinstance(res, Iterable):
-                for r in res:
-                    path = r.icon(dirname=res_path, *args, **kwargs)
-                    if path:
-                        return path
-            else:
-                path = res.icon(dirname=res_path, *args, **kwargs)
-                if path:
-                    return path
-
-        return QIcon()
+        return self.get(resource_type=ResourceTypes.ICON, *args, **kwargs) or QIcon()
 
     def pixmap(self, *args, **kwargs):
         """
@@ -177,36 +176,33 @@ class ResourceManager(object):
         :return: QPixmap
         """
 
-        if not self._resources:
-            return None
+        return self.get(resource_type=ResourceTypes.PIXMAP, *args, **kwargs) or QPixmap()
 
-        if 'key' in kwargs:
-            resources_paths = self.get_resources_paths(kwargs.pop('key'))
-            if resources_paths:
-                for res_path in resources_paths:
-                    res = None
-                    if res_path in self._resources:
-                        res = self._resources[res_path]
-                    if res:
-                        path = res.pixmap(dirname=res_path, *args, **kwargs)
-                        if path:
-                            return path
+    def gui(self, *args, **kwargs):
+        """
+        Returns compiled UI
+        :param args:
+        :param kwargs:
+        :return:
+        """
 
-        if self._project_resources:
-            for res_path, res in self._project_resources.items():
-                path = res.pixmap(dirname=res_path, *args, **kwargs)
-                if path:
-                    return path
+        return self.get(resource_type=ResourceTypes.GUI, *args, **kwargs)
 
-        for res_path, res in self._resources.items():
-            if isinstance(res, Iterable):
-                for r in res:
-                    path = r.pixmap(dirname=res_path, *args, **kwargs)
-                    if path:
-                        return path
-            else:
-                path = res.pixmap(dirname=res_path, *args, **kwargs)
-                if path:
-                    return path
+    def _get_resource_function(self, res, resource_type):
+        """
+        Internal function that returns resoruce function by its type
+        :param res: Resource
+        :param resource_type: str
+        :return: class
+        """
 
-        return QPixmap()
+        if resource_type == ResourceTypes.ICON:
+            res_fn = res.icon
+        elif resource_type == ResourceTypes.PIXMAP:
+            res_fn = res.pixmap
+        elif resource_type == ResourceTypes.GUI:
+            res_fn = res.gui
+        else:
+            res_fn = res.get
+
+        return res_fn
