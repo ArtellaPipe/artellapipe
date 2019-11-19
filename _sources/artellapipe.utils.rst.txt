@@ -9,7 +9,6 @@ Submodules
    artellapipe.utils.alembic
    artellapipe.utils.exceptions
    artellapipe.utils.mayaparser
-   artellapipe.utils.menu
    artellapipe.utils.plugin
    artellapipe.utils.resource
    artellapipe.utils.shader

@@ -1,7 +1,0 @@
-artellapipe.widgets.userinfo module
-===================================
-
-.. automodule:: artellapipe.widgets.userinfo
-   :members:
-   :undoc-members:
-   :show-inheritance:

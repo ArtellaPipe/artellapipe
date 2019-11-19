@@ -8,6 +8,9 @@ Submodules
 
    artellapipe.managers.assets
    artellapipe.managers.files
+   artellapipe.managers.libs
+   artellapipe.managers.menu
+   artellapipe.managers.tools
    artellapipe.managers.tracking
 
 Module contents

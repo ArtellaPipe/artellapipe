@@ -1,0 +1,7 @@
+artellapipe.managers.libs module
+================================
+
+.. automodule:: artellapipe.managers.libs
+   :members:
+   :undoc-members:
+   :show-inheritance:
