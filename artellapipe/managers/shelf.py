@@ -40,6 +40,7 @@ class ArtellaShelfManager(object):
 
         pass
 
+
 @decorators.Singleton
 class ArtellaShelfManagerSingleton(ArtellaShelfManager, object):
     def __init__(self):
