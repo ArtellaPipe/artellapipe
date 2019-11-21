@@ -1,0 +1,7 @@
+artellapipe.managers.shelf module
+=================================
+
+.. automodule:: artellapipe.managers.shelf
+   :members:
+   :undoc-members:
+   :show-inheritance:

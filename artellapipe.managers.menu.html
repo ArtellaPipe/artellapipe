@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.managers.tools module" href="artellapipe.managers.tools.html" />
+    <link rel="next" title="artellapipe.managers.shelf module" href="artellapipe.managers.shelf.html" />
     <link rel="prev" title="artellapipe.managers.libs module" href="artellapipe.managers.libs.html" /> 
 </head>
 
@@ -184,49 +184,9 @@
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.menu.</code><code class="sig-name descname">ArtellaMenuManager</code><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.clean_menus">
-<code class="sig-name descname">clean_menus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.clean_menus" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.create_bug_tracker_action">
-<code class="sig-name descname">create_bug_tracker_action</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.create_bug_tracker_action" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.create_main_menu">
-<code class="sig-name descname">create_main_menu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.create_main_menu" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="artellapipe.managers.menu.ArtellaMenuManager.create_menus">
-<code class="sig-name descname">create_menus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.create_menus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates all the menus</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.create_project_description_menu">
-<code class="sig-name descname">create_project_description_menu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.create_project_description_menu" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.create_tray_menu">
-<code class="sig-name descname">create_tray_menu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.create_tray_menu" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.get_menu">
-<code class="sig-name descname">get_menu</code><span class="sig-paren">(</span><em class="sig-param">menu_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.get_menu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the menu object if extsi; otherwise None
-:param str menu_name: name of the menu to get
-:return: QMenu</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.menu.ArtellaMenuManager.get_menu_names">
-<code class="sig-name descname">get_menu_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.get_menu_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list with the names of the created menus
-:return: list</p>
+<code class="sig-name descname">create_menus</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.menu.ArtellaMenuManager.create_menus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that should be implemented in specific DCC Menu Managers to create proper menu</p>
 </dd></dl>
 
 <dl class="method">
@@ -250,7 +210,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.managers.tools.html" class="btn btn-neutral float-right" title="artellapipe.managers.tools module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.shelf.html" class="btn btn-neutral float-right" title="artellapipe.managers.shelf module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="artellapipe.managers.libs.html" class="btn btn-neutral float-left" title="artellapipe.managers.libs module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
