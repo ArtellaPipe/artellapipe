@@ -214,7 +214,7 @@ class ToolsManager(object):
 
     def get_tool_menus(self):
         """
-        Returns dictionary with the menu info for al the registered tools
+        Returns dictionary with the menu info for all the registered tools
         :return: dict
         """
 
@@ -231,6 +231,26 @@ class ToolsManager(object):
             tool_menus[tool_path] = menu_data
 
         return tool_menus
+
+    def get_tool_shelfs(self):
+        """
+        Returns dictionary with the shelf info for all the registered tools
+        :return: dict
+        """
+
+        tool_shelfs = dict()
+
+        for tool_path, tool_data in self._tools.items():
+            tool_config = tool_data['config']
+            if not tool_config:
+                continue
+            shelf_data = tool_config.data.get('shelf', None)
+            if not shelf_data:
+                continue
+
+            tool_shelfs[tool_path] = shelf_data
+
+        return tool_shelfs
 
     def run_tool(self, project, tool_path, do_reload=False, debug=False, extra_args=None):
         """
