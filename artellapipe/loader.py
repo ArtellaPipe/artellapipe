@@ -86,6 +86,9 @@ def init(do_reload=False, dev=False):
     if tp.is_maya():
         from artellapipe.dccs import maya as maya_dcc
         maya_dcc.init(do_reload=do_reload)
+    elif tp.is_houdini():
+        from artellapipe.dccs import houdini as houdini_dcc
+        houdini_dcc.init(do_reload=do_reload)
 
 
 def create_logger_directory():
@@ -194,18 +197,18 @@ def register_tools(project_inst):
         artellapipe.ToolsMgr().register_tool(project=project_inst, pkg_loader=pkg_loader)
 
 
-def run_toolbox(project):
-    global toolbox
-    if toolbox:
-        return toolbox
-
-    import artellapipe
-    tools = artellapipe.ToolBox(project=project)
-    if not tp.Dcc.is_batch():
-        if dcc.is_mayapy():
-            return
-        tools.create_menus()
-
-    toolbox = tools
-
-    return tools
+# def run_toolbox(project):
+#     global toolbox
+#     if toolbox:
+#         return toolbox
+#
+#     import artellapipe
+#     tools = artellapipe.ToolBox(project=project)
+#     if not tp.Dcc.is_batch():
+#         if dcc.is_mayapy():
+#             return
+#         tools.create_menus()
+#
+#     toolbox = tools
+#
+#     return tools
