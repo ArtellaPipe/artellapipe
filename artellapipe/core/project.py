@@ -197,7 +197,7 @@ class ArtellaProject(object):
 
         self.update_paths()
         self.set_environment_variables()
-        # self.create_shelf()
+        self.create_shelf()
         self.create_menu()
         self._tray = self.create_tray()
         self.create_assets_manager()
@@ -495,21 +495,13 @@ class ArtellaProject(object):
         Creates Artella Project shelf
         """
 
-        LOGGER.debug('Building {} Tools Shelf'.format(self.name.title()))
+        if tp.Dcc == tp.Dccs.Unknown:
+            return False
 
-        shelf_category_icon = None
-        if self.shelf_icon_name:
-            shelf_category_icon = self.shelf_icon
-        project_shelf = self.SHELF_CLASS(name=self.name.replace(' ', ''), category_icon=shelf_category_icon)
-        icons_paths = resource.ResourceManager().get_resources_paths(key='shelf')
-        project_shelf.ICONS_PATHS = icons_paths
-        project_shelf.create(delete_if_exists=True)
-        shelf_file = self.get_shelf_path()
-        if not shelf_file or not os.path.isfile(shelf_file):
-            LOGGER.warning('Shelf File for Project {} is not valid: {}'.format(self.name, shelf_file))
-            return
-        project_shelf.build(shelf_file=shelf_file)
-        project_shelf.set_as_active()
+        shelf_manager = artellapipe.ShelfMgr()
+        shelf_manager.set_project(self)
+
+        return shelf_manager
 
     def create_menu(self):
         """
