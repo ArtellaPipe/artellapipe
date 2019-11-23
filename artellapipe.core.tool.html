@@ -217,6 +217,14 @@ Override in child classes</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.core.tool.Tool.register_callback">
+<code class="sig-name descname">register_callback</code><span class="sig-paren">(</span><em class="sig-param">callback_type</em>, <em class="sig-param">fn</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.register_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers the given callback with the given function
+:param callback_type: tpDccLib.DccCallbacks
+:param fn: Python function to be called when callback is emitted</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.core.tool.Tool.save_settings">
 <code class="sig-name descname">save_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.save_settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save settings of the attacher</p>
@@ -259,6 +267,12 @@ Override in child classes</p>
 <dt id="artellapipe.core.tool.Tool.staticMetaObject">
 <code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.core.tool.Tool.staticMetaObject" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.unregister_callbacks">
+<code class="sig-name descname">unregister_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.unregister_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unregisters all callbacks registered by this tool</p>
+</dd></dl>
 
 </dd></dl>
 
