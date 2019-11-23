@@ -100,6 +100,15 @@ class ArtellaAssetsManager(object):
         self._registered_asset_file_type_classes.append(asset_file_type_class)
         return True
 
+    def get_asset_types(self):
+        """
+        Returns a list with all available asset types
+        :return: list(str)
+        """
+
+        asset_types = self._config.get('types', default={})
+        return asset_types.keys()
+
     def get_file_type(self, file_type_name):
         """
         Returns file type object with given name
