@@ -202,6 +202,7 @@ class ArtellaProject(object):
         self.create_files_manager()
         self.create_tags_manager()
         self.create_shaders_manager()
+        self.create_playblasts_manager()
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
@@ -562,6 +563,17 @@ class ArtellaProject(object):
         shaders_manager.set_project(self)
 
         return shaders_manager
+
+    def create_playblasts_manager(self):
+        """
+       Creates instance of the playblasts manager used by the project
+       :return: ArtellaPlayblastsManager
+       """
+
+        playblasts_manager = artellapipe.PlayblastsMgr()
+        playblasts_manager.set_project(self)
+
+        return playblasts_manager
 
     def create_production_tracker(self):
         """
@@ -1036,22 +1048,6 @@ class ArtellaProject(object):
         return [
             path_utils.clean_path(os.path.join(self.get_project_path(), 'tools', 'publisher', 'plugins'))
         ]
-
-    # ==========================================================================================================
-    #  PLAYBLAST
-    # ==========================================================================================================
-
-    def get_playblast_presets_folder(self):
-        """
-        Returns path where Playblas Presets are loated
-        :return: str
-        """
-
-        presets_url = self.playblast_presets_url
-        if not presets_url:
-            return
-
-        return '{}{}'.format(self.get_path(), presets_url)
 
     # ==========================================================================================================
     # PRIVATE
