@@ -1,0 +1,7 @@
+artellapipe.core.tag module
+===========================
+
+.. automodule:: artellapipe.core.tag
+   :members:
+   :undoc-members:
+   :show-inheritance:

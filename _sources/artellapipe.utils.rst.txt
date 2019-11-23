@@ -12,7 +12,6 @@ Submodules
    artellapipe.utils.plugin
    artellapipe.utils.resource
    artellapipe.utils.shader
-   artellapipe.utils.tag
    artellapipe.utils.worker
 
 Module contents

@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.utils.tag module" href="artellapipe.utils.tag.html" />
+    <link rel="next" title="artellapipe.utils.worker module" href="artellapipe.utils.worker.html" />
     <link rel="prev" title="artellapipe.utils.resource module" href="artellapipe.utils.resource.html" /> 
 </head>
 
@@ -176,99 +176,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.utils.shader">
-<span id="artellapipe-utils-shader-module"></span><h1>artellapipe.utils.shader module<a class="headerlink" href="#module-artellapipe.utils.shader" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains utilities functions to work with Shaders</p>
-<dl class="class">
-<dt id="artellapipe.utils.shader.ShadingNetwork">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.shader.</code><code class="sig-name descname">ShadingNetwork</code><span class="sig-paren">(</span><em class="sig-param">shader_extension</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that defines a shading network</p>
-<dl class="method">
-<dt id="artellapipe.utils.shader.ShadingNetwork.create_shader_node">
-<em class="property">classmethod </em><code class="sig-name descname">create_shader_node</code><span class="sig-paren">(</span><em class="sig-param">node_type</em>, <em class="sig-param">as_type</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork.create_shader_node" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node_type</strong> – </p></li>
-<li><p><strong>as_type</strong> – </p></li>
-<li><p><strong>name</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.utils.shader.ShadingNetwork.get_shading_network">
-<em class="property">classmethod </em><code class="sig-name descname">get_shading_network</code><span class="sig-paren">(</span><em class="sig-param">shader_node</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork.get_shading_network" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>shader_node</strong> – </p></li>
-<li><p><strong>prefix</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.utils.shader.ShadingNetwork.load_network">
-<em class="property">classmethod </em><code class="sig-name descname">load_network</code><span class="sig-paren">(</span><em class="sig-param">shader_file_path</em>, <em class="sig-param">existing_material=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork.load_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads given shader file and creates a proper shader
-:param shader_file_path: str, JSON shader file
-:param existing_material:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.utils.shader.ShadingNetwork.read">
-<em class="property">static </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param">file_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads shader info from given JSON file
-:param file_dir: str
-:return: dict</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.utils.shader.ShadingNetwork.write">
-<em class="property">static </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">shader_dict</em>, <em class="sig-param">file_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes given shader dict to the given JSON file
-:param shader_dict: dict
-:param file_dir: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.utils.shader.ShadingNetwork.write_network">
-<em class="property">classmethod </em><code class="sig-name descname">write_network</code><span class="sig-paren">(</span><em class="sig-param">shader_extension</em>, <em class="sig-param">shaders_path</em>, <em class="sig-param">shaders=None</em>, <em class="sig-param">icon_path=None</em>, <em class="sig-param">publish=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.ShadingNetwork.write_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes shader network info to the given path
-:param shaders_path: str, path where we want to store the shader
-:param shaders: list&lt;str&gt;, list of shaders we want to store
-:param icon_path: str, icon we want to show in the shader viewer
-:return: list&lt;str&gt;, list of exported shaders</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="artellapipe.utils.shader.load_all_scene_shaders">
-<code class="sig-prename descclassname">artellapipe.utils.shader.</code><code class="sig-name descname">load_all_scene_shaders</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">load=True</em>, <em class="sig-param">apply_shader=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.load_all_scene_shaders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loops through all tag data scene nodes and loads all necessary shaders into the current scene
-If a specific shader is already loaded, that shader is skip
-:return: list&lt;str&gt;, list of loaded shaders</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="artellapipe.utils.shader.load_shader">
-<code class="sig-prename descclassname">artellapipe.utils.shader.</code><code class="sig-name descname">load_shader</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">shader_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.shader.load_shader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads shader with given name in current DCC
-:param project: ArtellaProject
-:param shader_name: str</p>
-</dd></dl>
-
+  <div class="section" id="artellapipe-utils-shader-module">
+<h1>artellapipe.utils.shader module<a class="headerlink" href="#artellapipe-utils-shader-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -283,7 +192,7 @@ If a specific shader is already loaded, that shader is skip
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.utils.tag.html" class="btn btn-neutral float-right" title="artellapipe.utils.tag module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.utils.worker.html" class="btn btn-neutral float-right" title="artellapipe.utils.worker module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="artellapipe.utils.resource.html" class="btn btn-neutral float-left" title="artellapipe.utils.resource module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

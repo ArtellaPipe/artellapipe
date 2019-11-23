@@ -16,6 +16,7 @@ Submodules
    artellapipe.core.scene
    artellapipe.core.sequence
    artellapipe.core.shot
+   artellapipe.core.tag
    artellapipe.core.tool
    artellapipe.core.toolbox
 
