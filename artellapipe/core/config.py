@@ -230,8 +230,8 @@ class ArtellaConfiguration(object):
         valid_config_paths = self._get_config_paths(project_name=project_name, module_config_name=module_config_name)
         if not valid_config_paths:
             raise RuntimeError(
-                        'Impossible to load configuration "{}"  for project "{}" because it does not exists in any of '
-                        'the configuration folders: {}'.format(config_name, project_name,  ''.join(all_config_paths)))
+                'Impossible to load configuration "{}"  for project "{}" because it does not exists in any of '
+                'the configuration folders: {}'.format(config_name, project_name, ''.join(all_config_paths)))
 
         project_config_path = valid_config_paths[0]
         config_data = metayaml.read(valid_config_paths, config_dict)
