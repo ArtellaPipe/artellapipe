@@ -10,6 +10,7 @@ Submodules
    artellapipe.managers.files
    artellapipe.managers.libs
    artellapipe.managers.menu
+   artellapipe.managers.playblasts
    artellapipe.managers.shaders
    artellapipe.managers.shelf
    artellapipe.managers.tags

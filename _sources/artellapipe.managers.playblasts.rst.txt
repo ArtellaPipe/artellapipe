@@ -1,0 +1,7 @@
+artellapipe.managers.playblasts module
+======================================
+
+.. automodule:: artellapipe.managers.playblasts
+   :members:
+   :undoc-members:
+   :show-inheritance:
