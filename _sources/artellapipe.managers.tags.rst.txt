@@ -1,0 +1,7 @@
+artellapipe.managers.tags module
+================================
+
+.. automodule:: artellapipe.managers.tags
+   :members:
+   :undoc-members:
+   :show-inheritance:

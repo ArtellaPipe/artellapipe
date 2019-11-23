@@ -237,9 +237,11 @@
 </li>
       <li><a href="artellapipe.managers.menu.html#module-artellapipe.managers.menu">artellapipe.managers.menu (module)</a>
 </li>
+      <li><a href="artellapipe.managers.shelf.html#module-artellapipe.managers.shelf">artellapipe.managers.shelf (module)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="artellapipe.managers.shelf.html#module-artellapipe.managers.shelf">artellapipe.managers.shelf (module)</a>
+      <li><a href="artellapipe.managers.tags.html#module-artellapipe.managers.tags">artellapipe.managers.tags (module)</a>
 </li>
       <li><a href="artellapipe.managers.tools.html#module-artellapipe.managers.tools">artellapipe.managers.tools (module)</a>
 </li>
@@ -287,6 +289,10 @@
 </li>
       <li><a href="artellapipe.core.tag.html#artellapipe.core.tag.ArtellaTagNode">ArtellaTagNode (class in artellapipe.core.tag)</a>
 </li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager">ArtellaTagsManager (class in artellapipe.managers.tags)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions">ArtellaTagsManager.TagDefinitions (class in artellapipe.managers.tags)</a>
+</li>
       <li><a href="artellapipe.widgets.tray.html#artellapipe.widgets.tray.ArtellaTray">ArtellaTray (class in artellapipe.widgets.tray)</a>
 </li>
       <li><a href="artellapipe.widgets.waiter.html#artellapipe.widgets.waiter.ArtellaWaiter">ArtellaWaiter (class in artellapipe.widgets.waiter)</a>
@@ -323,6 +329,8 @@
 </li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.change_namespace">change_namespace() (artellapipe.core.node.ArtellaDCCNode method)</a>
 </li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.check_if_current_selected_metadata_node_has_valid_info">check_if_current_selected_metadata_node_has_valid_info() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
+</li>
       <li><a href="artellapipe.widgets.spinner.html#artellapipe.widgets.spinner.SpinnerType.Circle">Circle (artellapipe.widgets.spinner.SpinnerType attribute)</a>
 </li>
       <li><a href="artellapipe.widgets.spinner.html#artellapipe.widgets.spinner.WaitSpinner.CIRCLE_INFO">CIRCLE_INFO (artellapipe.widgets.spinner.WaitSpinner attribute)</a>
@@ -333,16 +341,20 @@
         <li><a href="artellapipe.utils.worker.html#artellapipe.utils.worker.Worker.clear">(artellapipe.utils.worker.Worker method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.close_tool">close_tool() (artellapipe.core.tool.Tool method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.close_tool_attacher">close_tool_attacher() (artellapipe.core.tool.Tool method)</a>
 </li>
       <li><a href="artellapipe.widgets.spinner.html#artellapipe.widgets.spinner.WaitSpinner.closeEvent">closeEvent() (artellapipe.widgets.spinner.WaitSpinner method)</a>
 </li>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.config">config() (artellapipe.core.tool.Tool property)</a>
+
+      <ul>
+        <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.config">(artellapipe.managers.tags.ArtellaTagsManager property)</a>
 </li>
+      </ul></li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.convert_reference_to_absolute_path">convert_reference_to_absolute_path() (artellapipe.core.node.ArtellaDCCNode method)</a>
 </li>
       <li><a href="artellapipe.loader.html#artellapipe.loader.create_logger_directory">create_logger_directory() (in module artellapipe.loader)</a>
@@ -358,6 +370,8 @@
 </li>
       </ul></li>
       <li><a href="artellapipe.managers.shelf.html#artellapipe.managers.shelf.ArtellaShelfManager.create_shelf">create_shelf() (artellapipe.managers.shelf.ArtellaShelfManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.current_selection_has_metadata_node">current_selection_has_metadata_node() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -429,6 +443,8 @@
         <li><a href="artellapipe.core.config.html#artellapipe.core.config.get_config">(in module artellapipe.core.config)</a>
 </li>
       </ul></li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.get_current_selection">get_current_selection() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
+</li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_file">get_file() (artellapipe.core.abstract.AbstractAsset method)</a>
 </li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_id">get_id() (artellapipe.core.abstract.AbstractAsset method)</a>
@@ -445,8 +461,6 @@
       </ul></li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_name">get_name() (artellapipe.core.abstract.AbstractAsset method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.get_overrides">get_overrides() (artellapipe.core.node.ArtellaDCCNode method)</a>
 </li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_path">get_path() (artellapipe.core.abstract.AbstractAsset method)</a>
@@ -455,13 +469,27 @@
         <li><a href="artellapipe.core.config.html#artellapipe.core.config.ArtellaConfiguration.get_path">(artellapipe.core.config.ArtellaConfiguration method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_relative_path">get_relative_path() (artellapipe.core.abstract.AbstractAsset method)</a>
 </li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.get_short_name">get_short_name() (artellapipe.core.node.ArtellaAssetNode method)</a>
 </li>
-      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.get_tag_node">get_tag_node() (artellapipe.core.node.ArtellaDCCNode method)</a>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.get_tag_data_node_from_current_selection">get_tag_data_node_from_current_selection() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
 </li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.get_tag_data_nodes">get_tag_data_nodes() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.get_tag_info_nodes">get_tag_info_nodes() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
+</li>
+      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.get_tag_node">get_tag_node() (artellapipe.core.node.ArtellaDCCNode method)</a>
+
+      <ul>
+        <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.get_tag_node">(artellapipe.managers.tags.ArtellaTagsManager method)</a>
+</li>
+      </ul></li>
       <li><a href="artellapipe.core.tag.html#artellapipe.core.tag.ArtellaTagNode.get_tag_type">get_tag_type() (artellapipe.core.tag.ArtellaTagNode method)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.get_tag_types">get_tag_types() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
 </li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_thumbnail_path">get_thumbnail_path() (artellapipe.core.abstract.AbstractAsset method)</a>
 </li>
@@ -585,6 +613,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.NODE_ATTRIBUTE_NAME">NODE_ATTRIBUTE_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
+</li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.nodes_list">nodes_list() (artellapipe.core.node.ArtellaDCCNode property)</a>
 </li>
   </ul></td>
@@ -739,7 +769,11 @@
 </li>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.save_settings">save_settings() (artellapipe.core.tool.Tool method)</a>
 </li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.SCENE_SELECTION_NAME">SCENE_SELECTION_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
+</li>
       <li><a href="artellapipe.core.scene.html#artellapipe.core.scene.SceneIterator">SceneIterator (class in artellapipe.core.scene)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.select_tag_data_node">select_tag_data_node() (artellapipe.managers.tags.ArtellaTagsManager method)</a>
 </li>
       <li><a href="artellapipe.utils.exceptions.html#artellapipe.utils.exceptions.sentry_exception">sentry_exception() (in module artellapipe.utils.exceptions)</a>
 </li>
@@ -760,6 +794,8 @@
       <ul>
         <li><a href="artellapipe.managers.shelf.html#artellapipe.managers.shelf.ArtellaShelfManager.set_project">(artellapipe.managers.shelf.ArtellaShelfManager method)</a>
 </li>
+        <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.set_project">(artellapipe.managers.tags.ArtellaTagsManager method)</a>
+</li>
         <li><a href="artellapipe.loader.html#artellapipe.loader.set_project">(in module artellapipe.loader)</a>
 </li>
       </ul></li>
@@ -771,12 +807,12 @@
 </li>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.settings">settings() (artellapipe.core.tool.Tool method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.widgets.dialog.html#artellapipe.widgets.dialog.ArtellaDialog.setWindowTitle">setWindowTitle() (artellapipe.widgets.dialog.ArtellaDialog method)</a>
 </li>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.show_error_message">show_error_message() (artellapipe.core.tool.Tool method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.widgets.tray.html#artellapipe.widgets.tray.ArtellaTray.show_message">show_message() (artellapipe.widgets.tray.ArtellaTray method)</a>
 </li>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool.show_ok_message">show_ok_message() (artellapipe.core.tool.Tool method)</a>
@@ -827,7 +863,17 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.TAG_DATA_ATTRIBUTE_NAME">TAG_DATA_ATTRIBUTE_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.TAG_DATA_NODE_NAME">TAG_DATA_NODE_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.TAG_DATA_SCENE_NAME">TAG_DATA_SCENE_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
+</li>
       <li><a href="artellapipe.core.tag.html#artellapipe.core.tag.ArtellaTagNode.tag_info">tag_info() (artellapipe.core.tag.ArtellaTagNode property)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.TAG_INFO_ATTRIBUTE_NAME">TAG_INFO_ATTRIBUTE_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
+</li>
+      <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions.TAG_TYPE_ATTRIBUTE_NAME">TAG_TYPE_ATTRIBUTE_NAME (artellapipe.managers.tags.ArtellaTagsManager.TagDefinitions attribute)</a>
 </li>
       <li><a href="artellapipe.widgets.spinner.html#artellapipe.widgets.spinner.SpinnerType.Thumb">Thumb (artellapipe.widgets.spinner.SpinnerType attribute)</a>
 </li>
@@ -835,14 +881,14 @@
 </li>
       <li><a href="artellapipe.utils.worker.html#artellapipe.utils.worker.ThumbDownloaderWorker">ThumbDownloaderWorker (class in artellapipe.utils.worker)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.utils.worker.html#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals">ThumbDownloaderWorker.ThumbDownloaderWorkerSignals (class in artellapipe.utils.worker)</a>
 </li>
       <li><a href="artellapipe.widgets.label.html#artellapipe.widgets.label.ThumbnailLabel">ThumbnailLabel (class in artellapipe.widgets.label)</a>
 </li>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.Tool">Tool (class in artellapipe.core.tool)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.core.tool.html#artellapipe.core.tool.ToolAttacher">ToolAttacher (class in artellapipe.core.tool)</a>
 </li>
       <li><a href="artellapipe.core.toolbox.html#artellapipe.core.toolbox.ToolBox">ToolBox (class in artellapipe.core.toolbox)</a>
