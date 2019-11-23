@@ -73,7 +73,10 @@ def init(do_reload=False, dev=False):
     ]
 
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False)
-    artella_importer.import_packages(order=packages_order, only_packages=False, skip_modules=['artellapipe.libs'])
+    artella_importer.import_packages(
+        order=packages_order,
+        only_packages=False,
+        skip_modules=['artellapipe.libs', 'artellapipe.dccs'])
     if do_reload:
         artella_importer.reload_all()
 
