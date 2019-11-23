@@ -5,4 +5,5 @@ order = [
     'artellapipe.widgets.asset',
     'artellapipe.widgets.assetfile',
     'artellapipe.widgets.syncdialog',
+    'artellapipe.widgets.assetsviewer'
 ]

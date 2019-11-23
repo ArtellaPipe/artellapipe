@@ -165,8 +165,6 @@ class AssetsViewer(grid.GridWidget, object):
 
 class CategorizedAssetViewer(base.BaseWidget, object):
 
-    ASSETS_VIEWER_CLASS = AssetsViewer
-
     def __init__(self, project, column_count=4, parent=None):
 
         self._project = project
@@ -194,7 +192,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
 
         self._categories_btn_grp = QButtonGroup(self)
         self._categories_btn_grp.setExclusive(True)
-        asset_categories = self._project.asset_types if self._project else list()
+        asset_categories = artellapipe.AssetsMgr().get_asset_types() or list()
 
         self.main_layout.addWidget(self._assets_viewer)
 
