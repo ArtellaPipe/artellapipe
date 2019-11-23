@@ -46,8 +46,7 @@ from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 from artellapipe.libs.naming.core import naminglib
 from artellapipe.core import defines, config, asset, node, sequence, shot
-from artellapipe.widgets import tray
-from artellapipe.utils import resource, tag
+from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -202,6 +201,8 @@ class ArtellaProject(object):
         self._tray = self.create_tray()
         self.create_assets_manager()
         self.create_files_manager()
+        self.create_tags_manager()
+        self.create_shaders_manager()
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
@@ -541,6 +542,28 @@ class ArtellaProject(object):
 
         return assets_manager
 
+    def create_tags_manager(self):
+        """
+        Creates instance of the tags manager used by the project
+        :return: ArtellaTagsManager
+        """
+
+        tags_manager = artellapipe.TagsMgr()
+        tags_manager.set_project(self)
+
+        return tags_manager
+
+    def create_shaders_manager(self):
+        """
+        Creates instance of the shaders manager used by the project
+        :return: ArtellaShadersManager
+        """
+
+        shaders_manager = artellapipe.ShadersMgr()
+        shaders_manager.set_project(self)
+
+        return shaders_manager
+
     def create_production_tracker(self):
         """
         Creates instance of the production tracker used by the project
@@ -792,25 +815,7 @@ class ArtellaProject(object):
     # ASSETS
     # ==========================================================================================================
 
-    def get_tag_info_nodes(self, as_tag_nodes=False):
-        """
-        Returns all nodes containing tag info data
-        :return: list
-        """
 
-        tag_info_nodes = list()
-        objs = tp.Dcc.all_scene_objects()
-        for obj in objs:
-            valid_tag_info_data = tp.Dcc.attribute_exists(
-                node=obj, attribute_name=defines.ARTELLA_TAG_INFO_ATTRIBUTE_NAME)
-            if valid_tag_info_data:
-                if as_tag_nodes and self.TAG_NODE_CLASS:
-                    tag_info = tp.Dcc.get_attribute_value(
-                        node=obj, attribute_name=defines.ARTELLA_TAG_INFO_ATTRIBUTE_NAME)
-                    obj = self.TAG_NODE_CLASS(project=self, node=obj, tag_info=tag_info)
-                tag_info_nodes.append(obj)
-
-        return tag_info_nodes
 
     @decorators.timestamp
     def get_scene_assets(self, as_nodes=True, allowed_types=None):
@@ -823,7 +828,7 @@ class ArtellaProject(object):
 
         abc_nodes = self.get_alembics(as_asset_nodes=False, only_roots=True)
 
-        tag_data_nodes = tag.get_tag_data_nodes(project=self, as_tag_nodes=True)
+        tag_data_nodes = artellapipe.TagsMgr().get_tag_data_nodes(project=self, as_tag_nodes=True)
         for tag_data in tag_data_nodes:
             asset_node = tag_data.get_asset_node()
             if asset_node is None or asset_node in abc_nodes:
@@ -1034,29 +1039,6 @@ class ArtellaProject(object):
         return [
             path_utils.clean_path(os.path.join(self.get_project_path(), 'tools', 'publisher', 'plugins'))
         ]
-
-    # ==========================================================================================================
-    # SHADERS
-    # ==========================================================================================================
-
-    def get_shaders_path(self):
-        """
-        Returns path where shareds are located in the project
-        :return: str
-        """
-
-        return path_utils.clean_path(os.path.join(self.get_assets_path(), 'shaders'))
-
-    def update_shaders(self):
-        """
-        Updates shaders from Artella
-        """
-
-        shaders_path = self.get_shaders_path()
-        if not shaders_path:
-            return
-
-        self.sync_files(files=shaders_path)
 
     # ==========================================================================================================
     #  PLAYBLAST
