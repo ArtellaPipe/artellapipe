@@ -138,6 +138,79 @@ class ArtellaConfiguration(object):
 
         return parsed_data
 
+    def _get_artella_config_paths(self, module_config_name):
+        """
+        Returns a list of paths where configuration file can be located in artellapipe-config
+        :return: list(str)
+        """
+
+        artella_configs_path = os.environ.get('ARTELLA_CONFIGS_PATH', None)
+        if not artella_configs_path or not os.path.isdir(artella_configs_path):
+            from artellapipe import config
+            artella_config_dir = os.path.dirname(config.__file__)
+        else:
+            artella_config_dir = artella_configs_path
+
+        artella_config_env_dir = os.path.join(artella_config_dir, self._environment.lower())
+        if not os.path.isdir(artella_config_env_dir):
+            LOGGER.warning('Configuration Folder for Environment "{}" does not exists: "{}"'.format(
+                self._environment, artella_config_env_dir))
+
+        artella_config_path = os.path.join(artella_config_env_dir, module_config_name)
+        dcc_artella_config_path = os.path.join(artella_config_env_dir, tp.Dcc.get_name(), module_config_name)
+        dcc_version_artella_config_path = os.path.join(
+            artella_config_env_dir, tp.Dcc.get_name(), tp.Dcc.get_version_name(), module_config_name)
+
+        return [artella_config_path, dcc_artella_config_path, dcc_version_artella_config_path]
+
+    def _get_project_config_paths(self, project_name, module_config_name):
+        """
+        Returns a list of paths where configuration files can be located in project configuration module
+        :return: list(str)
+        """
+
+        project_config_path = None
+        dcc_project_config_path = None
+        dcc_version_project_config_path = None
+
+        try:
+            project_config_mod = importlib.import_module('{}.config'.format(project_name))
+            project_config_dir = os.path.dirname(project_config_mod.__file__)
+            project_config_env_dir = os.path.join(project_config_dir, self._environment.lower())
+            if not os.path.isdir(project_config_env_dir):
+                LOGGER.warning(
+                    'Configuration Folder for Environment "{}" and Project "{}" does not exists: "{}"'.format(
+                        self._environment, project_name, project_config_dir))
+
+            project_config_path = os.path.join(project_config_env_dir, module_config_name)
+            dcc_project_config_path = os.path.join(project_config_env_dir, tp.Dcc.get_name(), module_config_name)
+            dcc_version_project_config_path = os.path.join(
+                project_config_env_dir, tp.Dcc.get_name(), tp.Dcc.get_version_name(), module_config_name)
+        except RuntimeError:
+            LOGGER.warning('No Configuration Module found for project: {}'.format(project_name))
+
+        return [project_config_path, dcc_project_config_path, dcc_version_project_config_path]
+
+    def _get_config_paths(self, project_name, module_config_name, skip_non_existent=True):
+        """
+        Returns a list of valid paths where configuration files can be located
+        :return: list(str)
+        """
+
+        found_paths = list()
+        paths_to_found = self._get_artella_config_paths(module_config_name=module_config_name)
+        paths_to_found.extend(
+            self._get_project_config_paths(project_name=project_name, module_config_name=module_config_name))
+
+        for p in paths_to_found:
+            if not p:
+                continue
+            if skip_non_existent and not os.path.isfile(p):
+                continue
+            found_paths.append(p)
+
+        return found_paths
+
     def _get_config_data(self, project_name, config_name, config_dict):
         """
         Returns the config data of the given project name
@@ -149,67 +222,19 @@ class ArtellaConfiguration(object):
                 'Project Configuration File for {} Project not found! {}'.format(self, project_name, config_name))
             return
 
-        config_data = dict()
         module_config_name = config_name + '.yml'
 
         # We use artellapipe project configuration as base configuration file
-        artella_configs_path = os.environ.get('ARTELLA_CONFIGS_PATH', None)
-        if not artella_configs_path or not os.path.isdir(artella_configs_path):
-            from artellapipe import config
-            artella_config_dir = os.path.dirname(config.__file__)
-        else:
-            artella_config_dir = artella_configs_path
-        artella_config_env_dir = os.path.join(artella_config_dir, self._environment.lower())
-        artella_config_path = None
-        if os.path.isdir(artella_config_env_dir):
-            artella_config_path = os.path.join(artella_config_env_dir, module_config_name)
-            # if not os.path.isfile(artella_config_path):
-            #     LOGGER.warning('Configuration File for "{}" for Environment "{}" does not exists: "{}"'.format(
-            #         module_config_name,
-            #         self._environment,
-            #         artella_config_path
-            #     ))
-        else:
-            LOGGER.warning('Configuration Folder for Environment "{}" does not exists: "{}"'.format(
-                self._environment, artella_config_env_dir))
+        all_config_paths = self._get_config_paths(
+            project_name=project_name, module_config_name=module_config_name, skip_non_existent=False)
+        valid_config_paths = self._get_config_paths(project_name=project_name, module_config_name=module_config_name)
+        if not valid_config_paths:
+            raise RuntimeError(
+                        'Impossible to load configuration "{}"  for project "{}" because it does not exists in any of '
+                        'the configuration folders: {}'.format(config_name, project_name,  ''.join(all_config_paths)))
 
-        project_config_path = None
-        try:
-            project_config_mod = importlib.import_module('{}.config'.format(project_name))
-            project_config_dir = os.path.dirname(project_config_mod.__file__)
-            project_config_env_dir = os.path.join(project_config_dir, self._environment.lower())
-            if not os.path.isdir(project_config_env_dir):
-                LOGGER.warning(
-                    'Configuration Folder for Environment "{}" and Project "{}" does not exists: "{}"'.format(
-                        self._environment, project_name, artella_config_env_dir))
-                return config_data
-
-            project_config_path = project_config_env_dir
-
-            all_configs = [
-                f for f in os.listdir(project_config_env_dir) if os.path.isfile(
-                    os.path.join(project_config_env_dir, f))]
-            if module_config_name in all_configs:
-                project_config_path = os.path.join(project_config_env_dir, module_config_name)
-        except RuntimeError:
-            LOGGER.warning('No Configuration Module found for project: {}'.format(project_name))
-
-        if project_config_path and os.path.isfile(project_config_path):
-            if artella_config_path and os.path.isfile(artella_config_path):
-                config_data = metayaml.read([artella_config_path, project_config_path], config_dict)
-            else:
-                config_data = metayaml.read([project_config_path], config_dict)
-        else:
-            if not artella_config_path or not os.path.isfile(artella_config_path):
-                raise RuntimeError(
-                    'Impossible to load configuration "{}" because it does not exists in any of '
-                    'the configuration folders: \n\t{}\n\t{}"'.format(
-                        os.path.basename(artella_config_path),
-                        os.path.dirname(artella_config_path),
-                        project_config_path))
-            config_data = metayaml.read([artella_config_path], config_dict)
-            project_config_path = artella_config_path
-
+        project_config_path = valid_config_paths[0]
+        config_data = metayaml.read(valid_config_paths, config_dict)
         if not config_data:
             raise RuntimeError(
                 'Project Configuration File for {} Project is empty! {}'.format(self, project_config_path))

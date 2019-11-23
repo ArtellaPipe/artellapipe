@@ -59,7 +59,7 @@ class ShadersManager(object):
 
     def get_shaders_paths(self):
         """
-        Returns path where shareds are located in the project
+        Returns path where shaders are located in the project
         :return: str
         """
 
