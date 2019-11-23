@@ -815,8 +815,6 @@ class ArtellaProject(object):
     # ASSETS
     # ==========================================================================================================
 
-
-
     @decorators.timestamp
     def get_scene_assets(self, as_nodes=True, allowed_types=None):
         """
