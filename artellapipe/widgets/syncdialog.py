@@ -154,9 +154,10 @@ class ArtellaSyncFileDialog(ArtellaSyncDialog, object):
 
 
 class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
-    def __init__(self, project, paths=None):
+    def __init__(self, project, paths=None, recursive=False):
 
         self._paths = paths
+        self._recursive = recursive
 
         super(ArtellaSyncPathDialog, self).__init__(project=project)
 
@@ -181,10 +182,10 @@ class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
 
     def sync_files(self, event):
         for p in self._paths:
-            file_path = os.path.relpath(p, self._project.get_assets_path())
+            file_path = os.path.relpath(p, artellapipe.AssetsMgr().get_assets_path())
             self._progress_text.setText('Syncing files of folder: {0} ... Please wait!'.format(file_path))
             try:
-                artellalib.synchronize_path(p)
+                artellalib.synchronize_path_with_folders(p, recursive=self._recursive)
             except Exception as e:
                 LOGGER.error('Impossible to sync files ... Maybe Artella is down! Try it later ...')
                 LOGGER.error(str(e))

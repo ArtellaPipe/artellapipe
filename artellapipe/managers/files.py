@@ -115,7 +115,7 @@ class ArtellaFilesManager(object):
         sync_dialog = artellapipe.SyncFileDialog(project=self._project, files=files)
         sync_dialog.sync()
 
-    def sync_paths(self, paths):
+    def sync_paths(self, paths, recursive=False):
         """
         Synchronizes given paths from Artella server into user hard drive
         :param paths: list(str)
@@ -125,7 +125,7 @@ class ArtellaFilesManager(object):
 
         paths = python.force_list(paths)
 
-        sync_dialog = artellapipe.SyncPathDialog(project=self._project, paths=paths)
+        sync_dialog = artellapipe.SyncPathDialog(project=self._project, paths=paths, recursive=recursive)
         sync_dialog.sync()
 
     def sync_latest_published_version(self, file_to_sync):
