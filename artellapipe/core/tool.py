@@ -91,6 +91,28 @@ class Tool(base.BaseWidget, object):
 
         return self._attacher.save_settings()
 
+    def register_callback(self, callback_type, fn):
+        """
+        Registers the given callback with the given function
+        :param callback_type: tpDccLib.DccCallbacks
+        :param fn: Python function to be called when callback is emitted
+        """
+
+        if not self._attacher or not hasattr(self._attacher, 'register_callback'):
+            return None
+
+        return self._attacher.register_callback(callback_type, fn)
+
+    def unregister_callbacks(self):
+        """
+        Unregisters all callbacks registered by this tool
+        """
+
+        if not self._attacher or not hasattr(self._attacher, 'unregister_callbacks'):
+            return None
+
+        return self._attacher.unregister_callbacks()
+
     def show_ok_message(self, msg):
         """
         Shows an ok message in the attacher
@@ -144,6 +166,7 @@ class Tool(base.BaseWidget, object):
         Close tool
         """
 
+        self.unregister_callbacks()
         self.close()
 
 
