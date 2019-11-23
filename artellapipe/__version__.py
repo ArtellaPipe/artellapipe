@@ -12,4 +12,4 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-__version__ = "0.0.22"
+__version__ = "0.0.23"
