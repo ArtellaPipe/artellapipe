@@ -16,13 +16,12 @@ import os
 import json
 import logging.config
 
-from tpPyUtils import decorators, path as path_utils
-
 import tpDccLib as tp
 
 from tpQtLib.core import image
 
-from artellapipe.utils import tag as taggerutils
+from artellapipe.libs.artella.core import artellalib
+
 
 IGNORED_SHADERS = list()
 IGNORE_ATTRS = list()
@@ -30,13 +29,9 @@ if tp.is_maya():
     import tpMayaLib as maya
     from tpMayaLib.core import shader as maya_shaders
     from tpMayaLib.core import transform as maya_transform
-    from tpMayaLib.core import decorators as maya_decorators
 
-    UNDO_DECORATOR = maya_decorators.undo_chunk
     IGNORE_SHADERS = ['particleCloud1', 'shaderGlow1', 'defaultColorMgtGlobals', 'lambert1']
     IGNORE_ATTRS = ['computedFileTextureNamePattern']
-else:
-    UNDO_DECORATOR = decorators.empty_decorator
 
 LOGGER = logging.getLogger()
 
@@ -78,22 +73,24 @@ class ShadingNetwork(object):
             shader_dict = json.load(open_file)
         return shader_dict
 
-    # (too_many_arguments) pylint: disable=R0913
     @classmethod
-    def write_network(cls, shader_extension, shaders_path, shaders=None,
-                      icon_path=None, publish=False):
+    def write_network(cls, shader_extension, shaders_path, shaders=None, icon_path=None, publish=False, comment=None):
         """
         Writes shader network info to the given path
+        :param shader_extension: str
         :param shaders_path: str, path where we want to store the shader
         :param shaders: list<str>, list of shaders we want to store
         :param icon_path: str, icon we want to show in the shader viewer
+        :param publish: bool
+        :param comment: str
         :return: list<str>, list of exported shaders
         """
+
         if not os.path.exists(shaders_path):
             LOGGER.debug('ShaderLibrary: Shaders Path %s is not valid! Aborting export!', shaders_path)
 
         if shaders is None:
-            shaders = maya.cmds.ls(materials=True)
+            shaders = tp.Dcc.list_materials()
 
         exported_shaders = list()
         for shader in shaders:
@@ -129,8 +126,9 @@ class ShadingNetwork(object):
 
                 if publish:
                     LOGGER.debug('Creating new shader version in Artella: {}'.format(out_file))
-                    artellalib.upload_new_asset_version(out_file, comment='New Shader {} version'.format(shader),
-                                                        skip_saving=True)
+                    if not comment:
+                        comment = 'New Shader {} version'.format(shader)
+                    artellalib.upload_new_asset_version(out_file, comment=comment, skip_saving=True)
                 artellalib.unlock_file(out_file)
 
                 exported_shaders.append(out_file)
@@ -161,9 +159,11 @@ class ShadingNetwork(object):
                 node_sg = maya.cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=key + 'SG')
 
                 if node_type == 'displacementShader':
-                    maya.cmds.connectAttr(node + '.displacement', node_sg + '.displacementShader', force=True)
+                    tp.Dcc.connect_attribute(source_node=node, source_attribute='displacement',
+                                             target_node=node_sg, target_attribute='displacementShader', force=True)
                 else:
-                    maya.cmds.connectAttr(node + '.outColor', node_sg + '.surfaceShader', force=True)
+                    tp.Dcc.connect_attribute(source_node=node, source_attribute='outColor',
+                                             target_node=node_sg, target_attribute='surfaceShader', force=True)
             else:
                 cls.create_shader_node(node_type=node_type, as_type=as_type, name=key)
 
@@ -192,7 +192,7 @@ class ShadingNetwork(object):
                     name = key + '_'
                 # name = re.sub('(?<=[A-z])[0-9]+', '', name)
                 try:
-                    maya.cmds.rename(key, name)
+                    tp.Dcc.rename_node(key, name)
                 except Exception:
                     LOGGER.debug('ShaderLibrary: Impossible to rename {0} to {1}'.format(key, name))
 
@@ -230,7 +230,7 @@ class ShadingNetwork(object):
             prefix_name = shader_node
         shader_network = dict()
         shader_network[prefix_name] = cls._attrs_to_dict(shader_node, prefix)
-        connected_nodes = maya.cmds.listConnections(shader_node, source=True, destination=False)
+        connected_nodes = tp.Dcc.list_source_connections(node=shader_node)
         if connected_nodes:
             for n in connected_nodes:
                 shader_network.update(cls.get_shading_network(n, prefix))
@@ -251,18 +251,17 @@ class ShadingNetwork(object):
 
         attrs = {
             'asType': None, 'type': None, 'attr': dict(), 'connection': dict()}
-        shader_attrs = maya.cmds.listAttr(shader_node, multi=True)
+        shader_attrs = tp.Dcc.list_attributes(node=shader_node, multi=True)
 
         # Shader object type
-        attrs['type'] = maya.cmds.objectType(shader_node)
+        attrs['type'] = tp.Dcc.object_type(shader_node)
 
         # Shading node type
         attrs['asType'] = maya_shaders.get_shading_node_type(shader_node)
         for attr in shader_attrs:
             if not maya.cmds.connectionInfo('{0}.{1}'.format(shader_node, attr), isDestination=True):
                 try:
-                    value = maya.cmds.getAttr(
-                        '{0}.{1}'.format(shader_node, attr))
+                    value = tp.Dcc.get_attribute_value(node=shader_node, attribute_name=attr)
                     if value is not None:
                         if isinstance(value, list):
                             attrs['attr'][attr] = value[0]
@@ -289,15 +288,14 @@ class ShadingNetwork(object):
         for attr in attrs['connection']:
             con_node, con_attr = attrs['connection'][attr].split('.')
             try:
-                maya.cmds.connectAttr(
-                    '{}.{}'.format(con_node, con_attr), '{}.{}'.format(shader_node, attr), force=True)
+                tp.Dcc.connect_attribute(source_node=con_node, source_attribute=con_attr,
+                                         target_node=shader_node, target_attribute=attr, force=True)
             except Exception:
                 continue
 
-        if 'notes' not in attrs['attr'] and maya.cmds.objExists(shader_node) \
-                and maya.cmds.attributeQuery('notes', node=shader_node, exists=True):
-            maya.cmds.setAttr('{0}.{1}'.format(
-                shader_node, 'notes'), '', type='string')
+        if 'notes' not in attrs['attr'] and tp.Dcc.object_exists(
+                shader_node) and tp.Dcc.attribute_exists(node=shader_node, attribute_name='notes'):
+            tp.Dcc.set_string_attribute_value(node=shader_node, attribute_name='notes', attribute_value='')
         for attr in attrs['attr']:
             attr_type = None
             if attr in IGNORE_ATTRS:
@@ -318,309 +316,20 @@ class ShadingNetwork(object):
                         'ShaderLibrary: setAttr {0} skipped!'.format(attr))
                     continue
             elif isinstance(attrs['attr'][attr], basestring):
-                if attr == 'notes' and not maya.cmds.attributeQuery(
-                        'notes', node=shader_node, exists=True):
-                    maya.cmds.addAttr(
-                        shader_node, longName='notes', dataType='string')
+                if attr == 'notes' and not tp.Dcc.attribute_exists(node=shader_node, attribute_name='notes'):
+                    tp.Dcc.add_string_attribute(node=shader_node, attribute_name='notes')
                 try:
-                    maya.cmds.setAttr(
-                        '{}.{}'.format(shader_node, attr),
-                        attrs['attr'][attr], type='string')
+                    tp.Dcc.set_string_attribute_value(
+                        node=shader_node, attribute_name=attr, attribute_value=attrs['attr'][attr])
                 except Exception as exc:
                     LOGGER.debug(
                         'ShaderLibrary: setAttr {0} skipped!'.format(attr))
                     continue
             else:
                 try:
-                    maya.cmds.setAttr(
-                        '{}.{}'.format(shader_node, attr), attrs['attr'][attr])
+                    tp.Dcc.set_attribute_value(
+                        node=shader_node, attribute_name=attr, attribute_value=attrs['attr'][attr])
                 except Exception as exc:
                     LOGGER.debug(
                         'ShaderLibrary: setAttr {0} skipped!'.format(attr))
                     continue
-
-
-def load_shader(project, shader_name):
-    """
-    Loads shader with given name in current DCC
-    :param project: ArtellaProject
-    :param shader_name: str
-    """
-
-    if not tp.is_maya():
-        LOGGER.warning('Shaders loading is only supported in Maya!')
-        return
-
-    shader_library_path = project.get_shaders_path()
-    if not os.path.exists(shader_library_path):
-        LOGGER.debug(
-            '{} Shaders Library folder is not synchronized in your PC. '
-            'Syncronize it please!'.format(project.name.title()))
-        return False
-
-    shaders_extension = str(project.shaders_extension)
-    if not shaders_extension.startswith('.'):
-        shaders_extension = '.{}'.format(shaders_extension)
-
-    shader_path = path_utils.clean_path(
-        os.path.join(shader_library_path, shader_name + shaders_extension))
-    if os.path.isfile(shader_path):
-        if maya.cmds.objExists(shader_name):
-            LOGGER.warning(
-                'ShaderLibrary: Shader {} already exists! Shader skipped!'.format(shader_name))
-            return False
-        else:
-            ShadingNetwork.load_network(shader_file_path=shader_path)
-    else:
-        LOGGER.warning(
-            'ShaderLibrary: Shader {0} does not exist! Shader skipped!'.format(shader_path))
-        return False
-
-    return True
-
-
-@UNDO_DECORATOR
-def load_scene_shaders(project, load=True, apply_shader=True, tag_nodes=None):
-    """
-    Loops through all tag data scene nodes and loads all necessary shaders into
-    the current scene
-    If a specific shader is already loaded, that shader is skip
-    :return: list<str>, list of loaded shaders
-    """
-
-    if not tp.is_maya():
-        LOGGER.warning('Shaders loading is only supported in Maya!')
-        return
-
-    if apply_shader:
-        all_panels = maya.cmds.getPanel(type='modelPanel')
-        for p in all_panels:
-            maya.cmds.modelEditor(p, edit=True, displayTextures=False)
-
-    applied_data = list()
-    updated_textures = list()
-
-    if not tag_nodes:
-        tag_nodes = taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
-        tag_info_nodes = project.get_tag_info_nodes(as_tag_nodes=True)
-        tag_nodes.extend(tag_info_nodes)
-
-    if not tag_nodes:
-        LOGGER.error('No tag nodes found in the current scene. '
-                     'Aborting shaders loading ...')
-        return None
-
-    added_mats = list()
-
-    for tag in tag_nodes:
-        shaders = tag.get_shaders()
-        if not shaders:
-            LOGGER.error('No shaders found for asset: {}'.format(tag.get_asset().node))
-            continue
-
-        asset = tag.get_asset_node()
-
-        hires_group = tag.get_hires_group()
-        if not hires_group or not maya.cmds.objExists(hires_group):
-            hires_group = tag.get_asset().node
-
-        if not hires_group or not maya.cmds.objExists(hires_group):
-            LOGGER.error(
-                'No Hires group found for asset: {}'.format(
-                    tag.get_asset().node))
-            continue
-
-        hires_meshes = [obj for obj in
-                        maya.cmds.listRelatives(
-                            hires_group, allDescendents=True, type='transform',
-                            shapes=False, noIntermediate=True, fullPath=True) if
-                        maya.cmds.objExists(obj) and maya.cmds.listRelatives(obj, shapes=True)]
-        if not hires_meshes or len(hires_meshes) <= 0:
-            LOGGER.error(
-                'No Hires meshes found for asset: {}'.format(
-                    tag.get_asset().node))
-            continue
-
-        if asset.node != hires_group:
-            is_referenced = maya.cmds.referenceQuery(asset.node, isNodeReferenced=True)
-            if is_referenced:
-                namespace = maya.cmds.referenceQuery(asset.node, namespace=True)
-                if not namespace or not namespace.startswith(':'):
-                    LOGGER.error('Node {} has not a valid namespace!. Please contact TD!'.format(asset.node))
-                    continue
-                else:
-                    namespace = namespace[1:] + ':'
-
-        valid_meshes = list()
-        for mesh in hires_meshes:
-            is_referenced = maya.cmds.referenceQuery(mesh, isNodeReferenced=True)
-            if is_referenced:
-                namespace = maya.cmds.referenceQuery(mesh, namespace=True)
-                if not namespace or not namespace.startswith(':'):
-                    continue
-                else:
-                    namespace = namespace[1:] + ':'
-            else:
-                namespace = ''
-
-            mesh_no_namespace = mesh.replace(namespace, '')
-            asset_group = mesh_no_namespace.split('|')[1]
-
-            hires_grp_no_namespace = hires_group.replace(namespace, '')
-            hires_split = mesh_no_namespace.split(hires_grp_no_namespace)
-
-            group_mesh_name = hires_split[-1]
-            group_mesh_name = '|{0}{1}'.format(asset_group, group_mesh_name)
-
-            for shader_mesh in shaders.keys():
-                if shader_mesh == group_mesh_name:
-                    valid_meshes.append(mesh)
-                    break
-
-            for shader_mesh in shaders.keys():
-                shader_short = tp.Dcc.node_short_name(shader_mesh)
-                group_short = tp.Dcc.node_short_name(group_mesh_name)
-                if shader_short == group_short:
-                    if mesh not in valid_meshes:
-                        valid_meshes.append(mesh)
-                        break
-
-        if len(valid_meshes) <= 0:
-            LOGGER.error('No valid meshes found on asset. Please contact TD!'.format(tag.get_asset()))
-            continue
-
-        meshes_shading_groups = list()
-        for mesh in valid_meshes:
-            mesh_shapes = maya.cmds.listRelatives(mesh, shapes=True, noIntermediate=True)
-            if not mesh_shapes or len(mesh_shapes) <= 0:
-                LOGGER.error('Mesh {} has not valid shapes!'.format(mesh))
-                continue
-            for shape in mesh_shapes:
-                shape_name = shape.split(':')[-1]
-                if shape_name.endswith('Deformed'):
-                    shape_name = shape_name.replace('Deformed', '')
-                for shader_mesh, shader_data in shaders.items():
-                    for shader_shape, shader_group in shader_data.items():
-                        shader_shape_name = shader_shape.split('|')[-1]
-                        if shape_name == shader_shape_name:
-                            meshes_shading_groups.append([mesh, shader_group])
-        if len(meshes_shading_groups) <= 0:
-            LOGGER.error('No valid shading groups found on asset. Please contact TD!'.format(tag.get_asset()))
-            continue
-
-        for mesh_info in meshes_shading_groups:
-            mesh = mesh_info[0]
-            shading_info = mesh_info[1]
-            for shading_grp, materials in shading_info.items():
-                if not materials or len(materials) <= 0:
-                    LOGGER.error('No valid materials found on mesh {0} of asset {1}'.format(mesh, tag.get_asset()))
-                    continue
-
-                # If shading group already exists we do not create the material
-                if maya.cmds.objExists(shading_grp):
-                    continue
-
-                for mat in materials:
-                    if not mat or mat in added_mats:
-                        continue
-                    added_mats.append(mat)
-
-                    if load:
-                        LOGGER.debug('Loading Shader: {}'.format(mat))
-                        valid_shader = load_shader(project=project, shader_name=mat)
-                        if not valid_shader:
-                            LOGGER.error('Error while loading shader {}'.format(mat))
-
-            # After materials are created we try to apply to the meshes
-            try:
-                for shading_grp, materials in shading_info.items():
-                    if not tp.Dcc.object_exists(shading_grp):
-                        for mat in materials:
-                            if not materials or len(materials) <= 0:
-                                continue
-                            LOGGER.error(
-                                'Shading group {}  loaded from shader info does not exists!'.format(shading_grp))
-                            shading_grp = mat + 'SG'
-                            LOGGER.error(
-                                'Applying shading group based on nomenclature: {}'.format(shading_grp))
-                            if tp.Dcc.object_exists(shading_grp):
-                                LOGGER.error(
-                                    'Impossible to set shading group {0} to mesh {1}'.format(shading_grp, mesh))
-                                break
-
-                    if apply_shader:
-                        maya.cmds.sets(mesh, edit=True, forceElement=shading_grp)
-                        maya.cmds.ogs(reset=True)
-                        file_nodes = maya.cmds.ls(type='file')
-                        for f in file_nodes:
-                            if f not in updated_textures:
-                                updated_textures.append(f)
-                                maya.cmds.ogs(regenerateUVTilePreview=f)
-                        LOGGER.debug('Shading set {0} applied to mesh {1}'.format(shading_grp, mesh))
-                    applied_data.append([mesh, shading_grp])
-
-            except Exception as e:
-                LOGGER.error('Impossible to set shading group {0} to mesh {1}'.format(shading_grp, mesh))
-                LOGGER.error(str(e))
-
-    return applied_data
-
-
-def load_all_scene_shaders(project, load=True, apply_shader=True):
-    """
-    Loops through all tag data scene nodes and loads all necessary shaders into the current scene
-    If a specific shader is already loaded, that shader is skip
-    :return: list<str>, list of loaded shaders
-    """
-
-    if not tp.is_maya():
-        LOGGER.warning('Shaders loading is only supported in Maya!')
-        return
-
-    return load_scene_shaders(project=project, load=load, apply_shader=apply_shader)
-
-
-@UNDO_DECORATOR
-def unload_shaders(project, tag_nodes=None):
-    """
-    Unload shaders applied to assets loaded in current DCC scene or to given ones
-    :param tag_nodes:
-    """
-
-    if not tp.is_maya():
-        LOGGER.warning('Shaders unloading is only supported in Maya!')
-        return
-
-    if not tag_nodes:
-        tag_nodes = taggerutils.get_tag_data_nodes(project=project, as_tag_nodes=True)
-        tag_info_nodes = project.get_tag_info_nodes(as_tag_nodes=True)
-        tag_nodes.extend(tag_info_nodes)
-
-    found_nodes = list()
-    found_nodes.extend(tag_nodes)
-
-    for tag in found_nodes:
-        shaders = tag.get_shaders()
-        if not shaders:
-            LOGGER.error('No shaders found for asset: {}'.format(tag.get_asset().node))
-            continue
-
-        for shader_geo, shader_shapes in shaders.items():
-            for shader_shp, shader_data in shader_shapes.items():
-                for shader_sg, shader_names in shader_data.items():
-                    found_meshes = list()
-                    if not tp.Dcc.object_exists(shader_sg):
-                        continue
-                    cns = maya.cmds.listConnections(shader_sg)
-                    for cnt in cns:
-                        cnt_type = maya.cmds.nodeType(cnt, i=True)
-                        if 'dagNode' in cnt_type:
-                            found_meshes.append(cnt)
-                    for mesh in found_meshes:
-                        maya.cmds.sets(mesh, edit=True, forceElement='initialShadingGroup')
-
-                    for shd in shader_names:
-                        if tp.Dcc.object_exists(shd) and shd not in ['lambert1', 'particleCloud1']:
-                            tp.Dcc.delete_object(shd)
-                    if shader_sg not in ['initialShadingGroup', 'initialParticleSE']:
-                        tp.Dcc.delete_object(shader_sg)
