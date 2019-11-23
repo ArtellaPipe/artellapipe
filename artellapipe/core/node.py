@@ -310,11 +310,11 @@ class ArtellaDCCNode(object):
                 tag_data_node = tag_data_node[0]
                 tag_type = tp.Dcc.get_attribute_value(node=tag_data_node, attribute_name='tag_type')
                 if tag_type and tag_type == '{}_TAG'.format(self._project.name.upper()):
-                    tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=tag_data_node)
+                    tag_node = artellapipe.TagNode(project=self._project, node=tag_data_node)
                     return tag_node
         elif tp.Dcc.attribute_exists(node=self.node, attribute_name='tag_info'):
             tag_info = tp.Dcc.get_attribute_value(node=self.node, attribute_name='tag_info')
-            tag_node = self._project.TAG_NODE_CLASS(project=self._project, node=self.node, tag_info=tag_info)
+            tag_node = artellapipe.TagNode(project=self._project, node=self.node, tag_info=tag_info)
             return tag_node
 
     # def load_shaders(self):

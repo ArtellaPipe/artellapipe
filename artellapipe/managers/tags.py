@@ -70,11 +70,11 @@ class ArtellaTagsManager(object):
                 tag_data_node = tag_data_node[0]
                 tag_type = tp.Dcc.get_attribute_value(node=tag_data_node, attribute_name='tag_type')
                 if tag_type and tag_type == '{}_TAG'.format(project.name.upper()):
-                    tag_node = project.TAG_NODE_CLASS(project=project, node=tag_data_node)
+                    tag_node = artellapipe.TagNode(project=project, node=tag_data_node)
                     return tag_node
         elif tp.Dcc.attribute_exists(node=node, attribute_name='tag_info'):
             tag_info = tp.Dcc.get_attribute_value(node=node, attribute_name='tag_info')
-            tag_node = project.TAG_NODE_CLASS(project=project, node=node, tag_info=tag_info)
+            tag_node = artellapipe.TagNode(project=project, node=node, tag_info=tag_info)
             return tag_node
 
     def get_current_selection(self):
@@ -175,8 +175,8 @@ class ArtellaTagsManager(object):
                 tag_type = tp.Dcc.get_attribute_value(
                     node=obj, attribute_name=self.TagDefinitions.TAG_TYPE_ATTRIBUTE_NAME)
                 if tag_type and tag_type == project.tag_type_id:
-                    if as_tag_nodes and project.TAG_NODE_CLASS:
-                        obj = project.TAG_NODE_CLASS(project=project, node=obj)
+                    if as_tag_nodes and artellapipe.TagNode:
+                        obj = artellapipe.TagNode(project=project, node=obj)
                     tag_nodes.append(obj)
 
         return tag_nodes

@@ -45,7 +45,7 @@ import artellapipe
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 from artellapipe.libs.naming.core import naminglib
-from artellapipe.core import defines, config, asset, node, sequence, shot
+from artellapipe.core import defines, config, node, sequence, shot
 from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
@@ -57,7 +57,6 @@ class ArtellaProject(object):
     SEQUENCE_CLASS = sequence.ArtellaSequence
     SHOT_CLASS = shot.ArtellaShot
     ASSET_NODE_CLASS = node.ArtellaAssetNode
-    TAG_NODE_CLASS = asset.ArtellaTagNode
 
     def __init__(self, name, settings=None):
         super(ArtellaProject, self).__init__()

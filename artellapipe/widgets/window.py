@@ -198,6 +198,8 @@ class ArtellaWindow(tpQtLib.Window, object):
     def ui(self):
         super(ArtellaWindow, self).ui()
 
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
+
         window_icon = self._get_icon()
         self.setWindowIcon(window_icon)
 
@@ -251,7 +253,8 @@ class ArtellaWindow(tpQtLib.Window, object):
     def closeEvent(self, event):
         if self._tool:
             self._tool.close_tool()
-        event.accept()
+        super(ArtellaWindow, self).closeEvent(event)
+        # event.accept()
 
     def resizeEvent(self, event):
         """
