@@ -22,18 +22,6 @@ ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.yml'
 # Defines the name of the changelog file used by artellapipe
 ARTELLA_PROJECT_CHANGELOG_FILE_NAME = 'changelog.yml'
 
-# Defines the name of the shelf file used by artellapipe to setup project shelf
-ARTELLA_PROJECT_SHELF_FILE_NAME = 'shelf.json'
-
-# Defines the name of the menu file used by artellapipe to setup project shelf
-ARTELLA_PROJECT_MENU_FILE_NAME = 'menu.json'
-
-# Defines the name of the naing file used by artellapipe for pipeline naming
-ARTELLA_PROJECT_DEFAULT_NAMING_FILE_NAME = 'naming.json'
-
-# Defines the name of the version file used by artellapipe to check current tools version
-ARTELLA_PROJECT_DEFAULT_VERSION_FILE_NAME = '__version__.py'
-
 # Defines attribute name used to define a dictionary that maps tag types with categories in the Artella Outliner
 ARTELLA_CONFIG_OUTLINER_CATEGORIES_ATTRIBUTE_NAME = 'OUTLINER_CATEGORIES'
 
@@ -57,9 +45,6 @@ ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME = 'PATHS_TO_REGISTER'
 
 # Defines the default name used for assets
 ARTELLA_DEFAULT_ASSET_NAME = 'New_Asset'
-
-# Defines the name of the attribute for tag info
-ARTELLA_TAG_INFO_ATTRIBUTE_NAME = 'tag_info'
 
 # Defines the prefix used to store shot override attributes
 ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_PREFX = 'shot_overrides'
