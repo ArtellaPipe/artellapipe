@@ -233,7 +233,7 @@ class ArtellaConfiguration(object):
                 'Impossible to load configuration "{}"  for project "{}" because it does not exists in any of '
                 'the configuration folders: {}'.format(config_name, project_name, ''.join(all_config_paths)))
 
-        project_config_path = valid_config_paths[0]
+        project_config_path = valid_config_paths[-1]
         config_data = metayaml.read(valid_config_paths, config_dict)
         if not config_data:
             raise RuntimeError(

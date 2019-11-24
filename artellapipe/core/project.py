@@ -203,6 +203,7 @@ class ArtellaProject(object):
         self.create_tags_manager()
         self.create_shaders_manager()
         self.create_playblasts_manager()
+        self.create_pyblish_manager()
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
@@ -574,6 +575,17 @@ class ArtellaProject(object):
         playblasts_manager.set_project(self)
 
         return playblasts_manager
+
+    def create_pyblish_manager(self):
+        """
+       Creates instance of the Pyblish plugins manager used by the project
+       :return: ArtellaPyblishPluginsManager
+       """
+
+        pyblish_manager = artellapipe.PyblishMgr()
+        pyblish_manager.set_project(self)
+
+        return pyblish_manager
 
     def create_production_tracker(self):
         """
@@ -1035,19 +1047,6 @@ class ArtellaProject(object):
         """
 
         return re.compile(r"{}".format(self._shot_regex))
-
-    # ==========================================================================================================
-    # PUBLISHER
-    # ==========================================================================================================
-
-    def get_publisher_plugin_paths(self):
-        """
-        Function that registers all plugins available for Artella Publisher
-        """
-
-        return [
-            path_utils.clean_path(os.path.join(self.get_project_path(), 'tools', 'publisher', 'plugins'))
-        ]
 
     # ==========================================================================================================
     # PRIVATE
