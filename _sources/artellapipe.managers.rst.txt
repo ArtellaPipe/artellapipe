@@ -11,6 +11,7 @@ Submodules
    artellapipe.managers.libs
    artellapipe.managers.menu
    artellapipe.managers.playblasts
+   artellapipe.managers.pyblishplugins
    artellapipe.managers.shaders
    artellapipe.managers.shelf
    artellapipe.managers.tags

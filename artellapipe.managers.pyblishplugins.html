@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.managers.shaders module &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.pyblishplugins module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.managers.shelf module" href="artellapipe.managers.shelf.html" />
-    <link rel="prev" title="artellapipe.managers.pyblishplugins module" href="artellapipe.managers.pyblishplugins.html" /> 
+    <link rel="next" title="artellapipe.managers.shaders module" href="artellapipe.managers.shaders.html" />
+    <link rel="prev" title="artellapipe.managers.playblasts module" href="artellapipe.managers.playblasts.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -156,13 +156,13 @@
         
           <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
         
-      <li>artellapipe.managers.shaders module</li>
+      <li>artellapipe.managers.pyblishplugins module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.managers.shaders.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.pyblishplugins.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,8 +176,56 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-managers-shaders-module">
-<h1>artellapipe.managers.shaders module<a class="headerlink" href="#artellapipe-managers-shaders-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.managers.pyblishplugins">
+<span id="artellapipe-managers-pyblishplugins-module"></span><h1>artellapipe.managers.pyblishplugins module<a class="headerlink" href="#module-artellapipe.managers.pyblishplugins" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager for Pyblish Plugins</p>
+<dl class="class">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.pyblishplugins.</code><code class="sig-name descname">PyblishPluginsManager</code><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager.config">
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin">
+<code class="sig-name descname">get_plugin</code><span class="sig-paren">(</span><em class="sig-param">plugin_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a registered plugin by its name
+:param plugin_name: str
+:return: class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin_info">
+<code class="sig-name descname">get_plugin_info</code><span class="sig-paren">(</span><em class="sig-param">plugin_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dictionary with info of the given plugin
+:param plugin_name: str
+:return: dict</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin_path">
+<code class="sig-name descname">get_plugin_path</code><span class="sig-paren">(</span><em class="sig-param">plugin_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns path where plugin is located
+:param plugin_name: str
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager.plugins">
+<em class="property">property </em><code class="sig-name descname">plugins</code><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager.plugins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.pyblishplugins.PyblishPluginsManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.pyblishplugins.PyblishPluginsManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project this manager belongs to
+:param project: ArtellaProject</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -192,10 +240,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.managers.shelf.html" class="btn btn-neutral float-right" title="artellapipe.managers.shelf module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.shaders.html" class="btn btn-neutral float-right" title="artellapipe.managers.shaders module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.managers.pyblishplugins.html" class="btn btn-neutral float-left" title="artellapipe.managers.pyblishplugins module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.playblasts.html" class="btn btn-neutral float-left" title="artellapipe.managers.playblasts module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

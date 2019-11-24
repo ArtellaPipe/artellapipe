@@ -1,0 +1,7 @@
+artellapipe.managers.pyblishplugins module
+==========================================
+
+.. automodule:: artellapipe.managers.pyblishplugins
+   :members:
+   :undoc-members:
+   :show-inheritance:
