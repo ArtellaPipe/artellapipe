@@ -94,4 +94,5 @@ class ArtellaMenuManagerSingleton(ArtellaMenuManager, object):
         ArtellaMenuManager.__init__(self)
 
 
+artellapipe.register.register_class('Menu', ArtellaMenuManager)
 artellapipe.register.register_class('MenuMgr', ArtellaMenuManagerSingleton)

@@ -311,8 +311,6 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         Internal callback function that is called when an image object has finished loading
         """
 
-        LOGGER.warning('Updating asset icon with: {}'.format(asset_icon))
-
         if asset_icon and not asset_icon.isNull():
             self._thumbnail_icon = asset_icon
             self._asset_btn.setIcon(asset_icon)
