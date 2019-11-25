@@ -44,7 +44,6 @@ else:
 import artellapipe
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib, artellaclasses
-from artellapipe.libs.naming.core import naminglib
 from artellapipe.core import defines, config, node, sequence, shot
 from artellapipe.utils import resource
 
@@ -198,8 +197,9 @@ class ArtellaProject(object):
         self.create_shelf()
         self.create_menu()
         self._tray = self.create_tray()
-        self.create_assets_manager()
+        self.create_names_manager()
         self.create_files_manager()
+        self.create_assets_manager()
         self.create_tags_manager()
         self.create_shaders_manager()
         self.create_playblasts_manager()
@@ -339,25 +339,7 @@ class ArtellaProject(object):
 
         return 'Not Found!'
 
-    def solve_name(self, rule_name, *args, **kwargs):
-        """
-        Resolves name with given rule and attributes
-        :param rule_name: str
-        :param args: list
-        :param kwargs: dict
-        """
 
-        name_lib = naminglib.ArtellaNameLib()
-        current_rule = name_lib.active_rule()
-        name_lib.set_active_rule(rule_name)
-        solved_name = name_lib.solve(*args, **kwargs)
-        if current_rule:
-            if rule_name != current_rule.name:
-                name_lib.set_active_rule(current_rule.name)
-        else:
-            name_lib.set_active_rule(None)
-
-        return solved_name
 
     def init_settings(self):
         """
@@ -517,6 +499,17 @@ class ArtellaProject(object):
         menu_manager.set_project(self)
 
         return menu_manager
+
+    def create_names_manager(self):
+            """
+            Creates instance of the assets manager used by the project
+            :return: ArtellaAssetsManager
+            """
+
+            names_manager = artellapipe.NamesMgr()
+            names_manager.set_project(self)
+
+            return names_manager
 
     def create_assets_manager(self):
         """

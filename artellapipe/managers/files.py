@@ -11,15 +11,25 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import logging
+import inspect
+import traceback
+import importlib
 
 import tpDccLib as tp
 from tpPyUtils import python, decorators, path as path_utils
 from tpQtLib.core import qtutils
 
+if python.is_python2():
+    import pkgutil as loader
+else:
+    import importlib as loader
+
 import artellapipe
 import artellapipe.register
+from artellapipe.core import config
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
+from artellapipe.libs.naming.core import naminglib
 from artellapipe.utils import exceptions
 
 LOGGER = logging.getLogger()
@@ -28,6 +38,21 @@ LOGGER = logging.getLogger()
 class ArtellaFilesManager(object):
     def __init__(self):
         self._project = None
+        self._config = None
+
+        self._registered_file_clases = dict()
+
+    @property
+    def config(self):
+        return self._config
+
+    @property
+    def files(self):
+        return self._config.get('files', default=dict())
+
+    @property
+    def file_classes(self):
+        return self._registered_file_clases.values()
 
     def set_project(self, project):
         """
@@ -36,6 +61,45 @@ class ArtellaFilesManager(object):
         """
 
         self._project = project
+        self._config = config.get_config(project, 'artellapipe-files')
+
+        self._register_file_classes()
+
+    def register_file_class(self, file_type, file_class):
+        """
+        Registers a new file class into the project
+        :param file_type: str
+        :param file_class: class
+        """
+
+        self._registered_file_clases[file_type] = file_class
+        return True
+
+    def get_file_class(self, file_type_name):
+        """
+        Returns file type by its name
+        :param file_type_name: str
+        :return: class
+        """
+
+        if file_type_name not in self._registered_file_clases:
+            LOGGER.warning('File Type with name "{}" not registered!'.format(file_type_name))
+            return
+
+        return self._registered_file_clases[file_type_name]
+
+    def get_template(self, template_name):
+        """
+        Returns path template with the given name
+        :param template_name: str
+        :return: Template
+        """
+
+        template = naminglib.ArtellaNameLib().get_template(template_name)
+        if not template:
+            LOGGER.warning('No Template found with name: "{}"'.format(template_name))
+
+        return template
 
     def fix_path(self, path_to_fix):
         """
@@ -335,6 +399,55 @@ class ArtellaFilesManager(object):
         if not os.path.isfile(file_path):
             LOGGER.error('File {} cannot be locked because it does not exists!'.format(file_path))
             return False
+
+        return True
+
+    def _register_file_classes(self):
+        """
+        Internal function that registers file classes
+        """
+
+        if not self._project:
+            LOGGER.warning('Impossible to register file classes because Artella project is not defined!')
+            return False
+
+        for file_type, file_info in self._config.get('files', default={}).items():
+            full_file_class = file_info.get('class', None)
+            if not full_file_class:
+                LOGGER.warning('No class defined for File Type "{}". Skipping ...'.format(file_type))
+                continue
+            file_type_extensions = file_info.get('extensions', list())
+            file_type_rule = file_info.get('rule', None)
+            file_type_template = file_info.get('template', None)
+            file_class_split = full_file_class.split('.')
+            file_class = file_class_split[-1]
+            file_module = '.'.join(file_class_split[:-1])
+            LOGGER.info('Registering File: {}'.format(file_module))
+
+            try:
+                module_loader = loader.find_loader(file_module)
+            except (RuntimeError, ImportError) as exc:
+                LOGGER.warning('Impossible to import File Module: {} | {} | {}'.format(
+                    file_module, exc, traceback.format_exc()))
+                continue
+
+            class_found = None
+            mod = importlib.import_module(module_loader.fullname)
+            for cname, obj in inspect.getmembers(mod, inspect.isclass):
+                if cname == file_class:
+                    class_found = obj
+                    break
+
+            if not class_found:
+                LOGGER.warning('No File Class "{}" found in Module: "{}"'.format(file_class, file_module))
+                continue
+
+            obj.FILE_TYPE = file_type
+            obj.FILE_EXTENSIONS = file_type_extensions
+            obj.FILE_RULE = file_type_rule
+            obj.FILE_TEMPLATE = file_type_template
+
+            self.register_file_class(file_type, obj)
 
         return True
 

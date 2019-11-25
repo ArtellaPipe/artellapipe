@@ -19,6 +19,7 @@ import tpDccLib as tp
 
 import artellapipe
 import artellapipe.register
+from artellapipe.core import config
 
 LOGGER = logging.getLogger()
 
@@ -26,6 +27,7 @@ LOGGER = logging.getLogger()
 class ArtellaMenuManager(object):
     def __init__(self):
         self._project = None
+        self._config = None
         self._menu = None
         self._tray_menu = None
         self._project_description_menu = None
@@ -38,8 +40,13 @@ class ArtellaMenuManager(object):
         self._bug_object_action_name = None
         self._parent = tp.Dcc.get_main_window()
 
+    @property
+    def config(self):
+        return self._config
+
     def set_project(self, project):
         self._project = project
+        self._config = config.get_config(project, 'artellapipe-menu')
         self._menu_name = project.config.get('menu', 'name')
         self._menu_object_name = project.config.get('menu', 'object_name')
         self._tray_object_menu_name = project.config.get('tray', 'name')
@@ -77,15 +84,18 @@ class ArtellaMenuManager(object):
     def _launch_tool(self, tool, *args, **kwargs):
         print('Launching Tool: {}'.format(tool))
 
-    def _launch_command(self, command, *args, **kwargs):
+    def _launch_command(self, command, language='python', *args, **kwargs):
         """
-        Internal function that launches the given Python command
+        Internal function that launches the given command
         :param command: str
         :param args: list
         :param kwargs: dict
         """
 
-        exec(command)
+        if language == 'python':
+            exec(command)
+        else:
+            raise NotImplementedError('Commands of of language "{}" are not supported!'.format(language))
 
 
 @decorators.Singleton
