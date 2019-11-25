@@ -26,7 +26,6 @@ from artellapipe.core import abstract
 from artellapipe.utils import resource
 from artellapipe.libs import artella
 from artellapipe.libs.artella.core import artellalib
-from artellapipe.libs.naming.core import naminglib
 
 LOGGER = logging.getLogger()
 
@@ -131,7 +130,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         path_template_name = artellapipe.AssetsMgr().config.get('data', 'path_template_name')
-        template = naminglib.ArtellaNameLib().get_template(path_template_name)
+        template = artellapipe.FilesMgr().get_template(path_template_name)
         if not template:
             LOGGER.warning(
                 'Impossible to retrieve asset path because template "{}" is not in configuration file'.format(
@@ -234,7 +233,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: list(str)
         """
 
-        return [i for i in self.ASSET_FILES if i in artellapipe.AssetsMgr().config.get('files')]
+        return [i for i in self.ASSET_FILES if i in artellapipe.FilesMgr().files]
 
     # ==========================================================================================================
     # ARTELLA
@@ -294,7 +293,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if not extension:
             extension = self.project.default_extension
 
-        asset_files = artellapipe.AssetsMgr().config.get('files', default=dict())
+        asset_files = artellapipe.FilesMgr().files
         if file_type not in asset_files:
             LOGGER.warning(
                 'File Type "{}" is not valid! Supported File Types: {}'.format(file_type, asset_files.keys()))
@@ -305,7 +304,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             return None
 
         file_template_name = file_type.lower()
-        template = naminglib.ArtellaNameLib().get_template(file_template_name)
+        template = artellapipe.FilesMgr().get_template(file_template_name)
         if not template:
             LOGGER.warning(
                 'Impossible to retrieve asset file path because template "{}" is not in configuration file'.format(

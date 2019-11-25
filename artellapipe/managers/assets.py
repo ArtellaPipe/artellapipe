@@ -42,7 +42,6 @@ class ArtellaAssetsManager(object):
         self._assets = list()
         self._config = None
         self._registered_asset_classes = list()
-        self._registered_asset_file_type_classes = list()
 
     @property
     def config(self):
@@ -51,10 +50,6 @@ class ArtellaAssetsManager(object):
     @property
     def asset_classes(self):
         return self._registered_asset_classes
-
-    @property
-    def asset_file_classes(self):
-        return self._registered_asset_file_type_classes
 
     @property
     def assets(self):
@@ -70,7 +65,6 @@ class ArtellaAssetsManager(object):
         self._config = config.get_config(project, 'artellapipe-assets')
 
         self._register_asset_classes()
-        self._register_asset_file_types()
 
     def register_asset_class(self, asset_class):
         """
@@ -84,20 +78,6 @@ class ArtellaAssetsManager(object):
             return False
 
         self._registered_asset_classes.append(asset_class)
-        return True
-
-    def register_asset_file_type(self, asset_file_type_class):
-        """
-        Registers a new asset file type class into the project
-        :param asset_file_type_class: cls
-        """
-
-        if asset_file_type_class in self._registered_asset_file_type_classes:
-            LOGGER.warning(
-                'Asset File Type Class: "{}" is already registered. Skipping ...'.format(asset_file_type_class))
-            return False
-
-        self._registered_asset_file_type_classes.append(asset_file_type_class)
         return True
 
     def get_asset_types(self):
@@ -116,7 +96,7 @@ class ArtellaAssetsManager(object):
         :return: ArtellaAssetFile
         """
 
-        asset_files = self.config.get('files', default=dict())
+        asset_files = artellapipe.FilesMgr().files
         if not asset_files:
             return None
 
@@ -135,7 +115,7 @@ class ArtellaAssetsManager(object):
         :return: list
         """
 
-        asset_files = self.config.get('files', default=dict())
+        asset_files = artellapipe.FilesMgr().files
         if not asset_files:
             return None
 
@@ -153,7 +133,7 @@ class ArtellaAssetsManager(object):
         :return: dict
         """
 
-        asset_files = self.config.get('files', default=dict())
+        asset_files = artellapipe.FilesMgr().files
         if not asset_files:
             return None
 
@@ -296,7 +276,7 @@ class ArtellaAssetsManager(object):
         :return: bool
         """
 
-        return file_type in self._config.get('files')
+        return file_type in artellapipe.FilesMgr().files
 
     def get_asset_file(self, file_type, extension=None):
         """
@@ -311,12 +291,8 @@ class ArtellaAssetsManager(object):
         if not self.is_valid_asset_file_type(file_type):
             return
 
-        if not self.asset_file_classes:
-            LOGGER.warning('No Asset File Classes in current project: "{}"'.format(self._project.name.title()))
-            return
-
         asset_file_class_found = None
-        for asset_file_class in self.asset_file_classes:
+        for asset_file_class in artellapipe.FilesMgr().file_classes:
             if asset_file_class.FILE_TYPE == file_type:
                 asset_file_class_found = asset_file_class
                 break
@@ -416,12 +392,13 @@ class ArtellaAssetsManager(object):
 
     def _register_asset_classes(self):
         """
-        Internal function that can be override to register specific project asset classes
+        Internal function that project asset classes
         """
 
         if not self._project:
             LOGGER.warning('Impossible to register asset classes because Artella project is not defined!')
             return False
+
 
         for asset_type, asset_type_info in self._config.get('types', default={}).items():
             asset_files = asset_type_info.get('files', list())
@@ -437,7 +414,7 @@ class ArtellaAssetsManager(object):
             try:
                 module_loader = loader.find_loader(asset_module)
             except (RuntimeError, ImportError) as exc:
-                LOGGER.warning("Impossible to importer Asset Module: {} | {} | {}".format(
+                LOGGER.warning("Impossible to import Asset Module: {} | {} | {}".format(
                     asset_module, exc, traceback.format_exc()))
                 continue
 
@@ -456,51 +433,6 @@ class ArtellaAssetsManager(object):
             obj.ASSET_FILES = asset_files
 
             self.register_asset_class(obj)
-
-        return True
-
-    def _register_asset_file_types(self):
-        """
-        Internal function that can be override to register specific project file type classes
-        """
-
-        if not self._project:
-            LOGGER.warning('Impossible to register asset file types because Artella project is not defined!')
-            return False
-
-        for asset_file, asset_file_info in self._config.get('files', default=dict()).items():
-            file_extensions = asset_file_info.get('extensions', list())
-            full_file_class = asset_file_info.get('class', None)
-            if not full_file_class:
-                LOGGER.warning('No class defined for Asset File "{}". Skipping ...'.format(asset_file))
-                continue
-            file_class_split = full_file_class.split('.')
-            file_class = file_class_split[-1]
-            file_module = '.'.join(file_class_split[:-1])
-            LOGGER.info("Registering File: {}".format(file_module))
-
-            try:
-                module_loader = loader.find_loader(file_module)
-            except (RuntimeError, ImportError) as exc:
-                LOGGER.warning("Impossible to importer File Module: {} | {} | {}".format(
-                    file_module, exc, traceback.format_exc()))
-                continue
-
-            class_found = None
-            mod = importlib.import_module(module_loader.fullname)
-            for cname, obj in inspect.getmembers(mod, inspect.isclass):
-                if cname == file_class:
-                    class_found = obj
-                    break
-
-            if not class_found:
-                LOGGER.warning('No Asset Class "{}" found in Module: "{}"'.format(file_class, file_module))
-                continue
-
-            obj.FILE_TYPE = asset_file
-            obj.FILE_EXTENSIONS = file_extensions
-
-            self.register_asset_file_type(obj)
 
         return True
 
