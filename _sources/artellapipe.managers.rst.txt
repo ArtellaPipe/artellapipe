@@ -10,6 +10,8 @@ Submodules
    artellapipe.managers.files
    artellapipe.managers.libs
    artellapipe.managers.menu
+   artellapipe.managers.names
+   artellapipe.managers.ocio
    artellapipe.managers.playblasts
    artellapipe.managers.pyblishplugins
    artellapipe.managers.shaders

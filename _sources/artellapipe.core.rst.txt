@@ -11,6 +11,7 @@ Submodules
    artellapipe.core.assetfile
    artellapipe.core.config
    artellapipe.core.defines
+   artellapipe.core.file
    artellapipe.core.node
    artellapipe.core.project
    artellapipe.core.scene

@@ -1,0 +1,7 @@
+artellapipe.managers.names module
+=================================
+
+.. automodule:: artellapipe.managers.names
+   :members:
+   :undoc-members:
+   :show-inheritance:

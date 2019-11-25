@@ -1,0 +1,7 @@
+artellapipe.managers.ocio module
+================================
+
+.. automodule:: artellapipe.managers.ocio
+   :members:
+   :undoc-members:
+   :show-inheritance:
