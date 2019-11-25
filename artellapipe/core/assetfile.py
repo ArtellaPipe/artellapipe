@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains implementations for asset types
+Module that contains implementations for asset files
 """
 
 from __future__ import print_function, division, absolute_import
@@ -19,18 +19,14 @@ from tpPyUtils import decorators, path as path_utils
 from tpQtLib.core import qtutils
 
 import artellapipe
-from artellapipe.core import asset
+from artellapipe.core import file, asset
 from artellapipe.libs import artella
 from artellapipe.libs.artella.core import artellalib
 
 LOGGER = logging.getLogger()
 
 
-class ArtellaAssetFile(object):
-
-    FILE_TYPE = None
-    FILE_EXTENSIONS = list()
-
+class ArtellaAssetFile(file.ArtellaFile, object):
     def __init__(self, file_asset):
 
         self._asset = file_asset
@@ -43,7 +39,7 @@ class ArtellaAssetFile(object):
             asset.ArtellaAssetFileStatus.PUBLISHED: None
         }
 
-        super(ArtellaAssetFile, self).__init__()
+        super(ArtellaAssetFile, self).__init__(file_name=self._asset.get_name())
 
     def open_file(self, status):
         """
@@ -429,37 +425,3 @@ class ArtellaAssetFile(object):
                 else:
                     return artellalib.get_file_history(ref_path)
                 break
-
-    def _open_file(self, file_path, fix_path=True):
-        """
-        Internal function that opens current file in DCC
-        Overrides in custom asset file
-        :param path: str
-        :param fix_path: bool
-        :return:
-        """
-
-        pass
-
-    def _import_file(self, file_path, fix_path=True, *args, **kwargs):
-        """
-        Internal function that imports current file in DCC
-        Overrides in custom asset file
-        :param path: str
-        :param fix_path: bool
-        :return:
-        """
-
-        pass
-
-    def _reference_file(self, file_path, sync=False, *args, **kwargs):
-        """
-        Internal function that references current file in DCC
-        Overrides in custom asset file
-        :param path: str
-        :param fix_path: bool
-        :param sync: bool
-        :return:
-        """
-
-        pass
