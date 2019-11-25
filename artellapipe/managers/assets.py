@@ -399,7 +399,6 @@ class ArtellaAssetsManager(object):
             LOGGER.warning('Impossible to register asset classes because Artella project is not defined!')
             return False
 
-
         for asset_type, asset_type_info in self._config.get('types', default={}).items():
             asset_files = asset_type_info.get('files', list())
             full_asset_class = asset_type_info.get('class', None)

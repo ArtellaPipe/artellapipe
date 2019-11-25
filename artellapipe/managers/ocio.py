@@ -77,7 +77,9 @@ class ArtellaOCIOManager(object):
                 try:
                     tp.Dcc.load_plugin(plugin_name, quiet=True)
                 except Exception as exc:
-                    LOGGER.error('Error while loading OCIO Plugin: "{}" | {} | {}'.format(plugin_name, exc, traceback.format_exc()))
+                    LOGGER.error(
+                        'Error while loading OCIO Plugin: "{}" | {} | {}'.format(
+                            plugin_name, exc, traceback.format_exc()))
                     continue
 
             LOGGER.info('OCIO Plugin "{}" loaded successfully!'.format(plugin_name))

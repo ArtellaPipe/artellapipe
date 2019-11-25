@@ -339,8 +339,6 @@ class ArtellaProject(object):
 
         return 'Not Found!'
 
-
-
     def init_settings(self):
         """
         Function that initializes project settings file
@@ -501,15 +499,15 @@ class ArtellaProject(object):
         return menu_manager
 
     def create_names_manager(self):
-            """
-            Creates instance of the assets manager used by the project
-            :return: ArtellaAssetsManager
-            """
+        """
+        Creates instance of the assets manager used by the project
+        :return: ArtellaAssetsManager
+        """
 
-            names_manager = artellapipe.NamesMgr()
-            names_manager.set_project(self)
+        names_manager = artellapipe.NamesMgr()
+        names_manager.set_project(self)
 
-            return names_manager
+        return names_manager
 
     def create_assets_manager(self):
         """

@@ -211,7 +211,6 @@ class ArtellaFile(object):
 
         return True
 
-
     def _open_file(self, file_path):
         """
         Internal function that opens current file in DCC
