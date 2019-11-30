@@ -82,11 +82,63 @@ class ArtellaFilesManager(object):
         :return: class
         """
 
-        if file_type_name not in self._registered_file_clases:
+        if not self.check_file_type(file_type_name):
             LOGGER.warning('File Type with name "{}" not registered!'.format(file_type_name))
             return
 
         return self._registered_file_clases[file_type_name]
+
+    def check_file_type(self, file_type_name):
+        """
+        Returns whether or not give file type name corresponds to a valid file type
+        :param file_type_name: str
+        :return: bool
+        """
+
+        if file_type_name not in self._registered_file_clases:
+            return False
+
+        return True
+
+    def get_file_type_info(self, file_type):
+        """
+        Returns dictionary with the information of the given file type
+        :param file_type: str
+        :return: dict
+        """
+
+        if not self.files:
+            return None
+
+        return self.files[file_type] if file_type in self.files else dict()
+
+    def get_file_type_extensions(self, file_type):
+        """
+        Returns extensions of the given file type
+        :param file_type: str
+        :return: list(str)
+        """
+
+        file_type_info = self.get_file_type_info(file_type)
+        return file_type_info.get('extensions', list()) if file_type else list()
+
+    def get_file_types_by_extension(self, file_type_extension):
+        """
+        Returns file type by the given extension
+        :param file_type_extension: str
+        :return: list
+        """
+
+        asset_files = artellapipe.FilesMgr().files
+        if not asset_files:
+            return None
+
+        valid_file_types = list()
+        for file_type_name, file_type_class in self._registered_file_clases.items():
+            if file_type_extension in file_type_class.FILE_EXTENSIONS:
+                valid_file_types.append(file_type_class)
+
+        return valid_file_types
 
     def get_template(self, template_name):
         """
@@ -399,6 +451,7 @@ class ArtellaFilesManager(object):
         if not os.path.isfile(file_path):
             LOGGER.error('File {} cannot be locked because it does not exists!'.format(file_path))
             return False
+            return False
 
         return True
 
@@ -424,15 +477,18 @@ class ArtellaFilesManager(object):
             file_module = '.'.join(file_class_split[:-1])
             LOGGER.info('Registering File: {}'.format(file_module))
 
-            try:
-                module_loader = loader.find_loader(file_module)
-            except (RuntimeError, ImportError) as exc:
-                LOGGER.warning('Impossible to import File Module: {} | {} | {}'.format(
-                    file_module, exc, traceback.format_exc()))
+            module_loader = loader.find_loader(file_module)
+            if not module_loader:
+                LOGGER.warning('Impossible to load File Module: {}'.format(file_module))
                 continue
 
             class_found = None
-            mod = importlib.import_module(module_loader.fullname)
+            try:
+                mod = importlib.import_module(module_loader.fullname)
+            except Exception as exc:
+                LOGGER.warning('Impossible to register file class: {} | {}'.format(module_loader.fullname, exc))
+                continue
+
             for cname, obj in inspect.getmembers(mod, inspect.isclass):
                 if cname == file_class:
                     class_found = obj

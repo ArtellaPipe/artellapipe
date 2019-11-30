@@ -26,7 +26,7 @@ if python.is_python2():
 else:
     import importlib as loader
 
-import artellapipe
+import artellapipe.register
 from artellapipe.utils import exceptions
 from artellapipe.core import config
 from artellapipe.libs import artella as artella_lib
@@ -50,6 +50,10 @@ class ArtellaAssetsManager(object):
     @property
     def asset_classes(self):
         return self._registered_asset_classes
+
+    @property
+    def asset_types(self):
+        return self._config.get('types', default=dict()).keys()
 
     @property
     def assets(self):
@@ -89,65 +93,33 @@ class ArtellaAssetsManager(object):
         asset_types = self._config.get('types', default={})
         return asset_types.keys()
 
-    def get_file_type(self, file_type_name):
+    def get_asset_type_files(self, asset_type):
         """
-        Returns file type object with given name
-        :param file_type_name: str
-        :return: ArtellaAssetFile
-        """
-
-        asset_files = artellapipe.FilesMgr().files
-        if not asset_files:
-            return None
-
-        for file_type in self._registered_asset_file_type_classes:
-            if file_type.FILE_TYPE != file_type_name:
-                continue
-
-            return file_type
-
-        return None
-
-    def get_file_types_by_extension(self, file_type_extension):
-        """
-        Returns file type by the given extension
-        :param file_type_extension: str
-        :return: list
-        """
-
-        asset_files = artellapipe.FilesMgr().files
-        if not asset_files:
-            return None
-
-        valid_file_types = list()
-        for file_type in self._registered_asset_file_type_classes:
-            if file_type_extension in file_type.FILE_EXTENSIONS:
-                valid_file_types.append(file_type)
-
-        return valid_file_types
-
-    def get_file_type_info(self, file_type):
-        """
-        Returns dictionary with the information of the given file type
-        :param file_type: str
-        :return: dict
-        """
-
-        asset_files = artellapipe.FilesMgr().files
-        if not asset_files:
-            return None
-
-        return asset_files[file_type] if file_type in asset_files.keys() else dict()
-
-    def get_file_type_extensions(self, file_type):
-        """
-        Returns extensions of the given file type
-        :param file_type: str
+        Returns a list with all files available for a specific asset type
+        :param asset_type: str
         :return: list(str)
         """
 
-        file_type_info = self.get_file_type_info(file_type)
-        return file_type_info.get('extensions', list()) if file_type else list()
+        asset_types = self._config.get('types', default={})
+        if asset_type not in asset_types:
+            return list()
+
+        return asset_types.get(asset_type, {}).get('files', list())
+
+    def get_default_asset_name(self):
+        """
+        Returns the default name used by assets
+        :return: str
+        """
+
+        return self.config.get('default_name', default='New Asset')
+
+    def get_assets_by_type(self, asset_type):
+
+        if not self.is_valid_asset_type(asset_type):
+            return None
+
+        return [asset for asset in self.assets if asset.ASSET_TYPE == asset_type]
 
     def get_assets_path(self):
         """
@@ -268,6 +240,15 @@ class ArtellaAssetsManager(object):
                 artellalib.new_folder(file_path, folder_name)
 
         return True
+
+    def is_valid_asset_type(self, asset_type):
+        """
+        Returns whether or not given asset type is valid
+        :param asset_type: str
+        :return: bool
+        """
+
+        return asset_type in self.asset_types
 
     def is_valid_asset_file_type(self, file_type):
         """
