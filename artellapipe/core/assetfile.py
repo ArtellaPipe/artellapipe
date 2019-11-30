@@ -251,24 +251,6 @@ class ArtellaAssetFile(file.ArtellaFile, object):
 
             return local_versions
 
-
-
-            # for p in os.listdir(asset_path):
-            #     if status == defines.ArtellaFileStatus.WORKING:
-            #         if p != working_folder:
-            #             continue
-            #         for f in os.listdir(os.path.join(asset_path, working_folder)):
-            #             if f != self.FILE_TYPE:
-            #                 continue
-            #             # self.get_working_files_for_file_type(self.FILE_TYPE)
-            #     else:
-            #         if p == working_folder:
-            #             continue
-            #         if self.FILE_TYPE in p:
-            #             version = artellalib.split_version(p)
-            #             if version:
-            #                 local_versions[str(version[1])] = p
-
         return local_versions
 
     def get_latest_local_versions(self, status=None):
