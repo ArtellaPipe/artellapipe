@@ -202,8 +202,10 @@ class ArtellaProject(object):
         self.create_assets_manager()
         self.create_tags_manager()
         self.create_shaders_manager()
+        self.create_shots_manager()
         self.create_playblasts_manager()
         self.create_pyblish_manager()
+        self.create_shots_manager()
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
@@ -555,6 +557,17 @@ class ArtellaProject(object):
         shaders_manager.set_project(self)
 
         return shaders_manager
+
+    def create_shots_manager(self):
+        """
+        Creates instance of the shots manager used by the project
+        :return: ArtellaShotsManager
+        """
+
+        shots_manager = artellapipe.ShotsMgr()
+        shots_manager.set_project(self)
+
+        return shots_manager
 
     def create_playblasts_manager(self):
         """
@@ -989,55 +1002,6 @@ class ArtellaProject(object):
             self._sequences.append(new_sequence)
 
         return self._sequences
-
-    # ==========================================================================================================
-    # SHOTS
-    # ==========================================================================================================
-
-    @decorators.timestamp
-    def get_shots(self, force_update=False):
-        """
-        Returns all shots of the given sequence name
-        :param force_update: bool
-        :return: list(ArtellaShot)
-        """
-
-        if self._shots and not force_update:
-            return self._shots
-
-        if self._production_info and not force_update:
-            production_info = self._production_info
-        else:
-            production_info = self._update_production_info()
-        if not production_info:
-            return
-
-        sequences = self.get_sequences(force_update=force_update)
-        for seq in sequences:
-            sequence_path = seq.get_path()
-            if not sequence_path:
-                LOGGER.warning('Impossible to retrieve path for Sequence: {}!'.format(seq.name))
-                continue
-            sequence_info = seq.get_info()
-            print(sequence_info)
-
-    def get_shots_from_sequence(self, sequence_name, force_update=False):
-        """
-        Returns shots of the given sequence name
-        :param sequence_name: str
-        :param force_update: bool
-        :return:
-        """
-
-        shots = self.get_shots(force_update=force_update)
-
-    def get_shot_name_regex(self):
-        """
-        Returns regex used to identeify shots
-        :return: str
-        """
-
-        return re.compile(r"{}".format(self._shot_regex))
 
     # ==========================================================================================================
     # PRIVATE

@@ -20,7 +20,7 @@ from tpQtLib.widgets import splitters
 
 from artellapipe.utils import resource
 from artellapipe.libs.artella.core import artellalib, artellaclasses
-from artellapipe.core import asset
+from artellapipe.core import defines
 
 LOGGER = logging.getLogger()
 
@@ -118,7 +118,7 @@ class ArtellaSequence(object):
         return shots
 
     @decorators.timestamp
-    def update_files(self, status=asset.ArtellaAssetFileStatus.WORKING, force_update=False):
+    def update_files(self, status=defines.ArtellaFileStatus.WORKING, force_update=False):
         """
         Caches adn returns all the files that belongs to the current sequence
         :param status:
@@ -138,13 +138,13 @@ class ArtellaSequence(object):
             self._files[file_name] = dict()
             self._files[file_name]['path'] = file_folder
 
-            if status == asset.ArtellaAssetFileStatus.WORKING:
+            if status == defines.ArtellaFileStatus.WORKING:
                 file_folder_working = self._project.format_template(
                     '{}_working_folder'.format(file_name), {'sequence_name': self._name, 'sequence_index': self._id})
                 if not file_folder_working:
                     LOGGER.warning(
                         'Impossible to retrieve {} folder for Sequence {} File: "{}"'.format(
-                            asset.ArtellaAssetFileStatus.WORKING, self._name, file_name))
+                            defines.ArtellaFileStatus.WORKING, self._name, file_name))
                     return
                 file_folder_working_full = path_utils.clean_path(os.path.join(production_path, file_folder_working))
                 file_folder_working_info = artellalib.get_status(file_folder_working_full)
@@ -167,10 +167,10 @@ class ArtellaSequence(object):
 
                 if len(layout_files) > 0:
                     self._files[file_name]['status'] = dict()
-                    self._files[file_name]['status'][asset.ArtellaAssetFileStatus.WORKING] = dict()
-                    self._files[file_name]['status'][asset.ArtellaAssetFileStatus.WORKING]['path'] = \
+                    self._files[file_name]['status'][defines.ArtellaFileStatus.WORKING] = dict()
+                    self._files[file_name]['status'][defines.ArtellaFileStatus.WORKING]['path'] = \
                         file_folder_working
-                    self._files[file_name]['status'][asset.ArtellaAssetFileStatus.WORKING]['file'] = \
+                    self._files[file_name]['status'][defines.ArtellaFileStatus.WORKING]['file'] = \
                         layout_files[0]
             else:
                 raise NotImplementedError('Published Layout Files are not supported yet!')
@@ -259,16 +259,16 @@ class ArtellaSequenceWidget(base.BaseWidget, object):
             if not file_status:
                 continue
             file_statuses = list()
-            if asset.ArtellaAssetFileStatus.WORKING in file_status:
-                file_statuses.append(asset.ArtellaAssetFileStatus.WORKING)
-            elif asset.ArtellaAssetFileStatus.PUBLISHED in file_status:
-                file_statuses.append(asset.ArtellaAssetFileStatus.PUBLISHED)
+            if defines.ArtellaFileStatus.WORKING in file_status:
+                file_statuses.append(defines.ArtellaFileStatus.WORKING)
+            elif defines.ArtellaFileStatus.PUBLISHED in file_status:
+                file_statuses.append(defines.ArtellaFileStatus.PUBLISHED)
             for status in file_statuses:
                 seq_file = ArtellaSequenceFileWidget(
                     status=status,
                     root_path=file_data.get('path', None),
-                    base_path=file_data['status'][asset.ArtellaAssetFileStatus.WORKING].get('path', None),
-                    file_path=file_data['status'][asset.ArtellaAssetFileStatus.WORKING].get('file', None)
+                    base_path=file_data['status'][defines.ArtellaFileStatus.WORKING].get('path', None),
+                    file_path=file_data['status'][defines.ArtellaFileStatus.WORKING].get('file', None)
                 )
                 files_found.append(seq_file)
 
