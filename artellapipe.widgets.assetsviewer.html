@@ -176,8 +176,98 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-widgets-assetsviewer-module">
-<h1>artellapipe.widgets.assetsviewer module<a class="headerlink" href="#artellapipe-widgets-assetsviewer-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.widgets.assetsviewer">
+<span id="artellapipe-widgets-assetsviewer-module"></span><h1>artellapipe.widgets.assetsviewer module<a class="headerlink" href="#module-artellapipe.widgets.assetsviewer" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains widget implementation for asset viewer</p>
+<dl class="class">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.assetsviewer.</code><code class="sig-name descname">AssetsViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.widgets.grid.GridWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.add_asset">
+<code class="sig-name descname">add_asset</code><span class="sig-paren">(</span><em class="sig-param">asset_widget</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.add_asset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds given asset to viewer
+:param asset_widget: ArtellaAssetWidget</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.assetAdded">
+<code class="sig-name descname">assetAdded</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.assetAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.assetSynced">
+<code class="sig-name descname">assetSynced</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.assetSynced" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.change_category">
+<code class="sig-name descname">change_category</code><span class="sig-paren">(</span><em class="sig-param">category=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.change_category" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the category assets that are being showed by the viewer
+:param category: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.clear_assets">
+<code class="sig-name descname">clear_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.clear_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear all the assets of the asset viewer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.get_assets">
+<code class="sig-name descname">get_assets</code><span class="sig-paren">(</span><em class="sig-param">category=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.get_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list with all the assets of the given categories; All assets will be returned if not category
+is given
+:param category: str
+:return: list(ArtellaAssetWidget)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.update_assets">
+<code class="sig-name descname">update_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.update_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the list of assets in the asset viewer
+:param async: bool, Whether the update operation should be done asynchronously or not</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.update_assets_thumbnails">
+<code class="sig-name descname">update_assets_thumbnails</code><span class="sig-paren">(</span><em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.update_assets_thumbnails" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates all the thumbnails of the assets
+:param force: bool</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.widgets.assetsviewer.CategorizedAssetViewer">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.assetsviewer.</code><code class="sig-name descname">CategorizedAssetViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.CategorizedAssetViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.base.BaseWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.widgets.assetsviewer.CategorizedAssetViewer.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.widgets.assetsviewer.CategorizedAssetViewer.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.CategorizedAssetViewer.ui">
+<code class="sig-name descname">ui</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.CategorizedAssetViewer.ui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that sets up the ui of the widget
+Override it on new widgets (but always call super)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.CategorizedAssetViewer.update_asset_categories">
+<code class="sig-name descname">update_asset_categories</code><span class="sig-paren">(</span><em class="sig-param">asset_categories</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.CategorizedAssetViewer.update_asset_categories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates current categories with the given ones
+:param asset_categories: list(str)</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

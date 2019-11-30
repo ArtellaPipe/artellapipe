@@ -244,18 +244,23 @@
 
 <dl class="method">
 <dt id="artellapipe.core.abstract.AbstractAsset.import_file">
-<code class="sig-name descname">import_file</code><span class="sig-paren">(</span><em class="sig-param">file_type</em>, <em class="sig-param">status</em>, <em class="sig-param">extension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.import_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">import_file</code><span class="sig-paren">(</span><em class="sig-param">file_type</em>, <em class="sig-param">status</em>, <em class="sig-param">extension=None</em>, <em class="sig-param">reference=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.import_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imports asset file with the given type and status (if exists)
 :param file_type: str
 :param status: str
-:param extension: str</p>
+:param extension: str
+:param extension: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.core.abstract.AbstractAsset.import_file_by_extension">
-<code class="sig-name descname">import_file_by_extension</code><span class="sig-paren">(</span><em class="sig-param">extension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.import_file_by_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Imports asset file with the given extension
-:param extension: str</p>
+<code class="sig-name descname">import_file_by_extension</code><span class="sig-paren">(</span><em class="sig-param">status=None</em>, <em class="sig-param">extension=None</em>, <em class="sig-param">file_type=None</em>, <em class="sig-param">sync=False</em>, <em class="sig-param">reference=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.import_file_by_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>References asset file with the given extension
+:param status:
+:param extension: str
+:param file_type: str
+:param sync: bool
+:param reference: bool</p>
 </dd></dl>
 
 <dl class="method">
@@ -272,23 +277,6 @@
 :param file_type: str
 :param status: str
 :param extension: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.abstract.AbstractAsset.reference_file">
-<code class="sig-name descname">reference_file</code><span class="sig-paren">(</span><em class="sig-param">file_type</em>, <em class="sig-param">status</em>, <em class="sig-param">extension=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.reference_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>References asset file with the given type and status (if exists)
-:param file_type: str
-:param status: str
-:param extension: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.core.abstract.AbstractAsset.reference_file_by_extension">
-<code class="sig-name descname">reference_file_by_extension</code><span class="sig-paren">(</span><em class="sig-param">extension=None</em>, <em class="sig-param">sync=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.abstract.AbstractAsset.reference_file_by_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>References asset file with the given extension
-:param extension: str
-:param sync: bool</p>
 </dd></dl>
 
 </dd></dl>

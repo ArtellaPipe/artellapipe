@@ -1,0 +1,7 @@
+artellapipe.managers.shots module
+=================================
+
+.. automodule:: artellapipe.managers.shots
+   :members:
+   :undoc-members:
+   :show-inheritance:

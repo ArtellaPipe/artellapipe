@@ -16,6 +16,7 @@ Submodules
    artellapipe.managers.pyblishplugins
    artellapipe.managers.shaders
    artellapipe.managers.shelf
+   artellapipe.managers.shots
    artellapipe.managers.tags
    artellapipe.managers.tools
    artellapipe.managers.tracking

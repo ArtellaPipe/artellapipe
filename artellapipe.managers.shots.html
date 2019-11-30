@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.managers package &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.shots module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.managers.assets module" href="artellapipe.managers.assets.html" />
-    <link rel="prev" title="artellapipe.libs package" href="artellapipe.libs.html" /> 
+    <link rel="next" title="artellapipe.managers.tags module" href="artellapipe.managers.tags.html" />
+    <link rel="prev" title="artellapipe.managers.shelf module" href="artellapipe.managers.shelf.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,7 +93,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">artellapipe.managers package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
@@ -154,13 +154,15 @@
         
           <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
         
-      <li>artellapipe.managers package</li>
+          <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
+        
+      <li>artellapipe.managers.shots module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.managers.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.shots.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -174,32 +176,58 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-managers-package">
-<h1>artellapipe.managers package<a class="headerlink" href="#artellapipe-managers-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.assets.html">artellapipe.managers.assets module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.files.html">artellapipe.managers.files module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.libs.html">artellapipe.managers.libs module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.menu.html">artellapipe.managers.menu module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.names.html">artellapipe.managers.names module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.ocio.html">artellapipe.managers.ocio module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.playblasts.html">artellapipe.managers.playblasts module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.pyblishplugins.html">artellapipe.managers.pyblishplugins module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.shaders.html">artellapipe.managers.shaders module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.shelf.html">artellapipe.managers.shelf module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.shots.html">artellapipe.managers.shots module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.tags.html">artellapipe.managers.tags module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.tools.html">artellapipe.managers.tools module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.tracking.html">artellapipe.managers.tracking module</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="module-artellapipe.managers">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-artellapipe.managers" title="Permalink to this headline">¶</a></h2>
-</div>
+  <div class="section" id="module-artellapipe.managers.shots">
+<span id="artellapipe-managers-shots-module"></span><h1>artellapipe.managers.shots module<a class="headerlink" href="#module-artellapipe.managers.shots" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager to handle shots</p>
+<dl class="class">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.shots.</code><code class="sig-name descname">ArtellaShotsManager</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.config">
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shot_name_regex">
+<code class="sig-name descname">get_shot_name_regex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shot_name_regex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns regex used to identeify shots
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shot_regex">
+<code class="sig-name descname">get_shot_regex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shot_regex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns regex used to identify solstice shots
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shots">
+<code class="sig-name descname">get_shots</code><span class="sig-paren">(</span><em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all shots of the given sequence name
+:param force_update: bool
+:return: list(ArtellaShot)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shots_from_sequence">
+<code class="sig-name descname">get_shots_from_sequence</code><span class="sig-paren">(</span><em class="sig-param">sequence_name</em>, <em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shots_from_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns shots of the given sequence name
+:param sequence_name: str
+:param force_update: bool
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project this manager belongs to
+:param project: ArtellaProject</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -214,10 +242,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.managers.assets.html" class="btn btn-neutral float-right" title="artellapipe.managers.assets module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.tags.html" class="btn btn-neutral float-right" title="artellapipe.managers.tags module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.libs.html" class="btn btn-neutral float-left" title="artellapipe.libs package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.shelf.html" class="btn btn-neutral float-left" title="artellapipe.managers.shelf module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
