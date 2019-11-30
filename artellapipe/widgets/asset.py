@@ -24,7 +24,7 @@ from Qt.QtGui import *
 from tpQtLib.core import base, qtutils, menu
 
 import artellapipe.register
-from artellapipe.core import asset, defines
+from artellapipe.core import defines
 from artellapipe.utils import resource, worker
 
 LOGGER = logging.getLogger()
@@ -70,7 +70,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
     def __init__(self, asset, text=None, parent=None):
 
         self._asset = asset
-        self._text = text or defines.ARTELLA_DEFAULT_ASSET_NAME
+        self._text = text or artellapipe.AssetsMgr().get_default_asset_name()
         self._icon_path = None
         self._thumbnail_icon = None
 
@@ -219,14 +219,14 @@ class ArtellaAssetWidget(base.BaseWidget, object):
             asset_type_icon = resource.ResourceManager().icon(asset_type_name)
             asset_type_action = QAction(asset_type_icon, asset_type_name.title(), sync_menu)
             asset_type_action.triggered.connect(
-                partial(self._on_sync, asset_type_name, asset.ArtellaAssetFileStatus.ALL, False))
+                partial(self._on_sync, asset_type_name, defines.ArtellaFileStatus.ALL))
             actions_to_add.append(asset_type_action)
 
         if actions_to_add:
             download_icon = resource.ResourceManager().icon('download')
             all_action = QAction(download_icon, 'All', sync_menu)
             all_action.triggered.connect(
-                partial(self._on_sync, asset.ArtellaAssetFileStatus.ALL, asset.ArtellaAssetFileStatus.ALL, False))
+                partial(self._on_sync, defines.ArtellaFileStatus.ALL, defines.ArtellaFileStatus.ALL))
             actions_to_add.insert(0, all_action)
 
             for action in actions_to_add:

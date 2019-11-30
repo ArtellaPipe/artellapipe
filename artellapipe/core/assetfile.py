@@ -19,7 +19,7 @@ from tpPyUtils import decorators, path as path_utils
 from tpQtLib.core import qtutils
 
 import artellapipe
-from artellapipe.core import file, asset
+from artellapipe.core import defines, file
 from artellapipe.libs import artella
 from artellapipe.libs.artella.core import artellalib
 
@@ -27,19 +27,11 @@ LOGGER = logging.getLogger()
 
 
 class ArtellaAssetFile(file.ArtellaFile, object):
-    def __init__(self, file_asset):
+    def __init__(self, file_asset=None):
 
         self._asset = file_asset
 
-        self._history = None
-        self._working_status = None
-        self._working_history = None
-        self._latest_server_version = {
-            asset.ArtellaAssetFileStatus.WORKING: None,
-            asset.ArtellaAssetFileStatus.PUBLISHED: None
-        }
-
-        super(ArtellaAssetFile, self).__init__(file_name=self._asset.get_name())
+        super(ArtellaAssetFile, self).__init__(file_name=self._asset.get_name() if self._asset else None)
 
     def open_file(self, status):
         """
@@ -47,51 +39,49 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         :return:
         """
 
-        if status == asset.ArtellaAssetFileStatus.WORKING:
+        if status == defines.ArtellaFileStatus.WORKING:
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
 
         self._open_file(path=file_path)
 
-    def import_file(self, status, fix_path=True, sync=False, *args, **kwargs):
-        """
-        References current file into DCC
-        :return:
-        """
+    # def import_file(self, status, fix_path=True, sync=False, *args, **kwargs):
+    #     """
+    #     References current file into DCC
+    #     :return:
+    #     """
+    #
+    #     file_path = self._get_path(status=status, fix_path=fix_path)
+    #
+    #     valid_path = self._check_path(file_path, sync=sync)
+    #     if not valid_path:
+    #         msg = 'Impossible to import asset file of type "{}". File Path "{}" does not exists!'.format(
+    #             self.FILE_TYPE, file_path)
+    #         LOGGER.warning(msg)
+    #         qtutils.warning_message(msg)
+    #         return None
+    #
+    #     self._import_file(path=file_path, *args, **kwargs)
 
-        file_path = self._get_path(status=status, fix_path=fix_path)
-
-        valid_path = self._check_path(file_path, sync=sync)
-        if not valid_path:
-            msg = 'Impossible to import asset file of type "{}". File Path "{}" does not exists!'.format(
-                self.FILE_TYPE, file_path)
-            LOGGER.warning(msg)
-            qtutils.warning_message(msg)
-            return None
-
-        self._import_file(path=file_path, *args, **kwargs)
-
-    def reference_file(self, status, fix_path=True, sync=False, *args, **kwargs):
-        """
-        References current file into DCC
-        :param status: str
-        :param fix_path: bool
-        :param sync: bool
-        :return:
-        """
-
-        file_path = self._get_path(status=status, fix_path=fix_path)
-
-        valid_path = self._check_path(file_path, sync=sync)
-        if not valid_path:
-            msg = 'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
-                self.FILE_TYPE, file_path)
-            LOGGER.warning(msg)
-            qtutils.warning_message(msg)
-            return None
-
-        return self._reference_file(file_path=file_path, status=status, sync=sync, *args, **kwargs)
+    # def reference_file(self, status, fix_path=True, sync=False, *args, **kwargs):
+    #     """
+    #     References current file into DCC
+    #     :param status: str
+    #     :param fix_path: bool
+    #     :param sync: bool
+    #     :return:
+    #     """
+    #
+    #     valid_path = self._check_path(sync=sync)
+    #     if not valid_path:
+    #         msg = 'Impossible to reference asset file of type "{}". File Path "{}" does not exists!'.format(
+    #             self.FILE_TYPE, self._file_path)
+    #         LOGGER.warning(msg)
+    #         qtutils.warning_message(msg)
+    #         return None
+    #
+    #     return self._reference_file(file_path=self._file_path, status=status, sync=sync, *args, **kwargs)
 
     @property
     def asset(self):
@@ -113,7 +103,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
     def get_history(self, status, force_update=False):
         """
         Returns the history of the asset files
-        :param status: ArtellaAssetFileStatus
+        :param status: ArtellaFileStatus
         :param force_update: bool
         :return:
         """
@@ -132,7 +122,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         """
 
         working_path = self.asset.get_file(
-            file_type=self.FILE_TYPE, status=asset.ArtellaAssetFileStatus.WORKING,
+            file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.WORKING,
             extension=self.FILE_EXTENSIONS[0], fix_path=False
         )
 
@@ -147,14 +137,14 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         :return: str
         """
 
-        latest_local_versions = self.get_latest_local_versions(status=asset.ArtellaAssetFileStatus.PUBLISHED)
+        latest_local_versions = self.get_latest_local_versions(status=defines.ArtellaFileStatus.PUBLISHED)
         if not latest_local_versions:
             return
 
         version_folder = latest_local_versions[1]
 
         published_path = self.asset.get_file(
-            file_type=self.FILE_TYPE, status=asset.ArtellaAssetFileStatus.PUBLISHED,
+            file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.PUBLISHED,
             extension=self.FILE_EXTENSIONS[0], fix_path=False, version=version_folder
         )
 
@@ -169,7 +159,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         :return: str
         """
 
-        latest_local_versions = self.get_latest_local_versions(status=asset.ArtellaAssetFileStatus.PUBLISHED)
+        latest_local_versions = self.get_latest_local_versions(status=defines.ArtellaFileStatus.PUBLISHED)
 
         return latest_local_versions
 
@@ -183,16 +173,16 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         if not latest_published_version:
             return
 
-        asset_name = self.asset.get_name()
-        asset_path = self.asset.get_path()
-        version_folder = latest_published_version[1]
+        version_folder = latest_published_version['version_name']
         if not version_folder.startswith('__'):
             version_folder = '__{}'.format(version_folder)
         if not version_folder.endswith('__'):
             version_folder = '{}__'.format(version_folder)
 
-        published_path = self._get_published_path(
-            asset_name=asset_name, asset_path=asset_path, version_folder=version_folder)
+        published_path = self.asset.get_file(
+            file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.PUBLISHED,
+            extension=self.FILE_EXTENSIONS[0], version=version_folder, fix_path=False)
+
         if sync_folder:
             return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
 
@@ -204,43 +194,80 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         :return: str
         """
 
-        latest_server_versions = self.get_latest_server_version(status=asset.ArtellaAssetFileStatus.PUBLISHED)
+        latest_server_versions = self.get_latest_server_version(status=defines.ArtellaFileStatus.PUBLISHED)
 
         return latest_server_versions
 
     def get_local_versions(self, status=None):
         """
         Returns all local version of the current file type in the wrapped asset
-        :param status: ArtellaAssetFileStatus
+        :param status: ArtellaFileStatus
         :return:
         """
 
         if not status:
-            status = asset.ArtellaAssetFileStatus.WORKING
+            status = defines.ArtellaFileStatus.WORKING
 
         local_versions = dict()
+
+        if not self.asset:
+            LOGGER.warning('Impossible to retrieve local version because asset is not defined!')
+            return local_versions
 
         asset_path = self.asset.get_path()
         if not asset_path or not os.path.exists(asset_path):
             return local_versions
 
-        working_folder = artella.config.get('server', 'working_folder')
+        file_type_template = artellapipe.FilesMgr().get_template(self.FILE_TYPE)
+        if not file_type_template:
+            LOGGER.warning(
+                'Impossible to retrieve local version because template for "{}" is not in configuration file'.format(
+                    self.FILE_TYPE))
+            return local_versions
 
-        for p in os.listdir(asset_path):
-            if status == asset.ArtellaAssetFileStatus.WORKING:
-                if p != working_folder:
-                    continue
-                for f in os.listdir(os.path.join(asset_path, working_folder)):
-                    if f != self.FILE_TYPE:
+        for extension in self.FILE_EXTENSIONS:
+
+            template_dict = {
+                'asset_path': asset_path,
+                'asset_name': self._asset.get_name(),
+                'file_extension': extension
+            }
+
+            folders_to_check = list()
+            working_folder = artella.config.get('server', 'working_folder')
+            if status == defines.ArtellaFileStatus.PUBLISHED:
+                for p in os.listdir(asset_path):
+                    if p == working_folder:
                         continue
-                    # self.get_working_files_for_file_type(self.FILE_TYPE)
-            else:
-                if p == working_folder:
-                    continue
-                if self.FILE_TYPE in p:
-                    version = artellalib.split_version(p)
+                    folders_to_check.append(p)
+
+            for folder in folders_to_check:
+                template_dict['version_folder'] = folder
+                file_path = file_type_template.format(template_dict)
+                if file_path and os.path.isfile(file_path):
+                    version = artellalib.split_version(folder)
                     if version:
-                        local_versions[str(version[1])] = p
+                        local_versions[str(version[1])] = folder
+
+            return local_versions
+
+
+
+            # for p in os.listdir(asset_path):
+            #     if status == defines.ArtellaFileStatus.WORKING:
+            #         if p != working_folder:
+            #             continue
+            #         for f in os.listdir(os.path.join(asset_path, working_folder)):
+            #             if f != self.FILE_TYPE:
+            #                 continue
+            #             # self.get_working_files_for_file_type(self.FILE_TYPE)
+            #     else:
+            #         if p == working_folder:
+            #             continue
+            #         if self.FILE_TYPE in p:
+            #             version = artellalib.split_version(p)
+            #             if version:
+            #                 local_versions[str(version[1])] = p
 
         return local_versions
 
@@ -252,7 +279,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         """
 
         if not status:
-            status = asset.ArtellaAssetFileStatus.WORKING
+            status = defines.ArtellaFileStatus.WORKING
 
         latest_local_versions = dict()
 
@@ -275,7 +302,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         """
 
         if not status:
-            status = asset.ArtellaAssetFileStatus.WORKING
+            status = defines.ArtellaFileStatus.WORKING
 
         server_versions = self.get_server_versions(status=status, all_versions=False)
         if not server_versions:
@@ -289,7 +316,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
     def get_server_versions(self, status=None, all_versions=True, force_update=False):
         """
         Returns all server version of the current file type in the wrapped asset
-        :param status: ArtellaAssetFileStatus
+        :param status: ArtellaFileStatus
         :param force_update: bool, Whether to update Artella data or not (this can take time)
         :return:
         """
@@ -297,7 +324,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         result = list()
 
         if not status:
-            status = asset.ArtellaAssetFileStatus.WORKING
+            status = defines.ArtellaFileStatus.WORKING
 
         if not force_update and self._latest_server_version.get(status):
             return self._latest_server_version[status]
@@ -306,7 +333,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         if not asset_path:
             return
 
-        if status == asset.ArtellaAssetFileStatus.PUBLISHED:
+        if status == defines.ArtellaFileStatus.PUBLISHED:
             result = artellapipe.AssetsMgr().get_latest_published_versions(asset_path, file_type=self.FILE_TYPE)
         else:
             working_folder = artella.config.get('server', 'working_folder')
@@ -333,48 +360,82 @@ class ArtellaAssetFile(file.ArtellaFile, object):
 
         return self.get_project().assets_library_file_types.get()
 
-    def _get_path(self, status, fix_path=True):
-        """
-        Returns asset file path taking into account its status
-        :param status:
-        :param fix_path: bool
-        :return: str
-        """
+    def get_file_paths(self, return_first=False, fix_path=True, **kwargs):
 
-        if status == asset.ArtellaAssetFileStatus.WORKING:
+        if self.FILE_TYPE not in self._asset.ASSET_FILES:
+            LOGGER.warning(
+                'FileType "{}" is not a valid file for Assets of type "{}"'.format(
+                    self.FILE_TYPE, self._asset.ASSET_TYPE))
+            return list()
+
+        file_paths = super(
+            ArtellaAssetFile, self).get_file_paths(return_first=return_first, fix_path=fix_path, **kwargs)
+        if file_paths:
+            return file_paths
+
+        status = kwargs.get('status', defines.ArtellaFileStatus.PUBLISHED)
+        if status == defines.ArtellaFileStatus.WORKING:
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
 
         if not file_path:
-            return None
+            return None if return_first else file_paths
 
         if fix_path:
             file_path = artellapipe.FilesMgr().fix_path(file_path)
 
-        return file_path
+        if return_first:
+            return file_path
+        else:
+            return [file_path]
 
-    def _check_path(self, file_path, sync=False):
-        """
-        Returns whether or not given path exists.
-        :param file_path: str
-        :param sync: bool
-        :return: bool
-        """
+    # def _get_path(self, path, status=defines.ArtellaFileStatus.PUBLISHED, fix_path=True):
+    #     """
+    #     Returns asset file path taking into account its status
+    #     :param status:
+    #     :param fix_path: bool
+    #     :return: str
+    #     """
+    #
+    #     file_path = super(ArtellaAssetFile, self)._get_path(path=path)
+    #     if file_path:
+    #         return file_path
+    #
+    #     if status == defines.ArtellaFileStatus.WORKING:
+    #         file_path = self.get_working_path()
+    #     else:
+    #         file_path = self.get_latest_local_published_path()
+    #
+    #     if not file_path:
+    #         return None
+    #
+    #     if fix_path:
+    #         file_path = artellapipe.FilesMgr().fix_path(file_path)
+    #
+    #     return file_path
 
-        if sync or not file_path:
-            self.asset.sync_latest_published_files(file_type=self.FILE_TYPE)
-
-        if not file_path or not os.path.isfile(file_path):
-            return False
-
-        return True
+    # def _check_path(self, sync=False):
+    #     """
+    #     Returns whether or not given path exists.
+    #     :param file_path: str
+    #     :param sync: bool
+    #     :return: bool
+    #     """
+    #
+    #     if sync or not self._file_path:
+    #         self.asset.sync_latest_published_files(file_type=self.FILE_TYPE)
+    #
+    #     if not self._file_path or not os.path.isfile(self._file_path):
+    #         return False
+    #
+    #     return True
 
     def _get_history(self, status):
         """
         Internal function that returns the history of the aset files
         Overrides in custom file types if necessary
-        :param status: ArtellaAssetFileStatus
+        :param status: ArtellaFileStatus
         :return:
         """
 

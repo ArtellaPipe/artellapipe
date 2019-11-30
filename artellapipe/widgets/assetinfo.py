@@ -22,6 +22,7 @@ from tpQtLib.core import base
 from tpQtLib.widgets import breadcrumb, stack, splitters, grid
 
 import artellapipe.register
+from artellapipe.core import defines
 from artellapipe.utils import resource
 from artellapipe.libs.artella.core import artellalib
 
@@ -412,8 +413,6 @@ class WorkingAssetInfo(base.BaseWidget, object):
         Internal function that creates file buttons for the asset
         """
 
-        from artellapipe.core import asset
-
         if not self._asset_widget:
             return
 
@@ -431,7 +430,7 @@ class WorkingAssetInfo(base.BaseWidget, object):
 
         for file_type in self._asset_widget.asset.ASSET_FILES:
             file_btn = AssetFileButton(
-                self._asset_widget, asset.ArtellaAssetFileStatus.WORKING,
+                self._asset_widget, defines.ArtellaFileStatus.WORKING,
                 file_type, resource.ResourceManager().icon(file_type))
             file_btn.checkVersions.connect(self._on_check_versions)
             self._file_buttons[file_type] = file_btn

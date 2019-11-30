@@ -24,7 +24,7 @@ from tpQtLib.widgets import grid
 
 import artellapipe
 import artellapipe.register
-from artellapipe.core import asset
+from artellapipe.core import defines
 from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
@@ -110,18 +110,18 @@ class AssetsViewer(grid.GridWidget, object):
         """
 
         if not category:
-            category = asset.ArtellaAssetFileStatus.ALL
+            category = defines.ArtellaFileStatus.ALL
 
-        if category != asset.ArtellaAssetFileStatus.ALL and category not in artellapipe.AssetsMgr().config.get('types'):
+        if category != defines.ArtellaFileStatus.ALL and category not in artellapipe.AssetsMgr().config.get('types'):
             LOGGER.warning(
                 'Asset Type {} is not a valid asset type for project {}'.format(category, self._project.name.title()))
-            category = asset.ArtellaAssetFileStatus.ALL
+            category = defines.ArtellaFileStatus.ALL
 
         self.clear()
 
         new_assets = list()
         for new_asset in reversed(self._assets):
-            if category == asset.ArtellaAssetFileStatus.ALL:
+            if category == defines.ArtellaFileStatus.ALL:
                 new_asset.setVisible(True)
                 new_assets.insert(0, new_asset)
             else:
@@ -209,7 +209,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
 
         qtutils.clear_layout(self._categories_menu_layout)
 
-        all_asset_categories = [asset.ArtellaAssetFileStatus.ALL]
+        all_asset_categories = [defines.ArtellaFileStatus.ALL]
         all_asset_categories.extend(asset_categories)
         for category in all_asset_categories:
             new_btn = QPushButton(category)
@@ -218,7 +218,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
             new_btn.setCheckable(True)
             self._categories_menu_layout.addWidget(new_btn)
             self._categories_btn_grp.addButton(new_btn)
-            if category == asset.ArtellaAssetFileStatus.ALL:
+            if category == defines.ArtellaFileStatus.ALL:
                 new_btn.setIcon(resource.ResourceManager().icon('home'))
                 new_btn.setChecked(True)
             new_btn.toggled.connect(partial(self._on_change_category, category))

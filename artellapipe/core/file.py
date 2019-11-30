@@ -19,7 +19,7 @@ from tpPyUtils import python, path as path_utils
 from tpQtLib.core import qtutils
 
 import artellapipe
-from artellapipe.core import asset
+from artellapipe.core import defines
 
 LOGGER = logging.getLogger()
 
@@ -31,7 +31,8 @@ class ArtellaFile(object):
     FILE_RULE = None
     FILE_TEMPLATE = None
 
-    def __init__(self, file_name, file_path=None, file_extension=None):
+    def __init__(self, file_name, file_path=None, file_extension=None, project=None):
+        self._project = project if project else artellapipe.project
         self._file_name = self._get_name(file_name)
         self._file_path = self._get_path(file_path)
         self._extensions = self._get_extensions(file_extension)
@@ -39,8 +40,8 @@ class ArtellaFile(object):
         self._working_status = None
         self._working_history = None
         self._latest_server_version = {
-            asset.ArtellaAssetFileStatus.WORKING: None,
-            asset.ArtellaAssetFileStatus.PUBLISHED: None
+            defines.ArtellaFileStatus.WORKING: None,
+            defines.ArtellaFileStatus.PUBLISHED: None
         }
 
         super(ArtellaFile, self).__init__()
@@ -57,18 +58,22 @@ class ArtellaFile(object):
     def extensions(self):
         return self._extensions
 
-    def get_file_paths(self, return_first=False, fix_path=True):
+    def get_file_paths(self, return_first=False, fix_path=True, **kwargs):
         """
         Returns full path of the file
         :return: str or list(str)
         """
 
-        base_path = path_utils.clean_path('{}{}{}'.format(self.path, os.sep, self.name))
-        if not self._extensions:
-            LOGGER.warning('No valid extensions found for file: "{}"'.format(self.__class__.__name__))
-            return base_path
-
         file_paths = list()
+
+        if self.path:
+            base_path = path_utils.clean_path('{}{}{}'.format(self.path, os.sep, self.name))
+            if not self._extensions:
+                LOGGER.warning('No valid extensions found for file: "{}"'.format(self.__class__.__name__))
+                return base_path
+        else:
+            return None if return_first else file_paths
+
         extensions = self._extensions
         for extension in extensions:
             if not extension.startswith('.'):
@@ -90,31 +95,14 @@ class ArtellaFile(object):
         :return:
         """
 
-        if status == asset.ArtellaAssetFileStatus.WORKING:
+        if status == defines.ArtellaFileStatus.WORKING:
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
 
         self._open_file(path=file_path)
 
-    def import_file(self, status, fix_path=True, sync=False, *args, **kwargs):
-        """
-        References current file into DCC
-        :return:
-        """
-
-        file_path = self._get_path(status=status, fix_path=fix_path)
-        valid_path = self._check_path(file_path, sync=sync)
-        if not valid_path:
-            msg = 'Impossible to import file of type "{}". File Path "{}" does not exists!'.format(
-                self.FILE_TYPE, file_path)
-            LOGGER.warning(msg)
-            qtutils.warning_message(msg)
-            return None
-
-        self._import_file(path=file_path, *args, **kwargs)
-
-    def reference_file(self, fix_path=True, sync=False, *args, **kwargs):
+    def import_file(self, fix_path=True, sync=False, reference=False, *args, **kwargs):
         """
         References current file into DCC
         :param status: str
@@ -132,7 +120,10 @@ class ArtellaFile(object):
             qtutils.warning_message(msg)
             return None
 
-        return self._reference_file(file_path=file_path, *args, **kwargs)
+        if reference:
+            return self._reference_file(file_path=file_path, *args, **kwargs)
+        else:
+            return self._import_file(file_path=file_path, *args, **kwargs)
 
     def get_template_dict(self):
         """
@@ -164,18 +155,12 @@ class ArtellaFile(object):
         :return:str
         """
 
-        if not self.FILE_TEMPLATE:
-            return path
-
-        template_data = self.get_template_dict()
-        if not template_data:
-            return path
-
-        template = artellapipe.FilesMgr().get_template(self.FILE_TEMPLATE)
-        if not template:
-            return path
-
-        return template.format(template_data)
+        if self.FILE_TEMPLATE:
+            template_data = self.get_template_dict()
+            if template_data:
+                template = artellapipe.FilesMgr().get_template(self.FILE_TEMPLATE)
+                if template:
+                    return template.format(template_data)
 
     def _get_extensions(self, extension):
         """
@@ -219,7 +204,7 @@ class ArtellaFile(object):
         :return:
         """
 
-        pass
+        raise NotImplementedError('Open Function for "{}" is not implemented!'.format(self))
 
     def _import_file(self, file_path, *args, **kwargs):
         """
@@ -229,7 +214,7 @@ class ArtellaFile(object):
         :return:
         """
 
-        pass
+        raise NotImplementedError('Import Function for "{}" is not implemented!'.format(self))
 
     def _reference_file(self, file_path, *args, **kwargs):
         """
@@ -239,4 +224,4 @@ class ArtellaFile(object):
         :return:
         """
 
-        pass
+        raise NotImplementedError('Reference Function for "{}" is not implemented!'.format(self))

@@ -126,41 +126,29 @@ class AbstractAsset(object):
 
         raise NotImplementedError('get_file function for {} is not implemented!'.format(self.__class__.__name__))
 
-    def import_file(self, file_type, status, extension=None):
+    def import_file(self, file_type, status, extension=None, reference=False):
         """
         Imports asset file with the given type and status (if exists)
         :param file_type: str
         :param status: str
         :param extension: str
+        :param extension: bool
         """
+
         raise NotImplementedError('import_file function for {} is not implemented!'.format(self.__class__.__name__))
 
-    def import_file_by_extension(self, extension=None):
-        """
-        Imports asset file with the given extension
-        :param extension: str
-        """
-        raise NotImplementedError(
-            'import_file_by_extension function for {} is not implemented!'.format(self.__class__.__name__))
-
-    def reference_file(self, file_type, status, extension=None):
-        """
-        References asset file with the given type and status (if exists)
-        :param file_type: str
-        :param status: str
-        :param extension: str
-        """
-        raise NotImplementedError('reference_file function for {} is not implemented!'.format(self.__class__.__name__))
-
-    def reference_file_by_extension(self, extension=None, sync=False):
+    def import_file_by_extension(self, status=None, extension=None, file_type=None, sync=False, reference=False):
         """
         References asset file with the given extension
+        :param status:
         :param extension: str
+        :param file_type: str
         :param sync: bool
+        :param reference: bool
         """
 
         raise NotImplementedError(
-            'reference_file_by_extension function for {} is not implemented!'.format(self.__class__.__name__))
+            'import_file_by_extension function for {} is not implemented!'.format(self.__class__.__name__))
 
     def get_relative_path(self):
         """

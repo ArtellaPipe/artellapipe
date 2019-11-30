@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains all constant definitions used by artellapipe-core
+Module that contains all constant definitions used by artellapipe
 """
 
 from __future__ import print_function, division, absolute_import
@@ -13,11 +13,31 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 
-# Defines environment variable name that can setup to define folder where configuration files are located
-ARTELLA_CONFIGURATION_ENV = 'ARTELLA_PROJECT_CONFIGURATIONS_FOLDER'
+class ArtellaFileStatus(object):
 
-# Defines the name of the configuration file used by artellapipe to setup project
-ARTELLA_PROJECT_CONFIG_FILE_NAME = 'config.yml'
+    WORKING = 'working'
+    PUBLISHED = 'published'
+    ALL = 'All'
+
+    @classmethod
+    def is_valid(cls, status):
+        """
+        Returns whether given status is valid or not
+        :param status: str
+        :return: bool
+        """
+
+        return status == cls.WORKING or status == cls.PUBLISHED or status == cls.ALL
+
+    @classmethod
+    def supported_statuses(cls):
+        """
+        Returns list of supported Artella Asset File Statuses
+        :return: list(str)
+        """
+
+        return cls.WORKING, cls.PUBLISHED, cls.ALL
+
 
 # Defines the name of the changelog file used by artellapipe
 ARTELLA_PROJECT_CHANGELOG_FILE_NAME = 'changelog.yml'
@@ -42,9 +62,6 @@ ARTELLA_CONFIG_ENVIRONMENT_VARIABLE = 'PROJECT_ENV_VARIABLE'
 
 # Defines the name of the attribute that defines the paths that need to be registered in Python path
 ARTELLA_CONFIG_FOLDERS_TO_REGISTER_ATTRIBUTE_NAME = 'PATHS_TO_REGISTER'
-
-# Defines the default name used for assets
-ARTELLA_DEFAULT_ASSET_NAME = 'New_Asset'
 
 # Defines the prefix used to store shot override attributes
 ARTELLA_SHOT_OVERRIDES_ATTRIBUTE_PREFX = 'shot_overrides'
