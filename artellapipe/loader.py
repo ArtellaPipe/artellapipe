@@ -72,6 +72,8 @@ def init(do_reload=False, dev=False):
         'artellapipe.widgets'
     ]
 
+    # TODO: Do we really need to smkip artellapie.libs module import?
+
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False)
     artella_importer.import_packages(
         order=packages_order,
