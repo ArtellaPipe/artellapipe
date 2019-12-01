@@ -7,6 +7,7 @@ Submodules
 .. toctree::
 
    artellapipe.managers.assets
+   artellapipe.managers.dependencies
    artellapipe.managers.files
    artellapipe.managers.libs
    artellapipe.managers.menu

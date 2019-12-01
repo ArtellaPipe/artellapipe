@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.managers.files module &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.dependencies module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.managers.libs module" href="artellapipe.managers.libs.html" />
-    <link rel="prev" title="artellapipe.managers.dependencies module" href="artellapipe.managers.dependencies.html" /> 
+    <link rel="next" title="artellapipe.managers.files module" href="artellapipe.managers.files.html" />
+    <link rel="prev" title="artellapipe.managers.assets module" href="artellapipe.managers.assets.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -156,13 +156,13 @@
         
           <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
         
-      <li>artellapipe.managers.files module</li>
+      <li>artellapipe.managers.dependencies module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.managers.files.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.dependencies.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,8 +176,46 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-managers-files-module">
-<h1>artellapipe.managers.files module<a class="headerlink" href="#artellapipe-managers-files-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.managers.dependencies">
+<span id="artellapipe-managers-dependencies-module"></span><h1>artellapipe.managers.dependencies module<a class="headerlink" href="#module-artellapipe.managers.dependencies" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager for DCC dependencies</p>
+<dl class="class">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManager</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies">
+<code class="sig-name descname">get_current_scene_dependencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all dependencies that are currently loaded in current scene
+:return: list(str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies">
+<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all dependencies that are currently loaded in the given file
+:param file_path: str, file path we want to get dependencies of
+:param parent_path: str
+:param found_files: list(str)
+:return: list(str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project this manager belongs to
+:param project: ArtellaProject</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies">
+<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates all the dependencies of the given file path
+:param file_path: str</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -192,10 +230,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.managers.libs.html" class="btn btn-neutral float-right" title="artellapipe.managers.libs module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.files.html" class="btn btn-neutral float-right" title="artellapipe.managers.files module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.managers.dependencies.html" class="btn btn-neutral float-left" title="artellapipe.managers.dependencies module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.assets.html" class="btn btn-neutral float-left" title="artellapipe.managers.assets module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
