@@ -206,6 +206,7 @@ class ArtellaProject(object):
         self.create_playblasts_manager()
         self.create_pyblish_manager()
         self.create_shots_manager()
+        self.create_dependencies_manager()
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
@@ -590,6 +591,17 @@ class ArtellaProject(object):
         pyblish_manager.set_project(self)
 
         return pyblish_manager
+
+    def create_dependencies_manager(self):
+        """
+        Crates instance of the dependencies manager used by the project
+        :return: ArtellaDependenciesManager
+        """
+
+        deps_manager = artellapipe.DepsMgr()
+        deps_manager.set_project(self)
+
+        return deps_manager
 
     def create_production_tracker(self):
         """
