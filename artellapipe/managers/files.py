@@ -214,7 +214,7 @@ class ArtellaFilesManager(object):
             return path_to_resolve
 
         if path_to_resolve.startswith(project_var):
-            path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(self.env_var))
+            path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(self._project.env_var))
 
         return path_to_resolve
 
@@ -445,12 +445,11 @@ class ArtellaFilesManager(object):
                 return False
 
         if not file_path.startswith(self._project.get_path()):
-            LOGGER.error('Impossible to lock file that is nos located in {} Project Folder!'.format(self.name))
+            LOGGER.error('Impossible to lock file that is nos located in {} Project Folder!'.format(file_path))
             return
 
         if not os.path.isfile(file_path):
             LOGGER.error('File {} cannot be locked because it does not exists!'.format(file_path))
-            return False
             return False
 
         return True
