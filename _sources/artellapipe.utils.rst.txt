@@ -7,7 +7,6 @@ Submodules
 .. toctree::
 
    artellapipe.utils.exceptions
-   artellapipe.utils.mayaparser
    artellapipe.utils.plugin
    artellapipe.utils.resource
    artellapipe.utils.shader
