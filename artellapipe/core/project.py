@@ -854,57 +854,6 @@ class ArtellaProject(object):
     # ASSETS
     # ==========================================================================================================
 
-    @decorators.timestamp
-    def get_scene_assets(self, as_nodes=True, allowed_types=None):
-        """
-        Returns a list with all nodes in the current scene
-        :return: list
-        """
-
-        asset_nodes = list()
-
-        abc_nodes = self.get_alembics(as_asset_nodes=False, only_roots=True)
-
-        tag_data_nodes = artellapipe.TagsMgr().get_tag_data_nodes(project=self, as_tag_nodes=True)
-        for tag_data in tag_data_nodes:
-            asset_node = tag_data.get_asset_node()
-            if asset_node is None or asset_node in abc_nodes:
-                continue
-            if allowed_types:
-                asset_types = tag_data.get_types()
-                allow = [i for i in asset_types if i in allowed_types]
-                if allow:
-                    if as_nodes:
-                        asset_nodes.append(asset_node)
-                    else:
-                        asset_nodes.append(asset_node.name)
-            else:
-                if as_nodes:
-                    asset_nodes.append(asset_node)
-                else:
-                    asset_nodes.append(asset_node.name)
-
-        tag_info_nodes = self.get_tag_info_nodes(as_tag_nodes=True)
-        for tag_info in tag_info_nodes:
-            asset_node = tag_info.get_asset_node()
-            if not asset_node:
-                continue
-            if allowed_types:
-                asset_types = tag_info.get_types()
-                allow = [i for i in asset_types if i in allowed_types]
-                if allow:
-                    if as_nodes:
-                        asset_nodes.append(asset_node)
-                    else:
-                        asset_nodes.append(asset_node.name)
-            else:
-                if as_nodes:
-                    asset_nodes.append(asset_node)
-                else:
-                    asset_nodes.append(asset_node.name)
-
-        return asset_nodes
-
     def get_alembics(self, as_asset_nodes=True, only_roots=True):
         """
         Returns all alembic nodes in the scene
