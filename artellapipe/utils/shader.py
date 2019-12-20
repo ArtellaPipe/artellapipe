@@ -86,8 +86,15 @@ class ShadingNetwork(object):
         :return: list<str>, list of exported shaders
         """
 
+        if not shader_extension:
+            LOGGER.warning('Impossible to export shading because extension was not defined')
+            return
+        if not shader_extension.startswith('.'):
+            shader_extension = '.{}'.format(shader_extension)
+
         if not os.path.exists(shaders_path):
-            LOGGER.debug('ShaderLibrary: Shaders Path %s is not valid! Aborting export!', shaders_path)
+            LOGGER.warning('ShaderLibrary: Shaders Path %s is not valid! Aborting export!', shaders_path)
+            return
 
         if shaders is None:
             shaders = tp.Dcc.list_materials()
@@ -95,8 +102,10 @@ class ShadingNetwork(object):
         exported_shaders = list()
         for shader in shaders:
             if shader not in IGNORE_SHADERS:
+                shading_group = cls.get_shading_group(shader_node=shader)
+
                 # Get dict with all the info of the shader
-                shader_network = cls.get_shading_network(shader)
+                shader_network = cls.get_shading_network(shading_group)
 
                 # Store shader icon in base64 format
                 shader_network['icon'] = image.image_to_base64(icon_path)
@@ -156,12 +165,12 @@ class ShadingNetwork(object):
             elif as_type == 'asShader':
                 node = cls.create_shader_node(node_type=node_type,
                                               as_type=as_type, name=key)
-                node_sg = maya.cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=key + 'SG')
-
                 if node_type == 'displacementShader':
-                    tp.Dcc.connect_attribute(source_node=node, source_attribute='displacement',
-                                             target_node=node_sg, target_attribute='displacementShader', force=True)
+                    pass
+                    # tp.Dcc.connect_attribute(source_node=node, source_attribute='displacement',
+                    #                          target_node=node_sg, target_attribute='displacementShader', force=True)
                 else:
+                    node_sg = maya.cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=key + 'SG')
                     tp.Dcc.connect_attribute(source_node=node, source_attribute='outColor',
                                              target_node=node_sg, target_attribute='surfaceShader', force=True)
             else:
@@ -216,6 +225,37 @@ class ShadingNetwork(object):
         return shader_node
 
     @classmethod
+    def get_shading_group(cls, shader_node, prefix=None):
+        """
+
+        :param shader_node:
+        :param prefix:
+        :return:
+        """
+
+        if prefix is not None:
+            prefix_name = shader_node + '_' + prefix
+        else:
+            prefix_name = shader_node
+
+        shading_groups_found = list()
+        out_connections = tp.Dcc.list_destination_connections(node=prefix_name) or list()
+        for n in out_connections:
+            if not n or not tp.Dcc.object_exists(n) or not tp.Dcc.node_type(n) == 'shadingEngine':
+                continue
+            shading_groups_found.append(n)
+
+        if not shading_groups_found:
+            return None
+
+        if len(shading_groups_found) > 1:
+            LOGGER.warning(
+                'Multiple Shading Groups found for "{}": "{}". First one will be used exported ...'.format(
+                    prefix_name, shading_groups_found))
+
+        return shading_groups_found[0]
+
+    @classmethod
     def get_shading_network(cls, shader_node, prefix=None):
         """
 
@@ -230,13 +270,27 @@ class ShadingNetwork(object):
             prefix_name = shader_node
         shader_network = dict()
         shader_network[prefix_name] = cls._attrs_to_dict(shader_node, prefix)
-        connected_nodes = tp.Dcc.list_source_connections(node=shader_node)
-        if connected_nodes:
-            for n in connected_nodes:
-                shader_network.update(cls.get_shading_network(n, prefix))
+        connected_nodes = tp.Dcc.list_source_connections(node=shader_node) or list()
+
+        # shading_group = cls.get_shading_group(shader_node=shader_node, prefix=prefix)
+        # if shading_group:
+        #     shader_network['shading_group'] = dict()
+        #     shader_network['shading_group'][shading_group] = cls._attrs_to_dict(shading_group, prefix)
+        #     shading_group_connections = tp.Dcc.list_source_connections(node=shading_group) or list()
+        #     shader_network['shading_group']
+        #     for n in shading_group_connections:
+        #         if not n or not tp.Dcc.object_exists(n) or n == shader_node or tp.Dcc.node_type(n) == 'transform':
+        #             continue
+        #         shader_network['shading_group'][shading_group].update(cls.get_shading_network(n, prefix))
+        #         return shader_network
+
+        if not connected_nodes:
             return shader_network
-        else:
-            return shader_network
+
+        for n in connected_nodes:
+            shader_network.update(cls.get_shading_network(n, prefix))
+
+        return shader_network
 
     @classmethod
     def _attrs_to_dict(cls, shader_node, prefix=None):
