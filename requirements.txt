@@ -16,7 +16,6 @@ pytest
 pytest-cov
 coveralls==4.5.4; python_version>='3.6'
 coveralls==5.0; python_version<'3.6'
-coveralls
 sphinx
 sphinx_rtd_theme
 python-json-logger
