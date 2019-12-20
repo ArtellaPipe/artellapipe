@@ -19,6 +19,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
+from tpPyUtils import python
 from tpQtLib.core import base, qtutils
 from tpQtLib.widgets import grid
 
@@ -49,25 +50,43 @@ class AssetsViewer(grid.GridWidget, object):
         self.setSelectionMode(QAbstractItemView.NoSelection)
 
         self._assets = list()
+        self._cache = list()
         self._project = project
 
-    def get_assets(self, category=None):
+    def get_assets(self, update_cache=True, force=False):
         """
         Returns a list with all the assets of the given categories; All assets will be returned if not category
         is given
-        :param category: str
+        :param update_cache: bool, Updates the internal cache
+        :param force: bool, If True, cache and assets will be updated
         :return: list(ArtellaAssetWidget)
         """
 
-        if not self._assets:
-            self.update_assets()
+        if update_cache:
+            self.update_cache(force=force)
+
+        if self._assets and not force:
+            return self._assets
+
+        self.update_assets()
 
         return self._assets
 
-    def update_assets(self):
+    def update_cache(self, force=False):
+        """
+        Updates internal cache with the current assets located in Artella server
+        """
+
+        if self._cache and not force:
+            return self._cache
+
+        python.clear_list(self._cache)
+        return artellapipe.AssetsMgr().find_all_assets()
+
+    def update_assets(self, force=False):
         """
         Updates the list of assets in the asset viewer
-        :param async: bool, Whether the update operation should be done asynchronously or not
+        :param force: bool
         """
 
         if not self._project:
@@ -76,7 +95,7 @@ class AssetsViewer(grid.GridWidget, object):
 
         self.clear_assets()
 
-        all_assets = artellapipe.AssetsMgr().find_all_assets()
+        all_assets = self.update_cache(force=force)
         if not all_assets:
             return
 

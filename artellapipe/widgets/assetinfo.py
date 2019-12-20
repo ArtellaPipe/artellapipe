@@ -234,11 +234,12 @@ class AssetFileButton(base.BaseWidget, object):
 
     checkVersions = Signal(str, object)
 
-    def __init__(self, asset_widget, status, asset_file_type, asset_file_icon, parent=None):
+    def __init__(self, asset_widget, status, asset_file_type, asset_file_type_name, asset_file_icon, parent=None):
 
         self._asset_file_icon = asset_file_icon
         self._status = status
         self._asset_file_type = asset_file_type
+        self._asset_file_type_name = asset_file_type_name or asset_file_type
         self._asset_widget = asset_widget
 
         super(AssetFileButton, self).__init__(parent=parent)
@@ -258,7 +259,7 @@ class AssetFileButton(base.BaseWidget, object):
         folder_icon = resource.ResourceManager().icon('artella')
 
         self._file_btn = QPushButton()
-        self._file_btn.setText(self._asset_file_type.title())
+        self._file_btn.setText(self._asset_file_type_name)
         self._file_btn.setIcon(self._asset_file_icon)
         self._versions_btn = QPushButton()
         self._versions_btn.setFixedWidth(25)
@@ -377,6 +378,7 @@ class WorkingAssetInfo(base.BaseWidget, object):
         no_items_widget = QFrame()
         no_items_widget.setFrameShape(QFrame.StyledPanel)
         no_items_widget.setFrameShadow(QFrame.Sunken)
+        no_items_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         no_items_layout = QVBoxLayout()
         no_items_layout.setContentsMargins(0, 0, 0, 0)
         no_items_layout.setSpacing(0)
@@ -428,17 +430,21 @@ class WorkingAssetInfo(base.BaseWidget, object):
         file_buttons_widget.resizeColumnsToContents()
         file_buttons_widget.setSelectionMode(QAbstractItemView.NoSelection)
 
+        files_btn = list()
         for file_type in self._asset_widget.asset.ASSET_FILES:
+            file_type_name = artellapipe.FilesMgr().get_file_type_name(file_type)
             file_btn = AssetFileButton(
                 self._asset_widget, defines.ArtellaFileStatus.WORKING,
-                file_type, resource.ResourceManager().icon(file_type))
+                file_type, file_type_name, resource.ResourceManager().icon(file_type))
+            files_btn.append(file_btn)
             file_btn.checkVersions.connect(self._on_check_versions)
             self._file_buttons[file_type] = file_btn
             row, col = file_buttons_widget.first_empty_cell()
             file_buttons_widget.addWidget(row, col, file_btn)
             file_buttons_widget.resizeRowsToContents()
 
-        file_buttons_widget.setFixedHeight(file_buttons_widget.rowCount() * 26)
+        if files_btn:
+            file_buttons_widget.setFixedHeight(file_buttons_widget.rowCount() * files_btn[0].height() + 5)
 
         return file_buttons_widget
 
