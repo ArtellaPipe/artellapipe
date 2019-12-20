@@ -181,7 +181,7 @@
 <p>Module that contains definitions for DCC nodes in Artella</p>
 <dl class="class">
 <dt id="artellapipe.core.node.ArtellaAssetNode">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.node.</code><code class="sig-name descname">ArtellaAssetNode</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">node=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.node.</code><code class="sig-name descname">ArtellaAssetNode</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">asset</em>, <em class="sig-param">node=None</em>, <em class="sig-param">id=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#artellapipe.core.node.ArtellaDCCNode" title="artellapipe.core.node.ArtellaDCCNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.core.node.ArtellaDCCNode</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="artellapipe.core.node.ArtellaAssetNode.asset">
@@ -198,6 +198,22 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_file">
+<code class="sig-name descname">get_asset_shaders_file</code><span class="sig-paren">(</span><em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns file class of the Asset Shaders File
+This file is the one that maps asset geometry to shaders
+:param status: ArtellaAssetStatus
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_shaders_files">
+<code class="sig-name descname">get_shaders_files</code><span class="sig-paren">(</span><em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_shaders_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of shaders this asset needs to use
+:return: list(str)</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.core.node.ArtellaAssetNode.get_short_name">
 <code class="sig-name descname">get_short_name</code><span class="sig-paren">(</span><em class="sig-param">clean=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_short_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the short name of the DCC node
@@ -206,10 +222,29 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.id">
+<em class="property">property </em><code class="sig-name descname">id</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the associated asset ID for this node
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.load_shaders">
+<code class="sig-name descname">load_shaders</code><span class="sig-paren">(</span><em class="sig-param">status='published'</em>, <em class="sig-param">apply_shaders=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.load_shaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all the shaders of current asset node</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.core.node.ArtellaAssetNode.name">
 <em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the asset
 :return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.unload_shaders">
+<code class="sig-name descname">unload_shaders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.unload_shaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unloads all the shaders of current asset node</p>
 </dd></dl>
 
 </dd></dl>

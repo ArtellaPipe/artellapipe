@@ -225,10 +225,10 @@
 </li>
       <li><a href="artellapipe.libs.html#module-artellapipe.libs">artellapipe.libs (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.loader.html#module-artellapipe.loader">artellapipe.loader (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.managers.html#module-artellapipe.managers">artellapipe.managers (module)</a>
 </li>
       <li><a href="artellapipe.managers.dependencies.html#module-artellapipe.managers.dependencies">artellapipe.managers.dependencies (module)</a>
@@ -240,6 +240,8 @@
       <li><a href="artellapipe.managers.playblasts.html#module-artellapipe.managers.playblasts">artellapipe.managers.playblasts (module)</a>
 </li>
       <li><a href="artellapipe.managers.pyblishplugins.html#module-artellapipe.managers.pyblishplugins">artellapipe.managers.pyblishplugins (module)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#module-artellapipe.managers.shaders">artellapipe.managers.shaders (module)</a>
 </li>
       <li><a href="artellapipe.managers.shots.html#module-artellapipe.managers.shots">artellapipe.managers.shots (module)</a>
 </li>
@@ -320,6 +322,8 @@
 </li>
         <li><a href="artellapipe.managers.pyblishplugins.html#artellapipe.managers.pyblishplugins.PyblishPluginsManager.config">(artellapipe.managers.pyblishplugins.PyblishPluginsManager property)</a>
 </li>
+        <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.config">(artellapipe.managers.shaders.ShadersManager property)</a>
+</li>
         <li><a href="artellapipe.managers.shots.html#artellapipe.managers.shots.ArtellaShotsManager.config">(artellapipe.managers.shots.ArtellaShotsManager property)</a>
 </li>
         <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.config">(artellapipe.managers.tags.ArtellaTagsManager property)</a>
@@ -366,6 +370,12 @@
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.exists">exists() (artellapipe.core.node.ArtellaDCCNode property)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.export_shader">export_shader() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.export_shaders">export_shaders() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
@@ -392,6 +402,8 @@
       <li><a href="artellapipe.core.config.html#artellapipe.core.config.ArtellaConfiguration.get">get() (artellapipe.core.config.ArtellaConfiguration method)</a>
 </li>
       <li><a href="artellapipe.core.tag.html#artellapipe.core.tag.ArtellaTagNode.get_asset_node">get_asset_node() (artellapipe.core.tag.ArtellaTagNode method)</a>
+</li>
+      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_file">get_asset_shaders_file() (artellapipe.core.node.ArtellaAssetNode method)</a>
 </li>
       <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.get_camera_token">get_camera_token() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
 </li>
@@ -425,8 +437,6 @@
         <li><a href="artellapipe.core.config.html#artellapipe.core.config.ArtellaConfiguration.get_path">(artellapipe.core.config.ArtellaConfiguration method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.managers.pyblishplugins.html#artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin">get_plugin() (artellapipe.managers.pyblishplugins.PyblishPluginsManager method)</a>
 </li>
       <li><a href="artellapipe.managers.pyblishplugins.html#artellapipe.managers.pyblishplugins.PyblishPluginsManager.get_plugin_info">get_plugin_info() (artellapipe.managers.pyblishplugins.PyblishPluginsManager method)</a>
@@ -435,7 +445,27 @@
 </li>
       <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.get_presets_paths">get_presets_paths() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.get_project_path_token">get_project_path_token() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.get_project_rule_token">get_project_rule_token() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
+</li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.get_relative_path">get_relative_path() (artellapipe.core.abstract.AbstractAsset method)</a>
+</li>
+      <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.get_render_layer_token">get_render_layer_token() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.get_scene_operator">get_scene_operator() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.get_scene_token">get_scene_token() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.get_shader_file">get_shader_file() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.get_shader_path">get_shader_path() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.get_shaders_files">get_shaders_files() (artellapipe.core.node.ArtellaAssetNode method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.get_shaders_paths">get_shaders_paths() (artellapipe.managers.shaders.ShadersManager method)</a>
 </li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.get_short_name">get_short_name() (artellapipe.core.node.ArtellaAssetNode method)</a>
 </li>
@@ -485,6 +515,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.utils.plugin.html#artellapipe.utils.plugin.Plugin.id">id (artellapipe.utils.plugin.Plugin attribute)</a>
 </li>
+      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.id">id() (artellapipe.core.node.ArtellaAssetNode property)</a>
+</li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.import_file">import_file() (artellapipe.core.abstract.AbstractAsset method)</a>
 </li>
       <li><a href="artellapipe.core.abstract.html#artellapipe.core.abstract.AbstractAsset.import_file_by_extension">import_file_by_extension() (artellapipe.core.abstract.AbstractAsset method)</a>
@@ -513,11 +545,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.list_tokens">list_tokens() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.core.config.html#artellapipe.core.config.ArtellaConfiguration.load">load() (artellapipe.core.config.ArtellaConfiguration method)</a>
 </li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.load_asset_shaders">load_asset_shaders() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.managers.ocio.html#artellapipe.managers.ocio.ArtellaOCIOManager.load_plugins">load_plugins() (artellapipe.managers.ocio.ArtellaOCIOManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.load_scene_shaders">load_scene_shaders() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.load_shader">load_shader() (artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.load_shaders">load_shaders() (artellapipe.core.node.ArtellaAssetNode method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -609,15 +649,17 @@
 </li>
       <li><a href="artellapipe.loader.html#artellapipe.loader.register_libs">register_libs() (in module artellapipe.loader)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.managers.playblasts.html#artellapipe.managers.playblasts.PlayblastsManager.register_token">register_token() (artellapipe.managers.playblasts.PlayblastsManager method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.loader.html#artellapipe.loader.register_tools">register_tools() (in module artellapipe.loader)</a>
 </li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.remove">remove() (artellapipe.core.node.ArtellaDCCNode method)</a>
 </li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.remove_override">remove_override() (artellapipe.core.node.ArtellaDCCNode method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.remove_scene_operator">remove_scene_operator() (artellapipe.managers.shaders.ShadersManager method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -646,6 +688,8 @@
 </li>
         <li><a href="artellapipe.managers.pyblishplugins.html#artellapipe.managers.pyblishplugins.PyblishPluginsManager.set_project">(artellapipe.managers.pyblishplugins.PyblishPluginsManager method)</a>
 </li>
+        <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.set_project">(artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
         <li><a href="artellapipe.managers.shots.html#artellapipe.managers.shots.ArtellaShotsManager.set_project">(artellapipe.managers.shots.ArtellaShotsManager method)</a>
 </li>
         <li><a href="artellapipe.managers.tags.html#artellapipe.managers.tags.ArtellaTagsManager.set_project">(artellapipe.managers.tags.ArtellaTagsManager method)</a>
@@ -656,6 +700,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="artellapipe.widgets.label.html#artellapipe.widgets.label.ThumbnailLabel.setPixmap">setPixmap() (artellapipe.widgets.label.ThumbnailLabel method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager">ShadersManager (class in artellapipe.managers.shaders)</a>
 </li>
       <li><a href="artellapipe.utils.plugin.html#artellapipe.utils.plugin.PluginStats.start">start() (artellapipe.utils.plugin.PluginStats method)</a>
 </li>
@@ -699,11 +745,21 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="artellapipe.managers.dependencies.html#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies">update_dependencies() (artellapipe.managers.dependencies.ArtellaDependenciesManager method)</a>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.unload_asset_shaders">unload_asset_shaders() (artellapipe.managers.shaders.ShadersManager method)</a>
 </li>
+      <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaAssetNode.unload_shaders">unload_shaders() (artellapipe.core.node.ArtellaAssetNode method)</a>
+
+      <ul>
+        <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.unload_shaders">(artellapipe.managers.shaders.ShadersManager method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="artellapipe.managers.dependencies.html#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies">update_dependencies() (artellapipe.managers.dependencies.ArtellaDependenciesManager method)</a>
+</li>
       <li><a href="artellapipe.core.node.html#artellapipe.core.node.ArtellaDCCNode.update_info">update_info() (artellapipe.core.node.ArtellaDCCNode method)</a>
+</li>
+      <li><a href="artellapipe.managers.shaders.html#artellapipe.managers.shaders.ShadersManager.update_shaders">update_shaders() (artellapipe.managers.shaders.ShadersManager method)</a>
 </li>
   </ul></td>
 </tr></table>
