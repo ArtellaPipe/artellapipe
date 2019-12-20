@@ -554,7 +554,7 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
 
         return shaders_files
 
-    def load_shaders(self, status=defines.ArtellaFileStatus.PUBLISHED,  apply_shaders=True):
+    def load_shaders(self, status=defines.ArtellaFileStatus.PUBLISHED, apply_shaders=True):
         """
         Loads all the shaders of current asset node
         """

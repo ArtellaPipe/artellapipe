@@ -122,7 +122,7 @@ class ArtellaFilesManager(object):
         if not self.files:
             return
 
-        if not file_type in self.files:
+        if file_type not in self.files:
             return file_type
 
         return self.files[file_type].get('name', file_type)

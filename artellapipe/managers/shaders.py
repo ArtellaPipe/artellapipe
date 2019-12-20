@@ -369,7 +369,7 @@ class ShadersManager(object):
             LOGGER.warning('Impossible to unload shaders because no shaders found in current scene!')
 
         for asset in assets:
-           self.unload_asset_shaders(asset=asset, status=status)
+            self.unload_asset_shaders(asset=asset, status=status)
 
         return True
 
@@ -409,7 +409,7 @@ class ShadersManager(object):
             return None
 
         if publish:
-            pass
+            raise NotImplementedError('Export Shader Publish functionality is not implemented yet!')
 
         return exported_shader
 
