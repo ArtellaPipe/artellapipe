@@ -18,9 +18,14 @@ import inspect
 import logging
 
 import tpDccLib as tp
+from tpPyUtils import decorators
 
-import artellapipe
+import artellapipe.register
 from artellapipe.core import defines
+
+if tp.is_maya():
+    import tpMayaLib as maya
+    from tpMayaLib.core import attribute
 
 LOGGER = logging.getLogger()
 
@@ -167,6 +172,9 @@ class ArtellaDCCNode(object):
         if not is_referenced:
             self._nodes_list = tp.Dcc.list_children(
                 node=self._node, all_hierarchy=True, full_path=True, children_type='transform')
+            self._namespace = tp.Dcc.node_namespace(self.node)
+            if self._namespace:
+                self._valid = True
         else:
             self._loaded = tp.Dcc.node_is_loaded(self._node)
             if self._loaded:
@@ -317,28 +325,6 @@ class ArtellaDCCNode(object):
             tag_node = artellapipe.TagNode(project=self._project, node=self.node, tag_info=tag_info)
             return tag_node
 
-    # def load_shaders(self):
-    #     """
-    #     Loads all the shaders of current asset node
-    #     """
-    #
-    #     tag_node = self.get_tag_node()
-    #     if tag_node:
-    #         shader.load_scene_shaders(project=self._project, tag_nodes=[tag_node])
-    #     else:
-    #         artellapipe.logger.warning('Impossible to load shaders on asset: {}'.format(self.base_name))
-    #
-    # def unload_shaders(self):
-    #     """
-    #     Unloads all the shaders of current asset node
-    #     """
-    #
-    #     tag_node = self.get_tag_node()
-    #     if tag_node:
-    #         shader.unload_shaders(project=self._project, tag_nodes=[tag_node])
-    #     else:
-    #         artellapipe.logger.warning('Impossible to unload shaders on asset: {}'.format(self.base_name))
-
     def has_overrides(self):
         """
         Returns whether current node has overrides or not
@@ -467,23 +453,34 @@ class ArtellaDCCNode(object):
 
 
 class ArtellaAssetNode(ArtellaDCCNode, object):
-    def __init__(self, project, node=None, **kwargs):
+    def __init__(self, project, asset, node=None, id=None, **kwargs):
         super(ArtellaAssetNode, self).__init__(project=project, node=node, update_at_init=False)
 
         if node is not None:
             self._name = node
         else:
             self._name = kwargs.get('name', 'New_Asset')
-        self._asset_path = kwargs.get('path', '')             # We use -1, to force the asset path update in first use
         self._category = kwargs.get('category', None)
         self._description = kwargs.get('description', '')
-        self._asset = None
+        self._id = id
+        self._asset = asset
+        if self._asset and not self._id:
+            self._id = asset.get_id()
 
         self._current_version = None
         self._latest_version = None
         self._version_folder = dict()
 
         self.update_info()
+
+    @property
+    def id(self):
+        """
+        Returns the associated asset ID for this node
+        :return: str
+        """
+
+        return self._id
 
     @property
     def name(self):
@@ -501,11 +498,10 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         :return: str
         """
 
-        # Asset path retrieval is an expensive operation, so we only update it if necessary
-        if self._asset_path == '':
-            self._asset_path = self._get_asset_path()
+        if not self._asset:
+            return
 
-        return self._asset_path
+        return self._asset.get_path()
 
     @property
     def asset(self):
@@ -513,11 +509,6 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         Returns asset linked to this node
         :return: ArtellaAsset
         """
-
-        # NOTE: We must access asset path property through the property getter to make sure that
-        # file path is updated
-        if not self._asset:
-            self._asset = self._project.find_asset(asset_path=self.asset_path, allow_multiple_instances=False)
 
         return self._asset
 
@@ -530,22 +521,60 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
 
         return tp.Dcc.node_short_name(self._name).rstrip(string.digits) if clean else tp.Dcc.node_short_name(self._name)
 
-    def _get_asset_path(self):
+    def get_asset_shaders_file(self, status=defines.ArtellaFileStatus.PUBLISHED):
         """
-        Internal function that returns the asset path of the current node
-        :return: str
+        Returns file class of the Asset Shaders File
+        This file is the one that maps asset geometry to shaders
+        :param status: ArtellaAssetStatus
+        :return:
         """
 
-        assets_path = self._project.get_assets_path()
-        if assets_path is None or not os.path.exists(assets_path):
-            raise RuntimeError('Assets Path is not valid: {}'.format(assets_path))
+        asset_shader_file_path = self._asset.get_file('assetshader', status=status)
+        asset_shader_file_class = artellapipe.FilesMgr().get_file_class('assetshader')
+        shader_file = asset_shader_file_class(self._asset, file_path=asset_shader_file_path)
 
-        for root, dirs, files in os.walk(assets_path):
-            asset_path = root
-            asset_name = os.path.basename(root)
-            if asset_name == self.get_short_name():
-                return os.path.normpath(asset_path)
+        return shader_file
 
-            clean_name = self.get_short_name(clean=True)
-            if asset_name == clean_name:
-                return os.path.normpath(asset_path)
+    def get_shaders_files(self, status=defines.ArtellaFileStatus.PUBLISHED):
+        """
+        Returns list of shaders this asset needs to use
+        :return: list(str)
+        """
+
+        shaders = self.get_shaders(status=status)
+        if not shaders:
+            LOGGER.warning('No shaders found ...')
+            return
+
+        shaders_files = list()
+        for shader in shaders:
+            shader_file_path = artellapipe.ShadersMgr().get_shader_path(shader)
+            if shader_file_path not in shaders_files:
+                shaders_files.append(shader_file_path)
+
+        return shaders_files
+
+    def load_shaders(self, status=defines.ArtellaFileStatus.PUBLISHED,  apply_shaders=True):
+        """
+        Loads all the shaders of current asset node
+        """
+
+        if not tp.is_maya():
+            LOGGER.warning('Shaders loading is only supported in Maya!')
+            return
+
+        return artellapipe.ShadersMgr().load_asset_shaders(self, status=status, apply_shaders=apply_shaders)
+
+    def unload_shaders(self):
+        """
+        Unloads all the shaders of current asset node
+        """
+
+        if not tp.is_maya():
+            LOGGER.warning('Shaders unloading is only supported in Maya!')
+            return
+
+        return artellapipe.ShadersMgr().unload_asset_shaders(self)
+
+
+artellapipe.register.register_class('AssetNode', ArtellaAssetNode)
