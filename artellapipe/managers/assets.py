@@ -13,13 +13,15 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
+import copy
 import logging
 import inspect
 import traceback
 import importlib
 from collections import OrderedDict
 
-from tpPyUtils import python, decorators, path as path_utils
+import tpDccLib as tp
+from tpPyUtils import python, decorators, strings, path as path_utils
 
 if python.is_python2():
     import pkgutil as loader
@@ -415,6 +417,70 @@ class ArtellaAssetsManager(object):
             self.register_asset_class(obj)
 
         return True
+
+    @decorators.timestamp
+    def get_scene_assets(self, as_nodes=True, allowed_types=None):
+        """
+        Returns a list with all assets in the current scene
+        :param as_nodes: bool, Whether to return found assets as ArtellaAssetNodes or as strings (asset names)
+        :param allowed_types: list(str), List of types asset to filter by. If None, no filter is done
+        :return: list(str) or list(ArtellaAssetNode)
+        """
+
+        if not allowed_types:
+            allowed_types = list()
+
+        all_assets = self.find_all_assets()
+
+        if not allowed_types:
+            valid_assets = all_assets
+        else:
+            valid_assets = list()
+            for asset in all_assets:
+                if asset.ASSET_TYPE in allowed_types:
+                    valid_assets.append(asset)
+
+        if not valid_assets:
+            LOGGER.warning('No valid assets found in current scene!')
+            return
+
+        assets_ids = dict()
+        for asset in valid_assets:
+            assets_ids[asset.get_id()] = asset
+
+        all_shapes = tp.Dcc.all_shapes_nodes()
+
+        found_assets = OrderedDict()
+        for shape in all_shapes:
+            ns = tp.Dcc.node_namespace(shape)
+            if not ns or ns in found_assets:
+                continue
+            root_node = tp.Dcc.node_root(shape)
+            if not root_node:
+                continue
+            found_assets[ns] = {'node': root_node}
+
+        scene_assets = list()
+        for i, (ns, ns_info) in enumerate(found_assets.items()):
+            if ns.startswith((':', '|')):
+                ns = ns[1:]
+            clean_ns = strings.remove_digits_from_end_of_string(ns)
+            if not clean_ns:
+                LOGGER.warning('Impossible to retrieve asset because it has not an ID defined')
+                continue
+            if clean_ns not in assets_ids:
+                LOGGER.warning('No Asset Found with ID: "{}"'.format(clean_ns))
+                continue
+
+            if as_nodes:
+                asset_node = artellapipe.AssetNode(
+                    project=self._project, node=ns_info['node'], asset=assets_ids[clean_ns], id=ns
+                )
+            else:
+                asset_node = ns_info['node']
+            scene_assets.append(asset_node)
+
+        return scene_assets
 
 
 @decorators.Singleton
