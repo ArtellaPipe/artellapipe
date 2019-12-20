@@ -79,6 +79,22 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return asset_id.rstrip()
 
+    def set_id(self, new_id):
+        """
+        Sets the ID of this asset
+        :param new_id: str
+        """
+
+        id_attr = artellapipe.AssetsMgr().config.get('data', 'id_attribute')
+        asset_id = self._asset_data.get(id_attr, None)
+        if not asset_id:
+            LOGGER.warning(
+                'Impossible to retrieve asset ID because asset data does not contains "{}" attribute.'
+                '\nAsset Data: {}'.format(id_attr, self._asset_data))
+            return None
+
+        self._asset_data[id_attr] = new_id
+
     def get_name(self):
         """
         Implements abstract get_name function
@@ -209,6 +225,28 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         return [i for i in self.ASSET_FILES if i in artellapipe.FilesMgr().files]
 
+    def supports_file_type(self, file_type, status=defines.ArtellaFileStatus.ALL):
+        """
+        Returns whether or not current asset supports given file type
+        :param file_type: str, type of asset file.
+        :param status: type of sync (working, published or all)
+        :return: bool
+        """
+
+        if status != defines.ArtellaFileStatus.ALL:
+            if status not in self.ASSET_FILES:
+                LOGGER.warning(
+                    'Impossible to sync "{}" because current Asset {} does not support it!'.format(
+                        file_type, self.__class__.__name__))
+                return False
+            if status not in self.project:
+                LOGGER.warning(
+                    'Impossible to sync "{}" because project "{}" does not support it!'.format(
+                        file_type, self.project.name.title()))
+                return False
+
+        return True
+
     # ==========================================================================================================
     # ARTELLA
     # ==========================================================================================================
@@ -255,17 +293,23 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     # FILES
     # ==========================================================================================================
 
-    def get_file(self, file_type, status, extension=None, version=None, fix_path=False):
+    def get_file(self, file_type, status, extension=None, version=None, fix_path=False, only_local=False):
         """
         Returns file path of the given file type and status
         :param file_type: str
         :param status: str
         :param extension: str
+        :param version: str
         :param fix_path: str
+        :param only_local: bool
         """
 
         if not extension:
-            extension = self.project.default_extension
+            extensions = artellapipe.FilesMgr().get_file_type_extensions(file_type)
+            if extensions:
+                extension = extensions[0]
+            else:
+                extension = self.project.default_extension
 
         asset_files = artellapipe.FilesMgr().files
         if file_type not in asset_files:
@@ -299,19 +343,28 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             latest_local_versions = self.get_latest_local_versions(
                 status=defines.ArtellaFileStatus.PUBLISHED)
             file_type_local_versions = latest_local_versions.get(file_type, None)
-            if not file_type_local_versions:
-                LOGGER.warning(
-                    'No local versions found in Asset "{}" for File Type: "{}"'.format(asset_name, file_type))
-                return None
-            if version:
-                if version == file_type_local_versions[1]:
-                    template_dict['version_folder'] = version
+            if file_type_local_versions:
+                if version:
+                    if version == file_type_local_versions[1]:
+                        template_dict['version_folder'] = version
+                    else:
+                        if only_local:
+                            LOGGER.warning(
+                                'No local version "{}" found in Asset "{}" for File Type: "{}"'.format(
+                                    version, asset_name, file_type))
+                            return None
+                        else:
+                            template_dict['version_folder'] = version
+
                 else:
-                    LOGGER.warning(
-                        'No local version "{}" found in Asset "{}" for File Type: "{}"'.format(asset_name, file_type))
-                    return None
+                    template_dict['version_folder'] = file_type_local_versions[1]
             else:
-                template_dict['version_folder'] = file_type_local_versions[1]
+                if not version:
+                    LOGGER.warning(
+                        'No local versions found in Asset "{}" for File Type: "{}"'.format(asset_name, file_type))
+                    return None
+                else:
+                    template_dict['version_folder'] = version
 
             file_path = template.format(template_dict)
 
@@ -401,6 +454,33 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     # ==========================================================================================================
 
     @decorators.timestamp
+    def is_published(self, file_type=None):
+        """
+        Returns whether or not current asset and given type is published
+        :param file_type: str, type of asset file. If None, True will be returned if any fiel type is published
+        :return: bool
+        """
+
+        valid_types = self._get_types_to_check(file_type)
+        if not valid_types:
+            return
+
+        for valid_type in valid_types:
+            file_type = self.get_file_type(valid_type)
+            if not file_type:
+                continue
+
+            latest_published_info = file_type.get_server_versions(status=defines.ArtellaFileStatus.PUBLISHED)
+            if not latest_published_info:
+                return False
+            for version_info in latest_published_info:
+                latest_version_path = version_info.get('version_path', None)
+                if not latest_version_path:
+                    return False
+
+            return True
+
+    @decorators.timestamp
     def sync(self, file_type=None, sync_type=defines.ArtellaFileStatus.ALL):
         """
         Synchronizes asset file type and with the given sync type (working or published)
@@ -408,24 +488,15 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :param sync_type: str, type of sync (working, published or all)
         """
 
-        if sync_type != defines.ArtellaFileStatus.ALL:
-            if sync_type not in self.ASSET_FILES:
-                LOGGER.warning(
-                    'Impossible to sync "{}" because current Asset {} does not support it!'.format(
-                        file_type, self.__class__.__name__))
-                return
-            if sync_type not in self.project:
-                LOGGER.warning(
-                    'Impossible to sync "{}" because project "{}" does not support it!'.format(
-                        file_type, self.project.name.title()))
-                return
+        if not self.supports_file_type(file_type=file_type, status=sync_type):
+            return
 
         paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
         if not paths_to_sync:
             LOGGER.warning('No Paths to sync for "{}"'.format(self.get_name()))
             return
 
-        artellapipe.FilesMgr().sync_files(files=paths_to_sync)
+        artellapipe.FilesMgr().sync_paths(paths_to_sync, recursive=True)
 
     @decorators.timestamp
     def sync_latest_published_files(self, file_type=None, ask=False):
@@ -437,7 +508,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         if ask:
             result = qtutils.show_question(
                 None, 'Synchronizing Latest Published Files: {}'.format(self.get_name()),
-                'Are you sure you want to synchronize latest publishe files? This can take quite some time!')
+                'Are you sure you want to synchronize latest published files? This can take quite some time!')
             if result == QMessageBox.No:
                 return
 
@@ -540,15 +611,6 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     # SHADERS
     # ==========================================================================================================
 
-    @decorators.abstractmethod
-    def get_shading_type(self):
-        """
-        Returns the asset file type of the shading file for the project
-        :return: str
-        """
-
-        raise NotImplementedError('get_shading_type must be implemented in extended classes')
-
     def export_shaders(self):
         """
         Exports shaders of current asset
@@ -605,9 +667,13 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                 continue
 
             if sync_type == defines.ArtellaFileStatus.ALL or sync_type == defines.ArtellaFileStatus.WORKING:
-                paths_to_sync.append(file_type.get_working_path(sync_folder=True))
+                working_path = file_type.get_working_path(sync_folder=True)
+                if working_path and working_path not in paths_to_sync:
+                    paths_to_sync.append(working_path)
             if sync_type == defines.ArtellaFileStatus.ALL or sync_type == defines.ArtellaFileStatus.PUBLISHED:
-                paths_to_sync.append(file_type.get_latest_server_published_path(sync_folder=True))
+                published_path = file_type.get_latest_server_published_path(sync_folder=True)
+                if published_path and published_path not in paths_to_sync:
+                    paths_to_sync.append(published_path)
 
         return paths_to_sync
 

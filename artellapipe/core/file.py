@@ -67,7 +67,10 @@ class ArtellaFile(object):
         file_paths = list()
 
         if self.path:
-            base_path = path_utils.clean_path('{}{}{}'.format(self.path, os.sep, self.name))
+            if not self.path.endswith(self.name):
+                base_path = path_utils.clean_path(os.path.join(self.path, self.name))
+            else:
+                base_path = self.path
             if not self._extensions:
                 LOGGER.warning('No valid extensions found for file: "{}"'.format(self.__class__.__name__))
                 return base_path
@@ -125,6 +128,17 @@ class ArtellaFile(object):
         else:
             return self._import_file(file_path=file_path, *args, **kwargs)
 
+    def export_file(self, fix_path=True, *args, **kwargs):
+        """
+        Exports current file
+        :param fix_path: bool
+        :param args:
+        :param kwargs:
+        """
+
+        file_path = self.get_file_paths(return_first=True, fix_path=fix_path)
+        return self._export_file(file_path, *args, **kwargs)
+
     def get_template_dict(self):
         """
         Returns dictionary with the template data for this file
@@ -161,6 +175,8 @@ class ArtellaFile(object):
                 template = artellapipe.FilesMgr().get_template(self.FILE_TEMPLATE)
                 if template:
                     return template.format(template_data)
+
+        return path
 
     def _get_extensions(self, extension):
         """
@@ -204,7 +220,7 @@ class ArtellaFile(object):
         :return:
         """
 
-        raise NotImplementedError('Open Function for "{}" is not implemented!'.format(self))
+        raise NotImplementedError('_open_file function for "{}" is not implemented!'.format(self))
 
     def _import_file(self, file_path, *args, **kwargs):
         """
@@ -214,7 +230,7 @@ class ArtellaFile(object):
         :return:
         """
 
-        raise NotImplementedError('Import Function for "{}" is not implemented!'.format(self))
+        raise NotImplementedError('_import_file function for "{}" is not implemented!'.format(self))
 
     def _reference_file(self, file_path, *args, **kwargs):
         """
@@ -224,4 +240,14 @@ class ArtellaFile(object):
         :return:
         """
 
-        raise NotImplementedError('Reference Function for "{}" is not implemented!'.format(self))
+        raise NotImplementedError('_reference_file function for "{}" is not implemented!'.format(self))
+
+    def _export_file(self, file_path, *args, **kwargs):
+        """
+        Internal function that exports current file
+        :param file_path: str
+        :param args:
+        :param kwargs:
+        """
+
+        raise NotImplementedError('_export_file function for "{}" is not implemented!'.format(self))

@@ -27,11 +27,12 @@ LOGGER = logging.getLogger()
 
 
 class ArtellaAssetFile(file.ArtellaFile, object):
-    def __init__(self, file_asset=None):
+    def __init__(self, file_asset=None, file_path=None):
 
         self._asset = file_asset
 
-        super(ArtellaAssetFile, self).__init__(file_name=self._asset.get_name() if self._asset else None)
+        super(ArtellaAssetFile, self).__init__(
+            file_name=self._asset.get_name() if self._asset else None, file_path=file_path)
 
     def open_file(self, status):
         """
@@ -182,9 +183,16 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         published_path = self.asset.get_file(
             file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.PUBLISHED,
             extension=self.FILE_EXTENSIONS[0], version=version_folder, fix_path=False)
+        if not published_path:
+            LOGGER.warning('Impossible to retrieve latest published path ...')
+            return
 
         if sync_folder:
-            return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
+            ext = os.path.splitext(published_path)[-1]
+            if ext:
+                return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
+            else:
+                return path_utils.clean_path(os.path.dirname(published_path))
 
         return path_utils.clean_path(published_path)
 
