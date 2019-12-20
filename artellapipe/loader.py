@@ -42,8 +42,8 @@ def init(do_reload=False, dev=False):
     from tpPyUtils import importer
 
     class ArtellaPipe(importer.Importer, object):
-        def __init__(self):
-            super(ArtellaPipe, self).__init__(module_name='artellapipe')
+        def __init__(self, debug=False):
+            super(ArtellaPipe, self).__init__(module_name='artellapipe', debug=debug)
 
         def get_module_path(self):
             """
@@ -72,7 +72,7 @@ def init(do_reload=False, dev=False):
         'artellapipe.widgets'
     ]
 
-    artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False)
+    artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False, debug=dev)
     artella_importer.import_packages(
         order=packages_order,
         only_packages=False)
