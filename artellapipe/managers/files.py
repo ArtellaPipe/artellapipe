@@ -112,6 +112,21 @@ class ArtellaFilesManager(object):
 
         return self.files[file_type] if file_type in self.files else dict()
 
+    def get_file_type_name(self, file_type):
+        """
+        Returns nice name of the given file type
+        :param file_type: str
+        :return: str
+        """
+
+        if not self.files:
+            return
+
+        if not file_type in self.files:
+            return file_type
+
+        return self.files[file_type].get('name', file_type)
+
     def get_file_type_extensions(self, file_type):
         """
         Returns extensions of the given file type
