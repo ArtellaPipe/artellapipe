@@ -1,7 +1,0 @@
-artellapipe.core.scene module
-=============================
-
-.. automodule:: artellapipe.core.scene
-   :members:
-   :undoc-members:
-   :show-inheritance:

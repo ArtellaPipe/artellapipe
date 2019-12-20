@@ -14,7 +14,6 @@ Submodules
    artellapipe.core.file
    artellapipe.core.node
    artellapipe.core.project
-   artellapipe.core.scene
    artellapipe.core.sequence
    artellapipe.core.shot
    artellapipe.core.tag
