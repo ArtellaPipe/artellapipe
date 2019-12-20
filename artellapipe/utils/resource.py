@@ -13,11 +13,10 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-from collections import Iterable
 
 from Qt.QtGui import (QIcon, QPixmap)
 
-from tpPyUtils import decorators
+from tpPyUtils import decorators, python
 
 from tpQtLib.core import resource
 
@@ -76,17 +75,17 @@ class ResourceManager(object):
 
         resources_paths = list()
         for res in self._resources.values():
-            if isinstance(res, Iterable):
+            if not python.is_iterable(res):
+                dirname = res.dirname
+                if dirname in resources_paths:
+                    continue
+                resources_paths.append(res.dirname)
+            else:
                 for r in res:
                     dirname = r.dirname
                     if dirname in resources_paths:
                         continue
                     resources_paths.append(dirname)
-            else:
-                dirname = res.dirname
-                if dirname in resources_paths:
-                    continue
-                resources_paths.append(res.dirname)
 
         return resources_paths
 
@@ -133,16 +132,7 @@ class ResourceManager(object):
         for res_path, res in self._resources.items():
             if not os.path.isdir(res_path):
                 continue
-            if isinstance(res, Iterable):
-                for r in res:
-                    res_fn = self._get_resource_function(r, resource_type)
-                    if not resource_type:
-                        path = res_fn(dirname=res_path, *args)
-                    else:
-                        path = res_fn(dirname=res_path, *args, **kwargs)
-                    if path:
-                        return path
-            else:
+            if not python.is_iterable(res):
                 res_fn = self._get_resource_function(res, resource_type)
                 if not resource_type:
                     path = res_fn(dirname=res_path, *args)
@@ -150,6 +140,15 @@ class ResourceManager(object):
                         return path
                 else:
                     path = res_fn(dirname=res_path, *args, **kwargs)
+                    if path:
+                        return path
+            else:
+                for r in res:
+                    res_fn = self._get_resource_function(r, resource_type)
+                    if not resource_type:
+                        path = res_fn(dirname=res_path, *args)
+                    else:
+                        path = res_fn(dirname=res_path, *args, **kwargs)
                     if path:
                         return path
 
