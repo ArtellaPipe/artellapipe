@@ -109,6 +109,49 @@ class PlayblastsManager(object):
 
         return camera
 
+    def get_project_rule_token(self, rule_name):
+        """
+        Returns token based on the given rule
+        :param rule_name: str
+        :return: str
+        """
+
+        if not tp.is_maya():
+            return None
+
+        from tpMayaLib.core import helpers
+
+        return helpers.get_project_rule(rule_name)
+
+    def get_scene_token(self):
+        """
+        Returns scene token
+        :return: str
+        """
+
+        return tp.Dcc.scene_name() or 'playblast'
+
+    def get_project_path_token(self):
+        """
+        Returns project path token
+        :return: str
+        """
+
+        return self._project.get_path()
+
+    def get_render_layer_token(self):
+        """
+        Returns render layer token
+        :return: str
+        """
+
+        if not tp.is_maya():
+            return None
+
+        from tpMayaLib.core import layer
+
+        return layer.get_current_render_layer()
+
     def parse_current_scene(self):
         """
         Parse current DCC scene looking for settings related with play blasts
@@ -197,6 +240,8 @@ class PlayblastsManager(object):
         kwargs['camera'] = camera
         kwargs['width'] = width
         kwargs['height'] = height
+        kwargs['start_frame'] = start_frame
+        kwargs['end_frame'] = end_frame
         output = self._generate_playblast(**kwargs)
 
         return output
