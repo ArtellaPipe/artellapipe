@@ -176,8 +176,90 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-core-file-module">
-<h1>artellapipe.core.file module<a class="headerlink" href="#artellapipe-core-file-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.core.file">
+<span id="artellapipe-core-file-module"></span><h1>artellapipe.core.file module<a class="headerlink" href="#module-artellapipe.core.file" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains implementations for files</p>
+<dl class="class">
+<dt id="artellapipe.core.file.ArtellaFile">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.file.</code><code class="sig-name descname">ArtellaFile</code><span class="sig-paren">(</span><em class="sig-param">file_name</em>, <em class="sig-param">file_path=None</em>, <em class="sig-param">file_extension=None</em>, <em class="sig-param">project=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.file.ArtellaFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.core.file.ArtellaFile.FILE_EXTENSIONS">
+<code class="sig-name descname">FILE_EXTENSIONS</code><em class="property"> = []</em><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.FILE_EXTENSIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.core.file.ArtellaFile.FILE_RULE">
+<code class="sig-name descname">FILE_RULE</code><em class="property"> = None</em><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.FILE_RULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.core.file.ArtellaFile.FILE_TEMPLATE">
+<code class="sig-name descname">FILE_TEMPLATE</code><em class="property"> = None</em><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.FILE_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.core.file.ArtellaFile.FILE_TYPE">
+<code class="sig-name descname">FILE_TYPE</code><em class="property"> = None</em><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.export_file">
+<code class="sig-name descname">export_file</code><span class="sig-paren">(</span><em class="sig-param">fix_path=True</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.export_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports current file
+:param fix_path: bool
+:param args:
+:param kwargs:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.extensions">
+<em class="property">property </em><code class="sig-name descname">extensions</code><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.extensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.get_file_paths">
+<code class="sig-name descname">get_file_paths</code><span class="sig-paren">(</span><em class="sig-param">return_first=False</em>, <em class="sig-param">fix_path=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.get_file_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns full path of the file
+:return: str or list(str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.get_template_dict">
+<code class="sig-name descname">get_template_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.get_template_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dictionary with the template data for this file
+:return: dict</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.import_file">
+<code class="sig-name descname">import_file</code><span class="sig-paren">(</span><em class="sig-param">fix_path=True</em>, <em class="sig-param">sync=False</em>, <em class="sig-param">reference=False</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.import_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>References current file into DCC
+:param status: str
+:param fix_path: bool
+:param sync: bool
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.open_file">
+<code class="sig-name descname">open_file</code><span class="sig-paren">(</span><em class="sig-param">status</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.open_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>References current file into DCC
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.file.ArtellaFile.path">
+<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#artellapipe.core.file.ArtellaFile.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

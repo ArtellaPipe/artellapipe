@@ -176,8 +176,154 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-utils-worker-module">
-<h1>artellapipe.utils.worker module<a class="headerlink" href="#artellapipe-utils-worker-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.utils.worker">
+<span id="artellapipe-utils-worker-module"></span><h1>artellapipe.utils.worker module<a class="headerlink" href="#module-artellapipe.utils.worker" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains implementation for background workers</p>
+<dl class="class">
+<dt id="artellapipe.utils.worker.QtWorker">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">QtWorker</code><span class="sig-paren">(</span><em class="sig-param">app</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QThread</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Qt based worker</p>
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empties the queue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.queue_work">
+<code class="sig-name descname">queue_work</code><span class="sig-paren">(</span><em class="sig-param">worker_fn</em>, <em class="sig-param">params</em>, <em class="sig-param">asap=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.queue_work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queues up some work
+:param worker_fn: fn
+:param params: dict
+:param asap: bool
+:return: uid, unique identifier to identify the work</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.QtWorker.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.QtWorker.stop">
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the worker, run this before shutdown</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.QtWorker.workCompleted">
+<code class="sig-name descname">workCompleted</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.workCompleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.QtWorker.workFailure">
+<code class="sig-name descname">workFailure</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.QtWorker.workFailure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">ThumbDownloaderWorker</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QRunnable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="class">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals">
+<em class="property">class </em><code class="sig-name descname">ThumbDownloaderWorkerSignals</code><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.triggered">
+<code class="sig-name descname">triggered</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.ThumbDownloaderWorkerSignals.triggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.set_force">
+<code class="sig-name descname">set_force</code><span class="sig-paren">(</span><em class="sig-param">flag</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.set_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets whether thumb should be downloaded even if it exists
+:param flag: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.set_path">
+<code class="sig-name descname">set_path</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.set_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the path where image should be downloaded
+:param path: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.ThumbDownloaderWorker.set_preview_id">
+<code class="sig-name descname">set_preview_id</code><span class="sig-paren">(</span><em class="sig-param">preview_id</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.ThumbDownloaderWorker.set_preview_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the preview ID linked to Kitsu project
+:param preview_id: str</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.utils.worker.Worker">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.worker.</code><code class="sig-name descname">Worker</code><span class="sig-paren">(</span><em class="sig-param">app</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QThread</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empties the queue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.queue_work">
+<code class="sig-name descname">queue_work</code><span class="sig-paren">(</span><em class="sig-param">worker_fn</em>, <em class="sig-param">params=None</em>, <em class="sig-param">asap=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.queue_work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queues up some work returning a unique id to identify this worker
+:param worker_fn:
+:param params:
+:param asap:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.Worker.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.Worker.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.utils.worker.Worker.stop">
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><em class="sig-param">wait_for_completion=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.worker.Worker.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the worker, run this before shutdown</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.Worker.workCompleted">
+<code class="sig-name descname">workCompleted</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.Worker.workCompleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.utils.worker.Worker.workFailure">
+<code class="sig-name descname">workFailure</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.utils.worker.Worker.workFailure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

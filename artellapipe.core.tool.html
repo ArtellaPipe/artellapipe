@@ -176,8 +176,122 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-core-tool-module">
-<h1>artellapipe.core.tool module<a class="headerlink" href="#artellapipe-core-tool-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.core.tool">
+<span id="artellapipe-core-tool-module"></span><h1>artellapipe.core.tool module<a class="headerlink" href="#module-artellapipe.core.tool" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains core classes for tools</p>
+<dl class="class">
+<dt id="artellapipe.core.tool.Tool">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.tool.</code><code class="sig-name descname">Tool</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">config</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.base.BaseWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.core.tool.Tool.ATTACHER_TYPE">
+<code class="sig-name descname">ATTACHER_TYPE</code><em class="property"> = 0</em><a class="headerlink" href="#artellapipe.core.tool.Tool.ATTACHER_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.close_tool">
+<code class="sig-name descname">close_tool</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.close_tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close tool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.close_tool_attacher">
+<code class="sig-name descname">close_tool_attacher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.close_tool_attacher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.config">
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.core.tool.Tool.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.post_attacher_set">
+<code class="sig-name descname">post_attacher_set</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.post_attacher_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that is called once an attacher has been set
+Override in child classes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.project">
+<em class="property">property </em><code class="sig-name descname">project</code><a class="headerlink" href="#artellapipe.core.tool.Tool.project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.register_callback">
+<code class="sig-name descname">register_callback</code><span class="sig-paren">(</span><em class="sig-param">callback_type</em>, <em class="sig-param">fn</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.register_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers the given callback with the given function
+:param callback_type: tpDccLib.DccCallbacks
+:param fn: Python function to be called when callback is emitted</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.save_settings">
+<code class="sig-name descname">save_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.save_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save settings of the attacher</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.set_attacher">
+<code class="sig-name descname">set_attacher</code><span class="sig-paren">(</span><em class="sig-param">attacher</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.set_attacher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.settings">
+<code class="sig-name descname">settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns settings of the attacher
+:return: QtSettings</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.show_error_message">
+<code class="sig-name descname">show_error_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.show_error_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows an error message in the attacher
+:param msg: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.show_ok_message">
+<code class="sig-name descname">show_ok_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.show_ok_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows an ok message in the attacher
+:param msg: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.show_warning_message">
+<code class="sig-name descname">show_warning_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.show_warning_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows a warning message in the attacher
+:param msg: str</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.core.tool.Tool.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.core.tool.Tool.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.tool.Tool.unregister_callbacks">
+<code class="sig-name descname">unregister_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.tool.Tool.unregister_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unregisters all callbacks registered by this tool</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.core.tool.ToolAttacher">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.tool.</code><code class="sig-name descname">ToolAttacher</code><a class="headerlink" href="#artellapipe.core.tool.ToolAttacher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="artellapipe.core.tool.ToolAttacher.Dialog">
+<code class="sig-name descname">Dialog</code><em class="property"> = 1</em><a class="headerlink" href="#artellapipe.core.tool.ToolAttacher.Dialog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.core.tool.ToolAttacher.Window">
+<code class="sig-name descname">Window</code><em class="property"> = 0</em><a class="headerlink" href="#artellapipe.core.tool.ToolAttacher.Window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
