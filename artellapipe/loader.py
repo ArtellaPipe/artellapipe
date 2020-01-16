@@ -15,9 +15,10 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import inspect
 import logging.config
+from collections import OrderedDict
 
 import tpDccLib as tp
-from tpPyUtils import dcc, python
+from tpPyUtils import python
 
 toolbox = None
 
@@ -186,17 +187,19 @@ def register_tools(project_inst):
         import importlib as loader
 
     tools = project_inst.config_data.get('tools', list())
-    tools_to_register = dict()
+    tools_to_register = OrderedDict()
     tools_path = '{}.tools.{}'
     for tool_name in tools:
         for pkg in ['artellapipe', project_inst.get_clean_name()]:
             pkg_path = tools_path.format(pkg, tool_name)
             pkg_loader = loader.find_loader(pkg_path)
+            if tool_name not in tools_to_register:
+                tools_to_register[tool_name] = list()
             if pkg_loader is not None:
-                tools_to_register[tool_name] = pkg_loader
+                tools_to_register[tool_name].append(pkg_loader)
 
-    for pkg_loader in tools_to_register.values():
-        artellapipe.ToolsMgr().register_tool(project=project_inst, pkg_loader=pkg_loader)
+    for pkg_loaders in tools_to_register.values():
+        artellapipe.ToolsMgr().register_tool(project=project_inst, pkg_loaders=pkg_loaders)
 
 
 # def run_toolbox(project):

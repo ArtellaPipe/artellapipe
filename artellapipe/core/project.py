@@ -14,7 +14,6 @@ __email__ = "tpovedatd@gmail.com"
 
 
 import os
-import re
 import sys
 import time
 import locale
@@ -24,14 +23,13 @@ import datetime
 import importlib
 import traceback
 import webbrowser
-from collections import OrderedDict
 
 import six
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpPyUtils import python, decorators, osplatform, fileio, path as path_utils, folder as folder_utils
+from tpPyUtils import python, osplatform, fileio, path as path_utils, folder as folder_utils
 import tpDccLib as tp
 
 if python.is_python2():
@@ -43,7 +41,7 @@ else:
 
 import artellapipe
 from artellapipe.libs import artella as artella_lib
-from artellapipe.libs.artella.core import artellalib, artellaclasses
+from artellapipe.libs.artella.core import artellalib
 from artellapipe.core import defines, config, node, sequence, shot
 from artellapipe.utils import resource
 
@@ -55,16 +53,11 @@ class ArtellaProject(object):
     SHELF_CLASS = tp.Shelf
     SEQUENCE_CLASS = sequence.ArtellaSequence
     SHOT_CLASS = shot.ArtellaShot
-    ASSET_NODE_CLASS = node.ArtellaAssetNode
 
     def __init__(self, name, settings=None):
         super(ArtellaProject, self).__init__()
 
         self._tray = None
-
-        self._production_info = None
-        self._sequences = list()
-        self._shots = list()
 
         # To make sure that all variables are properly initialized we must call init_config first
         clean_name = self._get_clean_name(name)
@@ -130,7 +123,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        artella_production_folder = artellalib.config.get('server', {}).get('production_folder')
+        artella_production_folder = self.get_production_folder()
         if not artella_production_folder:
             LOGGER.warning('Impossible to retrieve Artella project ID!')
             return None
@@ -202,10 +195,10 @@ class ArtellaProject(object):
         self.create_assets_manager()
         self.create_tags_manager()
         self.create_shaders_manager()
+        self.create_sequences_manager()
         self.create_shots_manager()
         self.create_playblasts_manager()
         self.create_pyblish_manager()
-        self.create_shots_manager()
         self.create_dependencies_manager()
         self.create_production_tracker()
         self.update_project()
@@ -561,6 +554,17 @@ class ArtellaProject(object):
 
         return shaders_manager
 
+    def create_sequences_manager(self):
+        """
+        Creates instance of the sequences manager used by the project
+        :return: ArtellaSequencesManager
+        """
+
+        sequences_manager = artellapipe.SequencesMgr()
+        sequences_manager.set_project(self)
+
+        return sequences_manager
+
     def create_shots_manager(self):
         """
         Creates instance of the shots manager used by the project
@@ -746,6 +750,22 @@ class ArtellaProject(object):
 
         return os.environ.get(self.env_var)
 
+    def get_production_folder_name(self):
+        """
+        Returns production folder name of current project
+        :return: str
+        """
+
+        return artella_lib.config.get('server', 'production_folder_name')
+
+    def get_production_folder(self):
+        """
+        Returns production folder of current project
+        :return: str
+        """
+
+        return artella_lib.config.get('server', 'production_folder')
+
     def get_production_path(self):
         """
         Returns path where Production data for current project is stored
@@ -757,7 +777,7 @@ class ArtellaProject(object):
             LOGGER.warning('Impossible to retrieve productoin path because Artella project is not setup!')
             return
 
-        production_folder_name = artella_lib.config.get('server', 'production_folder_name')
+        production_folder_name = self.get_production_folder_name()
         return path_utils.clean_path(os.path.join(project_path, production_folder_name))
 
     def get_artella_url(self):
@@ -884,9 +904,9 @@ class ArtellaProject(object):
                 if tp.Dcc.attribute_exists(cnt_root, defines.ARTELLA_TAG_INFO_ATTRIBUTE_NAME):
                     if as_asset_nodes:
                         if only_roots:
-                            all_abc_roots.append(self.ASSET_NODE_CLASS(project=self, node=cnt_root))
+                            all_abc_roots.append(artellapipe.AssetNode(project=self, node=cnt_root))
                         else:
-                            all_abc_roots.append((self.ASSET_NODE_CLASS(project=self, node=cnt_root), abc))
+                            all_abc_roots.append((artellapipe.AssetNode(project=self, node=cnt_root), abc))
                     else:
                         if only_roots:
                             all_abc_roots.append(cnt_root)
@@ -905,66 +925,6 @@ class ArtellaProject(object):
         all_cameras = self.get_scene_assets(as_nodes=False, allowed_types=['camera'])
 
         return all_cameras
-
-    # ==========================================================================================================
-    # SEQUENCES
-    # ==========================================================================================================
-
-    @decorators.timestamp
-    def get_sequences(self, force_update=False):
-        """
-        Returns a list of current sequences in Artella
-        :param force_update: bool
-        :return: list(ArtellaSequence)
-        """
-
-        if self._sequences and not force_update:
-            return self._sequences
-
-        if self._production_info and not force_update:
-            production_info = self._production_info
-        else:
-            production_info = self._update_production_info()
-        if not production_info:
-            return
-
-        sequences_dict = dict()
-        sequences_names = dict()
-        for ref_name, ref_data in production_info.references.items():
-            if not ref_data.is_directory:
-                continue
-            rel_path = self.relative_path(ref_data.path)
-            parse_data = self.parse_template('sequence', rel_path)
-            if not parse_data:
-                continue
-            seq_id = parse_data['sequence_index']
-            seq_name = parse_data['sequence_name']
-            if seq_id in sequences_dict:
-                LOGGER.warning('Sequence with name: {} is duplicated. Skipping ...'.format(seq_name))
-                continue
-            sequences_dict[seq_id] = ref_data
-            sequences_names[seq_id] = seq_name
-
-        valid_index_sequences = dict()
-        not_index_sequences = dict()
-        for seq_id in sequences_dict.keys():
-            try:
-                int_id = int(seq_id)
-                valid_index_sequences[seq_id] = sequences_dict[seq_id]
-            except Exception:
-                not_index_sequences[seq_id] = sequences_dict[seq_id]
-
-        sequences_ordered = OrderedDict(sorted(valid_index_sequences.items(), key=lambda x: int(x[0])))
-        for seq_id in not_index_sequences.keys():
-            sequences_ordered[seq_id] = not_index_sequences[seq_id]
-
-        for seq_id, seq_data in sequences_ordered.items():
-            seq_name = sequences_names[seq_id]
-            new_sequence = self.SEQUENCE_CLASS(
-                project=self, sequence_name=seq_name, sequence_id=seq_id, sequence_data=seq_data)
-            self._sequences.append(new_sequence)
-
-        return self._sequences
 
     # ==========================================================================================================
     # PRIVATE
@@ -1031,29 +991,6 @@ class ArtellaProject(object):
         LOGGER.debug('Resolved string: {}'.format(resolved_string))
 
         return path_utils.clean_path(resolved_string)
-
-    def _update_production_info(self):
-        """
-        Internal callback function that updates current production info of the project
-        :return: ArtellaDirectoryMetaData
-        """
-
-        production_path = self.get_production_path()
-        if not production_path:
-            LOGGER.warning(
-                'Impossible to retrieve sequences because Production path for {} is not valid: {}!'.format(
-                    self.name.title(), production_path))
-            return
-
-        production_info = artellalib.get_status(production_path)
-        if not production_info:
-            LOGGER.warning('Impossible to retrieve sequences data from Artella server!')
-            return
-        if not isinstance(production_info, artellaclasses.ArtellaDirectoryMetaData):
-            LOGGER.warning('Error while retrieving Sequences info from Artella!')
-            return
-
-        return production_info
 
     def _update_dcc_ui(self):
         """
