@@ -17,15 +17,13 @@ import string
 import inspect
 import logging
 
+from Qt.QtGui import *
+
 import tpDccLib as tp
-from tpPyUtils import decorators
 
 import artellapipe.register
 from artellapipe.core import defines
-
-if tp.is_maya():
-    import tpMayaLib as maya
-    from tpMayaLib.core import attribute
+from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -171,7 +169,7 @@ class ArtellaDCCNode(object):
         is_referenced = tp.Dcc.node_is_referenced(self._node)
         if not is_referenced:
             self._nodes_list = tp.Dcc.list_children(
-                node=self._node, all_hierarchy=True, full_path=True, children_type='transform')
+                node=self._node, all_hierarchy=True, full_path=True, children_type='transform') or list()
             self._namespace = tp.Dcc.node_namespace(self.node)
             if self._namespace:
                 self._valid = True
@@ -350,7 +348,7 @@ class ArtellaDCCNode(object):
         try:
             from artellapipe.tools.shotmanager.apps import shotassembler
         except ImportError:
-            LOGGER.warning('Impossible to get overrides because Shot Assembler Tools is not available!')
+            # LOGGER.warning('Impossible to get overrides because Shot Assembler Tools is not available!')
             return
 
         if not self.has_overrides():
@@ -529,8 +527,16 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
         :return:
         """
 
-        asset_shader_file_path = self._asset.get_file('assetshader', status=status)
-        asset_shader_file_class = artellapipe.FilesMgr().get_file_class('assetshader')
+        asset_shader_file_path = self._asset.get_shaders_path(status=status)
+        if not asset_shader_file_path:
+            LOGGER.warning('No Shader File Path found for asset: {}'.format(self._asset.get_name()))
+            return None
+
+        asset_shader_file_class = artellapipe.ShadersMgr().get_shader_file_class()
+        if not asset_shader_file_class:
+            LOGGER.warning('No Shader File Class found! Aborting shader loading ...')
+            return None
+
         shader_file = asset_shader_file_class(self._asset, file_path=asset_shader_file_path)
 
         return shader_file
@@ -575,6 +581,28 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
             return
 
         return artellapipe.ShadersMgr().unload_asset_shaders(self)
+
+    def get_icon(self, force_update=False):
+        """
+        Returns icon associated to this node
+        :param force_update: bool
+        :return: QIcon or None
+        """
+
+        if not self._asset:
+            return
+
+        asset_name = self._asset.get_name()
+        thumbnail_path = artellapipe.AssetsMgr().get_asset_thumbnail_path(asset_name)
+        if thumbnail_path and os.path.isfile(thumbnail_path) and not force_update:
+            return QIcon(QPixmap(thumbnail_path))
+        else:
+            asset_thumb_id = self.get_thumbnail_path()
+            artellapipe.Tracker().download_preview_file_thumbnail(asset_thumb_id, thumbnail_path)
+            if not os.path.isfile(thumbnail_path):
+                return resource.ResourceManager().icon(artellapipe.AssetsMgr().get_default_asset_thumb())
+            else:
+                return QIcon(QPixmap(thumbnail_path))
 
 
 artellapipe.register.register_class('AssetNode', ArtellaAssetNode)
