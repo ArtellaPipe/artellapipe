@@ -74,7 +74,7 @@ class ArtellaTagNode(object):
             return None
 
         if self._tag_info_dict:
-            return self._project.ASSET_NODE_CLASS(project=self._project, node=self._node)
+            return artellapipe.AssetsMgr().get_asset_node_in_scene(node_id=self._node)
         else:
             if not tp.Dcc.attribute_exists(
                     node=self._node, attribute_name=artellapipe.TagsMgr().TagDefinitions.NODE_ATTRIBUTE_NAME):
@@ -83,7 +83,7 @@ class ArtellaTagNode(object):
                 node=self._node, attribute_name=artellapipe.TagsMgr().TagDefinitions.NODE_ATTRIBUTE_NAME)
             if connections:
                 node = connections[0]
-                return self._project.ASSET_NODE_CLASS(project=self._project, node=node)
+                return artellapipe.AssetsMgr().get_asset_node_in_scene(node_id=node)
 
         return None
 
