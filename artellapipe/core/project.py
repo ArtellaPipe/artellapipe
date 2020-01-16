@@ -364,7 +364,9 @@ class ArtellaProject(object):
         :return: str
         """
 
-        data_path = os.path.join(os.getenv('APPDATA'), self.get_clean_name())
+        import appdirs
+
+        data_path = appdirs.user_data_dir(self.get_clean_name())
         if not os.path.isdir(data_path):
             os.makedirs(data_path)
 
