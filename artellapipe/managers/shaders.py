@@ -86,6 +86,53 @@ class ShadersManager(object):
 
         return True
 
+    def get_shaders_file_type(self):
+        """
+        Returns file type used to define shaders
+        """
+
+        return self.config.get('file_type', default='shader')
+
+    def get_shader_path_file_type(self):
+        """
+        Returns file type used to define shaders path
+        :return: str
+        """
+
+        return self.config.get('shader_path_file_type', default='shaders')
+
+    def get_shaders_extensions(self):
+        """
+        Returns extension used for shaders in current project
+        :return: str
+        """
+
+        shaders_file_type = self.get_shaders_file_type()
+        extensions = artellapipe.FilesMgr().get_file_type_extensions(shaders_file_type)
+        if not extensions:
+            LOGGER.warning('Impossible to refresh shaders because shader file type is not defined in current project!')
+            return None
+
+        return extensions
+
+    def get_shader_file_class(self):
+        """
+        Returns shader file class associated to this asset
+        :return: class
+        """
+
+        shaders_file_type = self.get_shaders_file_type()
+        if not shaders_file_type:
+            LOGGER.warning('No Asset Shaders file type available!')
+            return None
+
+        asset_shader_file_class = artellapipe.FilesMgr().get_file_class(shaders_file_type)
+        if not asset_shader_file_class:
+            LOGGER.warning('No Shader File Class found! Aborting shader loading ...')
+            return None
+
+        return asset_shader_file_class
+
     def get_shaders_paths(self):
         """
         Returns path where shaders are located in the project
@@ -96,11 +143,12 @@ class ShadersManager(object):
         return [path_utils.clean_path(
             os.path.join(artellapipe.AssetsMgr().get_assets_path(), p)) for p in shaders_paths]
 
-    def get_shader_file(self, shader_name, shader_path=None):
+    def get_shader_file(self, shader_name, shader_path=None, asset=None):
         """
         Returns shader file with given name (if exists)
         :param shader_name: str
         :param shader_path: str
+        :param asset: str
         :return:
         """
 
@@ -123,15 +171,30 @@ class ShadersManager(object):
                 'Impossible to get shader path: {} | {} | {}'.format(shader_name, shaders_paths, shaders_file_type))
             return
 
-        for shader_path in shaders_paths:
+        if asset:
+            extra_dict = {
+                'shader_name':  shader_name
+            }
+            asset_shader_file_path = asset.get_file(
+                shaders_file_type, status=defines.ArtellaFileStatus.WORKING, extra_dict=extra_dict
+            )
+            if not asset_shader_file_path:
+                LOGGER.warning('No Shaders Path available for asset: "{}"'.format(asset.get_name()))
+                return None
+
             shader_file = shader_file_class(self._project, shader_name, file_path=shader_path)
-            shader_file_paths = shader_file.get_file_paths()
-            if shader_path:
-                return shader_file
-            else:
-                for shader_file_path in shader_file_paths:
-                    if os.path.isfile(shader_file_path):
-                        return shader_file
+            return shader_file
+
+        else:
+            for shader_path in shaders_paths:
+                shader_file = shader_file_class(self._project, shader_name, file_path=shader_path)
+                shader_file_paths = shader_file.get_file_paths()
+                if shader_path:
+                    return shader_file
+                else:
+                    for shader_file_path in shader_file_paths:
+                        if os.path.isfile(shader_file_path):
+                            return shader_file
 
         return None
 
@@ -154,12 +217,16 @@ class ShadersManager(object):
 
         return None
 
-    def update_shaders(self):
+    def update_shaders(self, shaders_paths=None):
         """
         Updates shaders from Artella
         """
 
-        shaders_paths = self.get_shaders_paths()
+        if shaders_paths:
+            shaders_paths = python.force_list(shaders_paths)
+        else:
+            shaders_paths = self.get_shaders_paths()
+
         if not shaders_paths:
             return
 
@@ -373,7 +440,162 @@ class ShadersManager(object):
 
         return True
 
-    def export_shader(self, shader_name, export_path=None, publish=False, comment=None, shader_swatch=None):
+    def get_asset_shaders(self, asset, return_only_shaders=True, skip_standard_shaders=True):
+        """
+        Returns list of shaders applied to the given asset
+        :param asset: list of dict
+        """
+
+        if not asset:
+            return
+
+        asset_shaders = dict()
+        only_shaders = list()
+
+        renderable_shapes = artellapipe.AssetsMgr().get_asset_renderable_shapes(asset)
+        if not renderable_shapes:
+            LOGGER.warning('No renderable shapes found in asset: "{}"'.format(asset.get_name()))
+            return asset_shaders
+
+        default_scene_shaders = tp.Dcc.default_shaders() or list()
+
+        for shape in renderable_shapes:
+            if shape not in asset_shaders:
+                asset_shaders[shape] = dict()
+            shading_groups = tp.Dcc.list_connections_of_type(shape, connection_type='shadingEngine')
+            if not shading_groups:
+                shading_groups = ['initialShadingGroup']
+            for shading_grp in shading_groups:
+                shading_grp_mat = tp.Dcc.list_materials(nodes=tp.Dcc.list_node_connections(shading_grp))
+                if skip_standard_shaders:
+                    for mat in shading_grp_mat:
+                        if mat in default_scene_shaders:
+                            continue
+
+                for mat in shading_grp_mat:
+                    if mat not in only_shaders:
+                        only_shaders.append(mat)
+                asset_shaders[shape][shading_grp] = shading_grp_mat
+
+        if not asset_shaders:
+            LOGGER.warning('No shaders found in current Asset: {}'.format(asset.get_name()))
+            return None
+
+        if return_only_shaders:
+            return only_shaders
+
+        return asset_shaders
+
+    def get_asset_shaders_to_export(self, asset, return_only_shaders=True, skip_standard_shaders=True):
+        """
+        Returns a list shaders that should be exported
+        :param asset:
+        :param return_only_shaders:
+        :param skip_standard_shaders:
+        :return:
+        """
+
+        shading_file_type = artellapipe.AssetsMgr().get_shading_file_type()
+        file_path = asset.get_file(file_type=shading_file_type, status=defines.ArtellaFileStatus.WORKING, fix_path=True)
+        valid_open = asset.open_file(file_type=shading_file_type, status=defines.ArtellaFileStatus.WORKING)
+        if not valid_open:
+            LOGGER.warning('Impossible to open Asset Shading File: {}'.format(file_path))
+            return None
+
+        asset_shaders = self.get_asset_shaders(
+            asset=asset, return_only_shaders=return_only_shaders, skip_standard_shaders=skip_standard_shaders)
+
+        if not asset_shaders:
+            LOGGER.warning('No shaders found in current Asset Shading File: {}'.format(file_path))
+            return None
+
+        return asset_shaders
+
+    def export_asset_shaders_mapping(self, asset, publish=False, comment=None, new_version=False):
+        """
+        Exports shaders mapping of the given asset
+        :param asset: ArtellaAsset
+        :param publish: bool
+        :param comment: str
+        :param new_version: bool
+        :return: bool
+        """
+
+        if not asset:
+            return False
+
+        shaders_mapping_file_type = artellapipe.AssetsMgr().get_shaders_mapping_file_type()
+        file_path = asset.get_file(
+            file_type=shaders_mapping_file_type, status=defines.ArtellaFileStatus.WORKING, fix_path=True)
+        if not file_path:
+            return False
+
+        shaders_mapping_file_class = artellapipe.FilesMgr().get_file_class(shaders_mapping_file_type)
+        if not shaders_mapping_file_class:
+            return False
+
+        shaders_mapping_file = shaders_mapping_file_class(asset, file_path=file_path)
+        shaders_mapping_file.export_file()
+
+        if new_version:
+            if os.path.isfile(file_path):
+                artellapipe.FilesMgr().lock_file(file_path)
+                valid_upload = artellapipe.FilesMgr().upload_working_version(
+                    file_path=file_path, skip_saving=True, comment=comment
+                )
+                if valid_upload:
+                    artellapipe.FilesMgr().unlock_file(file_path, warn_user=False)
+
+        if publish:
+            raise NotImplementedError('Export Shader Mapping Publish functionality is not implemented yet!')
+
+    def export_asset_shaders(
+            self, asset, publish=False, comment=None, new_version=False, shader_swatch=None, shaders_to_export=None):
+        """
+        Exports all shaders of the given asset
+        :param asset: ArtellaAsset
+        :param publish: bool
+        :param comment: str, publish comment
+        :param new_version: bool
+        :param shaders_to_export: list(str)
+        :return: bool
+        """
+
+        if not asset:
+            return False
+
+        if shaders_to_export is None:
+            shaders_to_export = list()
+        else:
+            shaders_to_export = python.force_list(shaders_to_export)
+
+        asset_shaders = self.get_asset_shaders_to_export(asset=asset)
+        if not asset_shaders:
+            return False
+
+        if shaders_to_export:
+            valid_shaders = list()
+            for shader_to_export in shaders_to_export:
+                if shader_to_export not in asset_shaders:
+                    continue
+                valid_shaders.append(shader_to_export)
+        else:
+            valid_shaders = asset_shaders
+        if not valid_shaders:
+            LOGGER.warning('No valid assets to export for asset: {}!'.format(asset.get_name()))
+            return
+
+        shaders_path = asset.get_shaders_path()
+        if not os.path.isdir(shaders_path):
+            os.makedirs(shaders_path)
+
+        return self.export_shaders(
+            shaders_names=valid_shaders, export_path=shaders_path, publish=publish,
+            comment=comment, new_version=new_version, asset=asset, shader_swatch=shader_swatch)
+
+    def export_shader(
+            self, shader_name, export_path=None, publish=False, comment=None, new_version=False,
+            shader_swatch=None, asset=None):
         """
         Exports shaders
         :param shader_name: str, name of the shader to export
@@ -388,17 +610,20 @@ class ShadersManager(object):
             shader_library_paths = self.get_shaders_paths()
             if shader_library_paths:
                 export_path = shader_library_paths[0]
-        if not export_path or not os.path.exists(export_path):
-            LOGGER.warning(
-                'Shader Export Path "{}" does not exists. Aborting shader "{}"  export!'.format(
-                    export_path, shader_name))
-            return None
+            if not export_path or not os.path.exists(export_path):
+                LOGGER.warning(
+                    'Shader Export Path "{}" does not exists. Aborting shader "{}"  export!'.format(
+                        export_path, shader_name))
+                return None
+        else:
+            if not os.path.exists(export_path):
+                os.makedirs(export_path)
 
         if not tp.Dcc.object_exists(shader_name):
             LOGGER.warning('Shader {0} does not exists in the scene! Aborting shader export!'.format(shader_name))
             return None
 
-        shader_file = self.get_shader_file(shader_name, shader_path=export_path)
+        shader_file = self.get_shader_file(shader_name, shader_path=export_path, asset=asset)
         if not shader_file:
             LOGGER.warning('Impossible to export shader "{}"!'.format(shader_name))
             return None
@@ -408,17 +633,32 @@ class ShadersManager(object):
             LOGGER.warning('Impossible to export shader "{}"'.format(shader_name))
             return None
 
+        if new_version:
+            for file_path in exported_shader:
+                if os.path.isfile(file_path):
+                    artellapipe.FilesMgr().lock_file(file_path)
+                    valid_upload = artellapipe.FilesMgr().upload_working_version(
+                        file_path=file_path, skip_saving=True, comment=comment
+                    )
+                    if valid_upload:
+                        artellapipe.FilesMgr().unlock_file(file_path, warn_user=False)
+
         if publish:
             raise NotImplementedError('Export Shader Publish functionality is not implemented yet!')
 
         return exported_shader
 
-    def export_shaders(self, shaders_names, publish=False, comment=None):
+    def export_shaders(
+            self, shaders_names, export_path=None, publish=False, comment=None, new_version=False,
+            asset=None, shader_swatch=None):
         """
         Exports all given shader names from current scene
         :param shaders_names: list(str)
+        :param export_path: STR
         :param publish: bool
         :param comment: str
+        :param new_version: bool
+        :param asset: ArtellaAsset
         :return: list
         """
 
@@ -428,7 +668,9 @@ class ShadersManager(object):
             return exported_shaders
 
         for shader_name in shaders_names:
-            exported_shader = self.export_shader(shader_name=shader_name, publish=publish, comment=comment)
+            exported_shader = self.export_shader(
+                shader_name=shader_name, export_path=export_path, publish=publish, comment=comment,
+                new_version=new_version, asset=asset, shader_swatch=shader_swatch)
             exported_shaders.append(exported_shader)
 
         return exported_shaders

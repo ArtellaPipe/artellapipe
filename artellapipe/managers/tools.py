@@ -61,7 +61,7 @@ class ToolsManager(object):
     def tools(self):
         return self._tools
 
-    def register_tool(self, project, pkg_loader):
+    def register_tool(self, project, pkg_loaders):
         """
         Register tool given path
         :param str tool_path: path to the module (for example, artellapipe.tools.welcome)
@@ -70,6 +70,14 @@ class ToolsManager(object):
         from artellapipe.core import config
 
         project_name = project.get_clean_name()
+
+        if len(pkg_loaders) > 1:
+            pkg_loader = pkg_loaders[-1]        # Package loader for Project specific tool implementation
+            core_loader = pkg_loaders[0]
+        else:
+            pkg_loader = pkg_loaders[0]
+            core_loader = None
+
         tool_path = pkg_loader.fullname
         if pkg_loader in self._tools:
             LOGGER.warning('Tool with path "{}" is already registered. Skipping ...'.format(tool_path))
@@ -87,6 +95,23 @@ class ToolsManager(object):
                 'project': project_name
             }
         )
+
+        core_config = None
+        if core_loader:
+            core_tool_path = core_loader.fullname
+            core_config = config.ArtellaConfiguration(
+                project_name=project_name,
+                config_name=core_tool_path.replace('.', '-'),
+                environment=project.get_environment(),
+                config_dict={
+                    'join': os.path.join,
+                    'user': os.path.expanduser('~'),
+                    'filename': core_loader.filename,
+                    'fullname': core_loader.fullname,
+                    'project': project_name
+                }
+            )
+
         tool_id = tool_config.data.get('id', None)
         tool_name = tool_config.data.get('name', None)
         tool_icon = tool_config.data.get('icon', None)
@@ -154,7 +179,9 @@ class ToolsManager(object):
             'tool_loader': tool_loader,
             'tool_package': pkg_loader.fullname,
             'tool_package_path': pkg_loader.filename,
-            'version': tool_found[1] if tool_found[1] is not None else "0.0.0"
+            'version': tool_found[1] if tool_found[1] is not None else "0.0.0",
+            'core_config': core_config,
+            'core_loader': core_loader
         }
 
         LOGGER.info('Tool "{}" registered successfully!'.format(tool_path))
@@ -290,6 +317,8 @@ class ToolsManager(object):
         tool_config = self._tools[tool_to_run]['config']
         tool_fullname = self._tools[tool_to_run]['loader'].fullname
         tool_version = self._tools[tool_to_run]['version']
+        core_config = self._tools[tool_to_run]['core_config']
+        core_loader = self._tools[tool_to_run]['core_loader']
 
         sentry_id = tool_config.data.get('sentry_id', None)
         if sentry_id and not project.is_dev():
@@ -297,6 +326,14 @@ class ToolsManager(object):
             sentry_sdk.init(sentry_id, release=tool_version)
 
         # Initialize and reload tool modules if necessary
+        if core_loader:
+            core_tool_importer = ToolImporter(core_loader, debug=debug)
+            core_import_order = ['{}.{}'.format(core_loader.fullname, mod) for mod in
+                            core_config.data.get('import_order', list())]
+            core_tool_importer.import_packages(order=core_import_order, only_packages=False)
+            if do_reload:
+                core_tool_importer.reload_all()
+
         tool_importer = ToolImporter(pkg_loader, debug=debug)
         import_order = ['{}.{}'.format(pkg_loader.fullname, mod) for mod in
                         tool_config.data.get('import_order', list())]

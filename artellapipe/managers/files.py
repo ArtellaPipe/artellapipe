@@ -12,7 +12,6 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 import inspect
-import traceback
 import importlib
 
 import tpDccLib as tp
@@ -40,7 +39,7 @@ class ArtellaFilesManager(object):
         self._project = None
         self._config = None
 
-        self._registered_file_clases = dict()
+        self._registered_file_classes = dict()
 
     @property
     def config(self):
@@ -52,7 +51,7 @@ class ArtellaFilesManager(object):
 
     @property
     def file_classes(self):
-        return self._registered_file_clases.values()
+        return self._registered_file_classes.values()
 
     def set_project(self, project):
         """
@@ -72,7 +71,7 @@ class ArtellaFilesManager(object):
         :param file_class: class
         """
 
-        self._registered_file_clases[file_type] = file_class
+        self._registered_file_classes[file_type] = file_class
         return True
 
     def get_file_class(self, file_type_name):
@@ -86,7 +85,7 @@ class ArtellaFilesManager(object):
             LOGGER.warning('File Type with name "{}" not registered!'.format(file_type_name))
             return
 
-        return self._registered_file_clases[file_type_name]
+        return self._registered_file_classes[file_type_name]
 
     def check_file_type(self, file_type_name):
         """
@@ -95,10 +94,19 @@ class ArtellaFilesManager(object):
         :return: bool
         """
 
-        if file_type_name not in self._registered_file_clases:
+        if file_type_name not in self._registered_file_classes:
             return False
 
         return True
+
+    def is_valid_file_type(self, file_type):
+        """
+        Returns whether the current file type is valid or not for current project
+        :param file_type: str
+        :return: bool
+        """
+
+        return file_type in self.files
 
     def get_file_type_info(self, file_type):
         """
@@ -149,7 +157,7 @@ class ArtellaFilesManager(object):
             return None
 
         valid_file_types = list()
-        for file_type_name, file_type_class in self._registered_file_clases.items():
+        for file_type_name, file_type_class in self._registered_file_classes.items():
             if file_type_extension in file_type_class.FILE_EXTENSIONS:
                 valid_file_types.append(file_type_class)
 
@@ -223,6 +231,8 @@ class ArtellaFilesManager(object):
         :return: str
         """
 
+        self._check_project()
+
         path_to_resolve = path_to_resolve.replace('\\', '/')
         project_var = os.environ.get(self._project.env_var)
         if not project_var:
@@ -232,6 +242,37 @@ class ArtellaFilesManager(object):
             path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(self._project.env_var))
 
         return path_to_resolve
+
+    def prefix_path_with_project_path(self, path_to_prefix, env_var=False):
+        """
+        Adds project path to given path as prefix
+        :param path_to_prefix: str
+        :return: str
+        """
+
+        self._check_project()
+
+        if env_var:
+            project_env_var = self._project.env_var
+            path_to_prefix = path_to_prefix.replace('\\', '/')
+            project_var = os.environ.get(project_env_var)
+            return path_utils.clean_path(os.path.join(project_var, path_to_prefix))
+        else:
+            return path_utils.clean_path(os.path.join(self._project.get_path(), path_to_prefix))
+
+    def prefix_path_with_artella_env_path(self, path_to_prefix):
+        """
+        Adds Artella environment variable path to given path as prefix
+        :param path_to_prefix: str
+        :return: str
+        """
+
+        root_prefix = artella_lib.config.get('app', 'root_prefix')
+        artella_var = os.environ.get(root_prefix, None)
+        if not artella_var:
+            return path_to_prefix
+
+        return path_utils.clean_path(os.path.join(artella_var, path_to_prefix))
 
     def sync_files(self, files):
         """
@@ -429,7 +470,7 @@ class ArtellaFilesManager(object):
         if comment:
             artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving)
             if notify:
-                self.tray.show_message(
+                self._project.tray.show_message(
                     title='New Working Version', msg='Version {} uploaded to Artella server successfully!'.format(
                         current_version))
             return True
@@ -478,7 +519,7 @@ class ArtellaFilesManager(object):
             LOGGER.warning('Impossible to register file classes because Artella project is not defined!')
             return False
 
-        for file_type, file_info in self._config.get('files', default={}).items():
+        for file_type, file_info in self._config.get('files', default=dict()).items():
             full_file_class = file_info.get('class', None)
             if not full_file_class:
                 LOGGER.warning('No class defined for File Type "{}". Skipping ...'.format(file_type))

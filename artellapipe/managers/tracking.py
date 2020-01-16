@@ -12,7 +12,6 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-import os
 import logging
 
 from Qt.QtCore import *
@@ -20,7 +19,6 @@ from Qt.QtCore import *
 from tpPyUtils import decorators
 
 import artellapipe.register
-from artellapipe.libs import artella
 
 LOGGER = logging.getLogger()
 
@@ -28,6 +26,7 @@ LOGGER = logging.getLogger()
 class TrackingManager(QObject, object):
 
     logged = Signal()
+    unlogged = Signal()
 
     def __init__(self):
         super(TrackingManager, self).__init__()
@@ -49,6 +48,13 @@ class TrackingManager(QObject, object):
 
         self._project = project
         # self.update_tracking_info()
+
+    def needs_login(self):
+        """
+        Returns whether or not production trackign needs log to work or not
+        """
+
+        return False
 
     def is_logged(self):
         """
@@ -112,7 +118,7 @@ class TrackingManager(QObject, object):
         """
         Downloads given preview file thumbnail and save it at given location
         :param preview_id:  str or dict, The preview file dict or ID.
-        :param target_path: str, Location on hard drive where to save the file.
+        :param file_path: str, Location on hard drive where to save the file.
         """
 
         raise NotImplementedError(
@@ -125,38 +131,26 @@ class TrackingManager(QObject, object):
         :return: list
         """
 
-        # TODO: Default implementation, it will be removed in the future
+        raise NotImplementedError(
+            'all_project_assets function for {} is not implemented!'.format(self.__class__.__name__))
 
-        found_assets = list()
+    def all_project_sequences(self):
+        """
+        Returns all the sequences of the current project
+        :return:
+        """
 
-        if not self._project:
-            LOGGER.warning('Impossible to retrieve assets because project is not defined!')
-            return found_assets
+        raise NotImplementedError(
+            'all_project_sequences function for {} is not implemented!'.format(self.__class__.__name__))
 
-        assets_path = artellapipe.AssetsMgr().get_assets_path()
-        if not artellapipe.AssetsMgr().is_valid_assets_path():
-            LOGGER.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
-            return
+    def all_project_shots(self):
+        """
+        Returns all the shots of the current project
+        :return:
+        """
 
-        if not assets_path or not os.path.exists(assets_path):
-            LOGGER.warning('Impossible to retrieve assets from invalid path: {}'.format(assets_path))
-            return found_assets
-
-        filename_attr = self.project.config.get('asset_data', 'filename')
-        if not filename_attr:
-            LOGGER.warning(
-                'Impossible to retrieve {} assets because asset data file name is not defined!'.format(
-                    self.project.name.title()))
-            return
-
-        for root, dirs, files in os.walk(assets_path):
-            if dirs and artella.config.get('server', {}).get('working_folder') in dirs:
-                _asset_name = os.path.basename(root)
-                new_asset = self.get_asset_from_path(asset_path=root)
-                if new_asset:
-                    found_assets.append(new_asset)
-
-        return found_assets
+        raise NotImplementedError(
+            'all_project_shots function for {} is not implemented!'.format(self.__class__.__name__))
 
 
 @decorators.Singleton

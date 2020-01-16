@@ -42,11 +42,22 @@ class ArtellaDependenciesManager(object):
         :param file_path: str, file path we want to get dependencies of
         :param parent_path: str
         :param found_files: list(str)
+        :param fix_paths: bool
         :return: list(str)
         """
 
         raise NotImplementedError(
             'get_dependencies function is not implemented in "{}"'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def fix_dependencies_paths(self, file_path):
+        """
+        Tries to fix paths that are not valid in the given file
+        :param file_path: str, file path we want to fix paths of
+        """
+
+        raise NotImplementedError(
+            'fix_dependencies_paths function is not implemented in "{}"'.format(self.__class__.__name__))
 
     def get_current_scene_dependencies(self):
         """
