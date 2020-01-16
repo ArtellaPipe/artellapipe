@@ -36,7 +36,7 @@ class AssetsViewer(grid.GridWidget, object):
     assetAdded = Signal(object)
     assetSynced = Signal()
 
-    def __init__(self, project, column_count=4, parent=None):
+    def __init__(self, project, column_count=4, show_context_menu=False, parent=None):
         super(AssetsViewer, self).__init__(parent=parent)
 
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -51,12 +51,20 @@ class AssetsViewer(grid.GridWidget, object):
 
         self._assets = list()
         self._cache = list()
+
         self._project = project
+        self._show_context_menu = show_context_menu
+
+        self._menu = self._create_contextual_menu()
+
+    def contextMenuEvent(self, event):
+        if not self._menu or not self._show_context_menu:
+            return
+        self._menu.exec_(event.globalPos())
 
     def get_assets(self, update_cache=True, force=False):
         """
-        Returns a list with all the assets of the given categories; All assets will be returned if not category
-        is given
+        Returns a list with all the assets of the project
         :param update_cache: bool, Updates the internal cache
         :param force: bool, If True, cache and assets will be updated
         :return: list(ArtellaAssetWidget)
@@ -119,7 +127,7 @@ class AssetsViewer(grid.GridWidget, object):
         Clear all the assets of the asset viewer
         """
 
-        self._assets = list()
+        python.clear_list(self._assets)
         self.clear()
 
     def change_category(self, category=None):
@@ -156,11 +164,11 @@ class AssetsViewer(grid.GridWidget, object):
 
     def add_asset(self, asset_widget):
         """
-        Adds given asset to viewer
+        Adds given asset widget to viewer
         :param asset_widget: ArtellaAssetWidget
         """
 
-        if asset_widget is None:
+        if not asset_widget:
             return
 
         self._add_widget(asset_widget)
@@ -181,13 +189,34 @@ class AssetsViewer(grid.GridWidget, object):
         self.addWidget(row, col, widget)
         self.resizeRowsToContents()
 
+    def _create_contextual_menu(self):
+        """
+        Returns custom contextual menu
+        :return: QMenu
+        """
+
+        new_menu = QMenu(self)
+        get_thumbnails_action = QAction(resource.ResourceManager().icon('picture'), 'Update Thumbnails', new_menu)
+        get_thumbnails_action.triggered.connect(self._on_update_thumbnails)
+        new_menu.addAction(get_thumbnails_action)
+
+        return new_menu
+
+    def _on_update_thumbnails(self):
+        """
+        Internal callback function that is called when Update Thumbnails action is triggered
+        """
+
+        self.update_assets_thumbnails(force=True)
+
 
 class CategorizedAssetViewer(base.BaseWidget, object):
 
-    def __init__(self, project, column_count=4, parent=None):
+    def __init__(self, project, column_count=4, show_context_menu=False, parent=None):
 
         self._project = project
         self._column_count = column_count
+        self._show_context_menu = show_context_menu
 
         super(CategorizedAssetViewer, self).__init__(parent=parent)
 
@@ -199,6 +228,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
         self._assets_viewer = artellapipe.AssetsViewer(
             project=self._project,
             column_count=self._column_count,
+            show_context_menu=self._show_context_menu,
             parent=self
         )
         self._assets_viewer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -246,6 +276,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
         """
         Internal callback function that is called when the user presses an Asset Category button
         :param category: str
+        :param flag: bool
         """
 
         if flag:

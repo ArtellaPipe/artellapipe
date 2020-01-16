@@ -20,13 +20,13 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import osplatform, path as path_utils
+from tpPyUtils import osplatform, python, path as path_utils
 
 from tpQtLib.core import base, qtutils, image
+from tpQtLib.widgets import layouts
 
 import artellapipe
 from artellapipe.utils import shader as shader_utils
-from artellapipe.widgets import assetsviewer
 
 LOGGER = logging.getLogger()
 
@@ -106,16 +106,21 @@ class ShaderViewerWidget(base.BaseWidget, object):
         :return: str
         """
 
-        shaders_extension = artellapipe.ShadersMgr().get_extension()
-        if not shaders_extension:
+        shaders_extensions = artellapipe.ShadersMgr().get_shaders_extensions()
+        if not shaders_extensions:
             return None
 
-        shaders_paths = artellapipe.ShadersMgr().get_shaders_paths()
-        for shaders_path in shaders_paths:
-            shader_path = path_utils.clean_path(os.path.join(shaders_path, self._name + shaders_extension))
-            if not os.path.isfile(shader_path):
-                continue
-            return shader_path
+        for shader_extension in shaders_extensions:
+            if not shader_extension.startswith('.'):
+                shader_extension = '.{}'.format(shader_extension)
+
+            shaders_paths = artellapipe.ShadersMgr().get_shaders_paths()
+            for shaders_path in shaders_paths:
+                shader_path = path_utils.clean_path(os.path.join(shaders_path, self._name + shader_extension))
+                if not os.path.isfile(shader_path):
+                    continue
+
+                return shader_path
 
     def _load_shader_data(self):
         """
@@ -142,21 +147,25 @@ class ShaderViewerWidget(base.BaseWidget, object):
         open_in_editor.triggered.connect(self.open_shader_in_editor)
 
 
-class ShadersViewer(QGridLayout, object):
+class ShadersViewer(layouts.FlowLayout, object):
 
     SHADER_VIEWER_WIDGET_CLASS = ShaderViewerWidget
 
-    def __init__(self, project, grid_size=4, parent=None):
-        super(ShadersViewer, self).__init__(parent)
+    def __init__(self, project, shaders_path=None, parent=None):
+        self._shaders_path = shaders_path
+        super(ShadersViewer, self).__init__(parent=parent)
 
         self._project = project
-        self._grid_size = grid_size
 
-        self.setHorizontalSpacing(0)
-        self.setVerticalSpacing(0)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSpacing(0)
+        # self.setHorizontalSpacing(0)
+        # self.setVerticalSpacing(0)
+        # self.setContentsMargins(0, 0, 0, 0)
+        # self.setSpacing(0)
 
+        self.refresh()
+
+    def set_shaders_path(self, shaders_path):
+        self._shaders_path = shaders_path
         self.refresh()
 
     def add_shader(self, widget):
@@ -165,15 +174,7 @@ class ShadersViewer(QGridLayout, object):
         :param widget: QWidget
         """
 
-        row = 0
-        col = 0
-        while self.itemAtPosition(row, col) is not None:
-            if col == self._grid_size - 1:
-                row += 1
-                col = 0
-            else:
-                col += 1
-        self.addWidget(widget, row, col)
+        self.addWidget(widget)
 
     def load_shader(self, shader_name):
         """
@@ -202,46 +203,53 @@ class ShadersViewer(QGridLayout, object):
 
         self.clear()
 
-        shaders_extension = artellapipe.ShadersMgr().get_extension()
-        if not shaders_extension:
+        shaders_extensions = artellapipe.ShadersMgr().get_shaders_extensions()
+        if not shaders_extensions:
             return False
 
-        shaders_library_paths = artellapipe.ShadersMgr().get_shaders_paths()
-        if not shaders_library_paths:
-            LOGGER.warning('Current Project has no shaders paths defined!')
-            return False
+        for shader_extension in shaders_extensions:
+            if not shader_extension.startswith('.'):
+                shader_extension = '.{}'.format(shader_extension)
 
-        valid_state = True
+            if not self._shaders_path:
+                shaders_library_paths = artellapipe.ShadersMgr().get_shaders_paths()
+                if not shaders_library_paths:
+                    LOGGER.warning('Current Project has no shaders paths defined!')
+                    return False
+            else:
+                shaders_library_paths = python.force_list(self._shaders_path)
 
-        invalid_paths = list()
-        for shaders_path in shaders_library_paths:
-            if not os.path.exists(shaders_path):
-                invalid_paths.append(shaders_path)
-        if invalid_paths:
-            result = qtutils.show_question(
-                None, 'Shaders Library Path not found!',
-                'Shaders Library Path is not sync! To start using this tool you should sync this folder first. '
-                'Do you want to do it?')
-            if result == QMessageBox.Yes:
-                artellapipe.ShadersMgr().update_shaders()
+            valid_state = True
 
-        for shaders_path in invalid_paths:
-            if not os.path.exists(shaders_path):
-                LOGGER.debug('Shader Library Path not found after sync. Something is wrong, please contact TD!')
-                valid_state = False
+            invalid_paths = list()
+            for shaders_path in shaders_library_paths:
+                if not os.path.exists(shaders_path):
+                    invalid_paths.append(shaders_path)
+            if invalid_paths:
+                result = qtutils.show_question(
+                    None, 'Shaders Path not found!',
+                    'Shaders Path is not sync! To start using this tool you should sync this folder first. '
+                    'Do you want to do it?')
+                if result == QMessageBox.Yes:
+                    artellapipe.ShadersMgr().update_shaders(shaders_paths=invalid_paths)
 
-        if not valid_state:
-            return False
+            for shaders_path in invalid_paths:
+                if not os.path.exists(shaders_path):
+                    LOGGER.debug('Shader Library Path not found after sync. Something is wrong, please contact TD!')
+                    valid_state = False
 
-        for shaders_path in shaders_library_paths:
-            for shader_file in os.listdir(shaders_path):
-                if not shader_file.endswith(shaders_extension):
-                    LOGGER.warning('Shader File: "{}" has invalid shader extension! Skipping ...'.format(shader_file))
-                    continue
-                shader_name = os.path.splitext(shader_file)[0]
-                shader_widget = self.SHADER_VIEWER_WIDGET_CLASS(project=self._project, shader_name=shader_name)
-                shader_widget.clicked.connect(partial(self._on_shader_widget_clicked, shader_name))
-                self.add_shader(shader_widget)
+            if not valid_state:
+                return False
+
+            for shaders_path in shaders_library_paths:
+                for shader_file in os.listdir(shaders_path):
+                    if not shader_file.endswith(shader_extension):
+                        LOGGER.warning('Shader File: "{}" has invalid shader extension! Skipping ...'.format(shader_file))
+                        continue
+                    shader_name = os.path.splitext(shader_file)[0]
+                    shader_widget = self.SHADER_VIEWER_WIDGET_CLASS(project=self._project, shader_name=shader_name)
+                    shader_widget.clicked.connect(partial(self._on_shader_widget_clicked, shader_name))
+                    self.add_shader(shader_widget)
 
     def _on_shader_widget_clicked(self, shader_name):
         """

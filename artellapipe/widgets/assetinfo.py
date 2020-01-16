@@ -308,7 +308,7 @@ class AssetFileButton(base.BaseWidget, object):
         if not self._asset_widget:
             return
 
-        if not file_type or file_type not in self._asset_widget.asset.ASSET_FILES:
+        if not file_type or file_type not in self._asset_widget.asset.FILES:
             return
 
         self._asset_widget.asset.open_file(file_type=self._asset_file_type, status=self._status)
@@ -321,7 +321,7 @@ class AssetFileButton(base.BaseWidget, object):
         if not self._asset_widget:
             return
 
-        if not file_type or file_type not in self._asset_widget.asset.ASSET_FILES:
+        if not file_type or file_type not in self._asset_widget.asset.FILES:
             return
 
         file_path = self._get_file_path()
@@ -431,7 +431,7 @@ class WorkingAssetInfo(base.BaseWidget, object):
         file_buttons_widget.setSelectionMode(QAbstractItemView.NoSelection)
 
         files_btn = list()
-        for file_type in self._asset_widget.asset.ASSET_FILES:
+        for file_type in self._asset_widget.asset.FILES:
             file_type_name = artellapipe.FilesMgr().get_file_type_name(file_type)
             file_btn = AssetFileButton(
                 self._asset_widget, defines.ArtellaFileStatus.WORKING,
