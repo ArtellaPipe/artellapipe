@@ -71,7 +71,6 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
         self._asset = asset
         self._text = text or artellapipe.AssetsMgr().get_default_asset_name()
-        self._icon_path = None
         self._thumbnail_icon = None
 
         super(ArtellaAssetWidget, self).__init__(parent=parent)
@@ -137,25 +136,50 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
     def get_thumbnail_path(self):
         """
-        Overrides base ArtellaAssetWidget get_thumbnail_path function
+        Returns path where asset thumbnail is located
         :return: str
         """
 
-        data_path = self._asset.project.get_data_path()
-        thumbnails_cache_folder = os.path.join(data_path, 'asset_thumbs_cache')
-        if not os.path.isdir(thumbnails_cache_folder):
-            os.makedirs(thumbnails_cache_folder)
+        asset_name = self._asset.get_name()
 
-        return os.path.join(thumbnails_cache_folder, self.asset.get_name() + '.png')
+        return artellapipe.AssetsMgr().get_asset_thumbnail_path(asset_name=asset_name, create_folder=True)
 
     def get_thumbnail_icon(self):
         """
-        Implements abstract get_thumbnail_icon function
         Returns the icon of the asset
         :return: QIcon
         """
 
         return self._thumbnail_icon
+
+    def update_thumbnail_icon(self, force=False):
+        """
+        Function that updates the thumbnail icon
+        :return:
+        """
+
+        try:
+            thumbnail_path = self.get_thumbnail_path()
+            if thumbnail_path and os.path.isfile(thumbnail_path) and not force:
+                thumb_icon = QIcon(QPixmap(thumbnail_path))
+                self._asset_btn.setIcon(thumb_icon)
+                self._thumbnail_icon = thumb_icon
+                return thumb_icon
+            else:
+                self._thumbnail_icon = resource.ResourceManager().icon(
+                    artellapipe.AssetsMgr().get_default_asset_thumb())
+                self._asset_btn.setIcon(self._thumbnail_icon)
+                asset_thumbnail_path = self._asset.get_thumbnail_path()
+                if not asset_thumbnail_path:
+                    return self._thumbnail_icon
+                self._worker_started = True
+                self._worker.set_path(thumbnail_path)
+                self._worker.set_force(force)
+                self._worker.set_preview_id(asset_thumbnail_path)
+                self.ThreadPool.start(self._worker)
+                return self._thumbnail_icon
+        except Exception as exc:
+            LOGGER.error('Impossible to update thumbnail icon: {} | {}'.format(exc, traceback.format_exc()))
 
     def _init(self):
         """
@@ -215,7 +239,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
 
         actions_to_add = list()
 
-        for asset_type_name in self.asset.ASSET_FILES:
+        for asset_type_name in self.asset.FILES:
             asset_type_icon = resource.ResourceManager().icon(asset_type_name)
             asset_type_action = QAction(asset_type_icon, asset_type_name.title(), sync_menu)
             asset_type_action.triggered.connect(
@@ -233,35 +257,6 @@ class ArtellaAssetWidget(base.BaseWidget, object):
                 sync_menu.addAction(action)
 
         return actions_to_add
-
-    def update_thumbnail_icon(self, force=False):
-        """
-        Function that updates the thumbnail icon
-        :return:
-        """
-
-        try:
-            thumbnail_path = self.get_thumbnail_path()
-            if thumbnail_path and os.path.isfile(thumbnail_path) and not force:
-                thumb_icon = QIcon(QPixmap(thumbnail_path))
-                self._asset_btn.setIcon(thumb_icon)
-                self._thumbnail_icon = thumb_icon
-                return thumb_icon
-            else:
-                self._thumbnail_icon = resource.ResourceManager().icon(
-                    artellapipe.AssetsMgr().config.get('default_thumb'))
-                self._asset_btn.setIcon(self._thumbnail_icon)
-                asset_thumbnail_path = self._asset.get_thumbnail_path()
-                if not asset_thumbnail_path:
-                    return self._thumbnail_icon
-                self._worker_started = True
-                self._worker.set_path(thumbnail_path)
-                self._worker.set_force(force)
-                self._worker.set_preview_id(asset_thumbnail_path)
-                self.ThreadPool.start(self._worker)
-                return self._thumbnail_icon
-        except Exception as exc:
-            LOGGER.error('Impossible to update thumbnail icon: {} | {}'.format(exc, traceback.format_exc()))
 
     def _on_context_menu(self, pos):
         """
