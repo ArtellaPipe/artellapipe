@@ -173,7 +173,7 @@ class ShadersManager(object):
 
         if asset:
             extra_dict = {
-                'shader_name':  shader_name
+                'shader_name': shader_name
             }
             asset_shader_file_path = asset.get_file(
                 shaders_file_type, status=defines.ArtellaFileStatus.WORKING, extra_dict=extra_dict

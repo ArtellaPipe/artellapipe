@@ -244,7 +244,8 @@ class ShadersViewer(layouts.FlowLayout, object):
             for shaders_path in shaders_library_paths:
                 for shader_file in os.listdir(shaders_path):
                     if not shader_file.endswith(shader_extension):
-                        LOGGER.warning('Shader File: "{}" has invalid shader extension! Skipping ...'.format(shader_file))
+                        LOGGER.warning(
+                            'Shader File: "{}" has invalid shader extension! Skipping ...'.format(shader_file))
                         continue
                     shader_name = os.path.splitext(shader_file)[0]
                     shader_widget = self.SHADER_VIEWER_WIDGET_CLASS(project=self._project, shader_name=shader_name)

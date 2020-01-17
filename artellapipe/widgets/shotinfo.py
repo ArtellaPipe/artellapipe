@@ -329,6 +329,7 @@ class ShotVersionsTree(QTreeWidget, object):
 
         self.header().hide()
 
+
 class WorkingShotInfo(base.BaseWidget, object):
     def __init__(self, shot_widget, parent=None):
 

@@ -365,7 +365,7 @@ class ArtellaFile(object):
         version_folder = latest_local_versions[1]
 
         published_path = self.get_file(file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.PUBLISHED,
-                                       extension=self.FILE_EXTENSIONS [0], fix_path=False, version=version_folder)
+                                       extension=self.FILE_EXTENSIONS[0], fix_path=False, version=version_folder)
 
         if sync_folder:
             return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))

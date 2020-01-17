@@ -88,7 +88,8 @@ class ArtellaSequence(abstract.AbstractSequence, object):
     #     :return: str
     #     """
     #
-    #     return self._project.format_template('sequence_name', {'sequence_name': self._name, 'sequence_index': self._id})
+    #     return self._project.format_template(
+    #     'sequence_name', {'sequence_name': self._name, 'sequence_index': self._id})
     #
     # def get_path(self):
     #     """
