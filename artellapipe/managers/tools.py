@@ -328,8 +328,8 @@ class ToolsManager(object):
         # Initialize and reload tool modules if necessary
         if core_loader:
             core_tool_importer = ToolImporter(core_loader, debug=debug)
-            core_import_order = ['{}.{}'.format(core_loader.fullname, mod) for mod in
-                            core_config.data.get('import_order', list())]
+            core_import_order = [
+                '{}.{}'.format(core_loader.fullname, mod) for mod in core_config.data.get('import_order', list())]
             core_tool_importer.import_packages(order=core_import_order, only_packages=False)
             if do_reload:
                 core_tool_importer.reload_all()
