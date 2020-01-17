@@ -69,6 +69,9 @@ class ToolsManager(object):
 
         from artellapipe.core import config
 
+        if not pkg_loaders:
+            return False
+
         project_name = project.get_clean_name()
 
         if len(pkg_loaders) > 1:

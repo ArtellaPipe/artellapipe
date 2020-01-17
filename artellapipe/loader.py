@@ -200,20 +200,3 @@ def register_tools(project_inst):
 
     for pkg_loaders in tools_to_register.values():
         artellapipe.ToolsMgr().register_tool(project=project_inst, pkg_loaders=pkg_loaders)
-
-
-# def run_toolbox(project):
-#     global toolbox
-#     if toolbox:
-#         return toolbox
-#
-#     import artellapipe
-#     tools = artellapipe.ToolBox(project=project)
-#     if not tp.Dcc.is_batch():
-#         if dcc.is_mayapy():
-#             return
-#         tools.create_menus()
-#
-#     toolbox = tools
-#
-#     return tools
