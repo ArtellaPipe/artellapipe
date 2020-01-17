@@ -189,9 +189,48 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.create_shot">
+<code class="sig-name descname">create_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_data</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.create_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new shot with the given data
+:param shot_data: dict
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.find_all_shots">
+<code class="sig-name descname">find_all_shots</code><span class="sig-paren">(</span><em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.find_all_shots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all shots of the given sequence
+:param force_update: bool
+:return: list(ArtellaShot)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.find_shot">
+<code class="sig-name descname">find_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_name=None</em>, <em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.find_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns shot of the project if found
+:param shot_name: str, name of the sequence to find
+:param force_update: bool, Whether sequences cache updated must be forced or not
+:return: ArtellaShort</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_name">
+<code class="sig-name descname">get_default_shot_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the default name used by shots
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_thumb">
+<code class="sig-name descname">get_default_shot_thumb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_thumb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the default thumb used by shots
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shot_name_regex">
 <code class="sig-name descname">get_shot_name_regex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shot_name_regex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns regex used to identeify shots
+<dd><p>Returns regex used to identify shots
 :return: str</p>
 </dd></dl>
 
@@ -200,14 +239,6 @@
 <code class="sig-name descname">get_shot_regex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shot_regex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns regex used to identify solstice shots
 :return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shots">
-<code class="sig-name descname">get_shots</code><span class="sig-paren">(</span><em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all shots of the given sequence name
-:param force_update: bool
-:return: list(ArtellaShot)</p>
 </dd></dl>
 
 <dl class="method">
@@ -220,11 +251,33 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.register_shot_class">
+<code class="sig-name descname">register_shot_class</code><span class="sig-paren">(</span><em class="sig-param">shot_class</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.register_shot_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers a new shot class into the project
+:param shot_class: cls</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.managers.shots.ArtellaShotsManager.set_project">
 <code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the project this manager belongs to
 :param project: ArtellaProject</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.shot_classes">
+<em class="property">property </em><code class="sig-name descname">shot_classes</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.shot_classes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.shot_types">
+<em class="property">property </em><code class="sig-name descname">shot_types</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.shot_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shots.ArtellaShotsManager.shots">
+<em class="property">property </em><code class="sig-name descname">shots</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.shots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

@@ -13,7 +13,12 @@ Submodules
    artellapipe.widgets.dialog
    artellapipe.widgets.label
    artellapipe.widgets.progressbar
+   artellapipe.widgets.sequence
+   artellapipe.widgets.sequenceinfo
    artellapipe.widgets.shadersviewer
+   artellapipe.widgets.shot
+   artellapipe.widgets.shotinfo
+   artellapipe.widgets.shotsviewer
    artellapipe.widgets.spinner
    artellapipe.widgets.syncdialog
    artellapipe.widgets.tray

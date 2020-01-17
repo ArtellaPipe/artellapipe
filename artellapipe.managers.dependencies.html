@@ -184,6 +184,13 @@
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManager</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths">
+<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries to fix paths that are not valid in the given file
+:param file_path: str, file path we want to fix paths of</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies">
 <code class="sig-name descname">get_current_scene_dependencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all dependencies that are currently loaded in current scene
@@ -197,6 +204,7 @@
 :param file_path: str, file path we want to get dependencies of
 :param parent_path: str
 :param found_files: list(str)
+:param fix_paths: bool
 :return: list(str)</p>
 </dd></dl>
 

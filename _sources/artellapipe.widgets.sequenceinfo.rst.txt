@@ -1,0 +1,7 @@
+artellapipe.widgets.sequenceinfo module
+=======================================
+
+.. automodule:: artellapipe.widgets.sequenceinfo
+   :members:
+   :undoc-members:
+   :show-inheritance:

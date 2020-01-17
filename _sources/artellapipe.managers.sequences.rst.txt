@@ -1,0 +1,7 @@
+artellapipe.managers.sequences module
+=====================================
+
+.. automodule:: artellapipe.managers.sequences
+   :members:
+   :undoc-members:
+   :show-inheritance:

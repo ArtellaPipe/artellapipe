@@ -1,0 +1,7 @@
+artellapipe.widgets.shotsviewer module
+======================================
+
+.. automodule:: artellapipe.widgets.shotsviewer
+   :members:
+   :undoc-members:
+   :show-inheritance:

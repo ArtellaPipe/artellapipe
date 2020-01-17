@@ -176,8 +176,119 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-managers-tracking-module">
-<h1>artellapipe.managers.tracking module<a class="headerlink" href="#artellapipe-managers-tracking-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.managers.tracking">
+<span id="artellapipe-managers-tracking-module"></span><h1>artellapipe.managers.tracking module<a class="headerlink" href="#module-artellapipe.managers.tracking" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains base abstract tracking class for Artella projects</p>
+<dl class="class">
+<dt id="artellapipe.managers.tracking.TrackingManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tracking.</code><code class="sig-name descname">TrackingManager</code><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_project_assets">
+<code class="sig-name descname">all_project_assets</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_project_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the assets information of the assets of the current project
+:return: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_project_sequences">
+<code class="sig-name descname">all_project_sequences</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_project_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all the sequences of the current project
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_project_shots">
+<code class="sig-name descname">all_project_shots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_project_shots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all the shots of the current project
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.check_update">
+<code class="sig-name descname">check_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.check_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if tracking manager has been updated or not. If not, an updating is forced</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.download_preview_file_thumbnail">
+<code class="sig-name descname">download_preview_file_thumbnail</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.download_preview_file_thumbnail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads given preview file thumbnail and save it at given location
+:param preview_id:  str or dict, The preview file dict or ID.
+:param file_path: str, Location on hard drive where to save the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.is_logged">
+<code class="sig-name descname">is_logged</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.is_logged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether user is locked into the tracking system or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.is_tracking_available">
+<code class="sig-name descname">is_tracking_available</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.is_tracking_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether tracking service is available or not
+:return: bool</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.managers.tracking.TrackingManager.logged">
+<code class="sig-name descname">logged</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.logged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.login">
+<code class="sig-name descname">login</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Login into tracking service with given user and password
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.logout">
+<code class="sig-name descname">logout</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.logout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logout from tracker service
+:param args:
+:param kwargs:
+:return: bool</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.needs_login">
+<code class="sig-name descname">needs_login</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.needs_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether or not production trackign needs log to work or not</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.project">
+<em class="property">property </em><code class="sig-name descname">project</code><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project linked to the tracking manager
+:param project: ArtellaProject</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.managers.tracking.TrackingManager.staticMetaObject">
+<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="artellapipe.managers.tracking.TrackingManager.unlogged">
+<code class="sig-name descname">unlogged</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.unlogged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.update_tracking_info">
+<code class="sig-name descname">update_tracking_info</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.update_tracking_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates all the project tracking info</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

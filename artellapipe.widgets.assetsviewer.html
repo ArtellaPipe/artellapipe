@@ -181,12 +181,12 @@
 <p>Module that contains widget implementation for asset viewer</p>
 <dl class="class">
 <dt id="artellapipe.widgets.assetsviewer.AssetsViewer">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.assetsviewer.</code><code class="sig-name descname">AssetsViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.assetsviewer.</code><code class="sig-name descname">AssetsViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">show_context_menu=False</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.widgets.grid.GridWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="artellapipe.widgets.assetsviewer.AssetsViewer.add_asset">
 <code class="sig-name descname">add_asset</code><span class="sig-paren">(</span><em class="sig-param">asset_widget</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.add_asset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds given asset to viewer
+<dd><p>Adds given asset widget to viewer
 :param asset_widget: ArtellaAssetWidget</p>
 </dd></dl>
 
@@ -214,10 +214,14 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.widgets.assetsviewer.AssetsViewer.contextMenuEvent">
+<code class="sig-name descname">contextMenuEvent</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">arg__1:PySide2.QtGui.QContextMenuEvent</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.contextMenuEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.widgets.assetsviewer.AssetsViewer.get_assets">
 <code class="sig-name descname">get_assets</code><span class="sig-paren">(</span><em class="sig-param">update_cache=True</em>, <em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.AssetsViewer.get_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list with all the assets of the given categories; All assets will be returned if not category
-is given
+<dd><p>Returns a list with all the assets of the project
 :param update_cache: bool, Updates the internal cache
 :param force: bool, If True, cache and assets will be updated
 :return: list(ArtellaAssetWidget)</p>
@@ -252,7 +256,7 @@ is given
 
 <dl class="class">
 <dt id="artellapipe.widgets.assetsviewer.CategorizedAssetViewer">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.assetsviewer.</code><code class="sig-name descname">CategorizedAssetViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.CategorizedAssetViewer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.assetsviewer.</code><code class="sig-name descname">CategorizedAssetViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">show_context_menu=False</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.assetsviewer.CategorizedAssetViewer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.base.BaseWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="attribute">
 <dt id="artellapipe.widgets.assetsviewer.CategorizedAssetViewer.staticMetaObject">

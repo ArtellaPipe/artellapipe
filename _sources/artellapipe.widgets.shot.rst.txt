@@ -1,0 +1,7 @@
+artellapipe.widgets.shot module
+===============================
+
+.. automodule:: artellapipe.widgets.shot
+   :members:
+   :undoc-members:
+   :show-inheritance:

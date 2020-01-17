@@ -15,6 +15,7 @@ Submodules
    artellapipe.managers.ocio
    artellapipe.managers.playblasts
    artellapipe.managers.pyblishplugins
+   artellapipe.managers.sequences
    artellapipe.managers.shaders
    artellapipe.managers.shelf
    artellapipe.managers.shots
