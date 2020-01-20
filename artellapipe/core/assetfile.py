@@ -71,7 +71,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
 
         return self._asset.project
 
-    def get_file(self, file_type, status, extension, fix_path=False, version=None):
+    def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None):
         """
         Implements base ArtellaFile get_file function
         Returns file of the attached object
@@ -84,7 +84,7 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         """
 
         return self._asset.get_file(
-            file_type=file_type, status=status, extension=extension, fix_path=fix_path, version=version)
+            file_type=self.FILE_TYPE, status=status, extension=extension, fix_path=fix_path, version=version)
 
     def get_path(self):
         """
