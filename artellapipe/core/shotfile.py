@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains implementations for sequence files
+Module that contains implementations for shot files
 """
 
 from __future__ import print_function, division, absolute_import
@@ -20,22 +20,22 @@ from artellapipe.core import defines, file
 LOGGER = logging.getLogger()
 
 
-class ArtellaSequenceFile(file.ArtellaFile, object):
-    def __init__(self, file_sequence=None, file_path=None):
+class ArtellaShotFile(file.ArtellaFile, object):
+    def __init__(self, file_shot=None, file_path=None):
 
-        self._sequence = file_sequence
+        self._shot = file_shot
 
-        super(ArtellaSequenceFile, self).__init__(
-            file_name=self._sequence.get_name() if self._sequence else None, file_path=file_path)
+        super(ArtellaShotFile, self).__init__(
+            file_name=self._shot.get_name() if self._shot else None, file_path=file_path)
 
     @property
-    def sequence(self):
+    def shot(self):
         """
-        Returns sequence linked to this file type
-        :return: ArtellaSequence
+        Returns shot linked to this file type
+        :return: ArtellaShot
         """
 
-        return self._sequence
+        return self.shot
 
     def has_valid_object(self):
         """
@@ -44,7 +44,7 @@ class ArtellaSequenceFile(file.ArtellaFile, object):
         :return: bool
         """
 
-        return bool(self._sequence)
+        return bool(self._shot)
 
     def get_template_dict(self, **kwargs):
         """
@@ -52,7 +52,7 @@ class ArtellaSequenceFile(file.ArtellaFile, object):
         :return: dict
         """
 
-        return self._sequence.get_template_dict(**kwargs)
+        return self._shot.get_template_dict(**kwargs)
 
     def get_project(self):
         """
@@ -61,7 +61,7 @@ class ArtellaSequenceFile(file.ArtellaFile, object):
         :return: ArtellaProject
         """
 
-        return self._sequence.project
+        return self._shot.project
 
     def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None):
         """
@@ -74,7 +74,7 @@ class ArtellaSequenceFile(file.ArtellaFile, object):
         :return: str
         """
 
-        return self._sequence.get_file(
+        return self._shot.get_file(
             file_type=self.FILE_TYPE, status=status, extension=extension, fix_path=fix_path, version=version)
 
     def get_path(self):
@@ -84,7 +84,7 @@ class ArtellaSequenceFile(file.ArtellaFile, object):
         :return: str
         """
 
-        return self._sequence.get_path()
+        return self._shot.get_path()
 
     def get_name(self):
         """
@@ -92,15 +92,8 @@ class ArtellaSequenceFile(file.ArtellaFile, object):
         :return: str
         """
 
-        return self._sequence.get_name()
+        return self._shot.get_name()
 
-    # def get_extension(self):
-    #     """
-    #     Returns the extension of the aseet file
-    #     :return: str
-    #     """
-    #
-    #     return self.get_project().assets_library_file_types.get()
 
     def get_latest_published_versions(self):
         """

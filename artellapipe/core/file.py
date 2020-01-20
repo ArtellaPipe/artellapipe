@@ -98,10 +98,9 @@ class ArtellaFile(object):
         raise NotImplementedError('get_project function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_file(self, file_type, status, extension, fix_path=False, version=None):
+    def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None):
         """
         Returns file of the attached object
-        :param file_type: str
         :param status: str
         :param extension: str
         :param fix_path: bool
@@ -215,7 +214,7 @@ class ArtellaFile(object):
 
         return file_paths
 
-    def open_file(self, status):
+    def open_file(self, status=defines.ArtellaFileStatus.WORKING):
         """
         References current file into DCC
         :return:
@@ -226,7 +225,7 @@ class ArtellaFile(object):
         else:
             file_path = self.get_latest_local_published_path()
 
-        self._open_file(path=file_path)
+        return self._open_file(file_path=file_path)
 
     def import_file(self, fix_path=True, sync=False, reference=False, *args, **kwargs):
         """
@@ -268,9 +267,8 @@ class ArtellaFile(object):
         :return: str
         """
 
-        working_path = self.get_file(
-            file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.WORKING,
-            extension=self.FILE_EXTENSIONS[0], fix_path=False
+        working_path = self.get_file(status=defines.ArtellaFileStatus.WORKING,
+                                     extension=self.FILE_EXTENSIONS[0], fix_path=False
         )
 
         if sync_folder:
@@ -364,8 +362,8 @@ class ArtellaFile(object):
 
         version_folder = latest_local_versions[1]
 
-        published_path = self.get_file(file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.PUBLISHED,
-                                       extension=self.FILE_EXTENSIONS[0], fix_path=False, version=version_folder)
+        published_path = self.get_file(status=defines.ArtellaFileStatus.PUBLISHED, extension=self.FILE_EXTENSIONS[0],
+                                       fix_path=False, version=version_folder)
 
         if sync_folder:
             return path_utils.clean_path(os.path.dirname(os.path.dirname(published_path)))
@@ -511,11 +509,17 @@ class ArtellaFile(object):
             return path
 
         if self.FILE_TEMPLATE:
-            template_data = self.get_template_dict()
+            if self.FILE_EXTENSIONS:
+                template_data = self.get_template_dict(extension=self.FILE_EXTENSIONS[0])
+            else:
+                template_data = self.get_template_dict()
             if template_data:
                 template = artellapipe.FilesMgr().get_template(self.FILE_TEMPLATE)
                 if template:
-                    return template.format(template_data)
+                    file_path = template.format(template_data)
+                    if file_path.endswith('.'):
+                        file_path = file_path[:-1]
+                    return file_path
 
     def _get_extensions(self, extension):
         """
