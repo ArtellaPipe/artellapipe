@@ -84,10 +84,11 @@ class ArtellaSequencesManager(object):
         return True
 
     @decorators.timestamp
-    def find_all_sequences(self, force_update=False):
+    def find_all_sequences(self, force_update=False, force_login=True):
         """
         Returns a list of all sequences in the current project
-        :param force_update: bool, Whether assets cache updated must be forced or not
+        :param force_update: bool, Whether sequences cache updated must be forced or not
+        :param force_login: bool, Whether logging to production tracker is forced or not
         :return: list(ArtellaSequence))
         """
 
@@ -98,6 +99,12 @@ class ArtellaSequencesManager(object):
 
         python.clear_list(self._sequences)
 
+        if not artellapipe.Tracker().is_logged() and force_login:
+            artellapipe.Tracker().login()
+        if not artellapipe.Tracker().is_logged():
+            LOGGER.warning(
+                'Impossible to find sequences of current project because user is not log into production tracker')
+            return None
         tracker = artellapipe.Tracker()
         sequences_list = tracker.all_project_sequences()
         if not sequences_list:
@@ -170,7 +177,6 @@ class ArtellaSequencesManager(object):
         """
         Returns sequence file object class linked to given file type for current project
         :param file_type: str
-        :param extension: str
         :return: ArtellaSequenceType
         """
 
@@ -194,7 +200,6 @@ class ArtellaSequencesManager(object):
     def get_latest_published_versions(self, sequence_path, file_type=None):
         """
         Returns all published version of the the different files of the given sequence
-        file is synchronized
         :param sequence_path: str, path of the sequence
         :param file_type: str, if given only paths of the given file type will be returned (model, rig, etc)
         :return: list(dict), number of version, name of version and version path

@@ -18,7 +18,9 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 from tpQtLib.core import menu, qtutils
+from tpQtLib.core import base
 
+import artellapipe
 from artellapipe.core import defines
 from artellapipe.utils import resource
 
@@ -131,3 +133,74 @@ class SequenceCategoryButton(QPushButton, object):
                 return
 
         self._sequence.sync(file_type, sync_type)
+
+
+class ArtellaSequenceWidget(base.BaseWidget, object):
+
+    clicked = Signal(object)
+
+    def __init__(self, sequence, text=None, parent=None):
+        self._sequence = sequence
+        self._text = text or artellapipe.SequencesMgr().get_default_sequence_name()
+
+        super(ArtellaSequenceWidget, self).__init__(parent=parent)
+
+        self._init()
+
+    def get_main_layout(self):
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(5, 5, 5, 5)
+        main_layout.setSpacing(0)
+        return main_layout
+
+    def ui(self):
+        super(ArtellaSequenceWidget, self).ui()
+
+        self.setFixedWidth(160)
+        self.setFixedHeight(160)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+
+        widget_layout = QVBoxLayout()
+        widget_layout.setContentsMargins(2, 2, 2, 2)
+        widget_layout.setSpacing(0)
+        main_frame = QFrame()
+        main_frame.setFrameStyle(QFrame.StyledPanel | QFrame.Raised)
+        main_frame.setLineWidth(1)
+        main_frame.setLayout(widget_layout)
+        self.main_layout.addWidget(main_frame)
+
+        self._sequence_btn = QPushButton('', self)
+        self._sequence_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._sequence_btn.setIcon(artellapipe.project.thumb_icon)
+        self._sequence_btn.setIconSize(QSize(150, 150))
+        self._sequence_lbl = QLabel(self._text)
+        self._sequence_lbl.setAlignment(Qt.AlignCenter)
+
+        widget_layout.addWidget(self._sequence_btn)
+        widget_layout.addWidget(self._sequence_lbl)
+
+    def setup_signals(self):
+        self._sequence_btn.clicked.connect(partial(self.clicked.emit, self))
+
+    @property
+    def sequence(self):
+        """
+        Returns shot data
+        :return: ArtellaSequence
+        """
+
+        return self._sequence
+
+    def _init(self):
+        """
+        Internal function that initializes sequence widget
+        Can be extended to add custom initialization functionality to sequence widgets
+        """
+
+        if not self._sequence:
+            return
+
+        self._sequence_lbl.setText(self._sequence.get_name())
+
+
+artellapipe.register.register_class('SequenceWidget', ArtellaSequenceWidget)

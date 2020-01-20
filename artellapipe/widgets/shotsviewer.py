@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains widget implementation for sequences viewer
+Module that contains widget implementation for shots viewer
 """
 
 from __future__ import print_function, division, absolute_import
@@ -194,11 +194,11 @@ class ShotsGrid(grid.GridWidget, object):
             return self._cache
 
         python.clear_list(self._cache)
-        return artellapipe.ShotsMgr().find_all_shots()
+        return artellapipe.ShotsMgr().find_all_shots(force_update=force)
 
     def update_shots(self, force=False):
         """
-        Updates the list of shots in the sequences viewer
+        Updates the list of shots in the shots viewer
         :param force: bool
         """
 
@@ -220,7 +220,7 @@ class ShotsGrid(grid.GridWidget, object):
 
     def clear_shots(self):
         """
-        Clear all the shots of the sequences viewer
+        Clear all the shots of the shots viewer
         """
 
         python.clear_list(self._shots)
@@ -261,7 +261,7 @@ class ShotsGrid(grid.GridWidget, object):
 
     def add_shot(self, shot_widget):
         """
-        Adds given sequence widget to viewer
+        Adds given shot widget to viewer
         :param shot_widget:  ArtellaShotWidget
         """
 
