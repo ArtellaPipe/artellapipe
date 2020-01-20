@@ -219,7 +219,7 @@ class ArtellaAssetsManager(object):
         """
         Returns a list of all assets in the project
         :param force_update: bool, Whether assets cache updated must be forced or not
-        :param force_login: bool, Whether loging to production tracker is forced or not
+        :param force_login: bool, Whether logging to production tracker is forced or not
         :return: variant, ArtellaAsset or list(ArtellaAsset)
         """
 

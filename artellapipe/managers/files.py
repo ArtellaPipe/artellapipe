@@ -15,7 +15,7 @@ import inspect
 import importlib
 
 import tpDccLib as tp
-from tpPyUtils import python, decorators, path as path_utils
+from tpPyUtils import python, decorators, timedate, osplatform, path as path_utils
 from tpQtLib.core import qtutils
 
 if python.is_python2():
@@ -341,7 +341,7 @@ class ArtellaFilesManager(object):
             return False
 
         if notify:
-            self._project.tray.show_message(title='Lock File', msg='File locked successfully!')
+            self._project.notify(title='Lock File', msg='File "{}" locked successfully!'.format(file_path))
 
         return True
 
@@ -378,7 +378,7 @@ class ArtellaFilesManager(object):
 
         artellalib.unlock_file(file_path=file_path)
         if notify:
-            self.tray.show_message(title='Unlock File', msg='File unlocked successfully!')
+            self._project.notify(title='Unlock File', msg='File "{}" unlocked successfully!'.format(file_path))
 
         return True
 
@@ -470,9 +470,10 @@ class ArtellaFilesManager(object):
         if comment:
             artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving)
             if notify:
-                self._project.tray.show_message(
-                    title='New Working Version', msg='Version {} uploaded to Artella server successfully!'.format(
-                        current_version))
+                self._project.notify(
+                    title='New Working Version',
+                    msg='Version {} for file "{}" uploaded to Artella server successfully!'.format(
+                        current_version, file_path))
             return True
 
         return False
