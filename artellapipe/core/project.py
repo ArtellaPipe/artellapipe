@@ -149,6 +149,15 @@ class ArtellaProject(object):
         return resource.ResourceManager().icon(self.icon_name, theme=self.icon_resources_folder)
 
     @property
+    def thumb_icon(self):
+        """
+        Returns thumb icon for the project
+        :return: QIcon
+        """
+
+        return resource.ResourceManager().icon(self.get_clean_name(), category='images', key='project', theme=None)
+
+    @property
     def tray_icon(self):
         """
         Returns icon used by the tray of the project
@@ -200,6 +209,7 @@ class ArtellaProject(object):
         self.create_playblasts_manager()
         self.create_pyblish_manager()
         self.create_dependencies_manager()
+        self.create_slack_manager()
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
@@ -249,8 +259,6 @@ class ArtellaProject(object):
         Returns folder where project configuration files are loaded
         :return: str
         """
-
-        print('bjblblbl')
 
         try:
             pkg_loader = loader.find_loader('{}.config'.format(self._get_clean_name(self.name)))
@@ -463,6 +471,12 @@ class ArtellaProject(object):
                     else:
                         os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + ';' + root
 
+        slack_token = self.config.get('slack_token', '')
+        slack_channel = self.config.get('slack_channel', '')
+        if slack_token and slack_channel:
+            os.environ['{}_SLACK_API_TOKEN'.format(self.get_clean_name().upper())] = 'xoxb-{}'.format(slack_token)
+            os.environ['{}_SLACK_CHANNEL'.format(self.get_clean_name().upper())] = slack_channel
+
         LOGGER.debug('=' * 100)
         LOGGER.debug("{} Pipeline initialization completed!".format(self.name))
         LOGGER.debug('=' * 100)
@@ -609,6 +623,17 @@ class ArtellaProject(object):
 
         return deps_manager
 
+    def create_slack_manager(self):
+        """
+        Crates instance of the slack manager used by the project
+        :return: SlackManager
+        """
+
+        slack_manager = artellapipe.SlackMgr()
+        slack_manager.set_project(self)
+
+        return slack_manager
+
     def create_production_tracker(self):
         """
         Creates instance of the production tracker used by the project
@@ -713,6 +738,15 @@ class ArtellaProject(object):
             title = self.name.title()
 
         webbrowser.open("mailto:%s?subject=%s" % (','.join(self.emails), quote(title)))
+
+    def notify(self, title, msg):
+        """
+        Notifies given message to the user
+        :param title: str
+        :param msg:
+        """
+
+        self.tray.show_message(title=title, msg=msg)
 
     # ==========================================================================================================
     # PROJECT
