@@ -89,7 +89,7 @@ class AbstractFile(object):
     @decorators.abstractmethod
     def get_path(self):
         """
-        Returns the path of the asset
+        Returns the path of the file
         :return: str
         """
 
@@ -727,7 +727,7 @@ class AbstractSequence(AbstractFile, object):
             'project_path': self._project.get_path(),
             'sequence_name': sequence_name,
             'file_extension': kwargs.get('extension', None),
-            'version_folder': kwargs.get('version_folder', defines.ArtellaFileStatus.WORKING)
+            'version_folder': kwargs.get('version_folder', artella.config.get('server', 'working_folder'))
         }
 
         return template_dict
@@ -776,11 +776,50 @@ class AbstractShot(AbstractFile, object):
         raise NotImplementedError('get_id function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_thumbnail_path(self):
+    def get_sequence(self):
         """
-        Returns the path where thumbnail path is located
+        Returns sequence name this shot belongs to
         :return: str
         """
 
-        raise NotImplementedError(
-            'get_thumbnail_path function for {} is not implemented!'.format(self.__class__.__name__))
+        raise NotImplementedError('get_id function for {} is not implemented!'.format(self.__class__.__name__))
+
+    # ==========================================================================================================
+    # IMPLEMENT
+    # ==========================================================================================================
+
+    def get_template_dict(self, **kwargs):
+        """
+        Returns the dict that contains necessary data to retrieve file template
+        :return: dict
+        """
+
+        shot_name = self.get_name()
+
+        template_dict = {
+            'project_path': self._project.get_path(),
+            'shot_name': shot_name,
+            'sequence_name': self.get_sequence(),
+            'file_extension': kwargs.get('extension', None),
+            'version_folder': kwargs.get('version_folder', artella.config.get('server', 'working_folder'))
+        }
+
+        return template_dict
+
+    def get_file_type(self, file_type, extension=None):
+        """
+        Returns sequence file object of the current sequence and given file type
+        :param file_type: str
+        :param extension: str
+        :return: ArtellaAssetType
+        """
+
+        if file_type not in self.FILES:
+            return None
+
+        sequence_file_class = artellapipe.ShotsMgr().get_shot_file(file_type=file_type, extension=extension)
+        if not sequence_file_class:
+            LOGGER.warning('File Type: {} | {} not registered in current project!'.format(file_type, extension))
+            return
+
+        return sequence_file_class(shot=self)
