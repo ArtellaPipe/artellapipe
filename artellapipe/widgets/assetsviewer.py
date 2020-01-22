@@ -139,7 +139,7 @@ class AssetsViewer(grid.GridWidget, object):
         if not category:
             category = defines.ArtellaFileStatus.ALL
 
-        if category != defines.ArtellaFileStatus.ALL and category not in artellapipe.AssetsMgr().config.get('types'):
+        if category != defines.ArtellaFileStatus.ALL and category not in artellapipe.AssetsMgr().get_asset_categories():
             LOGGER.warning(
                 'Asset Type {} is not a valid asset type for project {}'.format(category, self._project.name.title()))
             category = defines.ArtellaFileStatus.ALL

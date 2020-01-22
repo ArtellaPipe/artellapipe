@@ -84,6 +84,14 @@ class ArtellaAssetsManager(object):
         self._registered_asset_classes.append(asset_class)
         return True
 
+    def get_asset_categories(self):
+        """
+        Returns all asset categories of current project
+        :return: list(str)
+        """
+
+        return self.config.get('types', default=list())
+
     def get_asset_id_from_node(self, node):
         """
         Returns asset name of the given node
@@ -182,6 +190,11 @@ class ArtellaAssetsManager(object):
         return [asset for asset in self.assets if asset.FILE_TYPE == asset_type]
 
     def open_asset_shaders_file(self, asset):
+        """
+        Open asset shaders file of the given asset
+        :param asset:
+        """
+
         shading_file_type = artellapipe.AssetsMgr().get_shading_file_type()
         file_path = asset.get_file(
             file_type=shading_file_type, status=defines.ArtellaFileStatus.WORKING, fix_path=True)
@@ -522,13 +535,31 @@ class ArtellaAssetsManager(object):
 
         return asset_node
 
-        # all_scene_assets = self.get_scene_assets()
-        # if not all_scene_assets:
-        #     return None
-        #
-        # for asset_node in all_scene_assets:
-        #     if asset_node.id == node_id:
-        #         return asset_node
+    def get_assets_in_shot(self, shot, force_login=True):
+        """
+        Returns all the assets contained in given shot breakdown defined in production tracker
+        :param shot:
+        :return:
+        """
+
+        if not artellapipe.Tracker().is_logged() and force_login:
+            artellapipe.Tracker().login()
+        if not artellapipe.Tracker().is_logged():
+            LOGGER.warning(
+                'Impossible to find assets of current project because user is not log into production tracker')
+            return None
+        tracker = artellapipe.Tracker()
+        assets_in_shots = tracker.all_assets_in_shot(shot)
+        if not assets_in_shots:
+            LOGGER.warning('No assets found in shot breakdown')
+            return None
+
+        found_assets = list()
+        for asset_data in assets_in_shots:
+            new_asset = self.create_asset(asset_data)
+            found_assets.append(new_asset)
+
+        return found_assets
 
     def get_asset_renderable_shapes(self, asset, remove_namespace=False):
         """

@@ -311,7 +311,7 @@ class AssetFileButton(base.BaseWidget, object):
         if not file_type or file_type not in self._asset_widget.asset.FILES:
             return
 
-        self._asset_widget.asset.open_file(file_type=self._asset_file_type, status=self._status)
+        return self._asset_widget.asset.open_file(file_type=self._asset_file_type, status=self._status)
 
     def _on_check_working_versions(self, file_type):
         """
@@ -341,6 +341,9 @@ class AssetVersionsTree(QTreeWidget, object):
 
 
 class WorkingAssetInfo(base.BaseWidget, object):
+
+    STATUS = defines.ArtellaFileStatus.WORKING
+
     def __init__(self, asset_widget, parent=None):
 
         self._asset_widget = asset_widget
@@ -434,7 +437,7 @@ class WorkingAssetInfo(base.BaseWidget, object):
         for file_type in self._asset_widget.asset.FILES:
             file_type_name = artellapipe.FilesMgr().get_file_type_name(file_type)
             file_btn = AssetFileButton(
-                self._asset_widget, defines.ArtellaFileStatus.WORKING,
+                self._asset_widget, self.STATUS,
                 file_type, file_type_name, resource.ResourceManager().icon(file_type))
             files_btn.append(file_btn)
             file_btn.checkVersions.connect(self._on_check_versions)
@@ -477,17 +480,12 @@ class WorkingAssetInfo(base.BaseWidget, object):
         print(version_info)
 
 
-class PublishedAssetInfo(base.BaseWidget, object):
+class PublishedAssetInfo(WorkingAssetInfo, object):
+
+    STATUS = defines.ArtellaFileStatus.PUBLISHED
+
     def __init__(self, asset_widget, parent=None):
-
-        self._asset_widget = asset_widget
-
-        super(PublishedAssetInfo, self).__init__(parent=parent)
-
-    def ui(self):
-        super(PublishedAssetInfo, self).ui()
-
-        self.main_layout.addWidget(QPushButton('TEST'))
+        super(PublishedAssetInfo, self).__init__(asset_widget=asset_widget, parent=parent)
 
 
 artellapipe.register.register_class('AssetInfo', AssetInfoWidget)
