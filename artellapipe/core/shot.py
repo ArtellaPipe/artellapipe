@@ -491,5 +491,14 @@ class ArtellaShot(abstract.AbstractShot, object):
 
         return valid_import
 
+    def get_assets_from_breakdown(self):
+        """
+        Returns all the assets contained in shot breakdown defined in production tracker
+        :return: list(ArtellaAsset)
+        """
+
+        shot_id = self.get_id()
+        return artellapipe.AssetsMgr().get_assets_in_shot(shot_id)
+
 
 artellapipe.register.register_class('Shot', ArtellaShot)

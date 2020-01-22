@@ -180,7 +180,10 @@ class ArtellaShotsManager(object):
         self._check_project()
 
         shots_found = list()
-        all_shots = self.find_all_shots_in_current_scene(force_update=force_update, force_login=force_login)
+        all_shots = self.find_all_shots_in_current_scene(force_update=force_update, force_login=force_login) or list()
+        if not shot_name:
+            return all_shots
+
         for shot in all_shots:
             if shot.get_name() == shot_name:
                 shots_found.append(shot)
