@@ -152,6 +152,16 @@ class TrackingManager(QObject, object):
         raise NotImplementedError(
             'all_project_shots function for {} is not implemented!'.format(self.__class__.__name__))
 
+    def all_assets_in_shot(self, shot):
+        """
+        Returns all assets in the given shot
+        :param shot:
+        :param kwargs:
+        :return: list
+        """
+
+        raise NotImplementedError(
+            'all_assets_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
 
 @decorators.Singleton
 class TrackinManagerSingleton(TrackingManager, object):
