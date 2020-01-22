@@ -12,7 +12,11 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import os
 import logging
+
+import tpDccLib as tp
+from tpPyUtils import osplatform, path as path_utils
 
 import artellapipe
 from artellapipe.core import defines, file
@@ -150,3 +154,17 @@ class ArtellaAssetFile(file.ArtellaFile, object):
             return file_path
         else:
             return [file_path]
+
+    def _open_file(self, file_path):
+        if os.path.isfile(file_path):
+            if path_utils.clean_path(tp.Dcc.scene_name()) == path_utils.clean_path(file_path):
+                return True
+            tp.Dcc.open_file(file_path)
+            return True
+        elif os.path.isdir(file_path):
+            osplatform.open_file(file_path)
+            return True
+        else:
+            LOGGER.warning('Impossible to open file: "{}"'.format(file_path))
+
+        return False

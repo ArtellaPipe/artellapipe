@@ -214,7 +214,7 @@ class ArtellaFile(object):
 
         return file_paths
 
-    def open_file(self, status=defines.ArtellaFileStatus.WORKING):
+    def open_file(self, status=defines.ArtellaFileStatus.WORKING, fix_path=False):
         """
         References current file into DCC
         :return:
@@ -224,6 +224,9 @@ class ArtellaFile(object):
             file_path = self.get_working_path()
         else:
             file_path = self.get_latest_local_published_path()
+
+        if fix_path:
+            file_path = artellapipe.FilesMgr().fix_path(file_path)
 
         return self._open_file(file_path=file_path)
 
@@ -464,8 +467,8 @@ class ArtellaFile(object):
         if not version_folder.endswith('__'):
             version_folder = '{}__'.format(version_folder)
 
-        published_path = self.get_file(file_type=self.FILE_TYPE, status=defines.ArtellaFileStatus.PUBLISHED,
-                                       extension=self.FILE_EXTENSIONS[0], fix_path=False, version=version_folder)
+        published_path = self.get_file(status=defines.ArtellaFileStatus.PUBLISHED, extension=self.FILE_EXTENSIONS[0],
+                                       fix_path=False, version=version_folder)
         if not published_path:
             LOGGER.warning('Impossible to retrieve latest published path ...')
             return

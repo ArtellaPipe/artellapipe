@@ -209,6 +209,7 @@ class ArtellaProject(object):
         self.create_playblasts_manager()
         self.create_pyblish_manager()
         self.create_dependencies_manager()
+        self.create_casting_manager()
         self.create_slack_manager()
         self.create_production_tracker()
         self.update_project()
@@ -622,6 +623,18 @@ class ArtellaProject(object):
         deps_manager.set_project(self)
 
         return deps_manager
+
+    def create_casting_manager(self):
+        """
+        Crates instance of the casting manager used by the project
+        :return: ArtellaCastingManager
+        """
+
+        casting_manager = artellapipe.CastMgr()
+        casting_manager.set_project(self)
+
+        return casting_manager
+
 
     def create_slack_manager(self):
         """

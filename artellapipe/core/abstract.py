@@ -268,20 +268,12 @@ class AbstractFile(object):
         :return: bool
         """
 
-        file_path = self.get_file(file_type=file_type, status=status, extension=extension, fix_path=fix_path)
-        if os.path.isfile(file_path):
-            if fix_path:
-                file_path = artellapipe.FilesMgr().fix_path(file_path)
-            if path_utils.clean_path(tp.Dcc.scene_name()) == path_utils.clean_path(file_path):
-                return True
-            tp.Dcc.open_file(file_path)
-            return True
-        elif os.path.isdir(file_path):
-            osplatform.open_folder(file_path)
+        file_type_to_open = self.get_file_type(file_type)
+        if file_type_to_open:
+            return file_type_to_open.open_file(status=status, fix_path=fix_path)
         else:
-            LOGGER.warning('Impossible to open file of type "{}": {}'.format(file_type, file_path))
-
-        return False
+            LOGGER.warning('Impossible to open file of type "{}"'.format(file_type))
+            return False
 
     def import_file_by_extension(self, status=None, extension=None, file_type=None, sync=False, reference=False):
         """
