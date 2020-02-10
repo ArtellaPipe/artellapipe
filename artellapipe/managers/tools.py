@@ -169,10 +169,20 @@ class ToolsManager(object):
         # Register tool resources
         def_resources_path = os.path.join(pkg_loader.filename, 'resources')
         resources_path = tool_config.data.get('resources_path', def_resources_path)
+        if not resources_path or not os.path.isdir(resources_path):
+            resources_path = def_resources_path
         if os.path.isdir(resources_path):
             resource.ResourceManager().register_resource(resources_path, key='tools')
         else:
             LOGGER.info('No resources directory found for tool "{}" ...'.format(tool_name))
+
+        if core_loader:
+            core_def_resources_path = os.path.join(core_loader.filename, 'resources')
+            core_resources_path = core_config.data.get('resources_path', core_def_resources_path)
+            if not resources_path or not os.path.isdir(resources_path):
+                core_resources_path = core_def_resources_path
+            if os.path.isdir(core_resources_path):
+                resource.ResourceManager().register_resource(core_resources_path, key='tools')
 
         self._tools[tool_id] = {
             'name': tool_name,
