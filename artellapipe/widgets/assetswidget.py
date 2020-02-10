@@ -32,10 +32,12 @@ class AssetsWidget(base.BaseWidget, object):
 
     assetAdded = Signal(object)
 
-    def __init__(self, project, show_viewer_menu=False, parent=None):
+    def __init__(self, project, column_count=4, show_viewer_menu=False, parent=None, category_alignment='vertical'):
 
         self._project = project
+        self._column_count = column_count
         self._show_viewer_menu = show_viewer_menu
+        self._category_alignment = category_alignment
         if not self._project:
             LOGGER.warning('Invalid project for AssetsWidget!')
 
@@ -51,13 +53,21 @@ class AssetsWidget(base.BaseWidget, object):
     def ui(self):
         super(AssetsWidget, self).ui()
 
-        main_categories_menu_layout = QHBoxLayout()
+        if self._category_alignment == 'vertical':
+            main_categories_menu_layout = QHBoxLayout()
+        else:
+            main_categories_menu_layout = QVBoxLayout()
+
         main_categories_menu_layout.setContentsMargins(0, 0, 0, 0)
         main_categories_menu_layout.setSpacing(0)
         self.main_layout.addLayout(main_categories_menu_layout)
 
         categories_menu = QWidget()
-        self._categories_menu_layout = QVBoxLayout()
+
+        if self._category_alignment == 'vertical':
+            self._categories_menu_layout = QVBoxLayout()
+        else:
+            self._categories_menu_layout = QHBoxLayout()
         self._categories_menu_layout.setContentsMargins(0, 0, 0, 0)
         self._categories_menu_layout.setSpacing(0)
         self._categories_menu_layout.setAlignment(Qt.AlignTop)
@@ -68,7 +78,8 @@ class AssetsWidget(base.BaseWidget, object):
         main_categories_menu_layout.addWidget(asset_splitter)
 
         self._assets_viewer = artellapipe.AssetsViewer(
-            project=self._project, show_context_menu=self._show_viewer_menu, parent=self)
+            project=self._project, column_count=self._column_count,
+            show_context_menu=self._show_viewer_menu, parent=self)
         asset_splitter.addWidget(self._assets_viewer)
         self._assets_viewer.first_empty_cell()
 

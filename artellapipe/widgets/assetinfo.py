@@ -287,8 +287,26 @@ class AssetFileButton(base.BaseWidget, object):
 
         file_path = self._get_file_path()
         if not file_path or not os.path.exists(file_path):
-            self._file_btn.setEnabled(False)
-            self._versions_btn.setEnabled(False)
+            self._disable_state()
+            return
+
+        self._enable_state()
+
+    def _enable_state(self):
+        """
+        Internal function that enables the functionality of asset file buttons
+        """
+
+        self._file_btn.setEnabled(True)
+        self._versions_btn.setEnabled(True)
+
+    def _disable_state(self):
+        """
+        Internal function that disables the functionality of asset file buttons
+        """
+
+        self._file_btn.setEnabled(False)
+        self._versions_btn.setEnabled(False)
 
     def _get_file_path(self):
         """
@@ -434,7 +452,11 @@ class WorkingAssetInfo(base.BaseWidget, object):
         file_buttons_widget.setSelectionMode(QAbstractItemView.NoSelection)
 
         files_btn = list()
+        must_file_types = artellapipe.AssetsMgr().must_file_types
         for file_type in self._asset_widget.asset.FILES:
+            if must_file_types:
+                if file_type not in must_file_types:
+                    continue
             file_type_name = artellapipe.FilesMgr().get_file_type_name(file_type)
             file_btn = AssetFileButton(
                 self._asset_widget, self.STATUS,
