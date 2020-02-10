@@ -57,7 +57,8 @@ class ArtellaSequence(abstract.AbstractSequence, object):
             return None
 
         template_dict = {
-            'project_path': self._project.get_path(),
+            'project_id': self._project.id,
+            'project_id_number': self._project.id_number,
             'sequence_name': self.get_name()
         }
         sequence_path = template.format(template_dict)

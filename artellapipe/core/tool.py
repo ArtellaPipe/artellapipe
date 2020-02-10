@@ -47,11 +47,20 @@ class Tool(base.BaseWidget, object):
         return self._config
 
     def set_attacher(self, attacher):
+        """
+        Sets the attacher this tool will be linked to
+        :param attacher:
+        """
+
         self._attacher = attacher
         if attacher:
             self.post_attacher_set()
 
     def close_tool_attacher(self):
+        """
+        Closes tool attacher and the tool itself
+        """
+
         if not self._attacher:
             self.close_tool()
 

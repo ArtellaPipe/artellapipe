@@ -10,12 +10,15 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
+import locale
 import logging
 import inspect
+import tempfile
 import importlib
 
+import six
 import tpDccLib as tp
-from tpPyUtils import python, decorators, timedate, osplatform, path as path_utils
+from tpPyUtils import python, decorators, osplatform, path as path_utils
 from tpQtLib.core import qtutils
 
 if python.is_python2():
@@ -175,6 +178,14 @@ class ArtellaFilesManager(object):
             LOGGER.warning('No Template found with name: "{}"'.format(template_name))
 
         return template
+
+    def parse_path(self, path):
+        all_templates = naminglib.ArtellaNameLib().templates
+        for template in all_templates:
+            path_dict = naminglib.ArtellaNameLib().parse_template(template.name, path)
+            if not path_dict:
+                continue
+            return path_dict
 
     def fix_path(self, path_to_fix):
         """
@@ -510,6 +521,51 @@ class ArtellaFilesManager(object):
             return False
 
         return True
+
+    def _format_path(self, format_string, path='', **kwargs):
+        """
+        Resolves the given string with the given path and keyword arguments
+        :param format_string: str
+        :param path: str
+        :param kwargs: dict
+        :return: str
+        """
+
+        LOGGER.debug('Format String: {}'.format(format_string))
+
+        dirname, name, extension = path_utils.split_path(path)
+        encoding = locale.getpreferredencoding()
+        temp = tempfile.gettempdir()
+        if temp:
+            temp = temp.decode(encoding)
+
+        username = osplatform.get_user().lower()
+        if username:
+            username = username.decode(encoding)
+
+        local = os.getenv('APPDATA') or os.getenv('HOME')
+        if local:
+            local = local.decode(encoding)
+
+        kwargs.update(os.environ)
+
+        labels = {
+            "name": name,
+            "path": path,
+            "user": username,
+            "temp": temp,
+            "local": local,
+            "dirname": dirname,
+            "extension": extension,
+        }
+
+        kwargs.update(labels)
+
+        resolved_string = six.u(str(format_string)).format(**kwargs)
+
+        LOGGER.debug('Resolved string: {}'.format(resolved_string))
+
+        return path_utils.clean_path(resolved_string)
 
     def _register_file_classes(self):
         """

@@ -138,6 +138,8 @@ class LibsManager(object):
         # Register tool resources
         def_resources_path = os.path.join(pkg_loader.filename, 'resources')
         resources_path = lib_config.data.get('resources_path', def_resources_path)
+        if not resources_path or not os.path.isdir(resources_path):
+            resources_path = def_resources_path
         if os.path.isdir(resources_path):
             resource.ResourceManager().register_resource(resources_path, key='tools')
         else:

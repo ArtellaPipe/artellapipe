@@ -86,7 +86,7 @@ class ArtellaShotsManager(object):
     @decorators.timestamp
     def find_all_shots(self, force_update=False, force_login=True):
         """
-        Returns all shots of the given sequence
+        Returns all shots of the project
         :param force_update:  bool, Whether shots cache updated must be forced or not
         :param force_login: bool, Whether logging to production tracker is forced or not
         :return: list(ArtellaShot)
@@ -205,18 +205,22 @@ class ArtellaShotsManager(object):
 
         return artellapipe.Shot(project=self._project, shot_data=shot_data)
 
-    @decorators.timestamp
-    def get_shots_from_sequence(self, sequence_name, force_update=False):
+    def get_shots_from_sequence(self, sequence_name, force_update=False, force_login=True):
         """
         Returns shots of the given sequence name
         :param sequence_name: str
         :param force_update: bool
+        :param force_login: bool
         :return:
         """
 
-        raise NotImplementedError
+        sequence_shots = list()
+        all_shots = self.find_all_shots(force_update=force_update, force_login=force_login)
+        for shot in all_shots:
+            if shot.get_sequence() == sequence_name:
+                sequence_shots.append(shot)
 
-        # shots = self.find_all_shots(force_update=force_update)
+        return sequence_shots
 
     def is_valid_shot_type(self, shot_type):
         """

@@ -59,6 +59,10 @@ class ArtellaAssetsManager(object):
     def assets(self):
         return self._assets
 
+    @property
+    def must_file_types(self):
+        return self._config.get('must_file_types', default=list())
+
     def set_project(self, project):
         """
         Sets the project this manager belongs to
@@ -102,7 +106,7 @@ class ArtellaAssetsManager(object):
         node_name = tp.Dcc.node_short_name(node)
         namespace = tp.Dcc.node_namespace(node=node_name, check_node=False)
         if not namespace:
-            LOGGER.warning('Was not possible to find asset name from "{}"'.format(node))
+            # LOGGER.warning('Was not possible to find asset name from "{}"'.format(node))
             return False
 
         if namespace.startswith(':'):
@@ -183,6 +187,11 @@ class ArtellaAssetsManager(object):
         return self.config.get('default_thumb', default='default')
 
     def get_assets_by_type(self, asset_type):
+        """
+        Returns asset by its type
+        :param asset_type: str
+        :return: ArtellaAsset
+        """
 
         if not self.is_valid_asset_type(asset_type):
             return None
@@ -561,7 +570,7 @@ class ArtellaAssetsManager(object):
 
         return found_assets
 
-    def get_asset_renderable_shapes(self, asset, remove_namespace=False):
+    def get_asset_renderable_shapes(self, asset, remove_namespace=False, full_path=True):
         """
         Returns a list with all renderable shapes of the given asset
         :param remove_namespace: bool
@@ -571,13 +580,13 @@ class ArtellaAssetsManager(object):
         renderable_shapes = list()
 
         transform_relatives = tp.Dcc.list_relatives(
-            node=asset.get_name(), all_hierarchy=True, full_path=False, relative_type='transform',
+            node=asset.get_name(), all_hierarchy=True, full_path=full_path, relative_type='transform',
             shapes=False, intermediate_shapes=False)
 
         for obj in transform_relatives:
             if not tp.Dcc.object_exists(obj):
                 continue
-            shapes = tp.Dcc.list_shapes(node=obj, full_path=False, intermediate_shapes=False)
+            shapes = tp.Dcc.list_shapes(node=obj, full_path=full_path, intermediate_shapes=False)
             if not shapes:
                 continue
             renderable_shapes.extend(shapes)

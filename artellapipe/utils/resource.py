@@ -51,10 +51,10 @@ class ResourceManager(object):
         if key:
             if key == 'project':
                 self._project_resources[resources_path] = resource.Resource(resources_path)
-                if key in self._resources:
-                    self._resources[key].insert(0, resource.Resource(resources_path))
-                else:
-                    self._resources[key] = [resource.Resource(resources_path)]
+            if key in self._resources:
+                self._resources[key].insert(0, resource.Resource(resources_path))
+            else:
+                self._resources[key] = [resource.Resource(resources_path)]
 
         self._resources[resources_path] = resource.Resource(resources_path)
 
