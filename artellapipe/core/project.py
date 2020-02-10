@@ -16,15 +16,12 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import sys
 import time
-import locale
 import logging
 import tempfile
 import datetime
 import importlib
 import traceback
 import webbrowser
-
-import six
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
@@ -42,18 +39,13 @@ else:
 import artellapipe
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
-from artellapipe.core import defines, config, node, sequence, shot
+from artellapipe.core import defines, config
 from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
 
 class ArtellaProject(object):
-
-    SHELF_CLASS = tp.Shelf
-    SEQUENCE_CLASS = sequence.ArtellaSequence
-    SHOT_CLASS = shot.ArtellaShot
-
     def __init__(self, name, settings=None):
         super(ArtellaProject, self).__init__()
 
@@ -206,6 +198,8 @@ class ArtellaProject(object):
         self.create_shaders_manager()
         self.create_sequences_manager()
         self.create_shots_manager()
+        self.create_tasks_manager()
+        self.create_media_manager()
         self.create_playblasts_manager()
         self.create_pyblish_manager()
         self.create_dependencies_manager()
@@ -449,11 +443,19 @@ class ArtellaProject(object):
                     self.name.title()))
             LOGGER.error('{} | {}'.format(e, traceback.format_exc()))
 
+        temp_env_var = self.get_temporary_environment_variable()
+        os.environ[temp_env_var] = tempfile.gettempdir()
+        project_temp_folder = path_utils.clean_path(
+            os.path.join(tempfile.gettempdir(), '{}_temp'.format(self.get_clean_name())))
+        if not os.path.isdir(project_temp_folder):
+            try:
+                os.makedirs(project_temp_folder)
+            except Exception as exc:
+                LOGGER.warning('Impossible to create temporally folder for project "{}"'.format(self.get_clean_name()))
+        if os.path.isdir(project_temp_folder):
+            os.environ[temp_env_var] = project_temp_folder
+
         icons_paths = resource.ResourceManager().get_resources_paths()
-        # icons_paths = [
-        #     artellapipe.resource.RESOURCES_FOLDER,
-        #     self.resource.RESOURCES_FOLDER
-        # ]
 
         current_paths = list()
         if os.environ.get('XBMLANGPATH'):
@@ -591,6 +593,28 @@ class ArtellaProject(object):
 
         return shots_manager
 
+    def create_tasks_manager(self):
+        """
+        Creates instance of the tasks manager used by the project
+        :return: ArtellaShotsManager
+        """
+
+        tasks_manager = artellapipe.TasksMgr()
+        tasks_manager.set_project(self)
+
+        return tasks_manager
+
+    def create_media_manager(self):
+        """
+        Creates instance of hte media manager used by the project
+        :return: ArtellaMediaManager
+        """
+
+        media_manager = artellapipe.MediaMgr()
+        media_manager.set_project(self)
+
+        return media_manager
+
     def create_playblasts_manager(self):
         """
        Creates instance of the playblasts manager used by the project
@@ -635,7 +659,6 @@ class ArtellaProject(object):
 
         return casting_manager
 
-
     def create_slack_manager(self):
         """
         Crates instance of the slack manager used by the project
@@ -678,6 +701,23 @@ class ArtellaProject(object):
             for p in self.paths_to_register:
                 paths_to_return.append(path_utils.clean_path(os.path.join(self.get_project_path(), p)))
             return paths_to_return
+
+    def get_temporary_environment_variable(self):
+        """
+        Returns environment variable used to store temporally path of the project
+        :return: str
+        """
+
+        return '{}_TEMP'.format(self.get_clean_name().upper())
+
+    def get_temporary_folder(self):
+        """
+        Returns path where temporally folder for current folder is located
+        :return: str
+        """
+
+        temp_env = self.get_temporary_environment_variable()
+        return os.environ[temp_env]
 
     def message(self, msg, title=None):
         """
@@ -796,6 +836,23 @@ class ArtellaProject(object):
                 '{} Project not setup properly. Please contact TD to fix this problem'.format(self.name.title()))
 
         return os.environ.get(self.env_var)
+
+    def get_drive(self):
+        """
+        Returns drive Artella project is located
+        :return: str
+        """
+
+        project_path = self.get_path()
+        if not project_path or not os.path.isdir(project_path):
+            LOGGER.warning(
+                'Impossible to retrieve project path drive because project path does not exists: "{}"'.format(
+                    project_path))
+            return None
+
+        path_split = os.path.splitdrive(project_path)
+
+        return path_split[0]
 
     def get_production_folder_name(self):
         """
@@ -993,51 +1050,6 @@ class ArtellaProject(object):
         """
 
         return ArtellaProjectSettings(project=self, filename=self.get_settings_file())
-
-    def _format_path(self, format_string, path='', **kwargs):
-        """
-        Resolves the given string with the given path and keyword arguments
-        :param format_string: str
-        :param path: str
-        :param kwargs: dict
-        :return: str
-        """
-
-        LOGGER.debug('Format String: {}'.format(format_string))
-
-        dirname, name, extension = path_utils.split_path(path)
-        encoding = locale.getpreferredencoding()
-        temp = tempfile.gettempdir()
-        if temp:
-            temp = temp.decode(encoding)
-
-        username = osplatform.get_user().lower()
-        if username:
-            username = username.decode(encoding)
-
-        local = os.getenv('APPDATA') or os.getenv('HOME')
-        if local:
-            local = local.decode(encoding)
-
-        kwargs.update(os.environ)
-
-        labels = {
-            "name": name,
-            "path": path,
-            "user": username,
-            "temp": temp,
-            "local": local,
-            "dirname": dirname,
-            "extension": extension,
-        }
-
-        kwargs.update(labels)
-
-        resolved_string = six.u(str(format_string)).format(**kwargs)
-
-        LOGGER.debug('Resolved string: {}'.format(resolved_string))
-
-        return path_utils.clean_path(resolved_string)
 
     def _update_dcc_ui(self):
         """
