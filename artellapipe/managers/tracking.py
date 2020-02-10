@@ -49,6 +49,14 @@ class TrackingManager(QObject, object):
         self._project = project
         # self.update_tracking_info()
 
+    def get_name(self):
+        """
+        Returns the name of the production tracker system
+        :return: str
+        """
+
+        return 'Production Tracker'
+
     def needs_login(self):
         """
         Returns whether or not production trackign needs log to work or not
@@ -114,6 +122,15 @@ class TrackingManager(QObject, object):
         raise NotImplementedError('logout function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
+    def get_user_name(self):
+        """
+        Returns the name of the current logged user
+        :return: str
+        """
+
+        raise NotImplementedError('get_user_name function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
     def download_preview_file_thumbnail(self, preview_id, file_path):
         """
         Downloads given preview file thumbnail and save it at given location
@@ -123,6 +140,36 @@ class TrackingManager(QObject, object):
 
         raise NotImplementedError(
             'download_preview_file_thumbnail function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_project_name(self):
+        """
+        Returns name of the project
+        :return: str
+        """
+
+        raise NotImplementedError(
+            'get_project_name function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_project_fps(self):
+        """
+        Returns FPS (frames per second) used in the project
+        :return: int
+        """
+
+        raise NotImplementedError(
+            'get_project_fps function for {} is not implemented!'.format(self.__class__.__name__))
+
+    @decorators.abstractmethod
+    def get_project_resolution(self):
+        """
+        Returns resolution used in the project
+        :return: str
+        """
+
+        raise NotImplementedError(
+            'get_project_resolution function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
     def all_project_assets(self):
@@ -162,6 +209,44 @@ class TrackingManager(QObject, object):
 
         raise NotImplementedError(
             'all_assets_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def get_tasks_in_shot(self, shot_id):
+        """
+        Returns all tasks in given shot
+        :param shot_id: str
+        :return: list
+        """
+
+        raise NotImplementedError(
+            'get_tasks_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def all_task_types(self):
+        """
+        Returns all task types
+        :return: list
+        """
+
+        raise NotImplementedError(
+            'all_assets_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def all_task_types_for_assets(self):
+        """
+        Returns all task types for assets
+        :return:
+        """
+
+        raise NotImplementedError(
+            'all_task_types_for_assets function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def all_task_types_for_shots(self):
+        """
+        Returns all task types for assets
+        :return:
+        """
+
+        raise NotImplementedError(
+            'all_task_types_for_shots function for {} is not implemented!'.format(self.__class__.__name__))
+
 
 @decorators.Singleton
 class TrackinManagerSingleton(TrackingManager, object):
