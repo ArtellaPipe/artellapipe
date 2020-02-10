@@ -15,8 +15,8 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 
+import tpDccLib as tp
 from tpPyUtils import decorators, python, path as path_utils
-from tpQtLib.core import qtutils
 
 import artellapipe
 from artellapipe.core import defines
@@ -98,7 +98,7 @@ class ArtellaFile(object):
         raise NotImplementedError('get_project function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None):
+    def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None, **kwargs):
         """
         Returns file of the attached object
         :param status: str
@@ -220,17 +220,21 @@ class ArtellaFile(object):
         :return:
         """
 
-        if status == defines.ArtellaFileStatus.WORKING:
-            file_path = self.get_working_path()
-        else:
-            file_path = self.get_latest_local_published_path()
+        file_path = None
+        if self.path:
+            file_path = self.get_file_paths(return_first=True, fix_path=fix_path)
+        if not file_path or not os.path.isfile(file_path):
+            if status == defines.ArtellaFileStatus.WORKING:
+                file_path = self.get_working_path()
+            else:
+                file_path = self.get_latest_local_published_path()
 
-        if fix_path:
-            file_path = artellapipe.FilesMgr().fix_path(file_path)
+            if fix_path:
+                file_path = artellapipe.FilesMgr().fix_path(file_path)
 
         return self._open_file(file_path=file_path)
 
-    def import_file(self, fix_path=True, sync=False, reference=False, *args, **kwargs):
+    def import_file(self, status=defines.ArtellaFileStatus.WORKING, fix_path=True, sync=False, reference=False, *args, **kwargs):
         """
         References current file into DCC
         :param status: str
@@ -239,13 +243,13 @@ class ArtellaFile(object):
         :return:
         """
 
-        file_path = self.get_file_paths(return_first=True, fix_path=fix_path)
+        file_path = self.get_file_paths(return_first=True, fix_path=fix_path, status=status)
         valid_path = self._check_path(file_path, sync=sync)
         if not valid_path:
             msg = 'Impossible to reference file of type "{}". File Path "{}" does not exists!'.format(
                 self.FILE_TYPE, file_path)
             LOGGER.warning(msg)
-            qtutils.warning_message(msg)
+            # qtutils.warning_message(msg)
             return None
 
         if reference:
@@ -261,7 +265,7 @@ class ArtellaFile(object):
         :param kwargs:
         """
 
-        file_path = self.get_file_paths(return_first=True, fix_path=fix_path)
+        file_path = self.get_file_paths(return_first=True, fix_path=fix_path, **kwargs)
         return self._export_file(file_path, *args, **kwargs)
 
     def get_working_path(self, sync_folder=False):
@@ -330,10 +334,11 @@ class ArtellaFile(object):
 
         return local_versions
 
-    def get_latest_local_versions(self, status=None):
+    def get_latest_local_versions(self, status=None, next_version=False):
         """
         Returns latest local version of the of the current file type
         :param status: str
+        :param next_version: bool
         :return: dict
         """
 
@@ -350,6 +355,12 @@ class ArtellaFile(object):
             else:
                 if int(latest_local_versions[0]) < int(version):
                     latest_local_versions = [int(version), version_folder]
+
+        if latest_local_versions and next_version:
+            current_version = artellalib.split_version(latest_local_versions[1])
+            new_version = artellalib.split_version(latest_local_versions[1], next_version=True)
+            latest_local_versions[0] = new_version[1]
+            latest_local_versions[1] = latest_local_versions[1].replace(current_version[0], new_version[0])
 
         return latest_local_versions
 
@@ -519,9 +530,12 @@ class ArtellaFile(object):
             if template_data:
                 template = artellapipe.FilesMgr().get_template(self.FILE_TEMPLATE)
                 if template:
-                    file_path = template.format(template_data)
-                    if file_path.endswith('.'):
-                        file_path = file_path[:-1]
+                    try:
+                        file_path = template.format(template_data)
+                        if file_path.endswith('.'):
+                            file_path = file_path[:-1]
+                    except Exception:
+                        file_path = None
                     return file_path
 
     def _get_extensions(self, extension):
@@ -566,7 +580,13 @@ class ArtellaFile(object):
         :return:
         """
 
-        raise NotImplementedError('_open_file function for "{}" is not implemented!'.format(self))
+        if not file_path:
+            return False
+
+        if os.path.isfile(file_path) and tp.Dcc.scene_name() != file_path:
+            tp.Dcc.open_file(file_path)
+
+        return True
 
     def _import_file(self, file_path, *args, **kwargs):
         """
@@ -576,7 +596,13 @@ class ArtellaFile(object):
         :return:
         """
 
-        raise NotImplementedError('_import_file function for "{}" is not implemented!'.format(self))
+        if not file_path:
+            return False
+
+        if os.path.isfile(file_path) and tp.Dcc.scene_name() != file_path:
+            tp.Dcc.import_file(file_path)
+
+        return True
 
     def _reference_file(self, file_path, *args, **kwargs):
         """

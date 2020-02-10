@@ -15,7 +15,7 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 
-import tpDccLib as tp
+from tpPyUtils import path as path_utils
 
 import artellapipe.register
 from artellapipe.core import abstract, defines
@@ -115,7 +115,8 @@ class ArtellaAsset(abstract.AbstractAsset, object):
             return None
 
         template_dict = {
-            'project_path': self._project.get_path(),
+            'project_id': self._project.id,
+            'project_id_number': self._project.id_number,
             'asset_type': self.get_category(),
             'asset_name': self.get_name()
         }
@@ -126,6 +127,10 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                 'Impossible to retrieve asset path from template: "{} | {} | {}"'.format(
                     template.name, template.pattern, template_dict))
             return None
+
+        project_drive = artellapipe.project.get_drive()
+        if not asset_path.startswith(project_drive):
+            asset_path = path_utils.clean_path(os.path.join(project_drive, asset_path))
 
         return asset_path
 
@@ -170,23 +175,34 @@ class ArtellaAsset(abstract.AbstractAsset, object):
     # SHADERS
     # ==========================================================================================================
 
-    def get_shaders_path(self, status=defines.ArtellaFileStatus.WORKING):
+    def get_shaders_path(self, status=defines.ArtellaFileStatus.WORKING, next_version=False):
         """
         Returns path where asset shaders are stored
         :return: str
         """
 
-        shaders_path_file_type = artellapipe.ShadersMgr().get_shader_path_file_type()
+        shaders_path_file_type = artellapipe.ShadersMgr().get_shaders_path_file_type()
         if not shaders_path_file_type:
             LOGGER.warning('No Asset Shaders Path file type available!')
             return None
 
-        asset_shader_file_path = self.get_file(shaders_path_file_type, status=status)
-        if not asset_shader_file_path:
-            LOGGER.warning('No Shaders Path available for asset: "{}"'.format(self.get_name()))
+        shader_file_path_template = artellapipe.FilesMgr().get_template('shaders')
+        if not shader_file_path_template:
+            LOGGER.warning('No shaders path template found!')
             return None
 
-        return asset_shader_file_path
+        template_dict = {
+            'project_id': self._project.id,
+            'project_id_number': self._project.id_number,
+            'asset_type': self.get_category(),
+            'asset_name': self.get_name()
+        }
+
+        asset_shaders_path = self.solve_path(
+            file_type=shaders_path_file_type, template=shader_file_path_template, template_dict=template_dict,
+            status=status, check_file_type=False)
+
+        return asset_shaders_path
 
     # ==========================================================================================================
     # PRIVATE

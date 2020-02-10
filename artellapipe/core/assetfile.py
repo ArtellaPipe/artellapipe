@@ -58,7 +58,8 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         """
 
         template_dict = {
-            'project_path': self._project.get_path(),
+            'project_id': self._project.id,
+            'project_id_number': self._project.id_number,
             'asset_name': self._asset.get_name(),
             'asset_type': self._asset.get_category(),
             'file_extension': kwargs.get('extension', self.FILE_EXTENSIONS[0])
@@ -75,7 +76,8 @@ class ArtellaAssetFile(file.ArtellaFile, object):
 
         return self._asset.project
 
-    def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None):
+    def get_file(
+            self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None, **kwargs):
         """
         Implements base ArtellaFile get_file function
         Returns file of the attached object
@@ -87,8 +89,10 @@ class ArtellaAssetFile(file.ArtellaFile, object):
         :return: str
         """
 
+        template_dict = self.get_template_dict()
         return self._asset.get_file(
-            file_type=self.FILE_TYPE, status=status, extension=extension, fix_path=fix_path, version=version)
+            file_type=self.FILE_TYPE, status=status, extension=extension, fix_path=fix_path,
+            version=version, extra_dict=template_dict)
 
     def get_path(self):
         """
@@ -156,15 +160,20 @@ class ArtellaAssetFile(file.ArtellaFile, object):
             return [file_path]
 
     def _open_file(self, file_path):
-        if os.path.isfile(file_path):
+        if file_path and os.path.isfile(file_path):
             if path_utils.clean_path(tp.Dcc.scene_name()) == path_utils.clean_path(file_path):
                 return True
             tp.Dcc.open_file(file_path)
             return True
-        elif os.path.isdir(file_path):
+        elif file_path and os.path.isdir(file_path):
             osplatform.open_file(file_path)
             return True
         else:
+            if file_path:
+                folder_path = os.path.dirname(file_path)
+                if os.path.isdir(folder_path):
+                    osplatform.open_file(folder_path)
+                    return True
             LOGGER.warning('Impossible to open file: "{}"'.format(file_path))
 
         return False
