@@ -71,7 +71,7 @@ class ArtellaSequencesManager(object):
     def register_sequence_class(self, sequence_class):
         """
         Registers a new sequence class into the project
-        :param shot_class: cls
+        :param sequence_class: cls
         """
 
         if sequence_class in self._registered_sequence_classes:

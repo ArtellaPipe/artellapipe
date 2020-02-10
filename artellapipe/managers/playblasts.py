@@ -14,6 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 import logging
+import tempfile
 
 import tpDccLib as tp
 from tpPyUtils import decorators, path as path_utils
@@ -173,12 +174,9 @@ class PlayblastsManager(object):
         :return: str, path to playblast file
         """
 
-        filename = options.get('filename', '%TEMP%')
-        LOGGER.info('Capturing to {}'.format(filename))
-        options = options.copy()
-
         # Force viewer to False in call to capture because we have our own viewer opening call to allow a signal
         # to trigger between playblast and viewer
+        options = options.copy()
         options['viewer'] = False
         options.pop('panel', None)
 
@@ -237,6 +235,7 @@ class PlayblastsManager(object):
 
         tp.Dcc.set_current_frame(tp.Dcc.get_current_frame())
 
+        filename = kwargs.get('filename', tempfile.gettempdir())
         kwargs['camera'] = camera
         kwargs['width'] = width
         kwargs['height'] = height
@@ -245,6 +244,16 @@ class PlayblastsManager(object):
         output = self._generate_playblast(**kwargs)
 
         return output
+
+    def stamp_playblast(self, file_name, output_file, extra_dict=None):
+        if extra_dict is None:
+            extra_dict = dict()
+        output_split = os.path.splitext(output_file)
+        output_ext = output_split[-1]
+        if not output_ext or output_ext != '.mp4':
+            output_file = '{}.mp4'.format(output_split[0])
+
+        return artellapipe.MediaMgr().stamp(file_name, output_file, extra_dict=extra_dict)
 
     def _generate_playblast(self, width, height, off_screen, **kwargs):
         """
