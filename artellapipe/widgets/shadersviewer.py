@@ -128,7 +128,7 @@ class ShaderViewerWidget(base.BaseWidget, object):
         """
 
         shader_path = self.get_shader_path()
-        if not os.path.isfile(shader_path):
+        if not shader_path or not os.path.isfile(shader_path):
             LOGGER.warning('Shader Data Path {0} for shader {1} is not valid!'.format(shader_path, self._name))
             return
 

@@ -52,54 +52,21 @@ class ShadersManager(object):
         self._project = project
         self._config = config.get_config(project, 'artellapipe-shaders')
 
-    def get_scene_operator(self, create=True):
+    def get_shaders_path_file_type(self):
         """
-        Returns scene shaders operator node
+        Returns file type used to define shaders
         :return: str
         """
 
-        scene_operator = 'assets_operator'
-        if create:
-            if not tp.Dcc.object_exists(scene_operator):
-                scene_operator = maya.cmds.createNode('aiMerge', name='assets_operator')
-                tp.Dcc.connect_attribute(scene_operator, 'message', 'defaultArnoldRenderOptions', 'operator',
-                                         force=True)
+        return self.config.get('path_file_type', default='shaders')
 
-        return scene_operator
-
-    def remove_scene_operator(self):
+    def get_shaders_asset_file_type(self):
         """
-        Removes scene shader operator node if it has no more connections
-        """
-
-        scene_operator = self.get_scene_operator(create=False)
-        if not scene_operator or not tp.Dcc.object_exists(scene_operator):
-            return
-
-        inputs = tp.Dcc.list_source_connections(scene_operator)
-        if inputs:
-            LOGGER.warning(
-                'Impossible to remove scene operator: "{}" because it has input connections!'.format(scene_operator))
-            return
-
-        tp.Dcc.delete_object(scene_operator)
-
-        return True
-
-    def get_shaders_file_type(self):
-        """
-        Returns file type used to define shaders
+        Returns file type used to define asset shaders
+        :return: str
         """
 
         return self.config.get('file_type', default='shader')
-
-    def get_shader_path_file_type(self):
-        """
-        Returns file type used to define shaders path
-        :return: str
-        """
-
-        return self.config.get('shader_path_file_type', default='shaders')
 
     def get_shaders_extensions(self):
         """
@@ -107,7 +74,7 @@ class ShadersManager(object):
         :return: str
         """
 
-        shaders_file_type = self.get_shaders_file_type()
+        shaders_file_type = self.get_shaders_asset_file_type()
         extensions = artellapipe.FilesMgr().get_file_type_extensions(shaders_file_type)
         if not extensions:
             LOGGER.warning('Impossible to refresh shaders because shader file type is not defined in current project!')
@@ -133,6 +100,23 @@ class ShadersManager(object):
 
         return asset_shader_file_class
 
+    def get_asset_shader_file_class(self):
+        """
+        Returns asset shader file class associated to this asset
+        :return: class
+        """
+        asset_shaders_file_type = self.get_shaders_asset_file_type()
+        if not asset_shaders_file_type:
+            LOGGER.warning('No Asset Shaders file type available!')
+            return None
+
+        asset_shader_file_class = artellapipe.FilesMgr().get_file_class(asset_shaders_file_type)
+        if not asset_shader_file_class:
+            LOGGER.warning('No Shader File Class found! Aborting shader loading ...')
+            return None
+
+        return asset_shader_file_class
+
     def get_shaders_paths(self):
         """
         Returns path where shaders are located in the project
@@ -152,49 +136,55 @@ class ShadersManager(object):
         :return:
         """
 
-        if not shader_path:
-            shaders_paths = self.get_shaders_paths()
-            if not shaders_paths:
-                LOGGER.warning('Impossible to return shader file path because no shaders path are defined')
-                return
+        if not asset:
+            if not shader_path:
+                shaders_paths = self.get_shaders_paths()
+                if not shaders_paths:
+                    LOGGER.warning('Impossible to return shader file path because no shaders path are defined')
+                    return
+            else:
+                shaders_paths = python.force_list(shader_path)
         else:
-            shaders_paths = python.force_list(shader_path)
-
-        shaders_file_type = self.config.get('file_type', None)
-        if not shaders_file_type:
-            LOGGER.warning('Impossible to return shader file path because shader file type is not defined!')
-            return
-
-        shader_file_class = artellapipe.FilesMgr().get_file_class(shaders_file_type)
-        if not shader_file_class:
-            LOGGER.warning(
-                'Impossible to get shader path: {} | {} | {}'.format(shader_name, shaders_paths, shaders_file_type))
-            return
+            shaders_paths = list()
 
         if asset:
-            extra_dict = {
-                'shader_name': shader_name
-            }
-            asset_shader_file_path = asset.get_file(
-                shaders_file_type, status=defines.ArtellaFileStatus.WORKING, extra_dict=extra_dict
-            )
-            if not asset_shader_file_path:
-                LOGGER.warning('No Shaders Path available for asset: "{}"'.format(asset.get_name()))
-                return None
+            shaders_asset_file_type = self.get_shaders_asset_file_type()
+            if not shaders_asset_file_type:
+                LOGGER.warning('Impossible to return shader asset file path because shader file type is not defined!')
+                return
 
-            shader_file = shader_file_class(self._project, shader_name, file_path=shader_path)
+            shader_asset_file_class = artellapipe.FilesMgr().get_file_class(shaders_asset_file_type)
+            if not shader_asset_file_class:
+                LOGGER.warning(
+                    'Impossible to get shader path: {} | {} | {}'.format(
+                        shader_name, shaders_paths, shaders_asset_file_type))
+                return
+
+            shader_file = shader_asset_file_class(shader_name=shader_name, asset=asset)
             return shader_file
 
         else:
-            for shader_path in shaders_paths:
-                shader_file = shader_file_class(self._project, shader_name, file_path=shader_path)
-                shader_file_paths = shader_file.get_file_paths()
-                if shader_path:
-                    return shader_file
-                else:
-                    for shader_file_path in shader_file_paths:
-                        if os.path.isfile(shader_file_path):
-                            return shader_file
+            raise NotImplementedError('Library Shader File is not implemented!')
+            # shaders_file_type = self.get_shaders_file_type()
+            # if not shaders_file_type:
+            #     LOGGER.warning('Impossible to return shader file path because shader file type is not defined!')
+            #     return
+            #
+            # shader_file_class = artellapipe.FilesMgr().get_file_class(shaders_file_type)
+            # if not shader_file_class:
+            #     LOGGER.warning(
+            #         'Impossible to get shader path: {} | {} | {}'.format(shader_name, shaders_paths, shaders_file_type))
+            #     return
+            #
+            # for shader_path in shaders_paths:
+            #     shader_file = shader_file_class(self._project, shader_name, file_path=shader_path)
+            #     shader_file_paths = shader_file.get_file_paths()
+            #     if shader_path:
+            #         return shader_file
+            #     else:
+            #         for shader_file_path in shader_file_paths:
+            #             if os.path.isfile(shader_file_path):
+            #                 return shader_file
 
         return None
 
@@ -232,7 +222,8 @@ class ShadersManager(object):
 
         artellapipe.FilesMgr().sync_files(files=shaders_paths)
 
-    def load_shader(self, shader_name, shader_path=None, apply=True):
+    def load_shader(self,
+                    shader_name, shader_path=None, asset=None, apply=True, status=defines.ArtellaFileStatus.WORKING):
         """
         Loads shader with given name in current DCC
         :param shader_name: str
@@ -243,56 +234,69 @@ class ShadersManager(object):
             LOGGER.warning('Shaders loading is only supported in Maya!')
             return
 
+        from tpMayaLib.core import shader as maya_shader
+
+        if shader_name in maya_shader.get_default_shaders():
+            return True
+
         if apply:
             all_panels = maya.cmds.getPanel(type='modelPanel')
             for p in all_panels:
                 maya.cmds.modelEditor(p, edit=True, displayTextures=False)
 
-        valid_shaders_paths = list()
-        shader_library_paths = self.get_shaders_paths()
-        for p in shader_library_paths:
-            if not os.path.exists(p):
-                continue
-            valid_shaders_paths.append(p)
-        if not valid_shaders_paths:
-            LOGGER.debug(
-                '{} Shaders Library folder is not synchronized in your PC. Synchronize it please!'.format(
-                    self._project.name.title()))
-            return False
-
-        shader_file = self.get_shader_file(shader_name, shader_path=shader_path)
-        if not shader_file:
-            LOGGER.warning('Impossible to load shader "{}"!'.format(shader_name))
-            return
-
-        shader_file.import_file()
+        shader_file = self.get_shader_file(shader_name, asset=asset)
+        if shader_file:
+            shader_file.import_file(status=status)
+        else:
+            valid_shaders_paths = list()
+            shader_library_paths = self.get_shaders_paths()
+            for p in shader_library_paths:
+                if not os.path.exists(p):
+                    continue
+                valid_shaders_paths.append(p)
+            if not valid_shaders_paths:
+                LOGGER.debug(
+                    '{} Shaders Library folder is not synchronized in your PC. Synchronize it please!'.format(
+                        self._project.name.title()))
+                return False
+            shader_file = self.get_shader_file(shader_name, shader_path=shader_path)
+            if not shader_file:
+                LOGGER.warning('Impossible to load shader "{}"!'.format(shader_name))
+                return
+            else:
+                shader_file.import_file()
 
         return True
 
-    def load_asset_shaders(self, asset, apply_shaders=True, status=defines.ArtellaFileStatus.PUBLISHED):
+    def load_asset_shaders(self, asset_node, apply_shaders=True, status=defines.ArtellaFileStatus.PUBLISHED):
         """
         Loads all the shaders of the given asset
-        :param asset:
+        :param asset_node:
         :param apply_shaders: bool
         :param status:
         """
 
-        asset_shaders_file = asset.get_asset_shaders_file(status=status)
-        if not asset_shaders_file:
-            LOGGER.warning('No asset shader file found!')
+        if not tp.is_maya():
+            LOGGER.warning('Load Asset Shaders functionality is only available in Maya')
             return False
 
-        shader_names = asset_shaders_file.get_shaders()
+        shaders_mapping_file = asset_node.get_asset_shaders_mapping_file()
+        if not shaders_mapping_file:
+            LOGGER.warning('No asset shader mapping file found!')
+            return False
+
+        shader_names = shaders_mapping_file.get_shaders(status=status)
         if not shader_names:
-            LOGGER.warning('No shaders to load found!')
+            LOGGER.warning('No shaders to load found! ({})'.format(status))
+            return False
 
         if apply:
-            scene_operator = self.get_scene_operator()
+            scene_operator = artellapipe.Arnold().get_scene_operator()
             if not tp.Dcc.object_exists(scene_operator):
                 LOGGER.warning('No Scene Operator found in current scene!')
                 return False
 
-        asset_shading_geo_mapping = asset_shaders_file.get_shading_geometry_mapping()
+        asset_shading_geo_mapping = shaders_mapping_file.get_shading_geometry_mapping()
         shaded_shapes = asset_shading_geo_mapping.keys()
         updated_shapes = dict()
         for shape in shaded_shapes:
@@ -311,96 +315,133 @@ class ShadersManager(object):
                         'Reexport shader without namespace!'.format(shape))
                     continue
                 new_shape = shape.split('|')[-1]
-                new_shape = '{}:{}'.format(asset.id, new_shape)
+                new_shape = '{}:{}'.format(asset_node.id, new_shape)
                 updated_shapes[shape] = new_shape
 
         for shader_name in shader_names:
-            valid_load = self.load_shader(shader_name, apply=apply)
-            if not valid_load:
-                LOGGER.warning('Something went wrong when loading Shader "{}"'.format(shader_name))
-                continue
+            if not tp.Dcc.object_exists(shader_name):
+                valid_load = self.load_shader(shader_name, asset=asset_node.asset, apply=apply, status=status)
+                if not valid_load:
+                    LOGGER.warning('Something went wrong when loading Shader "{}"'.format(shader_name))
+                    continue
 
         if apply_shaders:
-            next_asset_index = maya_attribute.next_available_multi_index(
-                '{}.inputs'.format(scene_operator), use_connected_only=False)
-            asset_operator_node = maya.cmds.createNode('aiMerge', name='{}_operator'.format(asset.id))
-            tp.Dcc.connect_attribute(
-                source_node=asset_operator_node, source_attribute='out',
-                target_node=scene_operator, target_attribute='inputs[{}]'.format(next_asset_index)
-            )
+            asset_operator_node = asset_node.get_asset_operator()
+            if not asset_operator_node or not tp.Dcc.object_exists(asset_operator_node):
+                asset_operator_node = asset_node.create_operator_node()
+
+            if not asset_operator_node:
+                return False
+
             for i, (original_shape, updated_shape) in enumerate(updated_shapes.items()):
                 shaders_to_apply = asset_shading_geo_mapping[original_shape]
-                asset_shape_node = maya.cmds.createNode('aiSetParameter', name='{}_set'.format(updated_shape))
-                shape_name = updated_shape.split(':')[-1]
-                tp.Dcc.set_string_attribute_value(asset_shape_node, 'selection', '{}*{}'.format(asset.id, shape_name))
-                tp.Dcc.connect_attribute(
-                    source_node=asset_shape_node, source_attribute='out',
-                    target_node=asset_operator_node, target_attribute='inputs[{}]'.format(i))
+                asset_shape_operator = asset_node.get_shape_operator(updated_shape)
+                if not asset_shape_operator:
+                    asset_shape_operator = asset_node.create_shape_operator(updated_shape)
+                    if not asset_shape_operator:
+                        LOGGER.warning(
+                            'Impossible to create Asset Shape Operator for "{} | {}"'.format(
+                                asset_node.id, updated_shape))
+                        return False
+
                 for j, shader_to_apply in enumerate(shaders_to_apply):
-                    tp.Dcc.set_string_attribute_value(
-                        asset_shape_node, 'assignment[{}]'.format(j), "shader = '{}'".format(shader_to_apply))
+                    if not tp.Dcc.object_exists(shader_to_apply):
+                        continue
+                    shader_type = tp.Dcc.node_type(shader_to_apply)
+                    if shader_type == 'displacementShader':
+                        asset_node.add_shape_operator_assignment(
+                            shape_name=updated_shape, assignment_value="displacement = '{}'".format(shader_to_apply))
+                    else:
+                        asset_node.add_shape_operator_assignment(
+                            shape_name=updated_shape, assignment_value="shader = '{}'".format(shader_to_apply))
 
         return True
 
-    def unload_asset_shaders(self, asset, status=defines.ArtellaFileStatus.PUBLISHED):
+    def unload_asset_shaders(self, asset_node):
         """
         Unload shaders of given asset
-        :param asset:
+        :param asset_node:
         :param status:
-        :param with_undo:
         :return:
         """
 
-        asset_shaders_file = asset.get_asset_shaders_file(status=status)
-        if not asset_shaders_file:
-            LOGGER.warning('No asset shader file found!')
+        if not tp.is_maya():
+            LOGGER.warning('Unload Asset Shaders functionality is only available in Maya')
             return False
 
-        shader_names = asset_shaders_file.get_shaders()
+        from tpMayaLib.core import attribute
+
+        shaders_mapping_file = asset_node.get_asset_shaders_mapping_file()
+        if not shaders_mapping_file:
+            LOGGER.warning('No asset shader mapping file found!')
+            return False
+
+        shader_names = shaders_mapping_file.get_shaders(force=True, status=defines.ArtellaFileStatus.PUBLISHED)
+        working_shader_names = shaders_mapping_file.get_shaders(force=True, status=defines.ArtellaFileStatus.WORKING)
+        for working_shader_name in working_shader_names:
+            if working_shader_name not in shader_names:
+                shader_names.append(working_shader_name)
         if not shader_names:
-            LOGGER.warning('No shaders found for asset: {} | {}!'.format(asset.id, asset.name))
+            LOGGER.warning('No shaders to unload found!')
             return False
 
-        asset_shading_shader_mapping = asset_shaders_file.get_shading_group_shader_mapping()
+        # We clean shape operators
+        # asset_operator = '{}_operator'.format(asset.id)
+        # if tp.Dcc.object_exists(asset_operator):
+        #     LOGGER.info('Removing Asset Operator: {}'.format(asset_operator))
+        #     shape_sets = tp.Dcc.list_source_connections(asset_operator) or list()
+        #     for shape_set in shape_sets:
+        #         if tp.Dcc.object_exists(shape_set):
+        #             LOGGER.info('Removing Asset Operator "{}" Shape Set: "{}"'.format(asset_operator, shape_set))
+        #             tp.Dcc.delete_object(shape_set)
+        #     tp.Dcc.delete_object(asset_operator)
+
+        found_shaders = list()
+        arnold_set_parameters = tp.Dcc.list_nodes(node_type='aiSetParameter')
+        asset_shading_shader_mapping = shaders_mapping_file.get_shading_group_shader_mapping()
         for shader_grp, shaders_list in asset_shading_shader_mapping.items():
-            if shader_grp in ['initialShadingGroup', 'initialParticleSE']:
-                continue
-            if not tp.Dcc.object_exists(shader_grp):
-                LOGGER.warning(
-                    'Shading Group "{}" does not exist in current scene. '
-                    'Following shaders will not be deleted: "{}"'.format(shader_grp, shaders_list))
-                continue
-            cns = maya.cmds.listConnections(shader_grp)
-            found_meshes = list()
-            for cnt in cns:
-                cnt_type = maya.cmds.nodeType(cnt, i=True)
-                if 'dagNode' in cnt_type:
-                    found_meshes.append(cnt)
-            if found_meshes:
-                LOGGER.warning(
-                    'Impossible to clean Shading Group "{}" because it has meshes connected to it: "{}"'.format(
-                        found_meshes))
-                continue
-            shaders_to_delete = list()
+            # We check if shaders are being applied in other assets. If so, we skip the deletion of the shaders
             for shader_name in shaders_list:
-                if shader_name not in shader_names or shader_name in ['lambert1', 'particleCloud1']:
-                    LOGGER.warning('Impossible to clean Shader: "{}"'.format(shader_name))
-                    continue
-                shaders_to_delete.append(shader_name)
+                for set_node in arnold_set_parameters:
+                    indices = attribute.multi_index_list('{}.assignment'.format(set_node)) or list()
+                    for index in indices:
+                        assign_value = tp.Dcc.get_attribute_value(set_node, 'assignment[{}]'.format(index))
+                        if assign_value and shader_name in assign_value:
+                            if not tp.Dcc.attribute_exists(set_node, 'asset_id'):
+                                continue
+                            set_asset_id = tp.Dcc.get_attribute_value(set_node, 'asset_id')
+                            if set_asset_id != asset_node.id:
+                                continue
+                            if not tp.Dcc.attribute_exists(set_node, 'asset_shape'):
+                                continue
+                            asset_shape = tp.Dcc.get_attribute_value(set_node, 'asset_shape')
+                            valid_remove = asset_node.remove_shape_operator_assignment(
+                                assign_value, shape_name=asset_shape)
+                            if valid_remove:
+                                removed_shader = assign_value.split(' = ')[-1].replace("'", '')
+                                if removed_shader not in found_shaders:
+                                    found_shaders.append(removed_shader)
+                    set_empty = True
+                    indices = attribute.multi_index_list('{}.assignment'.format(set_node)) or list()
+                    for index in indices:
+                        assign_value = tp.Dcc.get_attribute_value(set_node, 'assignment[{}]'.format(index))
+                        if assign_value != '' and assign_value is not None:
+                            set_empty = False
+                    if set_empty:
+                        tp.Dcc.delete_object(set_node)
 
-            for shader_name in shaders_to_delete:
-                tp.Dcc.delete_object(shader_name)
-            tp.Dcc.delete_object(shader_grp)
+            shaders_to_remove = found_shaders[:]
+            arnold_set_parameters = tp.Dcc.list_nodes(node_type='aiSetParameter')
+            for set_node in arnold_set_parameters:
+                indices = attribute.multi_index_list('{}.assignment'.format(set_node)) or list()
+                for index in indices:
+                    assign_value = tp.Dcc.get_attribute_value(set_node, 'assignment[{}]'.format(index))
+                    for found_shader in found_shaders:
+                        if found_shader in assign_value:
+                            shaders_to_remove.pop(shaders_to_remove.index(found_shader))
 
-        asset_operator = '{}_operator'.format(asset.id)
-        if tp.Dcc.object_exists(asset_operator):
-            LOGGER.info('Removing Asset Operator: {}'.format(asset_operator))
-            shape_sets = tp.Dcc.list_source_connections(asset_operator) or list()
-            for shape_set in shape_sets:
-                if tp.Dcc.object_exists(shape_set):
-                    LOGGER.info('Removing Asset Operator "{}" Shape Set: "{}"'.format(asset_operator, shape_set))
-                    tp.Dcc.delete_object(shape_set)
-            tp.Dcc.delete_object(asset_operator)
+            for shader_to_remove in shaders_to_remove:
+                tp.Dcc.delete_object(shader_to_remove)
 
     @UNDO_DECORATOR
     def load_scene_shaders(self, status=defines.ArtellaFileStatus.PUBLISHED, apply_shaders=True):
@@ -415,15 +456,13 @@ class ShadersManager(object):
         if not scene_assets:
             LOGGER.warning('Impossible to load shaders because there are no assets in current scene!')
         for asset in scene_assets:
-
             asset.load_shaders(status=status, apply_shaders=apply_shaders)
 
     @UNDO_DECORATOR
-    def unload_shaders(self, assets=None, status=defines.ArtellaFileStatus.PUBLISHED):
+    def unload_shaders(self, assets=None):
         """
         Unload shaders applied to assets loaded in current DCC scene or to given ones
         :param assets:
-        :param status:
         """
 
         if not tp.is_maya():
@@ -436,7 +475,7 @@ class ShadersManager(object):
             LOGGER.warning('Impossible to unload shaders because no shaders found in current scene!')
 
         for asset in assets:
-            self.unload_asset_shaders(asset=asset, status=status)
+            self.unload_asset_shaders(asset_node=asset)
 
         return True
 
@@ -452,7 +491,7 @@ class ShadersManager(object):
         asset_shaders = dict()
         only_shaders = list()
 
-        renderable_shapes = artellapipe.AssetsMgr().get_asset_renderable_shapes(asset)
+        renderable_shapes = artellapipe.AssetsMgr().get_asset_renderable_shapes(asset, full_path=False)
         if not renderable_shapes:
             LOGGER.warning('No renderable shapes found in asset: "{}"'.format(asset.get_name()))
             return asset_shaders
@@ -511,7 +550,7 @@ class ShadersManager(object):
 
         return asset_shaders
 
-    def export_asset_shaders_mapping(self, asset, publish=False, comment=None, new_version=False):
+    def export_asset_shaders_mapping(self, asset, comment=None, new_version=False):
         """
         Exports shaders mapping of the given asset
         :param asset: ArtellaAsset
@@ -546,11 +585,8 @@ class ShadersManager(object):
                 if valid_upload:
                     artellapipe.FilesMgr().unlock_file(file_path, warn_user=False)
 
-        if publish:
-            raise NotImplementedError('Export Shader Mapping Publish functionality is not implemented yet!')
-
     def export_asset_shaders(
-            self, asset, publish=False, comment=None, new_version=False, shader_swatch=None, shaders_to_export=None):
+            self, asset, comment=None, new_version=False, shader_swatch=None, shaders_to_export=None):
         """
         Exports all shaders of the given asset
         :param asset: ArtellaAsset
@@ -585,24 +621,25 @@ class ShadersManager(object):
             LOGGER.warning('No valid assets to export for asset: {}!'.format(asset.get_name()))
             return
 
-        shaders_path = asset.get_shaders_path()
+        shaders_path = asset.get_shaders_path(status=defines.ArtellaFileStatus.WORKING)
+        if not shaders_path:
+            return
+
         if not os.path.isdir(shaders_path):
             os.makedirs(shaders_path)
 
         return self.export_shaders(
-            shaders_names=valid_shaders, export_path=shaders_path, publish=publish,
-            comment=comment, new_version=new_version, asset=asset, shader_swatch=shader_swatch)
+            shaders_names=valid_shaders, export_path=shaders_path, comment=comment,
+            new_version=new_version, asset=asset, shader_swatch=shader_swatch)
 
     def export_shader(
-            self, shader_name, export_path=None, publish=False, comment=None, new_version=False,
-            shader_swatch=None, asset=None):
+            self, shader_name, export_path=None, comment=None, new_version=False, shader_swatch=None, asset=None):
         """
         Exports shaders
         :param shader_name: str, name of the shader to export
         :param export_path: str, path where shader file will be exported into (optional)
         :param comment: str, publish comment
         :param shader_swatch: str, path where shader file will be exported into (optional)
-        :param publish: bool
         :return:
         """
 
@@ -628,7 +665,7 @@ class ShadersManager(object):
             LOGGER.warning('Impossible to export shader "{}"!'.format(shader_name))
             return None
 
-        exported_shader = shader_file.export_file(shader_swatch=shader_swatch)
+        exported_shader = shader_file.export_file(shader_swatch=shader_swatch, status=defines.ArtellaFileStatus.WORKING)
         if not exported_shader:
             LOGGER.warning('Impossible to export shader "{}"'.format(shader_name))
             return None
@@ -643,14 +680,10 @@ class ShadersManager(object):
                     if valid_upload:
                         artellapipe.FilesMgr().unlock_file(file_path, warn_user=False)
 
-        if publish:
-            raise NotImplementedError('Export Shader Publish functionality is not implemented yet!')
-
         return exported_shader
 
     def export_shaders(
-            self, shaders_names, export_path=None, publish=False, comment=None, new_version=False,
-            asset=None, shader_swatch=None):
+            self, shaders_names, export_path=None, comment=None, new_version=False, asset=None, shader_swatch=None):
         """
         Exports all given shader names from current scene
         :param shaders_names: list(str)
@@ -659,6 +692,7 @@ class ShadersManager(object):
         :param comment: str
         :param new_version: bool
         :param asset: ArtellaAsset
+        :param shader_swatch:
         :return: list
         """
 
@@ -669,7 +703,7 @@ class ShadersManager(object):
 
         for shader_name in shaders_names:
             exported_shader = self.export_shader(
-                shader_name=shader_name, export_path=export_path, publish=publish, comment=comment,
+                shader_name=shader_name, export_path=export_path, comment=comment,
                 new_version=new_version, asset=asset, shader_swatch=shader_swatch)
             exported_shaders.append(exported_shader)
 

@@ -20,6 +20,7 @@ import logging
 from Qt.QtGui import *
 
 import tpDccLib as tp
+from tpPyUtils import decorators
 
 import artellapipe.register
 from artellapipe.core import defines
@@ -510,6 +511,24 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
 
         return self._asset
 
+    @decorators.abstractmethod
+    def switch_to_proxy(self):
+        """
+        Switches current asset to its lowres version
+        :return:
+        """
+
+        raise NotImplementedError('switch_to_proxy function not implemented!')
+
+    @decorators.abstractmethod
+    def switch_to_hires(self):
+        """
+        Switches current asset to its lowres version
+        :return:
+        """
+
+        raise NotImplementedError('switch_to_hires function not implemented!')
+
     def get_short_name(self, clean=False):
         """
         Returns the short name of the DCC node
@@ -519,27 +538,24 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
 
         return tp.Dcc.node_short_name(self._name).rstrip(string.digits) if clean else tp.Dcc.node_short_name(self._name)
 
-    def get_asset_shaders_file(self, status=defines.ArtellaFileStatus.PUBLISHED):
+    def get_asset_shaders_mapping_file(self):
         """
-        Returns file class of the Asset Shaders File
+        Returns file class of the Asset Shaders Mapping File
         This file is the one that maps asset geometry to shaders
-        :param status: ArtellaAssetStatus
         :return:
         """
 
-        asset_shader_file_path = self._asset.get_shaders_path(status=status)
-        if not asset_shader_file_path:
-            LOGGER.warning('No Shader File Path found for asset: {}'.format(self._asset.get_name()))
-            return None
+        shaders_mapping_file_type = artellapipe.AssetsMgr().get_shaders_mapping_file_type()
+        if not shaders_mapping_file_type:
+            return False
 
-        asset_shader_file_class = artellapipe.ShadersMgr().get_shader_file_class()
-        if not asset_shader_file_class:
-            LOGGER.warning('No Shader File Class found! Aborting shader loading ...')
-            return None
+        shaders_mapping_file_class = artellapipe.FilesMgr().get_file_class(shaders_mapping_file_type)
+        if not shaders_mapping_file_class:
+            return False
 
-        shader_file = asset_shader_file_class(self._asset, file_path=asset_shader_file_path)
+        shaders_mapping_file = shaders_mapping_file_class(self._asset)
 
-        return shader_file
+        return shaders_mapping_file
 
     def get_shaders_files(self, status=defines.ArtellaFileStatus.PUBLISHED):
         """
@@ -549,7 +565,7 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
 
         shaders = self.get_shaders(status=status)
         if not shaders:
-            LOGGER.warning('No shaders found ...')
+            LOGGER.warning('No shaders found ... ({})'.format(status))
             return
 
         shaders_files = list()
@@ -603,6 +619,104 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
                 return resource.ResourceManager().icon(artellapipe.AssetsMgr().get_default_asset_thumb())
             else:
                 return QIcon(QPixmap(thumbnail_path))
+
+    def get_renderable_shapes(self, remove_namespace=False, full_path=True):
+        """
+        Returns a list with all renderable shapes of the current asset
+        :param remove_namespace: bool
+        :return: list(str)
+        """
+
+        renderable_shapes = list()
+
+        transform_relatives = tp.Dcc.list_relatives(
+            node=self._node, all_hierarchy=True, full_path=full_path, relative_type='transform',
+            shapes=False, intermediate_shapes=False)
+
+        for obj in transform_relatives:
+            if not tp.Dcc.object_exists(obj):
+                continue
+            shapes = tp.Dcc.list_shapes(node=obj, full_path=full_path, intermediate_shapes=False)
+            if not shapes:
+                continue
+            renderable_shapes.extend(shapes)
+
+        if remove_namespace:
+            renderable_shapes = [tp.Dcc.node_name_without_namespace(shape) for shape in renderable_shapes]
+
+        return list(set(renderable_shapes))
+
+    def get_asset_operator(self):
+        """
+        Returns asset operator of the current node
+        :return: str or None
+        """
+
+        return artellapipe.Arnold().get_asset_operator(self.id, create=False)
+
+    def create_operator_node(self):
+        """
+        Creates asset operator node in current scene
+        :return: str
+        """
+
+        return artellapipe.Arnold().get_asset_operator(self.id, connect_to_scene_operator=True, create=True)
+
+    def get_shape_operator(self, shape_name=None):
+        """
+        Returns asset shape operator of the current node
+        :param shape_name: str
+        :return: str
+        """
+
+        # TODO: Check if given shape is a shape of the current asset node
+
+        return artellapipe.Arnold().get_asset_shape_operator(self.id, shape_name, create=False)
+
+    def create_shape_operator(self, shape_name=None):
+        """
+        Creates asset shape operator of the current node for the given shape
+        :param shape_name: str
+        :return: str
+        """
+
+        # TODO: Check if given shape is a shape of the current asset node
+
+        return artellapipe.Arnold().get_asset_shape_operator(self.id, shape_name, connect_to_asset_operator=True, create=True)
+
+    def add_shape_operator_assignment(self, assignment_value, shape_name=None):
+        """
+        Adds a new shape operator assignment to given shape operator
+        :param shape_name: str
+        :param assignment_value: str
+        :return:
+        """
+
+        shape_operator = self.get_shape_operator(shape_name)
+        if not shape_operator:
+            LOGGER.warning(
+                'Impossible to set Asset Shape attribute for "{}" because '
+                'asset shape operator for "{}" does not exists!'.format(shape_name, self.id))
+            return
+
+        return artellapipe.Arnold().add_asset_shape_operator_assignment(self.id, shape_name, value=assignment_value)
+
+    def remove_shape_operator_assignment(self, assignment_value, shape_name=None):
+        """
+        Removes an existing shape operator assignment from given shape operator
+        :param shape_name: str
+        :param assignment_value: str
+        :return:
+        """
+
+        shape_operator = self.get_shape_operator(shape_name)
+        if not shape_operator:
+            LOGGER.warning(
+                'Impossible to remove Asset Shape attribute from "{}" because '
+                'asset shape operator for "{}" does not exists!'.format(shape_name, self.id))
+            return
+
+        return artellapipe.Arnold().remove_asset_shape_operator_assignment(self.id, shape_name, value=assignment_value)
 
 
 artellapipe.register.register_class('AssetNode', ArtellaAssetNode)

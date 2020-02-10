@@ -20,6 +20,7 @@ import tpDccLib as tp
 
 from tpQtLib.core import image
 
+import artellapipe
 from artellapipe.libs.artella.core import artellalib
 
 
@@ -103,6 +104,9 @@ class ShadingNetwork(object):
         for shader in shaders:
             if shader not in IGNORE_SHADERS:
                 shading_group = cls.get_shading_group(shader_node=shader)
+                if not shading_group:
+                    LOGGER.warning('No shading group linked to shader: "{}"'.format(shader))
+                    continue
 
                 # Get dict with all the info of the shader
                 shader_network = cls.get_shading_network(shading_group)
@@ -191,19 +195,19 @@ class ShadingNetwork(object):
             as_type = network_dict[key]['asType']
             if existing_material is not None and as_type == 'asShader':
                 continue
-            else:
-                shader_name = os.path.splitext(os.path.basename(shader_file_path))[0]
+            # else:
+            #     shader_name = os.path.splitext(os.path.basename(shader_file_path))[0]
 
                 # if key == shader_name and not maya.cmds.objExists(shader_name):
-                if key == shader_name:
-                    name = key
-                else:
-                    name = key + '_'
+                # if key == shader_name:
+                #     name = key
+                # else:
+                #     name = key + '_'
                 # name = re.sub('(?<=[A-z])[0-9]+', '', name)
-                try:
-                    tp.Dcc.rename_node(key, name)
-                except Exception:
-                    LOGGER.debug('ShaderLibrary: Impossible to rename {0} to {1}'.format(key, name))
+                # try:
+                #     tp.Dcc.rename_node(key, name)
+                # except Exception:
+                #     LOGGER.debug('ShaderLibrary: Impossible to rename {0} to {1}'.format(key, name))
 
     @classmethod
     def create_shader_node(cls, node_type, as_type, name):
@@ -249,9 +253,19 @@ class ShadingNetwork(object):
             return None
 
         if len(shading_groups_found) > 1:
-            LOGGER.warning(
-                'Multiple Shading Groups found for "{}": "{}". First one will be used exported ...'.format(
-                    prefix_name, shading_groups_found))
+            same_sg = True
+            current_sg = None
+            for sg in shading_groups_found:
+                if not current_sg:
+                    current_sg = sg
+                else:
+                    if sg != current_sg:
+                        same_sg = False
+                        break
+            if not same_sg:
+                LOGGER.warning(
+                    'Multiple Shading Groups found for "{}": "{}". First one will be used exported ...'.format(
+                        prefix_name, shading_groups_found))
 
         return shading_groups_found[0]
 
@@ -317,6 +331,10 @@ class ShadingNetwork(object):
                 try:
                     value = tp.Dcc.get_attribute_value(node=shader_node, attribute_name=attr)
                     if value is not None:
+
+                        if attr == 'fileTextureName':
+                            value = artellapipe.FilesMgr().resolve_path(value)
+
                         if isinstance(value, list):
                             attrs['attr'][attr] = value[0]
                         else:
@@ -325,8 +343,10 @@ class ShadingNetwork(object):
                     LOGGER.debug('ShaderLibrary: Attribute {0} skipped'.format(attr))
                     continue
             else:
-                connected_node, connection = maya.cmds.connectionInfo(
+                cconnection_info = maya.cmds.connectionInfo(
                     '{0}.{1}'.format(shader_node, attr), sourceFromDestination=True).split('.')
+                connected_node = cconnection_info[0]
+                connection = cconnection_info[1]
 
                 if prefix:
                     new_connection_name = '{}_{}.{}'.format(connected_node, prefix, connection)
@@ -373,8 +393,19 @@ class ShadingNetwork(object):
                 if attr == 'notes' and not tp.Dcc.attribute_exists(node=shader_node, attribute_name='notes'):
                     tp.Dcc.add_string_attribute(node=shader_node, attribute_name='notes')
                 try:
+                    value = attrs['attr'][attr]
+
+                    if attr == 'fileTextureName' and value:
+                        env_var = '${}/'.format(artellapipe.project.env_var)
+                        if not value.startswith(env_var):
+                            production_folder_name = artellapipe.project.get_production_folder()
+                            split_path = value.split(production_folder_name)
+                            if split_path:
+                                new_path = production_folder_name + split_path[-1]
+                                path_to_fix = artellapipe.FilesMgr().prefix_path_with_artella_env_path(new_path)
+                                value = artellapipe.FilesMgr().resolve_path(path_to_fix)
                     tp.Dcc.set_string_attribute_value(
-                        node=shader_node, attribute_name=attr, attribute_value=attrs['attr'][attr])
+                        node=shader_node, attribute_name=attr, attribute_value=value)
                 except Exception as exc:
                     LOGGER.debug(
                         'ShaderLibrary: setAttr {0} skipped!'.format(attr))
