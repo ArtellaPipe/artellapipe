@@ -19,12 +19,12 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import base
-from tpQtLib.widgets import breadcrumb, stack, splitters, grid
+import tpDcc
+from tpDcc.libs.qt.core import base
+from tpDcc.libs.qt.widgets import breadcrumb, stack, splitters, grid
 
 import artellapipe.register
 from artellapipe.core import defines
-from artellapipe.utils import resource
 from artellapipe.libs.artella.core import artellalib
 
 LOGGER = logging.getLogger()
@@ -86,12 +86,12 @@ class SequenceInfoWidget(base.BaseWidget, object):
 
         artella_btn = QToolButton()
         artella_btn.setText('Artella')
-        artella_btn.setIcon(resource.ResourceManager().icon('artella'))
+        artella_btn.setIcon(tpDcc.ResourcesMgr().icon('artella'))
         artella_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         view_locally_btn = QToolButton()
         view_locally_btn.setText('Folder')
-        view_locally_btn.setIcon(resource.ResourceManager().icon('folder'))
+        view_locally_btn.setIcon(tpDcc.ResourcesMgr().icon('folder'))
         view_locally_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         toolbar_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
@@ -141,8 +141,8 @@ class StatusStack(base.BaseWidget, object):
         buttons_group = QButtonGroup(self)
         buttons_group.setExclusive(True)
 
-        working_icon = resource.ResourceManager().icon('working')
-        published_icon = resource.ResourceManager().icon('box')
+        working_icon = tpDcc.ResourcesMgr().icon('working')
+        published_icon = tpDcc.ResourcesMgr().icon('box')
 
         self._working_btn = QPushButton('Working')
         self._working_btn.setIcon(working_icon)
@@ -229,9 +229,9 @@ class SequenceFileButton(base.BaseWidget, object):
     def ui(self):
         super(SequenceFileButton, self).ui()
 
-        version_icon = resource.ResourceManager().icon('version')
-        update_icon = resource.ResourceManager().icon('update')
-        menu_icon = resource.ResourceManager().icon('menu_vertical')
+        version_icon = tpDcc.ResourcesMgr().icon('version')
+        update_icon = tpDcc.ResourcesMgr().icon('update')
+        menu_icon = tpDcc.ResourcesMgr().icon('menu_vertical')
 
         self._file_btn = QPushButton()
         self._file_btn.setText(self._sequence_file_type_name)
@@ -388,7 +388,7 @@ class WorkingSequenceInfo(base.BaseWidget, object):
         no_shots_layout.setSpacing(0)
         no_shots_widget.setLayout(no_shots_layout)
         no_shots_lbl = QLabel()
-        no_items_pixmap = resource.ResourceManager().pixmap('no_shot_selected')
+        no_items_pixmap = tpDcc.ResourcesMgr().pixmap('no_shot_selected')
         no_shots_lbl.setPixmap(no_items_pixmap)
         no_shots_lbl.setAlignment(Qt.AlignCenter)
         no_shots_layout.addItem(QSpacerItem(0, 10, QSizePolicy.Preferred, QSizePolicy.Expanding))
@@ -439,7 +439,7 @@ class WorkingSequenceInfo(base.BaseWidget, object):
             file_type_name = artellapipe.FilesMgr().get_file_type_name(file_type)
             file_btn = SequenceFileButton(
                 self._sequence, defines.ArtellaFileStatus.WORKING,
-                file_type, file_type_name, resource.ResourceManager().icon(file_type))
+                file_type, file_type_name, tpDcc.ResourcesMgr().icon(file_type))
             files_btn.append(file_btn)
             file_btn.checkVersions.connect(self._on_check_versions)
             self._file_buttons[file_type] = file_btn

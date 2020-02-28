@@ -19,14 +19,14 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import python
-from tpQtLib.core import base, qtutils
-from tpQtLib.widgets import grid
+import tpDcc
+from tpDcc.libs.python import python
+from tpDcc.libs.qt.core import base, qtutils
+from tpDcc.libs.qt.widgets import grid
 
 import artellapipe
 import artellapipe.register
 from artellapipe.core import defines
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -196,7 +196,7 @@ class AssetsViewer(grid.GridWidget, object):
         """
 
         new_menu = QMenu(self)
-        get_thumbnails_action = QAction(resource.ResourceManager().icon('picture'), 'Update Thumbnails', new_menu)
+        get_thumbnails_action = QAction(tpDcc.ResourcesMgr().icon('picture'), 'Update Thumbnails', new_menu)
         get_thumbnails_action.triggered.connect(self._on_update_thumbnails)
         new_menu.addAction(get_thumbnails_action)
 
@@ -263,12 +263,12 @@ class CategorizedAssetViewer(base.BaseWidget, object):
         for category in all_asset_categories:
             new_btn = QPushButton(category)
             new_btn.setMinimumWidth(QFontMetrics(new_btn.font()).width(category) + 10)
-            new_btn.setIcon(resource.ResourceManager().icon(category.lower()))
+            new_btn.setIcon(tpDcc.ResourcesMgr().icon(category.lower()))
             new_btn.setCheckable(True)
             self._categories_menu_layout.addWidget(new_btn)
             self._categories_btn_grp.addButton(new_btn)
             if category == defines.ArtellaFileStatus.ALL:
-                new_btn.setIcon(resource.ResourceManager().icon('home'))
+                new_btn.setIcon(tpDcc.ResourcesMgr().icon('home'))
                 new_btn.setChecked(True)
             new_btn.toggled.connect(partial(self._on_change_category, category))
 

@@ -21,11 +21,11 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpQtLib.core import base, qtutils, menu
+from tpDcc.libs.qt.core import base, qtutils, menu
 
 import artellapipe.register
 from artellapipe.core import defines
-from artellapipe.utils import resource, worker
+from artellapipe.utils import worker
 
 LOGGER = logging.getLogger()
 

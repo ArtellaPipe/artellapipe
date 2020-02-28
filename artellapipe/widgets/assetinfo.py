@@ -18,12 +18,11 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import base
-from tpQtLib.widgets import breadcrumb, stack, splitters, grid
+from tpDcc.libs.qt.core import base
+from tpDcc.libs.qt.widgets import breadcrumb, stack, splitters, grid
 
 import artellapipe.register
 from artellapipe.core import defines
-from artellapipe.utils import resource
 from artellapipe.libs.artella.core import artellalib
 
 

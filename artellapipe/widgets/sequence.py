@@ -17,12 +17,11 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import menu, qtutils
-from tpQtLib.core import base
+import tpDcc
+from tpDcc.libs.qt.core import base, menu, qtutils
 
 import artellapipe
 from artellapipe.core import defines
-from artellapipe.utils import resource
 
 
 class SequenceCategoryButton(QPushButton, object):
@@ -41,9 +40,9 @@ class SequenceCategoryButton(QPushButton, object):
         :param context_menu: Menu
         """
 
-        sync_icon = resource.ResourceManager().icon('sync')
-        artella_icon = resource.ResourceManager().icon('artella')
-        eye_icon = resource.ResourceManager().icon('eye')
+        sync_icon = tpDcc.ResourcesMgr().icon('sync')
+        artella_icon = tpDcc.ResourcesMgr().icon('artella')
+        eye_icon = tpDcc.ResourcesMgr().icon('eye')
 
         artella_action = QAction(artella_icon, 'Open in Artella', context_menu)
         view_locally_action = QAction(eye_icon, 'View Locally', context_menu)

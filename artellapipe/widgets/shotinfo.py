@@ -18,12 +18,12 @@ from functools import partial
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpQtLib.core import base
-from tpQtLib.widgets import breadcrumb, stack, splitters, grid
+import tpDcc
+from tpDcc.libs.qt.core import base
+from tpDcc.libs.qt.widgets import breadcrumb, stack, splitters, grid
 
 import artellapipe.register
 from artellapipe.core import defines
-from artellapipe.utils import resource
 from artellapipe.libs.artella.core import artellalib
 
 
@@ -57,7 +57,7 @@ class ShotInfoWidget(base.BaseWidget, object):
         self._shot_icon_frame.setLayout(shot_icon_layout)
         self._shot_icon_lbl = QLabel()
         self._shot_icon_lbl.setAlignment(Qt.AlignCenter)
-        self._shot_icon_lbl.setPixmap(resource.ResourceManager().pixmap('default'))
+        self._shot_icon_lbl.setPixmap(tpDcc.ResourcesMgr().pixmap('default'))
         self._shot_toolbar_layout = QVBoxLayout()
         self._shot_toolbar_layout.setContentsMargins(2, 2, 2, 2)
         self._shot_toolbar_layout.setSpacing(5)
@@ -103,12 +103,12 @@ class ShotInfoWidget(base.BaseWidget, object):
 
         artella_btn = QToolButton()
         artella_btn.setText('Artella')
-        artella_btn.setIcon(resource.ResourceManager().icon('artella'))
+        artella_btn.setIcon(tpDcc.ResourcesMgr().icon('artella'))
         artella_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         view_locally_btn = QToolButton()
         view_locally_btn.setText('Folder')
-        view_locally_btn.setIcon(resource.ResourceManager().icon('folder'))
+        view_locally_btn.setIcon(tpDcc.ResourcesMgr().icon('folder'))
         view_locally_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         toolbar_layout.addItem(QSpacerItem(10, 0, QSizePolicy.Expanding, QSizePolicy.Preferred))
@@ -158,8 +158,8 @@ class StatusStack(base.BaseWidget, object):
         buttons_group = QButtonGroup(self)
         buttons_group.setExclusive(True)
 
-        working_icon = resource.ResourceManager().icon('working')
-        published_icon = resource.ResourceManager().icon('box')
+        working_icon = tpDcc.ResourcesMgr().icon('working')
+        published_icon = tpDcc.ResourcesMgr().icon('box')
 
         self._working_btn = QPushButton('Working')
         self._working_btn.setIcon(working_icon)
@@ -246,7 +246,7 @@ class ShotFileButton(base.BaseWidget, object):
     def ui(self):
         super(ShotFileButton, self).ui()
 
-        folder_icon = resource.ResourceManager().icon('artella')
+        folder_icon = tpDcc.ResourcesMgr().icon('artella')
 
         self._file_btn = QPushButton()
         self._file_btn.setText(self._shot_file_type_name)
@@ -374,7 +374,7 @@ class WorkingShotInfo(base.BaseWidget, object):
         no_shots_layout.setSpacing(0)
         no_shots_widget.setLayout(no_shots_layout)
         no_shots_lbl = QLabel()
-        no_items_pixmap = resource.ResourceManager().pixmap('no_shot_selected')
+        no_items_pixmap = tpDcc.ResourcesMgr().pixmap('no_shot_selected')
         no_shots_lbl.setPixmap(no_items_pixmap)
         no_shots_lbl.setAlignment(Qt.AlignCenter)
         no_shots_layout.addItem(QSpacerItem(0, 10, QSizePolicy.Preferred, QSizePolicy.Expanding))
@@ -425,7 +425,7 @@ class WorkingShotInfo(base.BaseWidget, object):
             file_type_name = artellapipe.FilesMgr().get_file_type_name(file_type)
             file_btn = ShotFileButton(
                 self._shot_widget, defines.ArtellaFileStatus.WORKING,
-                file_type, file_type_name, resource.ResourceManager().icon(file_type))
+                file_type, file_type_name, tpDcc.ResourcesMgr().icon(file_type))
             files_btn.append(file_btn)
             file_btn.checkVersions.connect(self._on_check_versions)
             self._file_buttons[file_type] = file_btn

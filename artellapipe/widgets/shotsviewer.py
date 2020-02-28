@@ -19,12 +19,12 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import python
-from tpQtLib.core import base, qtutils
-from tpQtLib.widgets import grid
+import tpDcc
+from tpDcc.libs.python import python
+from tpDcc.libs.qt.core import base, qtutils
+from tpDcc.libs.qt.widgets import grid
 
 import artellapipe
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -121,7 +121,7 @@ class ShotsViewer(base.BaseWidget, object):
             self._sequences_menu_layout.addWidget(new_btn)
             self._sequences_btn_grp.addButton(new_btn)
             if sequence_name == 'All':
-                new_btn.setIcon(resource.ResourceManager().icon('home'))
+                new_btn.setIcon(tpDcc.ResourcesMgr().icon('home'))
                 new_btn.setChecked(True)
             new_btn.toggled.connect(partial(self._on_change_sequence, sequence_name))
 

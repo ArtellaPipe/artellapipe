@@ -16,7 +16,7 @@ import logging
 
 from Qt.QtWidgets import *
 
-from tpQtLib.core import base
+from tpDcc.libs.qt.core import base
 
 import artellapipe.register
 

@@ -17,10 +17,10 @@ import logging
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpPyUtils import python
+from tpDcc.libs.python import python
 
-from tpQtLib.core import base
-from tpQtLib.widgets import grid
+from tpDcc.libs.qt.core import base
+from tpDcc.libs.qt.widgets import grid
 
 import artellapipe
 

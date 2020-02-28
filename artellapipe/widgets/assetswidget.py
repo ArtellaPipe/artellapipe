@@ -19,11 +19,11 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpQtLib.core import base, qtutils
+import tpDcc
+from tpDcc.libs.qt.core import base, qtutils
 
 import artellapipe
 from artellapipe.core import defines
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -121,12 +121,12 @@ class AssetsWidget(base.BaseWidget, object):
         for category in all_asset_categories:
             new_btn = QPushButton(category)
             new_btn.setMinimumWidth(QFontMetrics(new_btn.font()).width(category) + 10)
-            new_btn.setIcon(resource.ResourceManager().icon(category.lower()))
+            new_btn.setIcon(tpDcc.ResourcesMgr().icon(category.lower()))
             new_btn.setCheckable(True)
             self._categories_menu_layout.addWidget(new_btn)
             self._categories_btn_grp.addButton(new_btn)
             if category == defines.ArtellaFileStatus.ALL:
-                new_btn.setIcon(resource.ResourceManager().icon('home'))
+                new_btn.setIcon(tpDcc.ResourcesMgr().icon('home'))
                 new_btn.setChecked(True)
             new_btn.toggled.connect(partial(self._change_category, category))
 

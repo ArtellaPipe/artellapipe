@@ -20,10 +20,10 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
-from tpPyUtils import osplatform, python, path as path_utils
+from tpDcc.libs.python import osplatform, python, path as path_utils
 
-from tpQtLib.core import base, qtutils, image
-from tpQtLib.widgets import layouts
+from tpDcc.libs.qt.core import base, qtutils, image
+from tpDcc.libs.qt.widgets import layouts
 
 import artellapipe
 from artellapipe.utils import shader as shader_utils

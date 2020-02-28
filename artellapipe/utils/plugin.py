@@ -16,8 +16,8 @@ __email__ = "tpovedatd@gmail.com"
 import time
 import inspect
 
-import tpDccLib as tp
-from tpPyUtils import osplatform
+import tpDcc as tp
+from tpDcc.libs.python import osplatform
 
 
 class PluginStats(object):

@@ -16,9 +16,8 @@ import os
 import json
 import logging.config
 
-import tpDccLib as tp
-
-from tpQtLib.core import image
+import tpDcc as tp
+from tpDcc.libs.qt.core import image
 
 import artellapipe
 from artellapipe.libs.artella.core import artellalib
@@ -27,9 +26,9 @@ from artellapipe.libs.artella.core import artellalib
 IGNORED_SHADERS = list()
 IGNORE_ATTRS = list()
 if tp.is_maya():
-    import tpMayaLib as maya
-    from tpMayaLib.core import shader as maya_shaders
-    from tpMayaLib.core import transform as maya_transform
+    import tpDcc.dccs.maya as maya
+    from tpDcc.dccs.maya.core import shader as maya_shaders
+    from tpDcc.dccs.maya.core import transform as maya_transform
 
     IGNORE_SHADERS = ['particleCloud1', 'shaderGlow1', 'defaultColorMgtGlobals', 'lambert1']
     IGNORE_ATTRS = ['computedFileTextureNamePattern']

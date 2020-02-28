@@ -14,7 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 from Qt.QtWidgets import *
 
-from tpQtLib.widgets import buttons
+from tpDcc.libs.qt.widgets import buttons
 
 
 class IconButton(buttons.BaseButton, object):

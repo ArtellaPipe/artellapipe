@@ -72,7 +72,7 @@ language = None
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["*externals*.rst"]
 
-autodoc_mock_imports = ["maya", "pyfbsdk", "sentry_sdk", "tpDccLib", "pythonjsonlogger", "statusbar"]
+autodoc_mock_imports = ["maya", "pyfbsdk", "sentry_sdk", "tpDcc", "pythonjsonlogger", "statusbar"]
 
 
 # The name of the Pygments (syntax highlighting) style to use.

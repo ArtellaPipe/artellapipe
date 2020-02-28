@@ -20,9 +20,10 @@ import traceback
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
+import tpDcc
+
 import artellapipe.register
 from artellapipe.libs.artella.core import artellalib
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -60,7 +61,7 @@ class ArtellaSyncDialog(QDialog, object):
         self.main_layout.setSpacing(5)
         self.setLayout(self.main_layout)
 
-        splash_pixmap = resource.ResourceManager().pixmap('sync_splash', key='project')
+        splash_pixmap = tpDcc.ResourcesMgr().pixmap('sync_splash', key='project')
         splash = ArtellaSyncSplash(splash_pixmap)
         self._splash_layout = QVBoxLayout()
         self._splash_layout.setAlignment(Qt.AlignBottom)

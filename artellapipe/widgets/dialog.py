@@ -15,12 +15,10 @@ __email__ = "tpovedatd@gmail.com"
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-import tpQtLib
-
-from artellapipe.utils import resource
+import tpDcc
 
 
-class ArtellaDialog(tpQtLib.Dialog, object):
+class ArtellaDialog(tpDcc.Dialog, object):
 
     def __init__(
             self,
@@ -35,7 +33,7 @@ class ArtellaDialog(tpQtLib.Dialog, object):
         self._project = project
         self._tool = tool
 
-        title_pixmap = resource.ResourceManager().pixmap(name='artella_title', extension='png')
+        title_pixmap = tpDcc.ResourcesMgr().pixmap(name='artella_title', extension='png')
 
         super(ArtellaDialog, self).__init__(
             name=name,
