@@ -26,8 +26,8 @@ import webbrowser
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-from tpPyUtils import python, osplatform, fileio, path as path_utils, folder as folder_utils
-import tpDccLib as tp
+import tpDcc as tp
+from tpDcc.libs.python import python, osplatform, fileio, path as path_utils, folder as folder_utils
 
 if python.is_python2():
     from urllib2 import quote
@@ -39,8 +39,7 @@ else:
 import artellapipe
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
-from artellapipe.core import defines, config
-from artellapipe.utils import resource
+from artellapipe.core import defines
 
 LOGGER = logging.getLogger()
 
@@ -51,11 +50,20 @@ class ArtellaProject(object):
 
         self._tray = None
 
-        # To make sure that all variables are properly initialized we must call init_config first
         clean_name = self._get_clean_name(name)
-        self._config = config.ArtellaConfiguration(
-            project_name=clean_name,
+
+        # Register project configurations
+        try:
+            project_config_mod = importlib.import_module('{}.config'.format(clean_name))
+            tp.ConfigsMgr().register_package_configs(
+                clean_name, os.path.dirname(project_config_mod.__file__))
+        except RuntimeError:
+            artellapipe.logger.warning('No Configuration Module found for project: {}'.format(clean_name))
+
+        self._config = tp.ConfigsMgr().get_config(
             config_name='artellapipe-project',
+            package_name=clean_name,
+            root_package_name='artellapipe',
             environment=os.environ.get('{}_env'.format(self._get_clean_name(name)), 'DEVELOPMENT'),
             config_dict={
                 'title': clean_name.title(),
@@ -138,7 +146,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return resource.ResourceManager().icon(self.icon_name, theme=self.icon_resources_folder)
+        return tp.ResourcesMgr().icon(self.icon_name, theme=self.icon_resources_folder)
 
     @property
     def thumb_icon(self):
@@ -147,7 +155,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return resource.ResourceManager().icon(self.get_clean_name(), category='images', key='project', theme=None)
+        return tp.ResourcesMgr().icon(self.get_clean_name(), category='images', key='project', theme=None)
 
     @property
     def tray_icon(self):
@@ -156,7 +164,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return resource.ResourceManager().icon(self.tray_icon_name, key='project')
+        return tp.ResourcesMgr().icon(self.tray_icon_name, key='project')
 
     @property
     def shelf_icon(self):
@@ -165,7 +173,7 @@ class ArtellaProject(object):
         :return: QIcon
         """
 
-        return resource.ResourceManager().icon(self.shelf_icon_name, theme=None, key='project')
+        return tp.ResourcesMgr().icon(self.shelf_icon_name, theme=None, key='project')
 
     @property
     def tray(self):
@@ -189,7 +197,6 @@ class ArtellaProject(object):
         self.update_paths()
         self.set_environment_variables()
         self.create_shelf()
-        self.create_menu()
         self._tray = self.create_tray()
         self.create_names_manager()
         self.create_files_manager()
@@ -226,6 +233,22 @@ class ArtellaProject(object):
 
         current_environment = self.get_environment()
         return not current_environment or current_environment == 'DEVELOPMENT'
+
+    def get_toolsets_paths(self):
+        """
+        Returns path where project toolsets are located
+        :return: list(str)
+        """
+
+        return list()
+
+    def get_resources_paths(self):
+        """
+        Returns path where project resources are located
+        :return: list(str)
+        """
+
+        return list()
 
     def get_tag(self):
         """
@@ -381,7 +404,7 @@ class ArtellaProject(object):
         Creates and initializes Artella project logger
         """
 
-        from tpPyUtils import log as log_utils
+        from tpDcc.libs.python import log as log_utils
 
         log_path = self.get_data_path()
         if not os.path.exists(log_path):
@@ -455,7 +478,7 @@ class ArtellaProject(object):
         if os.path.isdir(project_temp_folder):
             os.environ[temp_env_var] = project_temp_folder
 
-        icons_paths = resource.ResourceManager().get_resources_paths()
+        icons_paths = tp.ResourcesMgr().get_resources_paths()
 
         current_paths = list()
         if os.environ.get('XBMLANGPATH'):
@@ -499,19 +522,6 @@ class ArtellaProject(object):
         shelf_manager.set_project(self)
 
         return shelf_manager
-
-    def create_menu(self):
-        """
-        Creates Artella Project menu
-        """
-
-        if tp.Dcc == tp.Dccs.Unknown:
-            return False
-
-        menu_manager = artellapipe.MenuMgr()
-        menu_manager.set_project(self)
-
-        return menu_manager
 
     def create_names_manager(self):
         """
@@ -908,7 +918,7 @@ class ArtellaProject(object):
 
         try:
             if tp.is_maya():
-                import tpMayaLib as maya
+                import tpDcc.dccs.maya as maya
                 LOGGER.debug('Setting {} Project ...'.format(self.name))
                 project_folder = os.environ.get(self.env_var, 'folder-not-defined')
                 if project_folder and os.path.exists(project_folder):
@@ -968,7 +978,7 @@ class ArtellaProject(object):
             return False
 
         if tp.is_maya():
-            from tpMayaLib.core import helpers
+            from tpDcc.dccs.maya.core import helpers
             helpers.clean_student_line()
 
         if notify:

@@ -17,142 +17,16 @@ import webbrowser
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
-import tpDccLib as tp
-
-import tpQtLib
-from tpQtLib.core import qtutils, statusbar
+import tpDcc
+from tpDcc.libs.qt.core import qtutils
 
 import artellapipe
-from artellapipe.utils import resource
 
 
-class ArtellaWindowStatusBar(statusbar.StatusWidget, object):
-    def __init__(self, parent=None):
-        super(ArtellaWindowStatusBar, self).__init__(parent)
-
-        self._project = None
-        self._info_url = None
-        self._tool = None
-
-        self.setFixedHeight(25)
-        self._info_btn = QPushButton()
-        self._info_btn.setIconSize(QSize(25, 25))
-        self._info_btn.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
-        self._info_btn.setIcon(resource.ResourceManager().icon('info1'))
-        self._info_btn.setStyleSheet('QWidget {background-color: rgba(255, 255, 255, 0); border:0px;}')
-
-        self._bug_btn = QPushButton()
-        self._bug_btn.setIconSize(QSize(25, 25))
-        self._bug_btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self._bug_btn.setIcon(resource.ResourceManager().icon('bug'))
-        self._bug_btn.setStyleSheet('QWidget {background-color: rgba(255, 255, 255, 0); border:0px;}')
-
-        self.main_layout.insertWidget(0, self._info_btn)
-        self.main_layout.insertWidget(1, self._bug_btn)
-
-        self._info_btn.clicked.connect(self._on_open_url)
-        self._bug_btn.clicked.connect(self._on_send_bug)
-
-    def set_project(self, project):
-        self._project = project
-
-    def set_info_url(self, url):
-        """
-        Sets the URL used to open tool info documentation web
-        :param url: str
-        """
-
-        self._info_url = url
-
-    def set_tool(self, tool):
-        """
-
-        :param tool:
-        :return:
-        """
-
-        self._tool = tool
-
-    def has_url(self):
-        """
-        Returns whether the URL documentation web is set or not
-        :return: bool
-        """
-
-        if not self._project:
-            return False
-
-        if self._info_url:
-            return True
-
-        return False
-
-    def has_tool(self):
-
-        if not self._project:
-            return False
-
-        if self._tool:
-            return True
-
-        return False
-
-    def show_info(self):
-        """
-        Shows the info button of the status bar
-        """
-
-        self._info_btn.setVisible(True)
-
-    def hide_info(self):
-        """
-        Hides the info button of the status bar
-        """
-
-        self._info_btn.setVisible(False)
-
-    def show_bug(self):
-        self._bug_btn.setVisible(True)
-
-    def hide_bug(self):
-        self._bug_btn.setVisible(False)
-
-    def open_info_url(self):
-        """
-        Opens tool documentation URL in user web browser
-        """
-
-        if not self._project:
-            return False
-
-        if self._info_url:
-            webbrowser.open_new_tab(self._info_url)
-
-    def _on_send_bug(self):
-
-        if not self._project:
-            return False
-
-        artellapipe.ToolsMgr().run_tool(self._project, 'bugtracker', extra_args={'tool': self._tool})
-
-    def _on_open_url(self):
-        """
-        Internal callback function that is called when the user presses the info icon button
-        :return:
-        """
-
-        self.open_info_url()
-
-
-class ArtellaWindow(tpQtLib.Window, object):
-
-    LOGO_NAME = None
-    STATUS_BAR_WIDGET = ArtellaWindowStatusBar
-
+class ArtellaWindow(tpDcc.Window, object):
     def __init__(
             self,
             project=None,
-            tool=None,
             name='Window',
             title='Window',
             size=(800, 535),
@@ -162,7 +36,6 @@ class ArtellaWindow(tpQtLib.Window, object):
             **kwargs):
 
         self._project = project
-        self._tool = tool
 
         super(ArtellaWindow, self).__init__(
             name=name,
@@ -177,11 +50,15 @@ class ArtellaWindow(tpQtLib.Window, object):
             **kwargs
         )
 
-        if self.parent():
-            for widget in self.parent().findChildren(QMainWindow):
-                if widget is not self:
-                    if widget.objectName() == self.objectName():
-                        widget.close()
+        # if self.parent():
+        #     for widget in self.parent().findChildren(QMainWindow):
+        #         if widget is not self:
+        #             if widget.objectName() == self.objectName():
+        #                 widget.close()
+
+        # We define icon after window frameless mode is set
+        window_icon = self._get_icon()
+        self.setWindowIcon(window_icon)
 
         screen_geo = QApplication.desktop().screenGeometry()
         screen_width = screen_geo.width()
@@ -197,9 +74,6 @@ class ArtellaWindow(tpQtLib.Window, object):
 
     def ui(self):
         super(ArtellaWindow, self).ui()
-
-        window_icon = self._get_icon()
-        self.setWindowIcon(window_icon)
 
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(0, 0, 0, 0)
@@ -226,15 +100,12 @@ class ArtellaWindow(tpQtLib.Window, object):
             win_logo = self._logo_scene.addPixmap(logo_pixmap)
             win_logo.setOffset(910, 0)
 
-        self._status_bar.set_project(self._project)
-        self._status_bar.set_tool(self._tool)
-        if not self._status_bar.has_url():
-            self._status_bar.hide_info()
-        if not self._status_bar.has_tool():
-            self._status_bar.hide_bug()
-
-        if self._tool:
-            self.main_layout.addWidget(self._tool)
+        # self._status_bar.set_project(self._project)
+        # self._status_bar.set_tool(self._tool)
+        # if not self._status_bar.has_url():
+        #     self._status_bar.hide_info()
+        # if not self._status_bar.has_tool():
+        #     self._status_bar.hide_bug()
 
         if self._project.is_dev():
             int_colors = self._project.dev_color0.split(',')
@@ -249,8 +120,8 @@ class ArtellaWindow(tpQtLib.Window, object):
         super(ArtellaWindow, self).setWindowTitle(title)
 
     def closeEvent(self, event):
-        if self._tool:
-            self._tool.close_tool()
+        # if self._tool:
+        #     self._tool.close_tool()
         super(ArtellaWindow, self).closeEvent(event)
 
     def resizeEvent(self, event):
@@ -314,24 +185,15 @@ class ArtellaWindow(tpQtLib.Window, object):
 
     def _get_logo(self):
         """
-        Internal function taht returns the logo used in window title
+        Internal function that returns the logo used in window title
         """
 
-        if self.LOGO_NAME:
-            if self._project:
-                win_logo = resource.ResourceManager().pixmap(self.LOGO_NAME, extension='png')
+        if self._config:
+            config_logo = self._config.get('logo', None)
+            if config_logo:
+                win_logo = tpDcc.ResourcesMgr().pixmap(config_logo, extension='png')
                 if not win_logo.isNull():
                     return win_logo
-                else:
-                    self._project.logger.warning(
-                        '{} Project Logo Image not found: {}!'.format(
-                            self._project.name.title(), self.LOGO_NAME + '.png'
-                        )
-                    )
-
-            win_logo = resource.ResourceManager().pixmap(self.LOGO_NAME, extension='png')
-            if not win_logo.isNull():
-                return win_logo
 
         return None
 
@@ -352,7 +214,7 @@ class ArtellaWindow(tpQtLib.Window, object):
                     )
                 )
 
-        return resource.ResourceManager().icon('artella')
+        return tpDcc.ResourcesMgr().icon('artella')
 
     def _get_title_pixmap(self):
         """
@@ -361,14 +223,14 @@ class ArtellaWindow(tpQtLib.Window, object):
 
         if self._project:
             title_background = self._project.config.get('title_background')
-            title_pixmap = resource.ResourceManager().pixmap(name=title_background, extension='png')
+            title_pixmap = tpDcc.ResourcesMgr().pixmap(name=title_background, extension='png', key='project')
             if not title_pixmap.isNull():
                 return title_pixmap
             else:
                 self._project.logger.warning('{} Project Title Background image not found: {}!'.format(
                     self._project.name.title(), title_background + '.png'))
 
-        return resource.ResourceManager().pixmap(name='title_background', extension='png')
+        return tpDcc.ResourcesMgr().pixmap(name='title_background', extension='png')
 
 
 def dock_window(project, window_class, min_width=300):
@@ -378,7 +240,7 @@ def dock_window(project, window_class, min_width=300):
     :param window_class: cls
     """
 
-    if not tp.is_maya():
+    if not tpDcc.is_maya():
         return
 
     import maya.cmds as cmds
