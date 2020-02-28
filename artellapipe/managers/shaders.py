@@ -15,16 +15,16 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 
-import tpDccLib as tp
-from tpPyUtils import decorators, python, path as path_utils
+import tpDcc as tp
+from tpDcc.libs.python import decorators, python, path as path_utils
 
 import artellapipe.register
-from artellapipe.core import defines, config
+from artellapipe.core import defines
 
 if tp.is_maya():
-    import tpMayaLib as maya
-    from tpMayaLib.core import decorators as maya_decorators
-    from tpMayaLib.core import attribute as maya_attribute
+    import tpDcc.dccs.maya as maya
+    from tpDcc.dccs.maya.core import decorators as maya_decorators
+    from tpDcc.dccs.maya.core import attribute as maya_attribute
     UNDO_DECORATOR = maya_decorators.undo_chunk
 else:
     UNDO_DECORATOR = decorators.empty_decorator
@@ -50,7 +50,8 @@ class ShadersManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-shaders')
+        self._config = tp.ConfigsMgr().get_config(
+            config_name='artellapipe-shaders', environment=project.get_environment())
 
     def get_shaders_path_file_type(self):
         """
@@ -234,7 +235,7 @@ class ShadersManager(object):
             LOGGER.warning('Shaders loading is only supported in Maya!')
             return
 
-        from tpMayaLib.core import shader as maya_shader
+        from tpDcc.dccs.maya.core import shader as maya_shader
 
         if shader_name in maya_shader.get_default_shaders():
             return True
@@ -369,7 +370,7 @@ class ShadersManager(object):
             LOGGER.warning('Unload Asset Shaders functionality is only available in Maya')
             return False
 
-        from tpMayaLib.core import attribute
+        from tpDcc.dccs.maya.core import attribute
 
         shaders_mapping_file = asset_node.get_asset_shaders_mapping_file()
         if not shaders_mapping_file:

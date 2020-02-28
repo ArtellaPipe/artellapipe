@@ -17,11 +17,10 @@ import logging
 import tempfile
 import mimetypes
 
-from tpPyUtils import decorators, yamlio, path as path_utils
+import tpDcc
+from tpDcc.libs.python import decorators, yamlio, path as path_utils
 
 import artellapipe
-from artellapipe.core import config
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 
@@ -48,7 +47,8 @@ class MediaManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-media')
+        self._config = tpDcc.ConfigsMgr().get_config(
+            config_name='artellapipe-media', environment=project.get_environment())
 
     def get_media_profiles_paths(self):
         """
@@ -144,7 +144,7 @@ class MediaManager(object):
                     try:
                         if value and os.path.isfile(value):
                             continue
-                        resource_path = resource.ResourceManager().get(profile_resource_folder, value, key='project')
+                        resource_path = tpDcc.ResourcesMgr().get(profile_resource_folder, value, key='project')
                     except Exception:
                         continue
                     if resource_path and os.path.isfile(resource_path):

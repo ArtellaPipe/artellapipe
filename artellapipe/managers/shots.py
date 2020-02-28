@@ -19,7 +19,8 @@ import traceback
 import importlib
 from collections import OrderedDict
 
-from tpPyUtils import decorators, python, path as path_utils
+import tpDcc
+from tpDcc.libs.python import decorators, python, path as path_utils
 
 if python.is_python2():
     import pkgutil as loader
@@ -27,7 +28,6 @@ else:
     import importlib as loader
 
 import artellapipe.register
-from artellapipe.core import config
 from artellapipe.utils import exceptions
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 
@@ -64,7 +64,8 @@ class ArtellaShotsManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-shots')
+        self._config = tpDcc.ConfigsMgr().get_config(
+            config_name='artellapipe-shots', environment=project.get_environment())
 
         self._register_shot_classes()
 

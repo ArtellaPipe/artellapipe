@@ -19,12 +19,11 @@ import logging
 
 from Qt.QtGui import *
 
-import tpDccLib as tp
-from tpPyUtils import decorators
+import tpDcc as tp
+from tpDcc.libs.python import decorators
 
 import artellapipe.register
 from artellapipe.core import defines
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 

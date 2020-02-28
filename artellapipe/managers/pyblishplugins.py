@@ -20,10 +20,10 @@ import traceback
 
 import pyblish.api
 
-from tpPyUtils import decorators, python
+import tpDcc
+from tpDcc.libs.python import decorators, python
 
 import artellapipe.register
-from artellapipe.core import config
 
 if python.is_python2():
     import pkgutil as loader
@@ -54,7 +54,8 @@ class PyblishPluginsManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-pyblishplugins')
+        self._config = tpDcc.ConfigsMgr().get_config(
+            config_name='artellapipe-pyblishplugins', environment=project.get_environment())
 
         self._register_plugins()
 

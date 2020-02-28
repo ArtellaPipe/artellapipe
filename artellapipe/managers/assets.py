@@ -19,8 +19,8 @@ import traceback
 import importlib
 from collections import OrderedDict
 
-import tpDccLib as tp
-from tpPyUtils import python, decorators, strings, path as path_utils
+import tpDcc as tp
+from tpDcc.libs.python import python, decorators, strings, path as path_utils
 
 if python.is_python2():
     import pkgutil as loader
@@ -29,7 +29,7 @@ else:
 
 import artellapipe.register
 from artellapipe.utils import exceptions
-from artellapipe.core import config, defines
+from artellapipe.core import defines
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 
@@ -70,7 +70,8 @@ class ArtellaAssetsManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-assets')
+        self._config = tp.ConfigsMgr().get_config(
+            config_name='artellapipe-assets', environment=project.get_environment())
 
         self._register_asset_classes()
 

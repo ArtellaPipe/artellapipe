@@ -16,11 +16,10 @@ import os
 import logging
 import tempfile
 
-import tpDccLib as tp
-from tpPyUtils import decorators, path as path_utils
+import tpDcc as tp
+from tpDcc.libs.python import decorators, path as path_utils
 
 import artellapipe.register
-from artellapipe.core import config
 
 LOGGER = logging.getLogger()
 
@@ -48,7 +47,8 @@ class PlayblastsManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-playblasts')
+        self._config = tp.ConfigsMgr().get_config(
+            config_name='artellapipe-playblasts', environment=project.get_environment())
 
     def get_presets_paths(self):
         """
@@ -120,7 +120,7 @@ class PlayblastsManager(object):
         if not tp.is_maya():
             return None
 
-        from tpMayaLib.core import helpers
+        from tpDcc.dccs.maya.core import helpers
 
         return helpers.get_project_rule(rule_name)
 
@@ -149,7 +149,7 @@ class PlayblastsManager(object):
         if not tp.is_maya():
             return None
 
-        from tpMayaLib.core import layer
+        from tpDcc.dccs.maya.core import layer
 
         return layer.get_current_render_layer()
 

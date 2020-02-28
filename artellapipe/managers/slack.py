@@ -14,7 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 
-from tpPyUtils import decorators
+from tpDcc.libs.python import decorators
 
 import artellapipe.register
 

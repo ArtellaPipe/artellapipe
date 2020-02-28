@@ -7,12 +7,16 @@ Base class that defines Artella Shot
 
 from __future__ import print_function, division, absolute_import
 
+__author__ = "Tomas Poveda"
+__license__ = "MIT"
+__maintainer__ = "Tomas Poveda"
+__email__ = "tpovedatd@gmail.com"
+
 import os
 import logging
-import traceback
 
-import tpDccLib as tp
-from tpPyUtils import folder
+import tpDcc as tp
+from tpDcc.libs.python import folder
 
 import artellapipe
 from artellapipe.core import abstract

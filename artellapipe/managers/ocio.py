@@ -15,11 +15,10 @@ __email__ = "tpovedatd@gmail.com"
 import logging
 import traceback
 
-import tpDccLib as tp
-from tpPyUtils import decorators
+import tpDcc as tp
+from tpDcc.libs.python import decorators
 
 import artellapipe.register
-from artellapipe.core import config
 
 LOGGER = logging.getLogger()
 
@@ -45,7 +44,8 @@ class ArtellaOCIOManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-ocio')
+        self._config = tp.ConfigsMgr().get_config(
+            config_name='artellapipe-ocio', environment=project.get_environment())
 
     def init_ocio(self):
         """

@@ -18,8 +18,8 @@ import webbrowser
 
 from Qt.QtWidgets import *
 
-from tpPyUtils import decorators, python, path as path_utils
-from tpQtLib.core import qtutils
+from tpDcc.libs.python import decorators, python, path as path_utils
+from tpDcc.libs.qt.core import qtutils
 
 import artellapipe
 from artellapipe.core import defines

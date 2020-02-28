@@ -15,11 +15,10 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 
-from tpPyUtils import path as path_utils
+from tpDcc.libs.python import path as path_utils
 
 import artellapipe.register
 from artellapipe.core import abstract, defines
-from artellapipe.utils import resource
 
 LOGGER = logging.getLogger()
 

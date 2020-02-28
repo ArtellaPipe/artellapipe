@@ -12,11 +12,10 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-import tpDccLib as tp
-from tpPyUtils import decorators
+import tpDcc as tp
+from tpDcc.libs.python import decorators
 
 import artellapipe.register
-from artellapipe.core import config
 
 
 class ArtellaTagsManager(object):
@@ -37,7 +36,9 @@ class ArtellaTagsManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-tags')
+        self._config = tp.ConfigsMgr().get_config(
+            config_name='artellapipe-tags', environment=project.get_environment()
+        )
 
     # Basic definitions for tag attributes
     class TagDefinitions(object):

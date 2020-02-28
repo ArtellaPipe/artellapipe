@@ -12,7 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-from tpPyUtils import decorators
+from tpDcc.libs.python import decorators
 
 import artellapipe.register
 from artellapipe.libs.naming.core import naminglib

@@ -17,9 +17,10 @@ import tempfile
 import importlib
 
 import six
-import tpDccLib as tp
-from tpPyUtils import python, decorators, osplatform, path as path_utils
-from tpQtLib.core import qtutils
+
+import tpDcc as tp
+from tpDcc.libs.python import python, decorators, osplatform, path as path_utils
+from tpDcc.libs.qt.core import qtutils
 
 if python.is_python2():
     import pkgutil as loader
@@ -28,7 +29,6 @@ else:
 
 import artellapipe
 import artellapipe.register
-from artellapipe.core import config
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
 from artellapipe.libs.naming.core import naminglib
@@ -63,7 +63,8 @@ class ArtellaFilesManager(object):
         """
 
         self._project = project
-        self._config = config.get_config(project, 'artellapipe-files')
+        self._config = tp.ConfigsMgr().get_config(
+            config_name='artellapipe-files', environment=project.get_environment())
 
         self._register_file_classes()
 

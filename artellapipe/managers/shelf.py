@@ -12,11 +12,10 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-import tpDccLib as tp
-from tpPyUtils import decorators
+import tpDcc as tp
+from tpDcc.libs.python import decorators
 
 import artellapipe.register
-from artellapipe.utils import resource
 
 
 class ArtellaShelfManager(object):
@@ -29,7 +28,7 @@ class ArtellaShelfManager(object):
         self._project = project
         self._shelf_name = project.config.get('shelf', 'name')
         self._shelf_icon_name = project.config.get('shelf', 'icon_name')
-        self._shelf_icon = resource.ResourceManager().icon(self._shelf_icon_name, key='project')
+        self._shelf_icon = tp.ResourcesMgr().icon(self._shelf_icon_name, key='project')
         self.create_shelf()
 
     @decorators.abstractmethod
