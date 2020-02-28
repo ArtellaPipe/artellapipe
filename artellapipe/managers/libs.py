@@ -17,17 +17,16 @@ import importlib
 import traceback
 import logging.config
 
-from tpPyUtils import decorators, importer, python
+import tpDcc
+from tpDcc.libs.python import decorators, importer, python
 
+import artellapipe
 import artellapipe.register
-from artellapipe.utils import resource
 
 if python.is_python2():
     import pkgutil as loader
 else:
     import importlib as loader
-
-LOGGER = logging.getLogger()
 
 
 class LibImporter(importer.Importer, object):
@@ -60,13 +59,10 @@ class LibsManager(object):
         return self._libs
 
     def register_lib(self, project, pkg_loader, do_reload=False):
-
-        from artellapipe.core import config
-
         project_name = project.get_clean_name()
         lib_path = pkg_loader.fullname
         if pkg_loader in self._libs:
-            LOGGER.warning('Lib with path "{}" is already registered. Skipping ...'.format(lib_path))
+            artellapipe.logger.warning('Lib with path "{}" is already registered. Skipping ...'.format(lib_path))
             return False
 
         mod_config_settings = None
@@ -96,15 +92,15 @@ class LibsManager(object):
         lib_name = lib_config.data.get('name', None)
         skip_modules = lib_config.data.get('skip_modules', list())
         if not lib_id:
-            LOGGER.warning(
+            artellapipe.logger.warning(
                 'Impossible to register library "{}" because its ID is not defined'.format(lib_path))
             return False
         if not lib_name:
-            LOGGER.warning(
+            artellapipe.logger.warning(
                 'Impossible to register library "{}" because its ID is not defined'.format(lib_path))
             return False
         if lib_id in self._libs:
-            LOGGER.warning(
+            artellapipe.logger.warning(
                 'Impossible to register library "{}" because its ID "{}" is already defined.'.format(lib_path, lib_id))
             return False
 
@@ -126,12 +122,12 @@ class LibsManager(object):
             except Exception as exc:
                 msg = 'Impossible to register Library: {}. Exception raised: {} | {}'.format(
                     lib_path, exc, traceback.format_exc())
-                LOGGER.warning(msg)
+                artellapipe.logger.warning(msg)
                 continue
 
             if qname.endswith('__version__') and hasattr(mod, '__version__'):
                 if version_found:
-                    LOGGER.warning('Already found version: "{}" for "{}"'.format(version_found, lib_path))
+                    artellapipe.logger.warning('Already found version: "{}" for "{}"'.format(version_found, lib_path))
                 else:
                     version_found = getattr(mod, '__version__')
 
@@ -141,9 +137,9 @@ class LibsManager(object):
         if not resources_path or not os.path.isdir(resources_path):
             resources_path = def_resources_path
         if os.path.isdir(resources_path):
-            resource.ResourceManager().register_resource(resources_path, key='tools')
+            tpDcc.ResourcesMgr().register_resource(resources_path, key='tools')
         else:
-            LOGGER.info('No resources directory found for tool "{}" ...'.format(lib_name))
+            artellapipe.logger.info('No resources directory found for tool "{}" ...'.format(lib_name))
 
         self._libs[lib_id] = {
             'name': lib_name,
@@ -154,7 +150,7 @@ class LibsManager(object):
             'version': version_found if version_found is not None else "0.0.0"
         }
 
-        LOGGER.info('Library "{}" registered successfully!'.format(lib_path))
+        artellapipe.logger.info('Library "{}" registered successfully!'.format(lib_path))
 
         self.load_library(lib_path=lib_id, do_reload=do_reload)
 
@@ -182,7 +178,7 @@ class LibsManager(object):
                         break
 
         if not lib_to_load or lib_to_load not in self._libs:
-            LOGGER.warning('Lib "{}" is not registered. Impossible to run!'.format(lib_path))
+            artellapipe.logger.warning('Lib "{}" is not registered. Impossible to run!'.format(lib_path))
             return
 
         pkg_loader = self._libs[lib_to_load]['lib_loader']
@@ -202,7 +198,7 @@ class LibsManager(object):
         logging.config.fileConfig(
             lib_config.data.get('logging_file', default_logging_config), disable_existing_loggers=False)
         lib_logger_level = '{}_LOG_LEVEL'.format(pkg_loader.fullname.replace('.', '_').upper())
-        LOGGER.setLevel(os.environ.get(lib_logger_level, lib_config.data.get('logger_level', 'WARNING')))
+        # LOGGER.setLevel(os.environ.get(lib_logger_level, lib_config.data.get('logger_level', 'WARNING')))
 
         # Import library modules
         mod = importlib.import_module(pkg_loader.fullname)
@@ -224,11 +220,7 @@ class LibsManager(object):
         return True
 
     def _create_lib_config(self, project_name, lib_path, project, config_dict):
-
-        from artellapipe.core import config
-
-        lib_config = config.ArtellaConfiguration(
-            project_name=project_name,
+        lib_config = tpDcc.ConfigsMgr().get_config(
             config_name=lib_path.replace('.', '-'),
             environment=project.get_environment(),
             config_dict=config_dict

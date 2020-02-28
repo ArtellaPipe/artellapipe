@@ -15,32 +15,30 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import inspect
 import logging.config
-from collections import OrderedDict
 
-import tpDccLib as tp
-from tpPyUtils import python
-
-toolbox = None
+import tpDcc as tp
+from tpDcc.libs.python import python
 
 
-def init(do_reload=False, dev=False):
+def init(do_reload=False, import_libs=True, dev=False):
     """
     Initializes module
     :param do_reload: bool, Whether to reload modules or not
     :param dev: bool, Whether artellapipe is initialized in dev mode or not
     """
 
-    # Load logger configuration
-    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
+    from tpDcc.libs.python import importer
+    from artellapipe import register
 
-    if not dev:
-        import sentry_sdk
-        try:
-            sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
-        except (RuntimeError, ImportError):
-            sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
+    logger = create_logger()
+    register.register_class('logger', logger)
 
-    from tpPyUtils import importer
+    # if not dev:
+    #     import sentry_sdk
+    #     try:
+    #         sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
+    #     except (RuntimeError, ImportError):
+    #         sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
 
     class ArtellaPipe(importer.Importer, object):
         def __init__(self, debug=False):
@@ -73,6 +71,12 @@ def init(do_reload=False, dev=False):
         'artellapipe.widgets'
     ]
 
+    if import_libs:
+        import tpDcc.loader
+        tpDcc.loader.init(do_reload=do_reload, dev=dev)
+        # import tpNameIt
+        # tpNameIt.init(do_reload=do_reload)
+
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False, debug=dev)
     artella_importer.import_packages(
         order=packages_order,
@@ -80,11 +84,14 @@ def init(do_reload=False, dev=False):
     if do_reload:
         artella_importer.reload_all()
 
-    create_logger_directory()
+    init_dcc(do_reload=do_reload)
 
-    from artellapipe.utils import resource
-    resources_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
-    resource.ResourceManager().register_resource(resources_path)
+
+def init_dcc(do_reload=False):
+    """
+    Checks DCC we are working on an initializes proper variables
+    :param do_reload: bool
+    """
 
     if tp.is_maya():
         from artellapipe.dccs import maya as maya_dcc
@@ -92,6 +99,17 @@ def init(do_reload=False, dev=False):
     elif tp.is_houdini():
         from artellapipe.dccs import houdini as houdini_dcc
         houdini_dcc.init(do_reload=do_reload)
+
+
+def create_logger():
+    """
+    Returns logger of current module
+    """
+
+    logging.config.fileConfig(get_logging_config(), disable_existing_loggers=False)
+    logger = logging.getLogger('artellapipe')
+
+    return logger
 
 
 def create_logger_directory():
@@ -134,12 +152,52 @@ def set_project(project_class, do_reload=False):
     """
 
     import artellapipe
+
+    # Register configuration paths
+    # NOTE: We must do it before instantiating the project, otherwise project configuration won't be available
+    register_configs()
+
+    # Create and register project
     project_inst = project_class()
     artellapipe.__dict__['project'] = project_inst
     artellapipe.__dict__[project_class.__name__.lower()] = project_inst
+
+    register_resources(project_inst)
     register_libs(project_inst, do_reload=do_reload)
-    register_tools(project_inst)
+    register_tools(project_inst, dev=project_inst.get_environment().lower() == 'development', do_reload=do_reload)
     project_inst.init()
+
+
+def register_configs():
+    """
+    Registers aretellapipe configuration files
+    """
+
+    from artellapipe import config
+
+    artella_configs_path = os.environ.get('ARTELLA_CONFIGS_PATH', None)
+    if artella_configs_path and os.path.isdir(artella_configs_path):
+        tp.ConfigsMgr().register_package_configs('artellapipe', artella_configs_path)
+    else:
+        tp.ConfigsMgr().register_package_configs('artellapipe', os.path.dirname(config.__file__))
+
+
+def register_resources(project):
+    """
+    Registers artellapipe and project resources
+    """
+
+    resources_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
+    tp.ResourcesMgr().register_resource(resources_path)
+
+    project_resources_paths = project.get_resources_paths()
+    for resources_key, resources_path in project_resources_paths.items():
+        if not os.path.isdir(resources_path):
+            continue
+        if resources_key:
+            tp.ResourcesMgr().register_resource(resources_path, resources_key)
+        else:
+            tp.ResourcesMgr().register_resource(resources_path)
 
 
 def register_libs(project_inst, do_reload=False):
@@ -173,30 +231,29 @@ def register_libs(project_inst, do_reload=False):
         artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
 
 
-def register_tools(project_inst):
+def register_tools(project_inst, dev=False, do_reload=False):
     """
     Function that register all available tools for given project
     :param project_inst: ArtellaProject
     """
 
-    import artellapipe
+    import artellapipe.toolsets
 
-    if python.is_python2():
-        import pkgutil as loader
-    else:
-        import importlib as loader
+    package_names = ['artellapipe', project_inst.get_clean_name()]
 
-    tools = project_inst.config_data.get('tools', list())
-    tools_to_register = OrderedDict()
-    tools_path = '{}.tools.{}'
-    for tool_name in tools:
-        for pkg in ['artellapipe', project_inst.get_clean_name()]:
-            pkg_path = tools_path.format(pkg, tool_name)
-            pkg_loader = loader.find_loader(pkg_path)
-            if tool_name not in tools_to_register:
-                tools_to_register[tool_name] = list()
-            if pkg_loader is not None:
-                tools_to_register[tool_name].append(pkg_loader)
+    # Tools
+    tools_to_load = project_inst.config_data.get('tools', list())
+    for package_name in package_names:
+        tp.ToolsMgr().load_package_tools(package_name=package_name, tools_to_load=tools_to_load, dev=dev)
+    artellapipe.MenusMgr().create_menus(project_inst.get_clean_name(), project=project_inst)
 
-    for pkg_loaders in tools_to_register.values():
-        artellapipe.ToolsMgr().register_tool(project=project_inst, pkg_loaders=pkg_loaders)
+    # Toolsets
+    # NOTE: Project specific toolsets paths MUST be registered in project specific loader
+    # TODO: Register a default project path where toolsets can be located
+    # NOTE: We can still using project specific loader to register custom toolset paths
+    tp.ToolsetsMgr().register_path('artellapipe', os.path.dirname(os.path.abspath(artellapipe.toolsets.__file__)))
+    for project_toolset_path in project_inst.get_toolsets_paths():
+        tp.ToolsetsMgr().register_path(project_inst.get_clean_name(), project_toolset_path)
+    for package_name in package_names:
+        tp.ToolsetsMgr().load_registered_toolsets(
+            package_name, tools_to_load=tools_to_load, dev=dev, do_reload=do_reload)
