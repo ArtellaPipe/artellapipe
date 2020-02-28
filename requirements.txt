@@ -5,10 +5,10 @@
 Qt.py
 six
 psutil
-tpPyUtils
-tpDccLib
-tpQtLib
-tpNameIt
+tpDcc-libs-python
+tpDcc-core
+tpDcc-libs-qt
+# tpNameIt
 pyblish-base
 pyblish-lite
 lucidity
