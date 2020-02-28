@@ -1,0 +1,7 @@
+artellapipe.managers.menus module
+=================================
+
+.. automodule:: artellapipe.managers.menus
+   :members:
+   :undoc-members:
+   :show-inheritance:

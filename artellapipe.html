@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -191,7 +192,6 @@
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.abstract.html">artellapipe.core.abstract module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.asset.html">artellapipe.core.asset module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.assetfile.html">artellapipe.core.assetfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.core.config.html">artellapipe.core.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.defines.html">artellapipe.core.defines module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.file.html">artellapipe.core.file module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.node.html">artellapipe.core.node module</a></li>
@@ -199,6 +199,7 @@
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.sequence.html">artellapipe.core.sequence module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.sequencefile.html">artellapipe.core.sequencefile module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.shot.html">artellapipe.core.shot module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.core.shotfile.html">artellapipe.core.shotfile module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.tag.html">artellapipe.core.tag module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.tool.html">artellapipe.core.tool module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.core.toolbox.html">artellapipe.core.toolbox module</a></li>
@@ -218,10 +219,12 @@
 <li class="toctree-l1"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="artellapipe.managers.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.assets.html">artellapipe.managers.assets module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.casting.html">artellapipe.managers.casting module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.dependencies.html">artellapipe.managers.dependencies module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.files.html">artellapipe.managers.files module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.libs.html">artellapipe.managers.libs module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.menu.html">artellapipe.managers.menu module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.media.html">artellapipe.managers.media module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.menus.html">artellapipe.managers.menus module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.names.html">artellapipe.managers.names module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.ocio.html">artellapipe.managers.ocio module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.playblasts.html">artellapipe.managers.playblasts module</a></li>
@@ -230,8 +233,9 @@
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.shaders.html">artellapipe.managers.shaders module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.shelf.html">artellapipe.managers.shelf module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.shots.html">artellapipe.managers.shots module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.slack.html">artellapipe.managers.slack module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.tags.html">artellapipe.managers.tags module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.tools.html">artellapipe.managers.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.tasks.html">artellapipe.managers.tasks module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.managers.tracking.html">artellapipe.managers.tracking module</a></li>
 </ul>
 </li>
@@ -242,11 +246,14 @@
 <li class="toctree-l2"><a class="reference internal" href="artellapipe.tools.html#module-artellapipe.tools">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="artellapipe.toolsets.html#module-artellapipe.toolsets">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="artellapipe.utils.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.utils.exceptions.html">artellapipe.utils.exceptions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.utils.plugin.html">artellapipe.utils.plugin module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="artellapipe.utils.resource.html">artellapipe.utils.resource module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.utils.shader.html">artellapipe.utils.shader module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.utils.worker.html">artellapipe.utils.worker module</a></li>
 </ul>
@@ -259,12 +266,14 @@
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.asset.html">artellapipe.widgets.asset module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.assetinfo.html">artellapipe.widgets.assetinfo module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.assetsviewer.html">artellapipe.widgets.assetsviewer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.assetswidget.html">artellapipe.widgets.assetswidget module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.button.html">artellapipe.widgets.button module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.dialog.html">artellapipe.widgets.dialog module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.label.html">artellapipe.widgets.label module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.progressbar.html">artellapipe.widgets.progressbar module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.sequence.html">artellapipe.widgets.sequence module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.sequenceinfo.html">artellapipe.widgets.sequenceinfo module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.sequencesviewer.html">artellapipe.widgets.sequencesviewer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.shadersviewer.html">artellapipe.widgets.shadersviewer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.shot.html">artellapipe.widgets.shot module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.widgets.shotinfo.html">artellapipe.widgets.shotinfo module</a></li>

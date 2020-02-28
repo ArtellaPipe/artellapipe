@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.managers.tools module &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.tasks module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -156,13 +157,13 @@
         
           <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
         
-      <li>artellapipe.managers.tools module</li>
+      <li>artellapipe.managers.tasks module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.managers.tools.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.tasks.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,88 +177,42 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.managers.tools">
-<span id="artellapipe-managers-tools-module"></span><h1>artellapipe.managers.tools module<a class="headerlink" href="#module-artellapipe.managers.tools" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains manager to handle tools</p>
+  <div class="section" id="module-artellapipe.managers.tasks">
+<span id="artellapipe-managers-tasks-module"></span><h1>artellapipe.managers.tasks module<a class="headerlink" href="#module-artellapipe.managers.tasks" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager to handle tasks</p>
 <dl class="class">
-<dt id="artellapipe.managers.tools.ToolImporter">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ToolImporter</code><span class="sig-paren">(</span><em class="sig-param">tool_pkg</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolImporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpPyUtils.importer.Importer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolImporter.get_module_path">
-<code class="sig-name descname">get_module_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolImporter.get_module_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns path where module is located
-:return: str</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="artellapipe.managers.tools.ToolsManager">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ToolsManager</code><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.tasks.ArtellaTasksManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tasks.</code><code class="sig-name descname">ArtellaTasksManager</code><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that handles all tools</p>
 <dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.get_config">
-<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><em class="sig-param">tool_id</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.get_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.get_tool_data_from_id">
-<code class="sig-name descname">get_tool_data_from_id</code><span class="sig-paren">(</span><em class="sig-param">tool_id</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.get_tool_data_from_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns registered tool from its id
-:param tool_id: str
-:return: dict</p>
+<dt id="artellapipe.managers.tasks.ArtellaTasksManager.get_task_names_for_shot">
+<code class="sig-name descname">get_task_names_for_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager.get_task_names_for_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all names of the tasks attached to the given shot
+:param shot_name: str
+:return: list(str)</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.get_tool_data_from_name">
-<code class="sig-name descname">get_tool_data_from_name</code><span class="sig-paren">(</span><em class="sig-param">tool_name</em>, <em class="sig-param">as_dict=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.get_tool_data_from_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns registered tool from its name
-:param tool_name: str
+<dt id="artellapipe.managers.tasks.ArtellaTasksManager.get_tasks_for_shot">
+<code class="sig-name descname">get_tasks_for_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager.get_tasks_for_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all tasks attached to the given shot
+:param shot_name: str
 :return:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.get_tool_data_from_tool">
-<code class="sig-name descname">get_tool_data_from_tool</code><span class="sig-paren">(</span><em class="sig-param">tool</em>, <em class="sig-param">as_dict=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.get_tool_data_from_tool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns registered tool data from a tool object
-:return: dict</p>
+<dt id="artellapipe.managers.tasks.ArtellaTasksManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project this manager belongs to
+:param project: ArtellaProject</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.get_tool_menus">
-<code class="sig-name descname">get_tool_menus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.get_tool_menus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns dictionary with the menu info for all the registered tools
-:return: dict</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.get_tool_shelfs">
-<code class="sig-name descname">get_tool_shelfs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.get_tool_shelfs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns dictionary with the shelf info for all the registered tools
-:return: dict</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.register_tool">
-<code class="sig-name descname">register_tool</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">pkg_loaders</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.register_tool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register tool given path
-:param str tool_path: path to the module (for example, artellapipe.tools.welcome)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.run_tool">
-<code class="sig-name descname">run_tool</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">tool_path</em>, <em class="sig-param">do_reload=False</em>, <em class="sig-param">debug=False</em>, <em class="sig-param">extra_args=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.run_tool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs tool with the given path or name
-:param str tool_path: name or path of the tool (artellapipe.tools.welcome or welcome)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.tools.ToolsManager.tools">
-<em class="property">property </em><code class="sig-name descname">tools</code><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.tools" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dl class="class">
+<dt id="artellapipe.managers.tasks.ArtellaTasksManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tasks.</code><code class="sig-name descname">ArtellaTasksManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.tasks.ArtellaTasksManager" title="artellapipe.managers.tasks.ArtellaTasksManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.tasks.ArtellaTasksManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>

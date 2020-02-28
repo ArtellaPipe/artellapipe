@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.widgets package &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.casting module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.widgets.asset module" href="artellapipe.widgets.asset.html" />
-    <link rel="prev" title="artellapipe.utils.worker module" href="artellapipe.utils.worker.html" /> 
+    <link rel="next" title="artellapipe.managers.dependencies module" href="artellapipe.managers.dependencies.html" />
+    <link rel="prev" title="artellapipe.managers.assets module" href="artellapipe.managers.assets.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,11 +93,11 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">artellapipe.widgets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
@@ -155,13 +155,15 @@
         
           <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
         
-      <li>artellapipe.widgets package</li>
+          <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
+        
+      <li>artellapipe.managers.casting module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.widgets.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.casting.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -175,38 +177,37 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-widgets-package">
-<h1>artellapipe.widgets package<a class="headerlink" href="#artellapipe-widgets-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.asset.html">artellapipe.widgets.asset module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.assetinfo.html">artellapipe.widgets.assetinfo module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.assetsviewer.html">artellapipe.widgets.assetsviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.assetswidget.html">artellapipe.widgets.assetswidget module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.button.html">artellapipe.widgets.button module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.dialog.html">artellapipe.widgets.dialog module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.label.html">artellapipe.widgets.label module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.progressbar.html">artellapipe.widgets.progressbar module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.sequence.html">artellapipe.widgets.sequence module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.sequenceinfo.html">artellapipe.widgets.sequenceinfo module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.sequencesviewer.html">artellapipe.widgets.sequencesviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shadersviewer.html">artellapipe.widgets.shadersviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shot.html">artellapipe.widgets.shot module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shotinfo.html">artellapipe.widgets.shotinfo module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shotsviewer.html">artellapipe.widgets.shotsviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.spinner.html">artellapipe.widgets.spinner module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.syncdialog.html">artellapipe.widgets.syncdialog module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.tray.html">artellapipe.widgets.tray module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.waiter.html">artellapipe.widgets.waiter module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.window.html">artellapipe.widgets.window module</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="module-artellapipe.widgets">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-artellapipe.widgets" title="Permalink to this headline">¶</a></h2>
-</div>
+  <div class="section" id="module-artellapipe.managers.casting">
+<span id="artellapipe-managers-casting-module"></span><h1>artellapipe.managers.casting module<a class="headerlink" href="#module-artellapipe.managers.casting" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager for shot/asset/sequences casting</p>
+<dl class="class">
+<dt id="artellapipe.managers.casting.ArtellaCastingManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.casting.</code><code class="sig-name descname">ArtellaCastingManager</code><a class="headerlink" href="#artellapipe.managers.casting.ArtellaCastingManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.managers.casting.ArtellaCastingManager.get_ocurrences_of_asset_in_shot">
+<code class="sig-name descname">get_ocurrences_of_asset_in_shot</code><span class="sig-paren">(</span><em class="sig-param">asset_name</em>, <em class="sig-param">shot_name</em>, <em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.casting.ArtellaCastingManager.get_ocurrences_of_asset_in_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of ocurrences of given asset in given shot
+:param asset_name: str, name of the asset
+:param shot_name: str, name of the shot
+:return: int or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.casting.ArtellaCastingManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.casting.ArtellaCastingManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project this manager belongs to
+:param project: ArtellaProject</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.managers.casting.ArtellaCastingManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.casting.</code><code class="sig-name descname">ArtellaCastingManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.casting.ArtellaCastingManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.casting.ArtellaCastingManager" title="artellapipe.managers.casting.ArtellaCastingManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.casting.ArtellaCastingManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
 </div>
 
 
@@ -221,10 +222,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.widgets.asset.html" class="btn btn-neutral float-right" title="artellapipe.widgets.asset module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.dependencies.html" class="btn btn-neutral float-right" title="artellapipe.managers.dependencies module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.utils.worker.html" class="btn btn-neutral float-left" title="artellapipe.utils.worker module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.assets.html" class="btn btn-neutral float-left" title="artellapipe.managers.assets module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

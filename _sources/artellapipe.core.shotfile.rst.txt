@@ -1,7 +1,7 @@
-artellapipe.managers.menu module
+artellapipe.core.shotfile module
 ================================
 
-.. automodule:: artellapipe.managers.menu
+.. automodule:: artellapipe.core.shotfile
    :members:
    :undoc-members:
    :show-inheritance:

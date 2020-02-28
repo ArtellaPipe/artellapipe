@@ -12,6 +12,7 @@ Subpackages
    artellapipe.libs
    artellapipe.managers
    artellapipe.tools
+   artellapipe.toolsets
    artellapipe.utils
    artellapipe.widgets
 

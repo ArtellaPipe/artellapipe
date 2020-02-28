@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -180,6 +181,12 @@
 <span id="artellapipe-managers-shaders-module"></span><h1>artellapipe.managers.shaders module<a class="headerlink" href="#module-artellapipe.managers.shaders" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager to handle shaders</p>
 <dl class="class">
+<dt id="artellapipe.managers.shaders.ArtellaShadersManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.shaders.</code><code class="sig-name descname">ArtellaShadersManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.shaders.ArtellaShadersManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.shaders.ShadersManager" title="artellapipe.managers.shaders.ShadersManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.shaders.ShadersManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
 <dt id="artellapipe.managers.shaders.ShadersManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.shaders.</code><code class="sig-name descname">ShadersManager</code><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -190,7 +197,7 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.export_asset_shaders">
-<code class="sig-name descname">export_asset_shaders</code><span class="sig-paren">(</span><em class="sig-param">asset</em>, <em class="sig-param">publish=False</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em>, <em class="sig-param">shader_swatch=None</em>, <em class="sig-param">shaders_to_export=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_asset_shaders" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_asset_shaders</code><span class="sig-paren">(</span><em class="sig-param">asset</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em>, <em class="sig-param">shader_swatch=None</em>, <em class="sig-param">shaders_to_export=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_asset_shaders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports all shaders of the given asset
 :param asset: ArtellaAsset
 :param publish: bool
@@ -202,7 +209,7 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.export_asset_shaders_mapping">
-<code class="sig-name descname">export_asset_shaders_mapping</code><span class="sig-paren">(</span><em class="sig-param">asset</em>, <em class="sig-param">publish=False</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_asset_shaders_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_asset_shaders_mapping</code><span class="sig-paren">(</span><em class="sig-param">asset</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_asset_shaders_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports shaders mapping of the given asset
 :param asset: ArtellaAsset
 :param publish: bool
@@ -213,19 +220,18 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.export_shader">
-<code class="sig-name descname">export_shader</code><span class="sig-paren">(</span><em class="sig-param">shader_name</em>, <em class="sig-param">export_path=None</em>, <em class="sig-param">publish=False</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em>, <em class="sig-param">shader_swatch=None</em>, <em class="sig-param">asset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_shader" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_shader</code><span class="sig-paren">(</span><em class="sig-param">shader_name</em>, <em class="sig-param">export_path=None</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em>, <em class="sig-param">shader_swatch=None</em>, <em class="sig-param">asset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_shader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports shaders
 :param shader_name: str, name of the shader to export
 :param export_path: str, path where shader file will be exported into (optional)
 :param comment: str, publish comment
 :param shader_swatch: str, path where shader file will be exported into (optional)
-:param publish: bool
 :return:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.export_shaders">
-<code class="sig-name descname">export_shaders</code><span class="sig-paren">(</span><em class="sig-param">shaders_names</em>, <em class="sig-param">export_path=None</em>, <em class="sig-param">publish=False</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em>, <em class="sig-param">asset=None</em>, <em class="sig-param">shader_swatch=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_shaders" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_shaders</code><span class="sig-paren">(</span><em class="sig-param">shaders_names</em>, <em class="sig-param">export_path=None</em>, <em class="sig-param">comment=None</em>, <em class="sig-param">new_version=False</em>, <em class="sig-param">asset=None</em>, <em class="sig-param">shader_swatch=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.export_shaders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports all given shader names from current scene
 :param shaders_names: list(str)
 :param export_path: STR
@@ -233,7 +239,15 @@
 :param comment: str
 :param new_version: bool
 :param asset: ArtellaAsset
+:param shader_swatch:
 :return: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.shaders.ShadersManager.get_asset_shader_file_class">
+<code class="sig-name descname">get_asset_shader_file_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.get_asset_shader_file_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns asset shader file class associated to this asset
+:return: class</p>
 </dd></dl>
 
 <dl class="method">
@@ -251,13 +265,6 @@
 :param return_only_shaders:
 :param skip_standard_shaders:
 :return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shaders.ShadersManager.get_scene_operator">
-<code class="sig-name descname">get_scene_operator</code><span class="sig-paren">(</span><em class="sig-param">create=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.get_scene_operator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns scene shaders operator node
-:return: str</p>
 </dd></dl>
 
 <dl class="method">
@@ -286,9 +293,9 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.managers.shaders.ShadersManager.get_shader_path_file_type">
-<code class="sig-name descname">get_shader_path_file_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.get_shader_path_file_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns file type used to define shaders path
+<dt id="artellapipe.managers.shaders.ShadersManager.get_shaders_asset_file_type">
+<code class="sig-name descname">get_shaders_asset_file_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.get_shaders_asset_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns file type used to define asset shaders
 :return: str</p>
 </dd></dl>
 
@@ -300,9 +307,10 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.managers.shaders.ShadersManager.get_shaders_file_type">
-<code class="sig-name descname">get_shaders_file_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.get_shaders_file_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns file type used to define shaders</p>
+<dt id="artellapipe.managers.shaders.ShadersManager.get_shaders_path_file_type">
+<code class="sig-name descname">get_shaders_path_file_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.get_shaders_path_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns file type used to define shaders
+:return: str</p>
 </dd></dl>
 
 <dl class="method">
@@ -314,30 +322,28 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.load_asset_shaders">
-<code class="sig-name descname">load_asset_shaders</code><span class="sig-paren">(</span><em class="sig-param">asset</em>, <em class="sig-param">apply_shaders=True</em>, <em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.load_asset_shaders" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_asset_shaders</code><span class="sig-paren">(</span><em class="sig-param">asset_node</em>, <em class="sig-param">apply_shaders=True</em>, <em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.load_asset_shaders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads all the shaders of the given asset
-:param asset:
+:param asset_node:
 :param apply_shaders: bool
 :param status:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.load_scene_shaders">
-<code class="sig-name descname">load_scene_shaders</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.load_scene_shaders" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shaders.ShadersManager.load_shader">
-<code class="sig-name descname">load_shader</code><span class="sig-paren">(</span><em class="sig-param">shader_name</em>, <em class="sig-param">shader_path=None</em>, <em class="sig-param">apply=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.load_shader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads shader with given name in current DCC
-:param shader_name: str
-:param apply: bool</p>
+<code class="sig-name descname">load_scene_shaders</code><span class="sig-paren">(</span><em class="sig-param">status='published'</em>, <em class="sig-param">apply_shaders=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.load_scene_shaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all shaders of the current assets in the scene
+:param status:
+:param apply_shaders: bool
+:return:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.managers.shaders.ShadersManager.remove_scene_operator">
-<code class="sig-name descname">remove_scene_operator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.remove_scene_operator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes scene shader operator node if it has no more connections</p>
+<dt id="artellapipe.managers.shaders.ShadersManager.load_shader">
+<code class="sig-name descname">load_shader</code><span class="sig-paren">(</span><em class="sig-param">shader_name</em>, <em class="sig-param">shader_path=None</em>, <em class="sig-param">asset=None</em>, <em class="sig-param">apply=True</em>, <em class="sig-param">status='working'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.load_shader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads shader with given name in current DCC
+:param shader_name: str
+:param apply: bool</p>
 </dd></dl>
 
 <dl class="method">
@@ -349,18 +355,19 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.unload_asset_shaders">
-<code class="sig-name descname">unload_asset_shaders</code><span class="sig-paren">(</span><em class="sig-param">asset</em>, <em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.unload_asset_shaders" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unload_asset_shaders</code><span class="sig-paren">(</span><em class="sig-param">asset_node</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.unload_asset_shaders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unload shaders of given asset
-:param asset:
+:param asset_node:
 :param status:
-:param with_undo:
 :return:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.unload_shaders">
-<code class="sig-name descname">unload_shaders</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.unload_shaders" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">unload_shaders</code><span class="sig-paren">(</span><em class="sig-param">assets=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shaders.ShadersManager.unload_shaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unload shaders applied to assets loaded in current DCC scene or to given ones
+:param assets:</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.managers.shaders.ShadersManager.update_shaders">

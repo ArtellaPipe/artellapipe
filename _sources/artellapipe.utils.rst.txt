@@ -8,7 +8,6 @@ Submodules
 
    artellapipe.utils.exceptions
    artellapipe.utils.plugin
-   artellapipe.utils.resource
    artellapipe.utils.shader
    artellapipe.utils.worker
 

@@ -9,7 +9,6 @@ Submodules
    artellapipe.core.abstract
    artellapipe.core.asset
    artellapipe.core.assetfile
-   artellapipe.core.config
    artellapipe.core.defines
    artellapipe.core.file
    artellapipe.core.node
@@ -17,6 +16,7 @@ Submodules
    artellapipe.core.sequence
    artellapipe.core.sequencefile
    artellapipe.core.shot
+   artellapipe.core.shotfile
    artellapipe.core.tag
    artellapipe.core.tool
    artellapipe.core.toolbox

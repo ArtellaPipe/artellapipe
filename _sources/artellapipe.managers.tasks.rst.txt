@@ -1,7 +1,7 @@
-artellapipe.managers.tools module
+artellapipe.managers.tasks module
 =================================
 
-.. automodule:: artellapipe.managers.tools
+.. automodule:: artellapipe.managers.tasks
    :members:
    :undoc-members:
    :show-inheritance:

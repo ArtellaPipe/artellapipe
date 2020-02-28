@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -179,6 +180,12 @@
   <div class="section" id="module-artellapipe.managers.playblasts">
 <span id="artellapipe-managers-playblasts-module"></span><h1>artellapipe.managers.playblasts module<a class="headerlink" href="#module-artellapipe.managers.playblasts" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager to handle playblasts</p>
+<dl class="class">
+<dt id="artellapipe.managers.playblasts.ArtellaPlayblastsManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.playblasts.</code><code class="sig-name descname">ArtellaPlayblastsManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.playblasts.ArtellaPlayblastsManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.playblasts.PlayblastsManager" title="artellapipe.managers.playblasts.PlayblastsManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.playblasts.PlayblastsManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
 <dl class="class">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.playblasts.</code><code class="sig-name descname">PlayblastsManager</code><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager" title="Permalink to this definition">¶</a></dt>
@@ -291,6 +298,11 @@
 <dd><p>Sets the project this manager belongs to
 :param project: ArtellaProject</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.playblasts.PlayblastsManager.stamp_playblast">
+<code class="sig-name descname">stamp_playblast</code><span class="sig-paren">(</span><em class="sig-param">file_name</em>, <em class="sig-param">output_file</em>, <em class="sig-param">extra_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.stamp_playblast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.tokens">

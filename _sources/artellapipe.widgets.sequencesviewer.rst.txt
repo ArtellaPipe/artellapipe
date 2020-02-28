@@ -1,0 +1,7 @@
+artellapipe.widgets.sequencesviewer module
+==========================================
+
+.. automodule:: artellapipe.widgets.sequencesviewer
+   :members:
+   :undoc-members:
+   :show-inheritance:

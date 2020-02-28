@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -184,6 +185,15 @@
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.core.node.</code><code class="sig-name descname">ArtellaAssetNode</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">asset</em>, <em class="sig-param">node=None</em>, <em class="sig-param">id=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#artellapipe.core.node.ArtellaDCCNode" title="artellapipe.core.node.ArtellaDCCNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.core.node.ArtellaDCCNode</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.add_shape_operator_assignment">
+<code class="sig-name descname">add_shape_operator_assignment</code><span class="sig-paren">(</span><em class="sig-param">assignment_value</em>, <em class="sig-param">shape_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.add_shape_operator_assignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new shape operator assignment to given shape operator
+:param shape_name: str
+:param assignment_value: str
+:return:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.core.node.ArtellaAssetNode.asset">
 <em class="property">property </em><code class="sig-name descname">asset</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns asset linked to this node
@@ -198,11 +208,32 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_file">
-<code class="sig-name descname">get_asset_shaders_file</code><span class="sig-paren">(</span><em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns file class of the Asset Shaders File
+<dt id="artellapipe.core.node.ArtellaAssetNode.create_operator_node">
+<code class="sig-name descname">create_operator_node</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.create_operator_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates asset operator node in current scene
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.create_shape_operator">
+<code class="sig-name descname">create_shape_operator</code><span class="sig-paren">(</span><em class="sig-param">shape_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.create_shape_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates asset shape operator of the current node for the given shape
+:param shape_name: str
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_asset_operator">
+<code class="sig-name descname">get_asset_operator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_asset_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns asset operator of the current node
+:return: str or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_mapping_file">
+<code class="sig-name descname">get_asset_shaders_mapping_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_asset_shaders_mapping_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns file class of the Asset Shaders Mapping File
 This file is the one that maps asset geometry to shaders
-:param status: ArtellaAssetStatus
 :return:</p>
 </dd></dl>
 
@@ -215,10 +246,26 @@ This file is the one that maps asset geometry to shaders
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_renderable_shapes">
+<code class="sig-name descname">get_renderable_shapes</code><span class="sig-paren">(</span><em class="sig-param">remove_namespace=False</em>, <em class="sig-param">full_path=True</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_renderable_shapes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list with all renderable shapes of the current asset
+:param remove_namespace: bool
+:return: list(str)</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.core.node.ArtellaAssetNode.get_shaders_files">
 <code class="sig-name descname">get_shaders_files</code><span class="sig-paren">(</span><em class="sig-param">status='published'</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_shaders_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns list of shaders this asset needs to use
 :return: list(str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.get_shape_operator">
+<code class="sig-name descname">get_shape_operator</code><span class="sig-paren">(</span><em class="sig-param">shape_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.get_shape_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns asset shape operator of the current node
+:param shape_name: str
+:return: str</p>
 </dd></dl>
 
 <dl class="method">
@@ -247,6 +294,29 @@ This file is the one that maps asset geometry to shaders
 <em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the asset
 :return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.remove_shape_operator_assignment">
+<code class="sig-name descname">remove_shape_operator_assignment</code><span class="sig-paren">(</span><em class="sig-param">assignment_value</em>, <em class="sig-param">shape_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.remove_shape_operator_assignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes an existing shape operator assignment from given shape operator
+:param shape_name: str
+:param assignment_value: str
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.switch_to_hires">
+<code class="sig-name descname">switch_to_hires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.switch_to_hires" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switches current asset to its lowres version
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.core.node.ArtellaAssetNode.switch_to_proxy">
+<code class="sig-name descname">switch_to_proxy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.core.node.ArtellaAssetNode.switch_to_proxy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switches current asset to its lowres version
+:return:</p>
 </dd></dl>
 
 <dl class="method">

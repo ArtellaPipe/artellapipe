@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.managers.menu module" href="artellapipe.managers.menu.html" />
+    <link rel="next" title="artellapipe.managers.media module" href="artellapipe.managers.media.html" />
     <link rel="prev" title="artellapipe.managers.files module" href="artellapipe.managers.files.html" /> 
 </head>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -176,44 +177,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.managers.libs">
-<span id="artellapipe-managers-libs-module"></span><h1>artellapipe.managers.libs module<a class="headerlink" href="#module-artellapipe.managers.libs" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains manager to handle libs</p>
-<dl class="class">
-<dt id="artellapipe.managers.libs.LibImporter">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.libs.</code><code class="sig-name descname">LibImporter</code><span class="sig-paren">(</span><em class="sig-param">tool_pkg</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.libs.LibImporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpPyUtils.importer.Importer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="artellapipe.managers.libs.LibImporter.get_module_path">
-<code class="sig-name descname">get_module_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.libs.LibImporter.get_module_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns path where module is located
-:return: str</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="artellapipe.managers.libs.LibsManager">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.libs.</code><code class="sig-name descname">LibsManager</code><a class="headerlink" href="#artellapipe.managers.libs.LibsManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that handles all libs</p>
-<dl class="method">
-<dt id="artellapipe.managers.libs.LibsManager.libs">
-<em class="property">property </em><code class="sig-name descname">libs</code><a class="headerlink" href="#artellapipe.managers.libs.LibsManager.libs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.libs.LibsManager.load_library">
-<code class="sig-name descname">load_library</code><span class="sig-paren">(</span><em class="sig-param">lib_path</em>, <em class="sig-param">do_reload=False</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.libs.LibsManager.load_library" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.libs.LibsManager.register_lib">
-<code class="sig-name descname">register_lib</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">pkg_loader</em>, <em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.libs.LibsManager.register_lib" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="artellapipe-managers-libs-module">
+<h1>artellapipe.managers.libs module<a class="headerlink" href="#artellapipe-managers-libs-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -228,7 +193,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.managers.menu.html" class="btn btn-neutral float-right" title="artellapipe.managers.menu module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.media.html" class="btn btn-neutral float-right" title="artellapipe.managers.media module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="artellapipe.managers.files.html" class="btn btn-neutral float-left" title="artellapipe.managers.files module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

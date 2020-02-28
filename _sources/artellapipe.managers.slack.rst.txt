@@ -1,0 +1,7 @@
+artellapipe.managers.slack module
+=================================
+
+.. automodule:: artellapipe.managers.slack
+   :members:
+   :undoc-members:
+   :show-inheritance:

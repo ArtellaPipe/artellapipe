@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.managers.tags module" href="artellapipe.managers.tags.html" />
+    <link rel="next" title="artellapipe.managers.slack module" href="artellapipe.managers.slack.html" />
     <link rel="prev" title="artellapipe.managers.shelf module" href="artellapipe.managers.shelf.html" /> 
 </head>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -176,111 +177,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.managers.shots">
-<span id="artellapipe-managers-shots-module"></span><h1>artellapipe.managers.shots module<a class="headerlink" href="#module-artellapipe.managers.shots" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains manager to handle shots</p>
-<dl class="class">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.shots.</code><code class="sig-name descname">ArtellaShotsManager</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.config">
-<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.create_shot">
-<code class="sig-name descname">create_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_data</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.create_shot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new shot with the given data
-:param shot_data: dict
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.find_all_shots">
-<code class="sig-name descname">find_all_shots</code><span class="sig-paren">(</span><em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.find_all_shots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all shots of the given sequence
-:param force_update: bool
-:return: list(ArtellaShot)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.find_shot">
-<code class="sig-name descname">find_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_name=None</em>, <em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.find_shot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns shot of the project if found
-:param shot_name: str, name of the sequence to find
-:param force_update: bool, Whether sequences cache updated must be forced or not
-:return: ArtellaShort</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_name">
-<code class="sig-name descname">get_default_shot_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the default name used by shots
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_thumb">
-<code class="sig-name descname">get_default_shot_thumb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_default_shot_thumb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the default thumb used by shots
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shot_name_regex">
-<code class="sig-name descname">get_shot_name_regex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shot_name_regex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns regex used to identify shots
-:return: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shot_regex">
-<code class="sig-name descname">get_shot_regex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shot_regex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns regex used to identify solstice shots
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.get_shots_from_sequence">
-<code class="sig-name descname">get_shots_from_sequence</code><span class="sig-paren">(</span><em class="sig-param">sequence_name</em>, <em class="sig-param">force_update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.get_shots_from_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns shots of the given sequence name
-:param sequence_name: str
-:param force_update: bool
-:return:</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.register_shot_class">
-<code class="sig-name descname">register_shot_class</code><span class="sig-paren">(</span><em class="sig-param">shot_class</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.register_shot_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Registers a new shot class into the project
-:param shot_class: cls</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.set_project" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the project this manager belongs to
-:param project: ArtellaProject</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.shot_classes">
-<em class="property">property </em><code class="sig-name descname">shot_classes</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.shot_classes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.shot_types">
-<em class="property">property </em><code class="sig-name descname">shot_types</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.shot_types" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.managers.shots.ArtellaShotsManager.shots">
-<em class="property">property </em><code class="sig-name descname">shots</code><a class="headerlink" href="#artellapipe.managers.shots.ArtellaShotsManager.shots" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="artellapipe-managers-shots-module">
+<h1>artellapipe.managers.shots module<a class="headerlink" href="#artellapipe-managers-shots-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -295,7 +193,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.managers.tags.html" class="btn btn-neutral float-right" title="artellapipe.managers.tags module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.slack.html" class="btn btn-neutral float-right" title="artellapipe.managers.slack module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="artellapipe.managers.shelf.html" class="btn btn-neutral float-left" title="artellapipe.managers.shelf module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

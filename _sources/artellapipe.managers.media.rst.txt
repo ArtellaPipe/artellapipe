@@ -1,7 +1,7 @@
-artellapipe.utils.resource module
+artellapipe.managers.media module
 =================================
 
-.. automodule:: artellapipe.utils.resource
+.. automodule:: artellapipe.managers.media
    :members:
    :undoc-members:
    :show-inheritance:

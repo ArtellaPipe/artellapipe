@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -176,138 +177,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.widgets.shotsviewer">
-<span id="artellapipe-widgets-shotsviewer-module"></span><h1>artellapipe.widgets.shotsviewer module<a class="headerlink" href="#module-artellapipe.widgets.shotsviewer" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains widget implementation for sequences viewer</p>
-<dl class="class">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.shotsviewer.</code><code class="sig-name descname">ShotsGrid</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">show_context_menu=False</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.widgets.grid.GridWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.add_shot">
-<code class="sig-name descname">add_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_widget</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.add_shot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds given sequence widget to viewer
-:param shot_widget:  ArtellaShotWidget</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.change_sequence">
-<code class="sig-name descname">change_sequence</code><span class="sig-paren">(</span><em class="sig-param">sequence_name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.change_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes the sequence of the shots that are being showed by the viewer
-:param sequence_name: str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.clear_shots">
-<code class="sig-name descname">clear_shots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.clear_shots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear all the shots of the sequences viewer</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.contextMenuEvent">
-<code class="sig-name descname">contextMenuEvent</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">arg__1:PySide2.QtGui.QContextMenuEvent</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.contextMenuEvent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.get_shots">
-<code class="sig-name descname">get_shots</code><span class="sig-paren">(</span><em class="sig-param">update_cache=True</em>, <em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.get_shots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list with all the shots of the project
-:param update_cache: bool, Updates the internal cache
-:param force: bool, If True, cache and shots will be updated
-:return: list</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.shotAdded">
-<code class="sig-name descname">shotAdded</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.shotAdded" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.shotSynced">
-<code class="sig-name descname">shotSynced</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.shotSynced" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.staticMetaObject">
-<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.staticMetaObject" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.update_cache">
-<code class="sig-name descname">update_cache</code><span class="sig-paren">(</span><em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.update_cache" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates internal cache with the current shots located in Artella server</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsGrid.update_shots">
-<code class="sig-name descname">update_shots</code><span class="sig-paren">(</span><em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsGrid.update_shots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the list of shots in the sequences viewer
-:param force: bool</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.shotsviewer.</code><code class="sig-name descname">ShotsViewer</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">column_count=4</em>, <em class="sig-param">show_context_menu=False</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.base.BaseWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.first_empty_cell">
-<code class="sig-name descname">first_empty_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.first_empty_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates ane empty cell in the shots grid</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.get_main_layout">
-<code class="sig-name descname">get_main_layout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.get_main_layout" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that generates the main layout used by the widget
-Override if necessary on new widgets
-:return: QLayout</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.setup_signals">
-<code class="sig-name descname">setup_signals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.setup_signals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that set up signals of the widget</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.shotAdded">
-<code class="sig-name descname">shotAdded</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.shotAdded" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.shotSynced">
-<code class="sig-name descname">shotSynced</code><em class="property"> = &lt;PySide2.QtCore.Signal object&gt;</em><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.shotSynced" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.staticMetaObject">
-<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.staticMetaObject" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.ui">
-<code class="sig-name descname">ui</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.ui" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that sets up the ui of the widget
-Override it on new widgets (but always call super)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.update_sequences_categories">
-<code class="sig-name descname">update_sequences_categories</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.update_sequences_categories" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates current sequences categories</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.shotsviewer.ShotsViewer.update_shots">
-<code class="sig-name descname">update_shots</code><span class="sig-paren">(</span><em class="sig-param">force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.shotsviewer.ShotsViewer.update_shots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates Shots viewer
-:param force: bool</p>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="artellapipe-widgets-shotsviewer-module">
+<h1>artellapipe.widgets.shotsviewer module<a class="headerlink" href="#artellapipe-widgets-shotsviewer-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

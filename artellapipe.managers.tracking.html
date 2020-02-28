@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="artellapipe.tools package" href="artellapipe.tools.html" />
-    <link rel="prev" title="artellapipe.managers.tools module" href="artellapipe.managers.tools.html" /> 
+    <link rel="prev" title="artellapipe.managers.tasks module" href="artellapipe.managers.tasks.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -184,8 +185,17 @@
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tracking.</code><code class="sig-name descname">TrackingManager</code><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PySide2.QtCore.QObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_assets_in_shot">
+<code class="sig-name descname">all_assets_in_shot</code><span class="sig-paren">(</span><em class="sig-param">shot</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_assets_in_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all assets in the given shot
+:param shot:
+:param kwargs:
+:return: list</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.all_project_assets">
-<code class="sig-name descname">all_project_assets</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_project_assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">all_project_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_project_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all the assets information of the assets of the current project
 :return: list</p>
 </dd></dl>
@@ -205,6 +215,27 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_task_types">
+<code class="sig-name descname">all_task_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_task_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all task types
+:return: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_task_types_for_assets">
+<code class="sig-name descname">all_task_types_for_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_task_types_for_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all task types for assets
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.all_task_types_for_shots">
+<code class="sig-name descname">all_task_types_for_shots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.all_task_types_for_shots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all task types for assets
+:return:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.check_update">
 <code class="sig-name descname">check_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.check_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if tracking manager has been updated or not. If not, an updating is forced</p>
@@ -212,10 +243,53 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.download_preview_file_thumbnail">
-<code class="sig-name descname">download_preview_file_thumbnail</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.download_preview_file_thumbnail" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">download_preview_file_thumbnail</code><span class="sig-paren">(</span><em class="sig-param">preview_id</em>, <em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.download_preview_file_thumbnail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Downloads given preview file thumbnail and save it at given location
 :param preview_id:  str or dict, The preview file dict or ID.
 :param file_path: str, Location on hard drive where to save the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.get_name">
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the production tracker system
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.get_project_fps">
+<code class="sig-name descname">get_project_fps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.get_project_fps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns FPS (frames per second) used in the project
+:return: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.get_project_name">
+<code class="sig-name descname">get_project_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.get_project_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns name of the project
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.get_project_resolution">
+<code class="sig-name descname">get_project_resolution</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.get_project_resolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns resolution used in the project
+:return: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.get_tasks_in_shot">
+<code class="sig-name descname">get_tasks_in_shot</code><span class="sig-paren">(</span><em class="sig-param">shot_id</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.get_tasks_in_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all tasks in given shot
+:param shot_id: str
+:return: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.tracking.TrackingManager.get_user_name">
+<code class="sig-name descname">get_user_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.get_user_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the current logged user
+:return: str</p>
 </dd></dl>
 
 <dl class="method">
@@ -227,7 +301,7 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.is_tracking_available">
-<code class="sig-name descname">is_tracking_available</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.is_tracking_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_tracking_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.is_tracking_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns whether tracking service is available or not
 :return: bool</p>
 </dd></dl>
@@ -239,14 +313,14 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.login">
-<code class="sig-name descname">login</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.login" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">login</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.login" title="Permalink to this definition">¶</a></dt>
 <dd><p>Login into tracking service with given user and password
 :return: bool</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.logout">
-<code class="sig-name descname">logout</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.logout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">logout</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.logout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logout from tracker service
 :param args:
 :param kwargs:
@@ -283,7 +357,7 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.tracking.TrackingManager.update_tracking_info">
-<code class="sig-name descname">update_tracking_info</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.update_tracking_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_tracking_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tracking.TrackingManager.update_tracking_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates all the project tracking info</p>
 </dd></dl>
 
@@ -306,7 +380,7 @@
         <a href="artellapipe.tools.html" class="btn btn-neutral float-right" title="artellapipe.tools package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.managers.tools.html" class="btn btn-neutral float-left" title="artellapipe.managers.tools module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.tasks.html" class="btn btn-neutral float-left" title="artellapipe.managers.tasks module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

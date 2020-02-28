@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.widgets package &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.core.shotfile module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.widgets.asset module" href="artellapipe.widgets.asset.html" />
-    <link rel="prev" title="artellapipe.utils.worker module" href="artellapipe.utils.worker.html" /> 
+    <link rel="next" title="artellapipe.core.tag module" href="artellapipe.core.tag.html" />
+    <link rel="prev" title="artellapipe.core.shot module" href="artellapipe.core.shot.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,14 +90,14 @@
 <li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.config.html">artellapipe.config package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">artellapipe.widgets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="artellapipe.html#submodules">Submodules</a></li>
@@ -155,13 +155,15 @@
         
           <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
         
-      <li>artellapipe.widgets package</li>
+          <li><a href="artellapipe.core.html">artellapipe.core package</a> &raquo;</li>
+        
+      <li>artellapipe.core.shotfile module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.widgets.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.core.shotfile.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -175,38 +177,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-widgets-package">
-<h1>artellapipe.widgets package<a class="headerlink" href="#artellapipe-widgets-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.asset.html">artellapipe.widgets.asset module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.assetinfo.html">artellapipe.widgets.assetinfo module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.assetsviewer.html">artellapipe.widgets.assetsviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.assetswidget.html">artellapipe.widgets.assetswidget module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.button.html">artellapipe.widgets.button module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.dialog.html">artellapipe.widgets.dialog module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.label.html">artellapipe.widgets.label module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.progressbar.html">artellapipe.widgets.progressbar module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.sequence.html">artellapipe.widgets.sequence module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.sequenceinfo.html">artellapipe.widgets.sequenceinfo module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.sequencesviewer.html">artellapipe.widgets.sequencesviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shadersviewer.html">artellapipe.widgets.shadersviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shot.html">artellapipe.widgets.shot module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shotinfo.html">artellapipe.widgets.shotinfo module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.shotsviewer.html">artellapipe.widgets.shotsviewer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.spinner.html">artellapipe.widgets.spinner module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.syncdialog.html">artellapipe.widgets.syncdialog module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.tray.html">artellapipe.widgets.tray module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.waiter.html">artellapipe.widgets.waiter module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artellapipe.widgets.window.html">artellapipe.widgets.window module</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="module-artellapipe.widgets">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-artellapipe.widgets" title="Permalink to this headline">¶</a></h2>
-</div>
+  <div class="section" id="artellapipe-core-shotfile-module">
+<h1>artellapipe.core.shotfile module<a class="headerlink" href="#artellapipe-core-shotfile-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -221,10 +193,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.widgets.asset.html" class="btn btn-neutral float-right" title="artellapipe.widgets.asset module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.core.tag.html" class="btn btn-neutral float-right" title="artellapipe.core.tag module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.utils.worker.html" class="btn btn-neutral float-left" title="artellapipe.utils.worker module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.core.shot.html" class="btn btn-neutral float-left" title="artellapipe.core.shot module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

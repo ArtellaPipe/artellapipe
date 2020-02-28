@@ -9,12 +9,14 @@ Submodules
    artellapipe.widgets.asset
    artellapipe.widgets.assetinfo
    artellapipe.widgets.assetsviewer
+   artellapipe.widgets.assetswidget
    artellapipe.widgets.button
    artellapipe.widgets.dialog
    artellapipe.widgets.label
    artellapipe.widgets.progressbar
    artellapipe.widgets.sequence
    artellapipe.widgets.sequenceinfo
+   artellapipe.widgets.sequencesviewer
    artellapipe.widgets.shadersviewer
    artellapipe.widgets.shot
    artellapipe.widgets.shotinfo

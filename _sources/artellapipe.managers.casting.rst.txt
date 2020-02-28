@@ -1,0 +1,7 @@
+artellapipe.managers.casting module
+===================================
+
+.. automodule:: artellapipe.managers.casting
+   :members:
+   :undoc-members:
+   :show-inheritance:

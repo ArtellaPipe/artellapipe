@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -176,55 +177,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.widgets.tray">
-<span id="artellapipe-widgets-tray-module"></span><h1>artellapipe.widgets.tray module<a class="headerlink" href="#module-artellapipe.widgets.tray" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains custom tray balloon widget</p>
-<dl class="class">
-<dt id="artellapipe.widgets.tray.ArtellaTray">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.widgets.tray.</code><code class="sig-name descname">ArtellaTray</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tpQtLib.core.base.BaseWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="attribute">
-<dt id="artellapipe.widgets.tray.ArtellaTray.ICON_NAME">
-<code class="sig-name descname">ICON_NAME</code><em class="property"> = None</em><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray.ICON_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.tray.ArtellaTray.create_menu">
-<code class="sig-name descname">create_menu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray.create_menu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates menu used by the tray
-Overrides in child classes to create custom menus
-:return: QMenu</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.tray.ArtellaTray.project">
-<em class="property">property </em><code class="sig-name descname">project</code><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray.project" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns project linked to this tray
-:return: ArtellaProject</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.tray.ArtellaTray.show_message">
-<code class="sig-name descname">show_message</code><span class="sig-paren">(</span><em class="sig-param">title</em>, <em class="sig-param">msg</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray.show_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shows a message in the tray
-:param title: str
-:param msg: str</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="artellapipe.widgets.tray.ArtellaTray.staticMetaObject">
-<code class="sig-name descname">staticMetaObject</code><em class="property"> = &lt;PySide2.QtCore.QMetaObject object&gt;</em><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray.staticMetaObject" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="artellapipe.widgets.tray.ArtellaTray.ui">
-<code class="sig-name descname">ui</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.widgets.tray.ArtellaTray.ui" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that sets up the ui of the widget
-Override it on new widgets (but always call super)</p>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="artellapipe-widgets-tray-module">
+<h1>artellapipe.widgets.tray module<a class="headerlink" href="#artellapipe-widgets-tray-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

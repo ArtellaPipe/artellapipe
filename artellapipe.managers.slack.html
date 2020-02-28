@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.utils.resource module &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.slack module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.utils.shader module" href="artellapipe.utils.shader.html" />
-    <link rel="prev" title="artellapipe.utils.plugin module" href="artellapipe.utils.plugin.html" /> 
+    <link rel="next" title="artellapipe.managers.tags module" href="artellapipe.managers.tags.html" />
+    <link rel="prev" title="artellapipe.managers.shots module" href="artellapipe.managers.shots.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,9 +93,10 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
 </li>
@@ -154,15 +155,15 @@
         
           <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
         
-          <li><a href="artellapipe.utils.html">artellapipe.utils package</a> &raquo;</li>
+          <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
         
-      <li>artellapipe.utils.resource module</li>
+      <li>artellapipe.managers.slack module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.utils.resource.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.slack.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,28 +177,62 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.utils.resource">
-<span id="artellapipe-utils-resource-module"></span><h1>artellapipe.utils.resource module<a class="headerlink" href="#module-artellapipe.utils.resource" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains manager to handle resources</p>
+  <div class="section" id="module-artellapipe.managers.slack">
+<span id="artellapipe-managers-slack-module"></span><h1>artellapipe.managers.slack module<a class="headerlink" href="#module-artellapipe.managers.slack" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager for Slack functionality</p>
 <dl class="class">
-<dt id="artellapipe.utils.resource.ResourceTypes">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.utils.resource.</code><code class="sig-name descname">ResourceTypes</code><a class="headerlink" href="#artellapipe.utils.resource.ResourceTypes" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.slack.SlackManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.slack.</code><code class="sig-name descname">SlackManager</code><a class="headerlink" href="#artellapipe.managers.slack.SlackManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="attribute">
-<dt id="artellapipe.utils.resource.ResourceTypes.GUI">
-<code class="sig-name descname">GUI</code><em class="property"> = 'ui'</em><a class="headerlink" href="#artellapipe.utils.resource.ResourceTypes.GUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="artellapipe.managers.slack.SlackManager.get_slack_channel">
+<code class="sig-name descname">get_slack_channel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.get_slack_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns slack channel messages wil lbe send
+:return: str</p>
+</dd></dl>
 
-<dl class="attribute">
-<dt id="artellapipe.utils.resource.ResourceTypes.ICON">
-<code class="sig-name descname">ICON</code><em class="property"> = 'icon'</em><a class="headerlink" href="#artellapipe.utils.resource.ResourceTypes.ICON" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="artellapipe.managers.slack.SlackManager.get_slack_client">
+<code class="sig-name descname">get_slack_client</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.get_slack_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns slack client of the current project
+:return: SlackClient</p>
+</dd></dl>
 
-<dl class="attribute">
-<dt id="artellapipe.utils.resource.ResourceTypes.PIXMAP">
-<code class="sig-name descname">PIXMAP</code><em class="property"> = 'pixmap'</em><a class="headerlink" href="#artellapipe.utils.resource.ResourceTypes.PIXMAP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="artellapipe.managers.slack.SlackManager.get_slack_token">
+<code class="sig-name descname">get_slack_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.get_slack_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns slack token used by slack API
+:return: str</p>
+</dd></dl>
 
+<dl class="method">
+<dt id="artellapipe.managers.slack.SlackManager.post_message">
+<code class="sig-name descname">post_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.post_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post a message in the project channel
+:param msg:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.slack.SlackManager.set_project">
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project this manager belongs to
+:param project: ArtellaProject</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="artellapipe.managers.slack.SlackManager.slack_is_available">
+<code class="sig-name descname">slack_is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.slack_is_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether slack is available or not
+:return: bool</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.managers.slack.SlackManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.slack.</code><code class="sig-name descname">SlackManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.slack.SlackManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.slack.SlackManager" title="artellapipe.managers.slack.SlackManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.slack.SlackManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
@@ -214,10 +249,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.utils.shader.html" class="btn btn-neutral float-right" title="artellapipe.utils.shader module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.tags.html" class="btn btn-neutral float-right" title="artellapipe.managers.tags module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.utils.plugin.html" class="btn btn-neutral float-left" title="artellapipe.utils.plugin module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.shots.html" class="btn btn-neutral float-left" title="artellapipe.managers.shots module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

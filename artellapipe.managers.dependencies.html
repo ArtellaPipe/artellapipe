@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="artellapipe.managers.files module" href="artellapipe.managers.files.html" />
-    <link rel="prev" title="artellapipe.managers.assets module" href="artellapipe.managers.assets.html" /> 
+    <link rel="prev" title="artellapipe.managers.casting module" href="artellapipe.managers.casting.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.widgets.html">artellapipe.widgets package</a></li>
 </ul>
@@ -185,7 +186,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths">
-<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tries to fix paths that are not valid in the given file
 :param file_path: str, file path we want to fix paths of</p>
 </dd></dl>
@@ -199,7 +200,7 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies">
-<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">parent_path=None</em>, <em class="sig-param">found_files=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all dependencies that are currently loaded in the given file
 :param file_path: str, file path we want to get dependencies of
 :param parent_path: str
@@ -217,11 +218,17 @@
 
 <dl class="method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies">
-<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates all the dependencies of the given file path
 :param file_path: str</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="artellapipe.managers.dependencies.ArtellaDependenciesManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.dependencies.ArtellaDependenciesManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
@@ -241,7 +248,7 @@
         <a href="artellapipe.managers.files.html" class="btn btn-neutral float-right" title="artellapipe.managers.files module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.managers.assets.html" class="btn btn-neutral float-left" title="artellapipe.managers.assets module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.casting.html" class="btn btn-neutral float-left" title="artellapipe.managers.casting module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
