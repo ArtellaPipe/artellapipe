@@ -17,7 +17,7 @@ import logging
 import traceback
 from functools import wraps
 
-from tpPyUtils import osplatform
+from tpDcc.libs.python import osplatform
 
 SENTRY_AVAILABLE = True
 try:
