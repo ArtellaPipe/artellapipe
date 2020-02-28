@@ -94,7 +94,6 @@ class ArtellaShotFile(file.ArtellaFile, object):
 
         return self._shot.get_name()
 
-
     def get_latest_published_versions(self):
         """
         Implements base ArtellaFile get_path function

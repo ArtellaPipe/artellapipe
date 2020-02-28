@@ -220,7 +220,8 @@ class AbstractFile(object):
         if check_file_type:
             if file_type not in available_files_types:
                 LOGGER.warning(
-                    'File Type "{}" is not valid! Supported File Types: {}'.format(file_type, available_files_types.keys()))
+                    'File Type "{}" is not valid! Supported File Types: {}'.format(
+                        file_type, available_files_types.keys()))
                 return None
         if not defines.ArtellaFileStatus.is_valid(status):
             LOGGER.warning('Given File Artella Sync Status: {} is not valid! Supported Statuses: {}'.format(

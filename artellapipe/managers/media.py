@@ -208,7 +208,7 @@ class MediaManager(object):
         if mime_start == 'video':
             return self.stamp_video(source=source, output=output, config_dict=extra_dict)
         elif mime_start == 'image':
-             return self.stamp_image(source=source, output=output, config_dict=extra_dict)
+            return self.stamp_image(source=source, output=output, config_dict=extra_dict)
         else:
             LOGGER.error('Impossible to stamp file: "{}"({})'.format(source, mime_start))
             return False

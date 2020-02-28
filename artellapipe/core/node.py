@@ -681,7 +681,8 @@ class ArtellaAssetNode(ArtellaDCCNode, object):
 
         # TODO: Check if given shape is a shape of the current asset node
 
-        return artellapipe.Arnold().get_asset_shape_operator(self.id, shape_name, connect_to_asset_operator=True, create=True)
+        return artellapipe.Arnold().get_asset_shape_operator(
+            self.id, shape_name, connect_to_asset_operator=True, create=True)
 
     def add_shape_operator_assignment(self, assignment_value, shape_name=None):
         """

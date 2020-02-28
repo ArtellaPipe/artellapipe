@@ -174,7 +174,8 @@ class ShadersManager(object):
             # shader_file_class = artellapipe.FilesMgr().get_file_class(shaders_file_type)
             # if not shader_file_class:
             #     LOGGER.warning(
-            #         'Impossible to get shader path: {} | {} | {}'.format(shader_name, shaders_paths, shaders_file_type))
+            #         'Impossible to get shader path: {} | {} | {}'.format(
+            #         shader_name, shaders_paths, shaders_file_type))
             #     return
             #
             # for shader_path in shaders_paths:

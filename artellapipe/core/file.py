@@ -98,7 +98,8 @@ class ArtellaFile(object):
         raise NotImplementedError('get_project function for {} is not implemented!'.format(self.__class__.__name__))
 
     @decorators.abstractmethod
-    def get_file(self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None, **kwargs):
+    def get_file(
+            self, status=defines.ArtellaFileStatus.WORKING, extension=None, fix_path=False, version=None, **kwargs):
         """
         Returns file of the attached object
         :param status: str
@@ -234,7 +235,8 @@ class ArtellaFile(object):
 
         return self._open_file(file_path=file_path)
 
-    def import_file(self, status=defines.ArtellaFileStatus.WORKING, fix_path=True, sync=False, reference=False, *args, **kwargs):
+    def import_file(self, status=defines.ArtellaFileStatus.WORKING, fix_path=True, sync=False,
+                    reference=False, *args, **kwargs):
         """
         References current file into DCC
         :param status: str
@@ -274,9 +276,8 @@ class ArtellaFile(object):
         :return: str
         """
 
-        working_path = self.get_file(status=defines.ArtellaFileStatus.WORKING,
-                                     extension=self.FILE_EXTENSIONS[0], fix_path=False
-        )
+        working_path = self.get_file(
+            status=defines.ArtellaFileStatus.WORKING, extension=self.FILE_EXTENSIONS[0], fix_path=False)
 
         if sync_folder:
             return path_utils.clean_path(os.path.dirname(working_path))
