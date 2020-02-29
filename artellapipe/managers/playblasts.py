@@ -48,7 +48,11 @@ class PlayblastsManager(object):
 
         self._project = project
         self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-playblasts', environment=project.get_environment())
+            config_name='artellapipe-playblasts',
+            package_name=self._project.get_clean_name(),
+            root_package_name='artellapipe',
+            environment=project.get_environment()
+        )
 
     def get_presets_paths(self):
         """

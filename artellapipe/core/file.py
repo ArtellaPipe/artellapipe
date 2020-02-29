@@ -251,7 +251,6 @@ class ArtellaFile(object):
             msg = 'Impossible to reference file of type "{}". File Path "{}" does not exists!'.format(
                 self.FILE_TYPE, file_path)
             LOGGER.warning(msg)
-            # qtutils.warning_message(msg)
             return None
 
         if reference:
@@ -311,6 +310,8 @@ class ArtellaFile(object):
                     self.FILE_TYPE))
             return local_versions
 
+        project_drive = self._project.get_drive()
+
         for extension in self.FILE_EXTENSIONS:
 
             template_dict = self.get_template_dict(extension=extension)
@@ -322,10 +323,11 @@ class ArtellaFile(object):
                     if p == working_folder:
                         continue
                     folders_to_check.append(p)
-
             for folder in folders_to_check:
                 template_dict['version_folder'] = folder
                 file_path = file_type_template.format(template_dict)
+                if not file_path.startswith(project_drive):
+                    file_path = path_utils.clean_path(os.path.join(project_drive, os.path.splitdrive(file_path)[-1]))
                 if file_path and os.path.exists(file_path):
                     version = artellalib.split_version(folder)
                     if version:

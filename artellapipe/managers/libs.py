@@ -222,6 +222,8 @@ class LibsManager(object):
     def _create_lib_config(self, project_name, lib_path, project, config_dict):
         lib_config = tpDcc.ConfigsMgr().get_config(
             config_name=lib_path.replace('.', '-'),
+            package_name=project_name,
+            root_package_name='artellapipe',
             environment=project.get_environment(),
             config_dict=config_dict
         )

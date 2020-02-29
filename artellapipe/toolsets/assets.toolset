@@ -1,0 +1,9 @@
+# Defines artellapipe Assets toolset
+
+type: assets
+name: Assets
+color: [125, 135, 255]
+hue_shift: 0
+toolsets:
+  - artellapipe-tools-assetslibrary
+  - artellapipe-tools-assetsmanager

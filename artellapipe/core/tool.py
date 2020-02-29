@@ -12,6 +12,7 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
+import os
 import webbrowser
 
 import tpDcc
@@ -30,6 +31,27 @@ class ToolAttacher(object):
 
 class ArtellaTool(tool.DccTool, object):
     def __init__(self, *args, **kwargs):
+
+        self._project = kwargs.pop('project')
+        project_name = self._project.get_clean_name()
+        config_name = kwargs['config'].data['fullname'].replace('.', '-')
+        config_dict = kwargs.get('config_dict', dict())
+        config_dict.update({
+            'join': os.path.join,
+            'user': os.path.expanduser('~'),
+            'filename': kwargs['config'].data['filename'],
+            'fullname': kwargs['config'].data['fullname'],
+            'project': project_name
+        })
+        new_config = tpDcc.ConfigsMgr().get_config(
+            config_name=config_name,
+            package_name=project_name,
+            root_package_name='artellapipe',
+            environment=self._project.get_environment(),
+            config_dict=config_dict
+        )
+        kwargs['config'] = new_config
+
         super(ArtellaTool, self).__init__(*args, **kwargs)
 
     def launch(self, *args, **kwargs):
@@ -71,6 +93,7 @@ class ArtellaTool(tool.DccTool, object):
         self._attacher.main_layout.addWidget(toolset_inst)
         # for toolset_widget in toolset_contents:
         #     self._attacher.main_layout.addWidget(toolset_widget)
+
         self._attacher.show()
 
         return self._attacher

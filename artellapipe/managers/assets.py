@@ -71,7 +71,11 @@ class ArtellaAssetsManager(object):
 
         self._project = project
         self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-assets', environment=project.get_environment())
+            config_name='artellapipe-assets',
+            package_name=self._project.get_clean_name(),
+            root_package_name='artellapipe',
+            environment=project.get_environment()
+        )
 
         self._register_asset_classes()
 

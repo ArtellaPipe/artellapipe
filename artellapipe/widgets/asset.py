@@ -21,6 +21,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 from Qt.QtGui import *
 
+import tpDcc
 from tpDcc.libs.qt.core import base, qtutils, menu
 
 import artellapipe.register
@@ -166,7 +167,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
                 self._thumbnail_icon = thumb_icon
                 return thumb_icon
             else:
-                self._thumbnail_icon = resource.ResourceManager().icon(
+                self._thumbnail_icon = tpDcc.ResourcesMgr().icon(
                     artellapipe.AssetsMgr().get_default_asset_thumb())
                 self._asset_btn.setIcon(self._thumbnail_icon)
                 asset_thumbnail_path = self._asset.get_thumbnail_path()
@@ -201,10 +202,10 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         :param context_menu: Menu
         """
 
-        sync_icon = resource.ResourceManager().icon('sync')
-        artella_icon = resource.ResourceManager().icon('artella')
-        eye_icon = resource.ResourceManager().icon('eye')
-        thumb_icon = resource.ResourceManager().icon('picture')
+        sync_icon = tpDcc.ResourcesMgr().icon('sync')
+        artella_icon = tpDcc.ResourcesMgr().icon('artella')
+        eye_icon = tpDcc.ResourcesMgr().icon('eye')
+        thumb_icon = tpDcc.ResourcesMgr().icon('picture')
 
         artella_action = QAction(artella_icon, 'Open in Artella', context_menu)
         view_locally_action = QAction(eye_icon, 'View Locally', context_menu)
@@ -240,14 +241,14 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         actions_to_add = list()
 
         for asset_type_name in self.asset.FILES:
-            asset_type_icon = resource.ResourceManager().icon(asset_type_name)
+            asset_type_icon = tpDcc.ResourcesMgr().icon(asset_type_name)
             asset_type_action = QAction(asset_type_icon, asset_type_name.title(), sync_menu)
             asset_type_action.triggered.connect(
                 partial(self._on_sync, asset_type_name, defines.ArtellaFileStatus.ALL))
             actions_to_add.append(asset_type_action)
 
         if actions_to_add:
-            download_icon = resource.ResourceManager().icon('download')
+            download_icon = tpDcc.ResourcesMgr().icon('download')
             all_action = QAction(download_icon, 'All', sync_menu)
             all_action.triggered.connect(
                 partial(self._on_sync, defines.ArtellaFileStatus.ALL, defines.ArtellaFileStatus.ALL))

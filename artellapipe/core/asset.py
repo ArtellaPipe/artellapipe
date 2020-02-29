@@ -15,6 +15,7 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging
 
+import tpDcc
 from tpDcc.libs.python import path as path_utils
 
 import artellapipe.register
@@ -129,7 +130,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
 
         project_drive = artellapipe.project.get_drive()
         if not asset_path.startswith(project_drive):
-            asset_path = path_utils.clean_path(os.path.join(project_drive, asset_path))
+            asset_path = path_utils.clean_path(os.path.join(project_drive, os.path.splitdrive(asset_path)[-1]))
 
         return asset_path
 
@@ -168,7 +169,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         :return: QIcon
         """
 
-        return resource.ResourceManager().icon(self.get_category().lower().replace(' ', '_'))
+        return tpDcc.ResourcesMgr().icon(self.get_category().lower().replace(' ', '_'))
 
     # ==========================================================================================================
     # SHADERS

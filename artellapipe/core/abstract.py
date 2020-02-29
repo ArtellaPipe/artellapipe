@@ -298,7 +298,7 @@ class AbstractFile(object):
 
         project_drive = artellapipe.project.get_drive()
         if not file_path.startswith(project_drive):
-            file_path = path_utils.clean_path(os.path.join(project_drive, file_path))
+            file_path = path_utils.clean_path(os.path.join(project_drive, os.path.splitdrive(file_path)[-1]))
 
         return file_path
 

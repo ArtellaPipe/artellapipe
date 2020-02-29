@@ -77,6 +77,12 @@ def init(do_reload=False, import_libs=True, dev=False):
         # import tpNameIt
         # tpNameIt.init(do_reload=do_reload)
 
+    try:
+        # This allow us to acces ToolsManager using artellapipe.ToolsMgr
+        register.register_class('ToolsMgr', tp.ToolsMgr)
+    except Exception:
+        pass
+
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False, debug=dev)
     artella_importer.import_packages(
         order=packages_order,

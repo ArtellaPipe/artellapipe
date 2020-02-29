@@ -114,7 +114,7 @@ class ArtellaDialog(tpDcc.Dialog, object):
                     '{} Project Icon not found: {}!'.format(
                         self._project.name.title(), self._project.icon_name + '.png'))
 
-        return resource.ResourceManager().icon('artella')
+        return tpDcc.ResourcesMgr().icon('artella')
 
     def _get_title_pixmap(self):
         """
@@ -123,7 +123,7 @@ class ArtellaDialog(tpDcc.Dialog, object):
 
         if self._project:
             title_background = self._project.config.get('title_background')
-            title_pixmap = resource.ResourceManager().pixmap(name=title_background, extension='png')
+            title_pixmap = tpDcc.ResourcesMgr().pixmap(name=title_background, extension='png')
             if not title_pixmap.isNull():
                 return title_pixmap
             else:
@@ -131,4 +131,4 @@ class ArtellaDialog(tpDcc.Dialog, object):
                     '{} Project Title Background image not found: {}!'.format(
                         self._project.name.title(), title_background + '.png'))
 
-        return resource.ResourceManager().pixmap(name='title_background', extension='png')
+        return tpDcc.ResourcesMgr().pixmap(name='title_background', extension='png')

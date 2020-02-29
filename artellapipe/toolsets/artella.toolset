@@ -1,4 +1,4 @@
-# Defines artellapipe Artella Tools toolset
+# Defines artellapipe Artella toolset
 
 type: artella
 name: Artella
@@ -6,3 +6,4 @@ color: [207, 77, 255]
 hue_shift: 0
 toolsets:
   - artellapipe-tools-artellamanager
+  - artellapipe-tools-artellauploader

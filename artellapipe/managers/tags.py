@@ -37,7 +37,10 @@ class ArtellaTagsManager(object):
 
         self._project = project
         self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-tags', environment=project.get_environment()
+            config_name='artellapipe-tags',
+            package_name=self._project.get_clean_name(),
+            root_package_name='artellapipe',
+            environment=project.get_environment()
         )
 
     # Basic definitions for tag attributes
