@@ -26,7 +26,6 @@ import artellapipe
 class ArtellaWindow(tpDcc.Window, object):
     def __init__(
             self,
-            project=None,
             name='Window',
             title='Window',
             size=(800, 535),
@@ -35,7 +34,7 @@ class ArtellaWindow(tpDcc.Window, object):
             *args,
             **kwargs):
 
-        self._project = project
+        self._project = artellapipe.project
 
         super(ArtellaWindow, self).__init__(
             name=name,
@@ -114,7 +113,7 @@ class ArtellaWindow(tpDcc.Window, object):
             self._dragger.setStyleSheet(dev_style)
 
     def setWindowTitle(self, title):
-        if self._project.is_dev():
+        if self._project.is_dev() and self._project.get_environment() not in title:
             title = '{} - [{}]'.format(title, self._project.get_environment())
 
         super(ArtellaWindow, self).setWindowTitle(title)
@@ -191,7 +190,7 @@ class ArtellaWindow(tpDcc.Window, object):
         if self._config:
             config_logo = self._config.get('logo', None)
             if config_logo:
-                win_logo = tpDcc.ResourcesMgr().pixmap(config_logo, extension='png')
+                win_logo = tpDcc.ResourcesMgr().pixmap(config_logo, extension='png', key='project')
                 if not win_logo.isNull():
                     return win_logo
 

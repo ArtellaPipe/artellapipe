@@ -77,12 +77,6 @@ def init(do_reload=False, import_libs=True, dev=False):
         # import tpNameIt
         # tpNameIt.init(do_reload=do_reload)
 
-    try:
-        # This allow us to acces ToolsManager using artellapipe.ToolsMgr
-        register.register_class('ToolsMgr', tp.ToolsMgr)
-    except Exception:
-        pass
-
     artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False, debug=dev)
     artella_importer.import_packages(
         order=packages_order,
@@ -193,9 +187,6 @@ def register_resources(project):
     Registers artellapipe and project resources
     """
 
-    resources_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
-    tp.ResourcesMgr().register_resource(resources_path)
-
     project_resources_paths = project.get_resources_paths()
     for resources_key, resources_path in project_resources_paths.items():
         if not os.path.isdir(resources_path):
@@ -204,6 +195,9 @@ def register_resources(project):
             tp.ResourcesMgr().register_resource(resources_path, resources_key)
         else:
             tp.ResourcesMgr().register_resource(resources_path)
+
+    resources_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources')
+    tp.ResourcesMgr().register_resource(resources_path)
 
 
 def register_libs(project_inst, do_reload=False):
@@ -248,9 +242,15 @@ def register_tools(project_inst, dev=False, do_reload=False):
     package_names = ['artellapipe', project_inst.get_clean_name()]
 
     # Tools
+    project_name = project_inst.get_clean_name()
     tools_to_load = project_inst.config_data.get('tools', list())
-    for package_name in package_names:
-        tp.ToolsMgr().load_package_tools(package_name=package_name, tools_to_load=tools_to_load, dev=dev)
+    config_dict = {'project': project_name}
+    tp.ToolsMgr().load_package_tools(
+        package_name='artellapipe', root_package_name=project_name, tools_to_load=tools_to_load,
+        config_dict=config_dict, dev=dev)
+    tp.ToolsMgr().load_package_tools(
+        package_name=project_name, tools_to_load=tools_to_load, config_dict=config_dict, dev=dev)
+
     artellapipe.MenusMgr().create_menus(project_inst.get_clean_name(), project=project_inst)
 
     # Toolsets
