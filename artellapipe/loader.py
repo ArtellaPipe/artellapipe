@@ -33,12 +33,12 @@ def init(do_reload=False, import_libs=True, dev=False):
     logger = create_logger()
     register.register_class('logger', logger)
 
-    # if not dev:
-    #     import sentry_sdk
-    #     try:
-    #         sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
-    #     except (RuntimeError, ImportError):
-    #         sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
+    if not dev:
+        import sentry_sdk
+        try:
+            sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
+        except (RuntimeError, ImportError):
+            sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
 
     class ArtellaPipe(importer.Importer, object):
         def __init__(self, debug=False):
