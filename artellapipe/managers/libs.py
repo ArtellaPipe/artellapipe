@@ -138,8 +138,6 @@ class LibsManager(object):
             resources_path = def_resources_path
         if os.path.isdir(resources_path):
             tpDcc.ResourcesMgr().register_resource(resources_path, key='tools')
-        else:
-            artellapipe.logger.info('No resources directory found for tool "{}" ...'.format(lib_name))
 
         self._libs[lib_id] = {
             'name': lib_name,

@@ -207,9 +207,9 @@ class ArtellaTagsManager(object):
 
 
 @decorators.Singleton
-class ArtellaToolsManagerSingleton(ArtellaTagsManager, object):
+class ArtellaTagsManagerSingleton(ArtellaTagsManager, object):
     def __init__(self):
         ArtellaTagsManager.__init__(self)
 
 
-artellapipe.register.register_class('TagsMgr', ArtellaToolsManagerSingleton)
+artellapipe.register.register_class('TagsMgr', ArtellaTagsManagerSingleton)
