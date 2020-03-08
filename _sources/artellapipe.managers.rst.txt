@@ -24,6 +24,7 @@ Submodules
    artellapipe.managers.slack
    artellapipe.managers.tags
    artellapipe.managers.tasks
+   artellapipe.managers.tools
    artellapipe.managers.tracking
 
 Module contents

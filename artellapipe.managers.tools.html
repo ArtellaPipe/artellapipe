@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>artellapipe.config package &mdash; artellapipe 0.0.l documentation</title>
+  <title>artellapipe.managers.tools module &mdash; artellapipe 0.0.l documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="artellapipe.core package" href="artellapipe.core.html" />
-    <link rel="prev" title="artellapipe package" href="artellapipe.html" /> 
+    <link rel="next" title="artellapipe.managers.tracking module" href="artellapipe.managers.tracking.html" />
+    <link rel="prev" title="artellapipe.managers.tasks module" href="artellapipe.managers.tasks.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,11 +89,10 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">artellapipe</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="artellapipe.html">artellapipe package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="artellapipe.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">artellapipe.config package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.core.html">artellapipe.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.dccs.html">artellapipe.dccs package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.libs.html">artellapipe.libs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="artellapipe.managers.html">artellapipe.managers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.tools.html">artellapipe.tools package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.toolsets.html">artellapipe.toolsets package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="artellapipe.utils.html">artellapipe.utils package</a></li>
@@ -155,13 +154,15 @@
         
           <li><a href="artellapipe.html">artellapipe package</a> &raquo;</li>
         
-      <li>artellapipe.config package</li>
+          <li><a href="artellapipe.managers.html">artellapipe.managers package</a> &raquo;</li>
+        
+      <li>artellapipe.managers.tools module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/artellapipe.config.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/artellapipe.managers.tools.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -175,12 +176,31 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-config-package">
-<h1>artellapipe.config package<a class="headerlink" href="#artellapipe-config-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-artellapipe.config">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-artellapipe.config" title="Permalink to this headline">¶</a></h2>
-<p>Initialization module for artellapipe-config</p>
-</div>
+  <div class="section" id="module-artellapipe.managers.tools">
+<span id="artellapipe-managers-tools-module"></span><h1>artellapipe.managers.tools module<a class="headerlink" href="#module-artellapipe.managers.tools" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager that handles Artella Tools</p>
+<dl class="class">
+<dt id="artellapipe.managers.tools.ArtellaToolsManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ArtellaToolsManager</code><a class="headerlink" href="#artellapipe.managers.tools.ArtellaToolsManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="artellapipe.managers.tools.ArtellaToolsManager.run_tool">
+<code class="sig-name descname">run_tool</code><span class="sig-paren">(</span><em class="sig-param">tool_id</em>, <em class="sig-param">do_reload=False</em>, <em class="sig-param">debug=False</em>, <em class="sig-param">project=None</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ArtellaToolsManager.run_tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launches artellapipe tool
+:param tool_id: str
+:param do_reload: bool
+:param debug: bool
+:param project: ArtellaProject or None</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="artellapipe.managers.tools.ArtellaToolsManagerSingleton">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ArtellaToolsManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.tools.ArtellaToolsManagerSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.tools.ArtellaToolsManager" title="artellapipe.managers.tools.ArtellaToolsManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.tools.ArtellaToolsManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
 </div>
 
 
@@ -195,10 +215,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="artellapipe.core.html" class="btn btn-neutral float-right" title="artellapipe.core package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="artellapipe.managers.tracking.html" class="btn btn-neutral float-right" title="artellapipe.managers.tracking module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="artellapipe.html" class="btn btn-neutral float-left" title="artellapipe package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="artellapipe.managers.tasks.html" class="btn btn-neutral float-left" title="artellapipe.managers.tasks module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -6,7 +6,6 @@ Subpackages
 
 .. toctree::
 
-   artellapipe.config
    artellapipe.core
    artellapipe.dccs
    artellapipe.libs
