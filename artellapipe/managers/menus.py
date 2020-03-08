@@ -148,7 +148,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
         bug_tracker_action.setIcon(tpDcc.ResourcesMgr().icon('bug'))
         parent_menu_bar.addAction(bug_tracker_action)
         bug_tracker_action.setObjectName(bug_object_action_name)
-        bug_tracker_action.triggered.connect(partial(self._launch_tool_by_name, 'bugtracker'))
+        bug_tracker_action.triggered.connect(partial(self._launch_tool_by_id, 'artellapipe-tools-bugtracker'))
 
     def create_tray_menu(self, project):
         """
