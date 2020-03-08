@@ -245,10 +245,10 @@ class ArtellaProject(object):
     def get_resources_paths(self):
         """
         Returns path where project resources are located
-        :return: list(str)
+        :return: dict(str, list(str), dict containing resources keys and resources paths
         """
 
-        return list()
+        return dict()
 
     def get_tag(self):
         """
