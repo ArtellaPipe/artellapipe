@@ -68,7 +68,7 @@ class ArtellaTool(tool.DccTool, object):
         return self.launch_frameless(*args, **kwargs)
 
     def run_tool(self, frameless_active=True, tool_kwargs=None, attacher_class=None):
-        if not 'project' in tool_kwargs or not tool_kwargs['project']:
+        if 'project' not in tool_kwargs or not tool_kwargs['project']:
             tool_kwargs['project'] = self._project
         return super(ArtellaTool, self).run_tool(
             frameless_active=frameless_active, tool_kwargs=tool_kwargs, attacher_class=artellapipe.Window)
