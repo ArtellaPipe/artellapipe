@@ -225,10 +225,13 @@ def register_libs(project_inst, do_reload=False):
             except Exception:
                 pkg_loader = None
             if pkg_loader is not None:
-                libs_to_register[lib_name] = pkg_loader
+                if lib_name not in libs_to_register:
+                    libs_to_register[lib_name] = list()
+                libs_to_register[lib_name].append(pkg_loader)
 
-    for pkg_loader in libs_to_register.values():
-        artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
+    for pkg_loaders in libs_to_register.values():
+        for pkg_loader in pkg_loaders:
+            artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
 
 
 def register_tools(project_inst, dev=False, do_reload=False):
