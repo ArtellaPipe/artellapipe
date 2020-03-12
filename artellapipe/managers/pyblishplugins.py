@@ -55,7 +55,10 @@ class PyblishPluginsManager(object):
 
         self._project = project
         self._config = tpDcc.ConfigsMgr().get_config(
-            config_name='artellapipe-pyblishplugins', environment=project.get_environment())
+            config_name='artellapipe-pyblishplugins',
+            package_name=self._project.get_clean_name(),
+            root_package_name='artellapipe',
+            environment=project.get_environment())
 
         self._register_plugins()
 
