@@ -1,4 +1,4 @@
 include artellapipe/__logging__.ini
 include artellapipe/changelog.yml
-include artellapipe/resources/icons/color/*.*
 include artellapipe/*.json
+recursive-include artellapipe/resources/* *.*
