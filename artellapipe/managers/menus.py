@@ -58,6 +58,8 @@ class ArtellaMenusManager(menus.MenusManager, object):
 
         menus_config = tpDcc.ConfigsMgr().get_config(
             config_name='artellapipe-menu',
+            package_name=project.get_clean_name(),
+            root_package_name='artellapipe',
             environment=project.get_environment()
         )
         if not menus_config:

@@ -65,7 +65,10 @@ class ArtellaShotsManager(object):
 
         self._project = project
         self._config = tpDcc.ConfigsMgr().get_config(
-            config_name='artellapipe-shots', environment=project.get_environment())
+            config_name='artellapipe-shots',
+            package_name=project.get_clean_name(),
+            root_package_name='artellapipe',
+            environment=project.get_environment())
 
         self._register_shot_classes()
 
