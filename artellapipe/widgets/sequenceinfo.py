@@ -229,6 +229,7 @@ class SequenceFileButton(base.BaseWidget, object):
     def ui(self):
         super(SequenceFileButton, self).ui()
 
+        sync_icon = tpDcc.ResourcesMgr().icon('sync')
         version_icon = tpDcc.ResourcesMgr().icon('version')
         update_icon = tpDcc.ResourcesMgr().icon('update')
         menu_icon = tpDcc.ResourcesMgr().icon('menu_vertical')
@@ -244,10 +245,13 @@ class SequenceFileButton(base.BaseWidget, object):
         options_menu = QMenu(self._options_btn)
         self._options_btn.setMenu(options_menu)
 
+        sync_action = QAction(sync_icon, 'Sync', options_menu)
         versions_action = QAction(version_icon, 'Check Versions', options_menu)
         check_dependencies_action = QAction(update_icon, 'Check Dependencies', options_menu)
+        options_menu.addAction(sync_action)
         options_menu.addAction(versions_action)
         options_menu.addAction(check_dependencies_action)
+        sync_action.triggered.connect(partial(self._on_sync, self._sequence_file_type))
         versions_action.triggered.connect(partial(self._on_check_working_versions, self._sequence_file_type))
         check_dependencies_action.triggered.connect(partial(self._on_check_dependencies, self._sequence_file_type))
 
@@ -298,6 +302,24 @@ class SequenceFileButton(base.BaseWidget, object):
 
         self._sequence.open_file(file_type=self._sequence_file_type, status=self._status)
 
+    def _on_sync(self, file_type):
+        """
+        Internal callback function that syncronizes to latest version the selected file type
+        """
+
+        if not self._sequence:
+            return
+
+        if not file_type or file_type not in self._sequence.FILES:
+            return
+
+        file_path =self._get_file_path()
+        if not file_path or not os.path.isfile(file_path):
+            LOGGER.warning('Impossible to syncronize because file path "{}" does not exists!'.format(file_path))
+            return
+
+        artellapipe.FilesMgr().sync_files([file_path])
+
     def _on_check_working_versions(self, file_type):
         """
         Internal callback function that is called when the user clicks on a check version action
@@ -333,8 +355,7 @@ class SequenceFileButton(base.BaseWidget, object):
             LOGGER.warning('Impossible to check dependencies because file path "{}" does not exists!'.format(file_path))
             return
 
-        artellapipe.ToolsMgr().run_tool(
-            self._sequence.project, 'dependenciesmanager', extra_args={'file_path': file_path})
+        artellapipe.ToolsMgr().run_tool('artellapipe-tools-dependenciesmanager', file_path=file_path)
 
 
 class SequenceVersionsTree(QTreeWidget, object):
