@@ -7,7 +7,10 @@ Base class that defines Artella Sequence
 
 from __future__ import print_function, division, absolute_import
 
+import os
 import logging
+
+from tpDcc.libs.python import path as path_utils
 
 import artellapipe
 from artellapipe.core import abstract
@@ -68,6 +71,8 @@ class ArtellaSequence(abstract.AbstractSequence, object):
                 'Impossible to retrieve sequence path from template: "{} | {} | {}"'.format(
                     template.name, template.pattern, template_dict))
             return None
+
+        sequence_path = artellapipe.FilesMgr().prefix_path_with_project_path(sequence_path)
 
         return sequence_path
 

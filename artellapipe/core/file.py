@@ -208,6 +208,9 @@ class ArtellaFile(object):
 
             if fix_path:
                 file_path = artellapipe.FilesMgr().fix_path(file_path)
+
+            file_path = artellapipe.FilesMgr().prefix_path_with_project_path(file_path)
+
             file_paths.append(file_path)
 
         if return_first:
@@ -310,8 +313,6 @@ class ArtellaFile(object):
                     self.FILE_TYPE))
             return local_versions
 
-        project_drive = self._project.get_drive()
-
         for extension in self.FILE_EXTENSIONS:
 
             template_dict = self.get_template_dict(extension=extension)
@@ -326,8 +327,7 @@ class ArtellaFile(object):
             for folder in folders_to_check:
                 template_dict['version_folder'] = folder
                 file_path = file_type_template.format(template_dict)
-                if not file_path.startswith(project_drive):
-                    file_path = path_utils.clean_path(os.path.join(project_drive, os.path.splitdrive(file_path)[-1]))
+                file_path = artellapipe.FilesMgr().prefix_path_with_project_path(file_path)
                 if file_path and os.path.exists(file_path):
                     version = artellalib.split_version(folder)
                     if version:

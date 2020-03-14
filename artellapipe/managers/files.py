@@ -203,7 +203,7 @@ class ArtellaFilesManager(object):
 
         project_env_var = self._project.env_var
 
-        path_to_fix = path_to_fix.replace('\\', '/')
+        path_to_fix = path_utils.clean_path(path_to_fix)
         project_var = os.environ.get(project_env_var)
         if not project_var:
             return path_to_fix
@@ -263,17 +263,27 @@ class ArtellaFilesManager(object):
         """
         Adds project path to given path as prefix
         :param path_to_prefix: str
+        :param env_var: bool
         :return: str
         """
 
         self._check_project()
 
+        if not path_to_prefix:
+            return
+
+        path_to_prefix = path_utils.clean_path(path_to_prefix)
+
         if env_var:
             project_env_var = self._project.env_var
-            path_to_prefix = path_to_prefix.replace('\\', '/')
-            project_var = os.environ.get(project_env_var)
+            project_var = path_utils.clean_path(os.environ.get(project_env_var))
+            if path_to_prefix.startswith(project_var):
+                return path_to_prefix
             return path_utils.clean_path(os.path.join(project_var, path_to_prefix))
         else:
+            project_path = path_utils.clean_path(self._project.get_path())
+            if path_to_prefix.startswith(project_path):
+                return path_to_prefix
             return path_utils.clean_path(os.path.join(self._project.get_path(), path_to_prefix))
 
     def prefix_path_with_artella_env_path(self, path_to_prefix):

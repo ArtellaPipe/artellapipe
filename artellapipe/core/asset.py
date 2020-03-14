@@ -128,9 +128,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                     template.name, template.pattern, template_dict))
             return None
 
-        project_drive = artellapipe.project.get_drive()
-        if not asset_path.startswith(project_drive):
-            asset_path = path_utils.clean_path(os.path.join(project_drive, os.path.splitdrive(asset_path)[-1]))
+        asset_path = artellapipe.FilesMgr().prefix_path_with_project_path(asset_path)
 
         return asset_path
 
