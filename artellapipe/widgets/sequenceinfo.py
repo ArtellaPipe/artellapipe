@@ -313,7 +313,7 @@ class SequenceFileButton(base.BaseWidget, object):
         if not file_type or file_type not in self._sequence.FILES:
             return
 
-        file_path =self._get_file_path()
+        file_path = self._get_file_path()
         if not file_path or not os.path.isfile(file_path):
             LOGGER.warning('Impossible to syncronize because file path "{}" does not exists!'.format(file_path))
             return
