@@ -76,7 +76,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
                         if isinstance(i, string_types) and i == 'separator':
                             main_menu.addSeparator()
                             continue
-                        self._menu_creator(main_menu, i, package_name, dev=project.is_dev())
+                        self._menu_creator(main_menu, i,  project.get_clean_name(), dev=project.is_dev())
 
         # Tools Menus
         tools_menu_data = self.get_tools_menus() or dict()
@@ -86,7 +86,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
                     if isinstance(i, string_types) and i == 'separator':
                         main_menu.addSeparator()
                         continue
-                    self._menu_creator(main_menu, i, pkg_name, dev=project.is_dev())
+                    self._menu_creator(main_menu, i,  project.get_clean_name(), dev=project.is_dev())
 
         self.create_tray_menu(project=project)
         self.create_bug_tracker_action(package_name=package_name)
