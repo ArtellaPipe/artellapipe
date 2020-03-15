@@ -90,6 +90,9 @@ class ArtellaShot(abstract.AbstractShot, object):
         if not tp.Dcc.object_exists(node_name):
             return None
 
+        if tp.is_maya() and not tp.Dcc.node_type(node_name) == 'shot':
+            return None
+
         return node_name
 
     def get_sequence(self):
