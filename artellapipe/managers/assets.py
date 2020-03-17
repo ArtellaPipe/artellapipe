@@ -201,7 +201,7 @@ class ArtellaAssetsManager(object):
         if not self.is_valid_asset_type(asset_type):
             return None
 
-        return [asset for asset in self.assets if asset.FILE_TYPE == asset_type]
+        return [asset for asset in self.assets if asset and asset.FILE_TYPE == asset_type]
 
     def open_asset_shaders_file(self, asset):
         """
