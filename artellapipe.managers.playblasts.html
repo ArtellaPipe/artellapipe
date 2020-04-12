@@ -179,131 +179,131 @@
   <div class="section" id="module-artellapipe.managers.playblasts">
 <span id="artellapipe-managers-playblasts-module"></span><h1>artellapipe.managers.playblasts module<a class="headerlink" href="#module-artellapipe.managers.playblasts" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager to handle playblasts</p>
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.playblasts.ArtellaPlayblastsManagerSingleton">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.playblasts.</code><code class="sig-name descname">ArtellaPlayblastsManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.playblasts.ArtellaPlayblastsManagerSingleton" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.playblasts.PlayblastsManager" title="artellapipe.managers.playblasts.PlayblastsManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.playblasts.PlayblastsManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.playblasts.</code><code class="sig-name descname">PlayblastsManager</code><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.capture">
-<code class="sig-name descname">capture</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.capture" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">capture</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.capture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a playblast in an independent panel
 :param kwargs:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.capture_context">
 <code class="sig-name descname">capture_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.capture_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns context used during capture
 :return:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.capture_scene">
-<code class="sig-name descname">capture_scene</code><span class="sig-paren">(</span><em class="sig-param">options</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.capture_scene" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">capture_scene</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.capture_scene" title="Permalink to this definition">¶</a></dt>
 <dd><p>Capturing using scene settings
 :param options: dict, collection of output options
 :return: str, path to playblast file</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.config">
 <em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.format_tokens">
-<code class="sig-name descname">format_tokens</code><span class="sig-paren">(</span><em class="sig-param">token_str</em>, <em class="sig-param">attrs_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.format_tokens" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">format_tokens</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">token_str</span></em>, <em class="sig-param"><span class="n">attrs_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.format_tokens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the tokens with the given strings
 :param token_str: str, filename of the playbalst with tokens
 :param attrs_dict: dict, parsed capture options
 :return: str, formatted filename with all tokens resolved</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.get_camera_token">
-<code class="sig-name descname">get_camera_token</code><span class="sig-paren">(</span><em class="sig-param">attrs_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_camera_token" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_camera_token</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attrs_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_camera_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns short name of camera from options
 :param attrs_dict: dict, parsed capture options</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.get_presets_paths">
 <code class="sig-name descname">get_presets_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_presets_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns paths where playblasts presets are located
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.get_project_path_token">
 <code class="sig-name descname">get_project_path_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_project_path_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns project path token
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.get_project_rule_token">
-<code class="sig-name descname">get_project_rule_token</code><span class="sig-paren">(</span><em class="sig-param">rule_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_project_rule_token" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_project_rule_token</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rule_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_project_rule_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns token based on the given rule
 :param rule_name: str
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.get_render_layer_token">
 <code class="sig-name descname">get_render_layer_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_render_layer_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns render layer token
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.get_scene_token">
 <code class="sig-name descname">get_scene_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.get_scene_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns scene token
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.list_tokens">
 <code class="sig-name descname">list_tokens</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.list_tokens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of all the registered playblast tokens
 :return: list(str)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.parse_current_scene">
 <code class="sig-name descname">parse_current_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.parse_current_scene" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse current DCC scene looking for settings related with play blasts
 :return: dict</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.register_token">
-<code class="sig-name descname">register_token</code><span class="sig-paren">(</span><em class="sig-param">token</em>, <em class="sig-param">fn</em>, <em class="sig-param">label=''</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.register_token" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">register_token</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">token</span></em>, <em class="sig-param"><span class="n">fn</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.register_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Registers given token
 :param token: str
 :param fn: fn
 :param label: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.set_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the project this manager belongs to
 :param project: ArtellaProject</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.stamp_playblast">
-<code class="sig-name descname">stamp_playblast</code><span class="sig-paren">(</span><em class="sig-param">file_name</em>, <em class="sig-param">output_file</em>, <em class="sig-param">extra_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.stamp_playblast" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stamp_playblast</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">output_file</span></em>, <em class="sig-param"><span class="n">extra_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.stamp_playblast" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.playblasts.PlayblastsManager.tokens">
 <em class="property">property </em><code class="sig-name descname">tokens</code><a class="headerlink" href="#artellapipe.managers.playblasts.PlayblastsManager.tokens" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>

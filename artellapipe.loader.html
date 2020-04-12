@@ -171,77 +171,77 @@
   <div class="section" id="module-artellapipe.loader">
 <span id="artellapipe-loader-module"></span><h1>artellapipe.loader module<a class="headerlink" href="#module-artellapipe.loader" title="Permalink to this headline">¶</a></h1>
 <p>Initialization module for artellapipe</p>
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.create_logger">
 <code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">create_logger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.create_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns logger of current module</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.create_logger_directory">
 <code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">create_logger_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.create_logger_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates artellapipe logger directory</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.get_logging_config">
 <code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">get_logging_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.get_logging_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns logging configuration file path
 :return: str</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.get_logging_level">
 <code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">get_logging_level</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.get_logging_level" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns logging level to use
 :return: str</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.init">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">do_reload=False</em>, <em class="sig-param">import_libs=True</em>, <em class="sig-param">dev=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">import_libs</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dev</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes module
 :param do_reload: bool, Whether to reload modules or not
 :param dev: bool, Whether artellapipe is initialized in dev mode or not</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.init_dcc">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">init_dcc</code><span class="sig-paren">(</span><em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.init_dcc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">init_dcc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.init_dcc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks DCC we are working on an initializes proper variables
 :param do_reload: bool</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.register_configs">
 <code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_configs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_configs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Registers aretellapipe configuration files</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.register_libs">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_libs</code><span class="sig-paren">(</span><em class="sig-param">project_inst</em>, <em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_libs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_libs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_inst</span></em>, <em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_libs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that registera all available libs for given project
 :param project_inst: ArtellaProject
 :param do_reload: bool</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.register_resources">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_resources</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_resources" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_resources</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_resources" title="Permalink to this definition">¶</a></dt>
 <dd><p>Registers artellapipe and project resources</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.register_tools">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_tools</code><span class="sig-paren">(</span><em class="sig-param">project_inst</em>, <em class="sig-param">dev=False</em>, <em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_tools" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">register_tools</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_inst</span></em>, <em class="sig-param"><span class="n">dev</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.register_tools" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that register all available tools for given project
 :param project_inst: ArtellaProject</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="artellapipe.loader.set_project">
-<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project_class</em>, <em class="sig-param">do_reload=False</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.set_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">artellapipe.loader.</code><code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project_class</span></em>, <em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.loader.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>This functions sets the given class instance as the current Artella project used
 :param project_class: ArtellaProject</p>
 </dd></dl>

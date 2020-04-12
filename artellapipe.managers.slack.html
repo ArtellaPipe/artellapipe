@@ -179,47 +179,47 @@
   <div class="section" id="module-artellapipe.managers.slack">
 <span id="artellapipe-managers-slack-module"></span><h1>artellapipe.managers.slack module<a class="headerlink" href="#module-artellapipe.managers.slack" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager for Slack functionality</p>
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.slack.SlackManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.slack.</code><code class="sig-name descname">SlackManager</code><a class="headerlink" href="#artellapipe.managers.slack.SlackManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.slack.SlackManager.get_slack_channel">
 <code class="sig-name descname">get_slack_channel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.get_slack_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns slack channel messages wil lbe send
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.slack.SlackManager.get_slack_client">
 <code class="sig-name descname">get_slack_client</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.get_slack_client" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns slack client of the current project
 :return: SlackClient</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.slack.SlackManager.get_slack_token">
 <code class="sig-name descname">get_slack_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.get_slack_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns slack token used by slack API
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.slack.SlackManager.post_message">
-<code class="sig-name descname">post_message</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.post_message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">post_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.post_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Post a message in the project channel
 :param msg:
 :return:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.slack.SlackManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.set_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the project this manager belongs to
 :param project: ArtellaProject</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.slack.SlackManager.slack_is_available">
 <code class="sig-name descname">slack_is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.slack.SlackManager.slack_is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns whether slack is available or not
@@ -228,7 +228,7 @@
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.slack.SlackManagerSingleton">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.slack.</code><code class="sig-name descname">SlackManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.slack.SlackManagerSingleton" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.slack.SlackManager" title="artellapipe.managers.slack.SlackManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.slack.SlackManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>

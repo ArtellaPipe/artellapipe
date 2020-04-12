@@ -179,97 +179,97 @@
   <div class="section" id="module-artellapipe.managers.media">
 <span id="artellapipe-managers-media-module"></span><h1>artellapipe.managers.media module<a class="headerlink" href="#module-artellapipe.managers.media" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager to Media related operations</p>
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.media.ArtellaMediaManagerSingleton">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.media.</code><code class="sig-name descname">ArtellaMediaManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.media.ArtellaMediaManagerSingleton" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.media.MediaManager" title="artellapipe.managers.media.MediaManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.media.MediaManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.media.MediaManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.media.</code><code class="sig-name descname">MediaManager</code><a class="headerlink" href="#artellapipe.managers.media.MediaManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="artellapipe.managers.media.MediaManager.TEMP_PREFIX">
 <code class="sig-name descname">TEMP_PREFIX</code><em class="property"> = 'artella_mediamgr'</em><a class="headerlink" href="#artellapipe.managers.media.MediaManager.TEMP_PREFIX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="artellapipe.managers.media.MediaManager.TEMP_SUFFIX">
 <code class="sig-name descname">TEMP_SUFFIX</code><em class="property"> = 'tmp'</em><a class="headerlink" href="#artellapipe.managers.media.MediaManager.TEMP_SUFFIX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.config">
 <em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.managers.media.MediaManager.config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.create_temp_path">
-<code class="sig-name descname">create_temp_path</code><span class="sig-paren">(</span><em class="sig-param">prefix=None</em>, <em class="sig-param">suffix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.create_temp_path" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_temp_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">suffix</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.create_temp_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates temporary folder used during media operations to store temporal files
 :param prefix: str
 :param suffix: str
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.get_media_profile_data">
-<code class="sig-name descname">get_media_profile_data</code><span class="sig-paren">(</span><em class="sig-param">media_profile_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profile_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_media_profile_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">media_profile_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profile_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns data stored in given media profile name if exists
 :param media_profile_name: str
 :return: dict</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.get_media_profile_path">
-<code class="sig-name descname">get_media_profile_path</code><span class="sig-paren">(</span><em class="sig-param">media_profile_name</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profile_path" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_media_profile_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">media_profile_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profile_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns path to given media profile name
 :param media_profile_name: str
 :return: str</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.get_media_profiles_extensions">
 <code class="sig-name descname">get_media_profiles_extensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profiles_extensions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns list of extensions used to define media profiles
 :return: list(str)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.get_media_profiles_file_paths">
 <code class="sig-name descname">get_media_profiles_file_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profiles_file_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns paths to all media profiles stored in media profiles paths
 :return: list(str)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.get_media_profiles_paths">
 <code class="sig-name descname">get_media_profiles_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.get_media_profiles_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all used to search media profiles in
 :return: list(str)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.set_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the project this manager belongs to
 :param project: ArtellaProject</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.stamp">
-<code class="sig-name descname">stamp</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">output</em>, <em class="sig-param">config_dict=None</em>, <em class="sig-param">extra_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stamp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">output</span></em>, <em class="sig-param"><span class="n">config_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extra_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.stamp_image">
-<code class="sig-name descname">stamp_image</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">output</em>, <em class="sig-param">config_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp_image" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stamp_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">output</span></em>, <em class="sig-param"><span class="n">config_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp_image" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.stamp_video">
-<code class="sig-name descname">stamp_video</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">output</em>, <em class="sig-param">config_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp_video" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stamp_video</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">output</span></em>, <em class="sig-param"><span class="n">config_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp_video" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

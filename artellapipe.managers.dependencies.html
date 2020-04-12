@@ -179,27 +179,27 @@
   <div class="section" id="module-artellapipe.managers.dependencies">
 <span id="artellapipe-managers-dependencies-module"></span><h1>artellapipe.managers.dependencies module<a class="headerlink" href="#module-artellapipe.managers.dependencies" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager for DCC dependencies</p>
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManager</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths">
-<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tries to fix paths that are not valid in the given file
 :param file_path: str, file path we want to fix paths of</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies">
 <code class="sig-name descname">get_current_scene_dependencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all dependencies that are currently loaded in current scene
 :return: list(str)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies">
-<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">parent_path=None</em>, <em class="sig-param">found_files=None</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em>, <em class="sig-param"><span class="n">parent_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">found_files</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all dependencies that are currently loaded in the given file
 :param file_path: str, file path we want to get dependencies of
 :param parent_path: str
@@ -208,23 +208,23 @@
 :return: list(str)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the project this manager belongs to
 :param project: ArtellaProject</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies">
-<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates all the dependencies of the given file path
 :param file_path: str</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="artellapipe.managers.dependencies.ArtellaDependenciesManagerSingleton">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManagerSingleton" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="artellapipe.managers.dependencies.ArtellaDependenciesManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.dependencies.ArtellaDependenciesManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
