@@ -13,12 +13,11 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-import webbrowser
 
 import tpDcc
 from tpDcc.core import tool
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import toolset, buttons
+from tpDcc.libs.qt.widgets import toolset, buttons, message
 
 import artellapipe
 import artellapipe.register
@@ -157,6 +156,33 @@ class ArtellaToolWidget(base.BaseWidget, object):
                 self.toolset.attacher.fade_close()
             except Exception:
                 self.toolset.attacher.close()
+
+    def show_info_message(self, msg, msecs=3):
+        """
+        Set an info message to be displayed in the status widget
+        :param msg: str
+        :param msecs: float
+        """
+
+        message.PopupMessage.info(msg, parent=self, duration=msecs, closable=True)
+
+    def show_warning_message(self, msg, msecs=3):
+        """
+        Set a warning message to be displayed in the status widget
+        :param msg: str
+        :param msecs: float
+        """
+
+        message.PopupMessage.warning(msg, parent=self, duration=msecs, closable=True)
+
+    def show_error_message(self, msg, msecs=3):
+        """
+        Set an error message to be displayed in the status widget
+        :param msg: str
+        :param msecs: float
+        """
+
+        message.PopupMessage.error(msg, parent=self, duration=msecs, closable=True)
 
 
 artellapipe.register.register_class('Tool', ArtellaTool)
