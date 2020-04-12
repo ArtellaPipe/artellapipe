@@ -16,7 +16,6 @@ import os
 import logging
 
 import tpDcc
-from tpDcc.libs.python import path as path_utils
 
 import artellapipe.register
 from artellapipe.core import abstract, defines
@@ -128,6 +127,7 @@ class ArtellaAsset(abstract.AbstractAsset, object):
                     template.name, template.pattern, template_dict))
             return None
 
+        asset_path = os.path.expandvars(asset_path)
         asset_path = artellapipe.FilesMgr().prefix_path_with_project_path(asset_path)
 
         return asset_path

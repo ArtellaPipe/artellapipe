@@ -21,7 +21,7 @@ from Qt.QtWidgets import *
 
 import tpDcc
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import breadcrumb, stack, splitters, grid
+from tpDcc.libs.qt.widgets import breadcrumb, stack, dividers, grid
 
 import artellapipe.register
 from artellapipe.core import defines
@@ -392,9 +392,9 @@ class WorkingSequenceInfo(base.BaseWidget, object):
 
         self._buttons_widget = self._create_asset_files_buttons()
 
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
         self.main_layout.addWidget(self._buttons_widget)
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
 
         self._stack = stack.SlidingStackedWidget()
         self._stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)

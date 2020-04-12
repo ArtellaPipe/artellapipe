@@ -284,7 +284,7 @@ class ArtellaFilesManager(object):
             project_path = path_utils.clean_path(self._project.get_path())
             if path_to_prefix.startswith(project_path):
                 return path_to_prefix
-            return path_utils.clean_path(os.path.join(self._project.get_path(), path_to_prefix))
+            return path_utils.clean_path(os.path.join(project_path, path_to_prefix))
 
     def prefix_path_with_artella_env_path(self, path_to_prefix):
         """

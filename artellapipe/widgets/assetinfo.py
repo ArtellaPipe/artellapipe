@@ -20,7 +20,7 @@ from Qt.QtWidgets import *
 
 import tpDcc
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import breadcrumb, stack, splitters, grid
+from tpDcc.libs.qt.widgets import breadcrumb, stack, dividers, grid
 
 import artellapipe.register
 from artellapipe.core import defines
@@ -69,7 +69,7 @@ class AssetInfoWidget(base.BaseWidget, object):
 
         self.main_layout.addWidget(self._title_breadcrumb)
         self.main_layout.addWidget(self._asset_icon_frame)
-        # self.main_layout.addLayout(splitters.SplitterLayout())
+        # self.main_layout.addLayout(dividers.DividerLayout())
 
     def reset(self):
         """
@@ -86,7 +86,7 @@ class AssetInfoWidget(base.BaseWidget, object):
         if not self._asset_widget:
             return
 
-        self._title_breadcrumb.set([self._asset_widget.asset.get_name()])
+        self._title_breadcrumb.set_items([{'text': self._asset_widget.asset.get_name()}])
         thumb_icon = self._asset_widget.get_thumbnail_icon()
         thumb_size = artellapipe.AssetsMgr().config.get('thumb_size')
         self._asset_icon_lbl.setPixmap(
@@ -388,9 +388,9 @@ class WorkingAssetInfo(base.BaseWidget, object):
 
         self._buttons_widget = self._create_asset_files_buttons()
 
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
         self.main_layout.addWidget(self._buttons_widget)
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
 
         self._stack = stack.SlidingStackedWidget()
         self._stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -469,7 +469,7 @@ class WorkingAssetInfo(base.BaseWidget, object):
             file_buttons_widget.resizeRowsToContents()
 
         if files_btn:
-            file_buttons_widget.setFixedHeight(file_buttons_widget.rowCount() * files_btn[0].height() + 5)
+            file_buttons_widget.setFixedHeight(file_buttons_widget.rowCount() * files_btn[0].height() + 10)
 
         return file_buttons_widget
 

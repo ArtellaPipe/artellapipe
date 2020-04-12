@@ -96,7 +96,8 @@ class ArtellaMenusManager(menus.MenusManager, object):
     def remove_previous_menus(self, project, package_name=None):
         super(ArtellaMenusManager, self).remove_previous_menus(package_name=package_name)
 
-        parent_menu_bar = qtutils.get_window_menu_bar(tpDcc.Dcc.get_main_window())
+        main_win = tpDcc.Dcc.get_main_window()
+        parent_menu_bar = main_win.menuBar()
         if not parent_menu_bar:
             return
 
@@ -112,7 +113,8 @@ class ArtellaMenusManager(menus.MenusManager, object):
         :return:
         """
 
-        parent_menu_bar = qtutils.get_window_menu_bar(tpDcc.Dcc.get_main_window())
+        main_win = tpDcc.Dcc.get_main_window()
+        parent_menu_bar = main_win.menuBar()
         if not parent_menu_bar:
             return
 
@@ -135,7 +137,8 @@ class ArtellaMenusManager(menus.MenusManager, object):
         :return:
         """
 
-        parent_menu_bar = qtutils.get_window_menu_bar(tpDcc.Dcc.get_main_window())
+        main_win = tpDcc.Dcc.get_main_window()
+        parent_menu_bar = main_win.menuBar()
         if not parent_menu_bar:
             return
 
@@ -158,7 +161,8 @@ class ArtellaMenusManager(menus.MenusManager, object):
         :return:
         """
 
-        parent_menu_bar = qtutils.get_window_menu_bar(tpDcc.Dcc.get_main_window())
+        main_win = tpDcc.Dcc.get_main_window()
+        parent_menu_bar = main_win.menuBar()
         if not parent_menu_bar:
             return
 

@@ -167,7 +167,7 @@ class ArtellaFile(object):
 
         file_name = self.get_name()
         file_path = self.get_path()
-        working_folder = artella.config.get('server', 'working_folder')
+        working_folder = self._project.get_working_folder()
         file_path = os.path.join(file_path, working_folder, self.FILE_TYPE, file_name + self.FILE_EXTENSIONS[0])
         history = artellalib.get_file_history(file_path=file_path)
 
@@ -318,7 +318,7 @@ class ArtellaFile(object):
             template_dict = self.get_template_dict(extension=extension)
 
             folders_to_check = list()
-            working_folder = artella.config.get('server', 'working_folder')
+            working_folder = self._project.get_working_folder()
             if status == defines.ArtellaFileStatus.PUBLISHED:
                 for p in os.listdir(file_path):
                     if p == working_folder:
@@ -421,7 +421,7 @@ class ArtellaFile(object):
         if status == defines.ArtellaFileStatus.PUBLISHED:
             result = self.get_latest_published_versions()
         else:
-            working_folder = artella.config.get('server', 'working_folder')
+            working_folder = self._project.get_working_folder()
             working_path = os.path.join(file_path, working_folder, self.FILE_TYPE)
 
             if not force_update and self._working_status:

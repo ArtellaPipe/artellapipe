@@ -225,8 +225,8 @@ class ArtellaAssetsManager(object):
 
         self._check_project()
 
-        assets_folder_name = artella_lib.config.get('server', 'assets_folder_name')
-        assets_path = os.path.join(self._project.get_path(), assets_folder_name)
+        assets_folder = self._project.config.get('assets_folder')
+        assets_path = os.path.join(self._project.get_path(), assets_folder)
 
         return assets_path
 
@@ -334,7 +334,7 @@ class ArtellaAssetsManager(object):
             LOGGER.warning('Impossible to create Asset {} in Path: {}!'.format(asset_name, asset_path))
             return
 
-        working_folder = artella_lib.config.get('server', 'working_folder')
+        working_folder = self._project.get_working_folder()
 
         if folders_to_create:
             for folder_name in folders_to_create:
@@ -402,7 +402,7 @@ class ArtellaAssetsManager(object):
         """
 
         filename_attr = self._config.get('data', 'filename')
-        working_folder = artella_lib.config.get('server', 'working_folder')
+        working_folder = self._project.get_working_folder()
         return os.path.join(asset_path, working_folder, filename_attr)
 
     def get_latest_published_versions(self, asset_path, file_type=None):

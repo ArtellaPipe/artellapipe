@@ -20,7 +20,7 @@ from Qt.QtWidgets import *
 
 import tpDcc
 from tpDcc.libs.qt.core import base
-from tpDcc.libs.qt.widgets import breadcrumb, stack, splitters, grid
+from tpDcc.libs.qt.widgets import breadcrumb, stack, dividers, grid
 
 import artellapipe.register
 from artellapipe.core import defines
@@ -76,7 +76,7 @@ class ShotInfoWidget(base.BaseWidget, object):
         if not self._shot_widget:
             return
 
-        self._shot_title_breadcrumb.set([self._shot_widget.shot.get_name()])
+        self._shot_title_breadcrumb.set_items([{'text': self._shot_widget.shot.get_name()}])
         thumb_icon = self._shot_widget.get_thumbnail_icon()
         thumb_size = artellapipe.ShotsMgr().config.get('thumb_size')
         self._shot_icon_lbl.setPixmap(
@@ -357,9 +357,9 @@ class WorkingShotInfo(base.BaseWidget, object):
 
         self._buttons_widget = self._create_asset_files_buttons()
 
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
         self.main_layout.addWidget(self._buttons_widget)
-        self.main_layout.addLayout(splitters.SplitterLayout())
+        self.main_layout.addLayout(dividers.DividerLayout())
 
         self._stack = stack.SlidingStackedWidget()
         self._stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)

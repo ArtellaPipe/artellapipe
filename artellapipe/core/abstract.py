@@ -254,7 +254,7 @@ class AbstractFile(object):
                 return None
 
         if status == defines.ArtellaFileStatus.WORKING:
-            template_dict['version_folder'] = artella.config.get('server', 'working_folder')
+            template_dict['version_folder'] = self._project.get_working_folder()
             for k, v in extra_dict.items():
                 if k in template_dict:
                     if v and v != template_dict[k]:
@@ -293,6 +293,7 @@ class AbstractFile(object):
 
             file_path = template.format(template_dict)
 
+        file_path = path_utils.clean_path(os.path.expandvars(file_path))
         file_path = artellapipe.FilesMgr().prefix_path_with_project_path(file_path)
 
         if fix_path:
@@ -773,7 +774,7 @@ class AbstractSequence(AbstractFile, object):
             'project_id_number': self._project.id_number,
             'sequence_name': sequence_name,
             'file_extension': kwargs.get('extension', None),
-            'version_folder': kwargs.get('version_folder', artella.config.get('server', 'working_folder'))
+            'version_folder': kwargs.get('version_folder', self._project.get_working_folder())
         }
 
         return template_dict
@@ -848,7 +849,7 @@ class AbstractShot(AbstractFile, object):
             'shot_name': shot_name,
             'sequence_name': self.get_sequence(),
             'file_extension': kwargs.get('extension', None),
-            'version_folder': kwargs.get('version_folder', artella.config.get('server', 'working_folder'))
+            'version_folder': kwargs.get('version_folder', self._project.get_working_folder())
         }
 
         return template_dict

@@ -44,6 +44,11 @@ from artellapipe.core import defines
 LOGGER = logging.getLogger()
 
 
+class ArtellaProjectType(object):
+    INDIE = 'indie'
+    ENTERPRISE = 'enterprise'
+
+
 class ArtellaProject(object):
     def __init__(self, name, settings=None):
         super(ArtellaProject, self).__init__()
@@ -259,6 +264,14 @@ class ArtellaProject(object):
         tag_env_var = '{}_tag'.format(self.get_clean_name())
         return os.environ.get(tag_env_var, None)
 
+    def get_project_type(self):
+        """
+        Returns the current type of the Artella project. It can be Indie (indie) or Enterprise (enterprise)
+        :return: str
+        """
+
+        return self._config.get('project_type', default=ArtellaProjectType.INDIE)
+
     def get_project_path(self):
         """
         Returns path where default Artella project is located
@@ -452,7 +465,7 @@ class ArtellaProject(object):
                 artellalib.get_spigot_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
             artellalib.update_local_artella_root()
             root_prefix = artella_lib.config.get('app', 'root_prefix')
-            production_folder = artella_lib.config.get('server', 'production_folder')
+            production_folder = self.get_production_folder()
             artella_var = os.environ.get(root_prefix, None)
             LOGGER.debug('Artella environment variable is set to: {}'.format(artella_var))
             if artella_var and os.path.exists(artella_var):
@@ -864,13 +877,29 @@ class ArtellaProject(object):
 
         return path_split[0]
 
+    def get_working_folder_name(self):
+        """
+        Returns working folder name of the current project
+        :return: str
+        """
+
+        return self._config.get('working_folder')
+
+    def get_working_folder(self):
+        """
+        Returns production folder of current project
+        :return: str
+        """
+
+        return artella_lib.config.get('server', self.get_project_type()).get('working_folder')
+
     def get_production_folder_name(self):
         """
         Returns production folder name of current project
         :return: str
         """
 
-        return artella_lib.config.get('server', 'production_folder_name')
+        return self._config.get('production_folder')
 
     def get_production_folder(self):
         """
@@ -878,7 +907,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return artella_lib.config.get('server', 'production_folder')
+        return artella_lib.config.get('server', self.get_project_type()).get('production_folder')
 
     def get_production_path(self):
         """
@@ -900,7 +929,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        artella_web = artella_lib.config.get('server', 'url')
+        artella_web = artella_lib.config.get('server', self.get_project_type()).get('url')
         return '{}/project/{}/files'.format(artella_web, self.id)
 
     def get_artella_assets_url(self):
@@ -909,7 +938,8 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return '{}/Assets/'.format(self.get_artella_url())
+        assets_folder_name = self._config.get('assets_folder', default='Assets')
+        return '{}/{}/'.format(self.get_artella_url(), assets_folder_name)
 
     def update_project(self):
         """
