@@ -11,4 +11,4 @@ from artellapipe import __version__
 
 
 def test_version():
-    assert __version__.__version__
+    assert __version__.get_version()

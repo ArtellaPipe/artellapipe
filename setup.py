@@ -1,5 +1,4 @@
 from setuptools import setup
 
-from artellapipe import __version__
-
-setup()
+import versioneer
+setup(version=versioneer.get_version(), cmdclass=versioneer.get_cmdclass())
