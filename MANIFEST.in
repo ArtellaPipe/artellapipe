@@ -2,3 +2,5 @@ include artellapipe/__logging__.ini
 include artellapipe/changelog.yml
 include artellapipe/*.json
 recursive-include artellapipe/resources/* *.*
+include versioneer.py
+include artellapipe/_version.py
