@@ -32,6 +32,54 @@ class ArtellaNamesManager(object):
 
         self._project = project
 
+    def check_node_name(self, node_name):
+        """
+        Returns whether or not given node corresponds to a valid node name taking into consideration node type
+        :param node_name: str
+        :return: bool
+        """
+
+        parsed_name = self.parse_node_name(node_name)
+        if 'node_type' not in parsed_name:
+            return False
+
+        for k, v in parsed_name.items():
+            if v is None:
+                return False
+
+        naming_config = tpDcc.ConfigsMgr().get_config(
+            config_name='tpDcc-naming',
+            package_name=self._project.get_clean_name(),
+            root_package_name='tpDcc',
+            environment=self._project.get_environment()
+        )
+        auto_suffix = naming_config.get('auto_suffixes', default=dict()) if naming_config else None
+        obj_type = self._get_object_type(node_name)
+
+        if naming_config and auto_suffix:
+            if obj_type not in auto_suffix:
+                return True if obj_type == parsed_name['node_type'] else False
+            else:
+                return True if auto_suffix[obj_type] == parsed_name['node_type'] else False
+        else:
+            return True if obj_type == parsed_name['node_type'] else False
+
+    def parse_node_name(self, node_name):
+        """
+        Parses given node name
+        :param node_name: str
+        :return: list(str)
+        """
+
+        if not tpDcc.is_maya():
+            artellapipe.logger.warning('Parse Node Name by type functionality is only supported in Maya!')
+            return None
+
+        name_lib = naminglib.ArtellaNameLib()
+        name_lib.set_active_rule('node')
+
+        return name_lib.parse(node_name)
+
     def solve_node_name_by_type(self, node_names=None, **kwargs):
         """
         Resolves node name taking into account its type
@@ -84,26 +132,7 @@ class ArtellaNamesManager(object):
                         obj_name, obj_uuid, solved_names[obj_name]))
                 continue
 
-            # TODO: This code is a duplicated version of the one in
-            #  tpDcc.dccs.maya.core.name.auto_suffix_object function. Move this code to a DCC specific function
-            obj_type = maya.cmds.objectType(obj_name)
-            if obj_type == 'transform':
-                shape_nodes = maya.cmds.listRelatives(obj_name, shapes=True, fullPath=True)
-                if not shape_nodes:
-                    obj_type = 'group'
-                else:
-                    obj_type = maya.cmds.objectType(shape_nodes[0])
-            elif obj_type == 'joint':
-                shape_nodes = maya.cmds.listRelatives(obj_name, shapes=True, fullPath=True)
-                if shape_nodes and maya.cmds.objectType(shape_nodes[0]) == 'nurbsCurve':
-                    obj_type = 'controller'
-            if obj_type == 'nurbsCurve':
-                connections = maya.cmds.listConnections('{}.message'.format(obj_name))
-                if connections:
-                    for node in connections:
-                        if maya.cmds.nodeType(node) == 'controller':
-                            obj_type = 'controller'
-                            break
+            obj_type = self._get_object_type(obj_name)
             if obj_type not in auto_suffix:
                 rule_name = 'node'
                 node_type = obj_type
@@ -163,6 +192,42 @@ class ArtellaNamesManager(object):
             name_lib.set_active_rule(None)
 
         return solved_name
+
+    def _get_object_type(self, obj_name):
+        """
+        Internal function that returns object type given a node
+        :param obj_name: str
+        :return: str
+        """
+
+        if not tpDcc.is_maya():
+            artellapipe.logger.warning('Solve Node Name by type functionality is only supported in Maya!')
+            return None
+
+        import tpDcc.dccs.maya as maya
+
+        # TODO: This code is a duplicated version of the one in
+        #  tpDcc.dccs.maya.core.name.auto_suffix_object function. Move this code to a DCC specific function
+        obj_type = maya.cmds.objectType(obj_name)
+        if obj_type == 'transform':
+            shape_nodes = maya.cmds.listRelatives(obj_name, shapes=True, fullPath=True)
+            if not shape_nodes:
+                obj_type = 'group'
+            else:
+                obj_type = maya.cmds.objectType(shape_nodes[0])
+        elif obj_type == 'joint':
+            shape_nodes = maya.cmds.listRelatives(obj_name, shapes=True, fullPath=True)
+            if shape_nodes and maya.cmds.objectType(shape_nodes[0]) == 'nurbsCurve':
+                obj_type = 'controller'
+        if obj_type == 'nurbsCurve':
+            connections = maya.cmds.listConnections('{}.message'.format(obj_name))
+            if connections:
+                for node in connections:
+                    if maya.cmds.nodeType(node) == 'controller':
+                        obj_type = 'controller'
+                        break
+
+        return obj_type
 
 
 @decorators.Singleton
