@@ -40,6 +40,7 @@ import artellapipe
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
 from artellapipe.core import defines
+from artellapipe.utils import exceptions
 
 LOGGER = logging.getLogger()
 
@@ -838,25 +839,11 @@ class ArtellaProject(object):
         env_var = os.environ.get(self.env_var, None)
 
         if not env_var or force_update:
+            self.set_environment_variables()
             self.update_project()
             env_var = os.environ.get(self.env_var, None)
-
-            # We force the launch of Artella
-            if not env_var:
-                try:
-                    if tp.is_maya():
-                        artellalib.launch_artella_app()
-                        artellalib.load_artella_maya_plugin()
-                    self.update_project()
-                except Exception as e:
-                    raise RuntimeError(
-                        '{} Project not set up properly after launching Artella. Is Artella Running?'.format(
-                            self.name.title()))
-
-        env_var = os.environ.get(self.env_var, None)
         if not env_var:
-            raise RuntimeError(
-                '{} Project not setup properly. Please contact TD to fix this problem'.format(self.name.title()))
+            return ''
 
         return os.environ.get(self.env_var)
 
@@ -951,7 +938,9 @@ class ArtellaProject(object):
                 import tpDcc.dccs.maya as maya
                 LOGGER.debug('Setting {} Project ...'.format(self.name))
                 project_folder = os.environ.get(self.env_var, 'folder-not-defined')
-                if project_folder and os.path.exists(project_folder):
+                if project_folder and project_folder != 'folder-not-defined':
+                    if not os.path.isdir(project_folder):
+                        os.makedirs(project_folder)
                     maya.cmds.workspace(project_folder, openWorkspace=True)
                     LOGGER.debug('{} Project setup successfully! => {}'.format(self.name, project_folder))
                 else:
