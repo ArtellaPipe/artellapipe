@@ -100,6 +100,8 @@ class ArtellaToolset(toolset.ToolsetWidget, object):
         bug_icon = tpDcc.ResourcesMgr().icon('bug')
 
         self._bug_btn = buttons.BaseMenuButton()
+        self._bug_btn.setFixedWidth(22)
+        self._bug_btn.setFixedHeight(22)
         self._bug_btn.set_icon(bug_icon, size=12, color_offset=40)
 
         self._title_frame._horizontal_layout.addWidget(self._bug_btn)
@@ -116,9 +118,6 @@ class ArtellaToolset(toolset.ToolsetWidget, object):
 
         if not self._project:
             return False
-
-        print('ogogogogogogog')
-
         # artellapipe.ToolsMgr().run_tool('artellapipe-tools-bugtracker', extra_args={'tool': self._tool})
 
 

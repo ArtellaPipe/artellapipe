@@ -86,6 +86,11 @@ def init(do_reload=False, import_libs=True, dev=False):
 
     init_dcc(do_reload=do_reload)
 
+    # When working in production, we use custom exception hook to show message box to user
+    if not dev:
+        from artellapipe.utils import exceptions
+        exceptions.ArtellaExceptionHook()
+
 
 def init_dcc(do_reload=False):
     """
