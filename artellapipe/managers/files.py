@@ -524,11 +524,12 @@ class ArtellaFilesManager(object):
         if not file_path:
             file_path = tp.Dcc.scene_name()
             if not file_path:
-                LOGGER.error('File {} cannot be locked because it does not exists!'.format(file_path))
+                LOGGER.error('File {} is not a valid file project path!'.format(file_path))
                 return False
 
         if not file_path.startswith(self._project.get_path()):
-            LOGGER.error('Impossible to lock file that is nos located in {} Project Folder!'.format(file_path))
+            LOGGER.error(
+                'File "{}" is not a valid project path because it is not located in Project Folder!'.format(file_path))
             return
 
         if not os.path.isfile(file_path):

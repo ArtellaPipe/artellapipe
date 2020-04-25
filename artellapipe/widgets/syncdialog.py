@@ -169,6 +169,10 @@ class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
             self._timer.stop()
             self.close()
 
+    def closeEvent(self, event):
+        self._timer.stop()
+        super(ArtellaSyncPathDialog, self).closeEvent(event)
+
     def sync(self):
         if not self._paths:
             self.close()
@@ -177,8 +181,8 @@ class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
         try:
             threading.Thread(target=self.sync_files, args=(self._event,), name='ArtellaSyncPathsThread').start()
         except Exception as e:
-            LOGGER.debug(str(e))
-            LOGGER.debug(traceback.format_exc())
+            LOGGER.error(str(e))
+            LOGGER.error(traceback.format_exc())
         self.exec_()
 
     def sync_files(self, event):
