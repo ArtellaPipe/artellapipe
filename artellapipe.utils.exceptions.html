@@ -176,71 +176,8 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="module-artellapipe.utils.exceptions">
-<span id="artellapipe-utils-exceptions-module"></span><h1>artellapipe.utils.exceptions module<a class="headerlink" href="#module-artellapipe.utils.exceptions" title="Permalink to this headline">¶</a></h1>
-<p>Module that contains exceptions functions</p>
-<dl class="py exception">
-<dt id="artellapipe.utils.exceptions.ArtellaPipeException">
-<em class="property">exception </em><code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">ArtellaPipeException</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em>, <em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.ArtellaPipeException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Custom exception that raises Bug Tracker Tool for Artella</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="artellapipe.utils.exceptions.ArtellaProjectUndefinedException">
-<em class="property">exception </em><code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">ArtellaProjectUndefinedException</code><a class="headerlink" href="#artellapipe.utils.exceptions.ArtellaProjectUndefinedException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Exception that is raised when project is not defined</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="artellapipe.utils.exceptions.FileNotFoundException">
-<em class="property">exception </em><code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">FileNotFoundException</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.FileNotFoundException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Exceptions that is raised when a file does not exists on disk</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="artellapipe.utils.exceptions.RecursiveParserExceptions">
-<em class="property">exception </em><code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">RecursiveParserExceptions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em>, <em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.RecursiveParserExceptions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#artellapipe.utils.exceptions.ArtellaPipeException" title="artellapipe.utils.exceptions.ArtellaPipeException"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.utils.exceptions.ArtellaPipeException</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Custom exception that is raised when a recursive section is found by parser</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="artellapipe.utils.exceptions.capture_exception">
-<code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">capture_exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.capture_exception" title="Permalink to this definition">¶</a></dt>
-<dd><p>Captures given exception
-:param exc: str or Exception, Exception to capture</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="artellapipe.utils.exceptions.capture_message">
-<code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">capture_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.capture_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Captures given message
-:param msg: str</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="artellapipe.utils.exceptions.capture_sentry_exception">
-<code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">capture_sentry_exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.capture_sentry_exception" title="Permalink to this definition">¶</a></dt>
-<dd><p>Captures given exception in sentry server
-:param exc: str or Exception, Exception to capture</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="artellapipe.utils.exceptions.capture_sentry_message">
-<code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">capture_sentry_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.capture_sentry_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Captures given exception in sentry server
-:param msg: str</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="artellapipe.utils.exceptions.sentry_exception">
-<code class="sig-prename descclassname">artellapipe.utils.exceptions.</code><code class="sig-name descname">sentry_exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.utils.exceptions.sentry_exception" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorators that sends exception to sentry server</p>
-</dd></dl>
-
+  <div class="section" id="artellapipe-utils-exceptions-module">
+<h1>artellapipe.utils.exceptions module<a class="headerlink" href="#artellapipe-utils-exceptions-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
