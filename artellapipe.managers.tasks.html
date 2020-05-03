@@ -184,11 +184,27 @@
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tasks.</code><code class="sig-name descname">ArtellaTasksManager</code><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
+<dt id="artellapipe.managers.tasks.ArtellaTasksManager.get_all_task_statuses">
+<code class="sig-name descname">get_all_task_statuses</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager.get_all_task_statuses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all task statuses for current project
+:return: list(str)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="artellapipe.managers.tasks.ArtellaTasksManager.get_task_names_for_shot">
 <code class="sig-name descname">get_task_names_for_shot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shot_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager.get_task_names_for_shot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all names of the tasks attached to the given shot
 :param shot_name: str
 :return: list(str)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.tasks.ArtellaTasksManager.get_task_status_for_shot">
+<code class="sig-name descname">get_task_status_for_shot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shot_name</span></em>, <em class="sig-param"><span class="n">task_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tasks.ArtellaTasksManager.get_task_status_for_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the status of the given task in the given shot
+:param shot_name: str, name of the shot
+:param task_name: str, name of the task
+:return: str, status name</p>
 </dd></dl>
 
 <dl class="py method">
