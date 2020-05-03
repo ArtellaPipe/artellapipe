@@ -60,6 +60,34 @@ class ArtellaTasksManager(object):
 
         return [task.name for task in tasks_for_shot]
 
+    def get_all_task_statuses(self):
+        """
+        Returns all task statuses for current project
+        :return: list(str)
+        """
+
+        return artellapipe.Tracker().all_task_statuses()
+
+    def get_task_status_for_shot(self, shot_name, task_name):
+        """
+        Returns the status of the given task in the given shot
+        :param shot_name: str, name of the shot
+        :param task_name: str, name of the task
+        :return: str, status name
+        """
+
+        tasks_for_shot = self.get_tasks_for_shot(shot_name)
+        if not tasks_for_shot:
+            return
+
+        task_found = None
+        for task in tasks_for_shot:
+            if task.name == task_name:
+                task_found = task
+                break
+
+        return artellapipe.Tracker().get_task_status(task_found.id)
+
 
 @decorators.Singleton
 class ArtellaTasksManagerSingleton(ArtellaTasksManager, object):
