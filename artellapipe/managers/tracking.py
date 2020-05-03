@@ -210,6 +210,15 @@ class TrackingManager(QObject, object):
         raise NotImplementedError(
             'all_assets_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
 
+    def get_task_by_id(self, task_id):
+        """
+        Returns task with the given ID
+        :param task_id: str
+        :return:
+        """
+
+        raise NotImplementedError('get_task_by_id function for {} is not implemented!'.format(self.__class__.__name__))
+
     def get_tasks_in_shot(self, shot_id):
         """
         Returns all tasks in given shot
@@ -220,6 +229,19 @@ class TrackingManager(QObject, object):
         raise NotImplementedError(
             'get_tasks_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
 
+    def upload_shot_task_preview(self, task_id, preview_file_path, comment='', status=None):
+        """
+        Uploads task preview file to the tracker server
+        :param task_id: str, ID of task to submit preview file into
+        :param preview_file_path: str, file path of the preview file to upload
+        :param comment: str, comment to link to the task with given preview
+        :param status: str, new status for the task
+        :return: bool
+        """
+
+        raise NotImplementedError(
+            'upload_shot_task_preview function for {} is not implemented!'.format(self.__class__.__name__))
+
     def all_task_types(self):
         """
         Returns all task types
@@ -228,6 +250,15 @@ class TrackingManager(QObject, object):
 
         raise NotImplementedError(
             'all_assets_in_shot function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def all_task_statuses(self):
+        """
+        Returns all task statuses for current project
+        :return:
+        """
+
+        raise NotImplementedError(
+            'all_task_statuses function for {} is not implemented!'.format(self.__class__.__name__))
 
     def all_task_types_for_assets(self):
         """
@@ -246,6 +277,16 @@ class TrackingManager(QObject, object):
 
         raise NotImplementedError(
             'all_task_types_for_shots function for {} is not implemented!'.format(self.__class__.__name__))
+
+    def get_task_status(self, task_id):
+        """
+        Returns the status of the given task name
+        :param task_id: str
+        :return:
+        """
+
+        raise NotImplementedError(
+            'get_task_status function for {} is not implemented!'.format(self.__class__.__name__))
 
 
 @decorators.Singleton
