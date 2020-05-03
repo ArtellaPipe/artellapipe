@@ -150,7 +150,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
                 child_widget.deleteLater()
 
         bug_tracker_action = QAction(parent_menu_bar)
-        bug_tracker_action.setIcon(tpDcc.ResourcesMgr().icon('bug'))
+        bug_tracker_action.setIcon(tpDcc.ResourcesMgr().icon('bug', theme='color'))
         parent_menu_bar.addAction(bug_tracker_action)
         bug_tracker_action.setObjectName(bug_object_action_name)
         bug_tracker_action.triggered.connect(partial(self._launch_tool_by_id, 'artellapipe-tools-bugtracker'))
