@@ -39,6 +39,12 @@ if tp.is_maya():
     import tpDcc.dccs.maya as maya
 
 
+# TODO: Move this into a project specific configuration file
+EXCEPTIONS_TO_SKIP = [
+    'was not found in MAYA_PLUG_IN_PATH'
+]
+
+
 def capture_exception(exc):
     """
     Captures given exception
@@ -138,7 +144,6 @@ def sentry_exception(function):
 
 
 def show_exception_box(exc_text, exc_trace):
-
     if QApplication.instance() is not None:
         error_box = ArtellaExceptionDialog(exc_text, exc_trace)
         error_box.exec_()
@@ -266,7 +271,26 @@ class ArtellaExceptionHook(QObject):
                     capture_sentry_exception(Exception(log_msg))
 
             # trigger message box show
-            self._exception_caught.emit(exc_value, log_msg)
+            skip_exception_box = self._should_skip_exception_box(exc_value, log_msg)
+            if not skip_exception_box:
+                self._exception_caught.emit(exc_value, log_msg)
 
             if tp.is_maya():
                 return maya.utils._formatGuiException(exc_type, exc_value, exc_traceback, detail)
+
+    def _should_skip_exception_box(self, exc_value, log_msg):
+        """
+        Internal function that returns whether or not exception message box should be show or not
+        :param exc_value: str
+        :param log_msg: str
+        :return: bool
+        """
+
+        exc_value = str(exc_value) or ''
+        log_msg = str(exc_value) or ''
+
+        for skip_exc_msg in EXCEPTIONS_TO_SKIP:
+            if skip_exc_msg in exc_value or skip_exc_msg in log_msg:
+                return True
+
+        return False
