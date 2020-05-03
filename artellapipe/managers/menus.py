@@ -190,7 +190,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
             if item_lbl == 'separator':
                 tray_menu.addSeparator()
             else:
-                item_icon = tpDcc.ResourcesMgr().icon(item_icon_name)
+                item_icon = tpDcc.ResourcesMgr().icon(item_icon_name, theme='color')
                 if item_icon and not item_icon.isNull():
                     new_item = QAction(item_icon, item_lbl, tray_menu)
                 else:
