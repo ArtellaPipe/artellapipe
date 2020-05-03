@@ -201,7 +201,9 @@ class ArtellaProject(object):
         """
 
         self.update_paths()
-        self.set_environment_variables()
+        valid_setup = self.set_environment_variables()
+        if not valid_setup:
+            LOGGER.warning('Impossible to setup Artella project. Make sure that Artella App is working!')
         self.create_shelf()
         self._tray = self.create_tray()
         self.create_names_manager()
@@ -221,6 +223,8 @@ class ArtellaProject(object):
         self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
+
+        return True
 
     def get_environment(self):
         """
@@ -464,7 +468,9 @@ class ArtellaProject(object):
                 mtime = time.time()
                 date_value = datetime.datetime.fromtimestamp(mtime)
                 artellalib.get_spigot_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
-            artellalib.update_local_artella_root()
+            valid_metadata = artellalib.update_local_artella_root()
+            if not valid_metadata:
+                return False
             root_prefix = artella_lib.config.get('app', 'root_prefix')
             production_folder = self.get_production_folder()
             artella_var = os.environ.get(root_prefix, None)
@@ -523,6 +529,8 @@ class ArtellaProject(object):
         LOGGER.debug('*' * 100)
         LOGGER.debug('-' * 100)
         LOGGER.debug('\n')
+
+        return True
 
     def create_shelf(self):
         """
