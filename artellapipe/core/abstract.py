@@ -13,7 +13,6 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-import logging
 import webbrowser
 
 from Qt.QtWidgets import *
@@ -23,10 +22,7 @@ from tpDcc.libs.qt.core import qtutils
 
 import artellapipe
 from artellapipe.core import defines
-from artellapipe.libs import artella
 from artellapipe.libs.artella.core import artellalib
-
-LOGGER = logging.getLogger()
 
 
 class AbstractFile(object):
@@ -145,7 +141,7 @@ class AbstractFile(object):
 
         asset_path = self.get_path()
         if not os.path.isdir(asset_path):
-            LOGGER.warning(
+            artellapipe.logger.warning(
                 'Impossible to open asset path locally because path for Asset "{}" : "{}" does not exists!'.format(
                     self.get_name(), asset_path
                 ))
@@ -219,18 +215,18 @@ class AbstractFile(object):
 
         if check_file_type:
             if file_type not in available_files_types:
-                LOGGER.warning(
+                artellapipe.logger.warning(
                     'File Type "{}" is not valid! Supported File Types: {}'.format(
                         file_type, available_files_types.keys()))
                 return None
         if not defines.ArtellaFileStatus.is_valid(status):
-            LOGGER.warning('Given File Artella Sync Status: {} is not valid! Supported Statuses: {}'.format(
+            artellapipe.logger.warning('Given File Artella Sync Status: {} is not valid! Supported Statuses: {}'.format(
                 status, defines.ArtellaFileStatus.supported_statuses()))
             return None
 
         file_type_inst = self.get_file_type(file_type)
         if not file_type_inst:
-            LOGGER.warning('File Type "{}" is not valid'.format(file_type,))
+            artellapipe.logger.warning('File Type "{}" is not valid'.format(file_type,))
             return None
         file_type_dict = file_type_inst.get_template_dict() or dict()
         if file_type_dict:
@@ -239,16 +235,16 @@ class AbstractFile(object):
                     extra_dict[k] = v
                 else:
                     if v and v != extra_dict[k]:
-                        LOGGER.info('Updating Template Dict from file type specific value: {} | {} >>> {}'.format(
-                            k, extra_dict[k], file_type_dict[k]
-                        ))
+                        artellapipe.logger.info(
+                            'Updating Template Dict from file type specific value: {} | {} >>> {}'.format(
+                                k, extra_dict[k], file_type_dict[k]))
                         extra_dict[k] = v
 
         if not template:
             file_template_name = available_files_types[file_type].get('template', file_type.lower())
             template = artellapipe.FilesMgr().get_template(file_template_name)
             if not template:
-                LOGGER.warning(
+                artellapipe.logger.warning(
                     'Impossible to retrieve file path because template "{}" is not in configuration file'.format(
                         file_template_name))
                 return None
@@ -272,7 +268,7 @@ class AbstractFile(object):
                         template_dict['version_folder'] = version
                     else:
                         if only_local:
-                            LOGGER.warning('No local version "{}" found for File Type: "{}"'.format(version, file_type))
+                            artellapipe.logger.warning('No local version "{}" found for File Type: "{}"'.format(version, file_type))
                             return None
                         else:
                             template_dict['version_folder'] = version
@@ -282,7 +278,7 @@ class AbstractFile(object):
             else:
                 if not version:
                     if must_exist:
-                        LOGGER.warning('No local versions found for File Type: "{}"'.format(file_type))
+                        artellapipe.logger.warning('No local versions found for File Type: "{}"'.format(file_type))
                         return None
                     else:
                         template_dict['version_folder'] = '__{}__v001'.format(file_type)
@@ -317,7 +313,7 @@ class AbstractFile(object):
         if file_type_to_open:
             return file_type_to_open.open_file(status=status, fix_path=fix_path)
         else:
-            LOGGER.warning('Impossible to open file of type "{}"'.format(file_type))
+            artellapipe.logger.warning('Impossible to open file of type "{}"'.format(file_type))
             return False
 
     def import_file(self, status=None, extension=None, file_type=None, sync=False, reference=False):
@@ -344,20 +340,20 @@ class AbstractFile(object):
                     extension = file_type_extensions[0]
 
         if extension not in available_extensions:
-            LOGGER.warning('Impossible to reference file with extension "{}". Supported extensions: {}'.format(
-                extension, available_extensions
-            ))
+            artellapipe.logger.warning(
+                'Impossible to reference file with extension "{}". Supported extensions: {}'.format(
+                    extension, available_extensions))
             return False
 
         file_types = artellapipe.FilesMgr().get_file_types_by_extension(extension)
         if not file_types:
-            LOGGER.warning(
+            artellapipe.logger.warning(
                 'Impossible to reference file by its extension ({}) because no file types are registered!'.format(
                     extension))
             return False
 
         if len(file_types) > 1 and not file_type:
-            LOGGER.warning(
+            artellapipe.logger.warning(
                 'Multiple file types found with extension: {}. Do not know which file should imported!'.format(
                     extension))
             return False
@@ -372,9 +368,9 @@ class AbstractFile(object):
                 if ft.FILE_TYPE != file_type:
                     continue
                 if reference:
-                    return ft(self).import_file(sync=sync, reference=True)
+                    return ft(self).import_file(status=status, sync=sync, reference=True)
                 else:
-                    return ft(self).import_file(sync=sync, reference=False)
+                    return ft(self).import_file(status=status, sync=sync, reference=False)
 
     def supports_file_type(self, file_type, status=defines.ArtellaFileStatus.ALL):
         """
@@ -386,12 +382,12 @@ class AbstractFile(object):
 
         if status != defines.ArtellaFileStatus.ALL:
             if status not in self.FILES:
-                LOGGER.warning(
+                artellapipe.logger.warning(
                     'Impossible to sync "{}" because current Asset {} does not support it!'.format(
                         file_type, self.__class__.__name__))
                 return False
             if status not in self.project:
-                LOGGER.warning(
+                artellapipe.logger.warning(
                     'Impossible to sync "{}" because project "{}" does not support it!'.format(
                         file_type, self.project.name.title()))
                 return False
@@ -435,7 +431,8 @@ class AbstractFile(object):
 
         artella_url = self.get_artella_url()
         if not artella_url:
-            LOGGER.warning('Impossible to open Artella URL for asset "{}" : "{}"'.format(self.get_name(), artella_url))
+            artellapipe.logger.warning(
+                'Impossible to open Artella URL for asset "{}" : "{}"'.format(self.get_name(), artella_url))
             return None
 
         webbrowser.open(artella_url)
@@ -546,7 +543,7 @@ class AbstractFile(object):
 
         paths_to_sync = self._get_paths_to_sync(file_type, sync_type)
         if not paths_to_sync:
-            LOGGER.warning('No Paths to sync for "{}"'.format(self.get_name()))
+            artellapipe.logger.warning('No Paths to sync for "{}"'.format(self.get_name()))
             return
 
         artellapipe.FilesMgr().sync_paths(paths_to_sync, recursive=True)
@@ -735,7 +732,8 @@ class AbstractAsset(AbstractFile, object):
 
         asset_file_class = artellapipe.AssetsMgr().get_asset_file(file_type=file_type, extension=extension)
         if not asset_file_class:
-            LOGGER.warning('File Type: {} | {} not registered in current project!'.format(file_type, extension))
+            artellapipe.logger.warning(
+                'File Type: {} | {} not registered in current project!'.format(file_type, extension))
             return
 
         return asset_file_class(asset=self, **kwargs)
@@ -792,7 +790,8 @@ class AbstractSequence(AbstractFile, object):
 
         sequence_file_class = artellapipe.SequencesMgr().get_sequence_file(file_type=file_type, extension=extension)
         if not sequence_file_class:
-            LOGGER.warning('File Type: {} | {} not registered in current project!'.format(file_type, extension))
+            artellapipe.logger.warning(
+                'File Type: {} | {} not registered in current project!'.format(file_type, extension))
             return
 
         return sequence_file_class(sequence=self)
@@ -867,7 +866,8 @@ class AbstractShot(AbstractFile, object):
 
         sequence_file_class = artellapipe.ShotsMgr().get_shot_file(file_type=file_type, extension=extension)
         if not sequence_file_class:
-            LOGGER.warning('File Type: {} | {} not registered in current project!'.format(file_type, extension))
+            artellapipe.logger.warning(
+                'File Type: {} | {} not registered in current project!'.format(file_type, extension))
             return
 
         return sequence_file_class(shot=self)

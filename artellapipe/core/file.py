@@ -20,7 +20,6 @@ from tpDcc.libs.python import decorators, python, path as path_utils
 
 import artellapipe
 from artellapipe.core import defines
-from artellapipe.libs import artella
 from artellapipe.libs.artella.core import artellalib
 
 LOGGER = logging.getLogger()
