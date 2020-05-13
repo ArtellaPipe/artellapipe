@@ -268,7 +268,8 @@ class AbstractFile(object):
                         template_dict['version_folder'] = version
                     else:
                         if only_local:
-                            artellapipe.logger.warning('No local version "{}" found for File Type: "{}"'.format(version, file_type))
+                            artellapipe.logger.warning(
+                                'No local version "{}" found for File Type: "{}"'.format(version, file_type))
                             return None
                         else:
                             template_dict['version_folder'] = version
