@@ -86,6 +86,9 @@ class ArtellaTasksManager(object):
                 task_found = task
                 break
 
+        if not task_found:
+            return
+
         return artellapipe.Tracker().get_task_status(task_found.id)
 
 

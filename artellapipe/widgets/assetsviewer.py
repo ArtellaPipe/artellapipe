@@ -89,7 +89,9 @@ class AssetsViewer(grid.GridWidget, object):
             return self._cache
 
         python.clear_list(self._cache)
-        return artellapipe.AssetsMgr().find_all_assets()
+        self._cache = artellapipe.AssetsMgr().find_all_assets()
+
+        return self._cache
 
     def update_assets(self, force=False):
         """
