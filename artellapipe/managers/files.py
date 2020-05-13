@@ -192,10 +192,11 @@ class ArtellaFilesManager(object):
                 continue
             return path_dict
 
-    def fix_path(self, path_to_fix):
+    def fix_path(self, path_to_fix, clean_path=True):
         """
         Converts path to a path relative to project environment variable
         :param path_to_fix: str
+        :param clean_path: bool
         :return: str
         """
 
@@ -203,7 +204,9 @@ class ArtellaFilesManager(object):
 
         project_env_var = self._project.env_var
 
-        path_to_fix = path_utils.clean_path(path_to_fix)
+        if clean_path:
+            path_to_fix = path_utils.clean_path(path_to_fix)
+
         project_var = os.environ.get(project_env_var)
         if not project_var:
             return path_to_fix
@@ -274,6 +277,10 @@ class ArtellaFilesManager(object):
 
         path_to_prefix = path_utils.clean_path(path_to_prefix)
 
+        production_folder = self._project.get_production_folder()
+        if path_to_prefix.startswith((production_folder, os.sep + production_folder, '/' + production_folder)):
+            return self.prefix_path_with_artella_env_path(path_to_prefix)
+
         if env_var:
             project_env_var = self._project.env_var
             project_var = path_utils.clean_path(os.environ.get(project_env_var))
@@ -284,6 +291,7 @@ class ArtellaFilesManager(object):
             project_path = path_utils.clean_path(self._project.get_path())
             if path_to_prefix.startswith(project_path):
                 return path_to_prefix
+
             return path_utils.clean_path(os.path.join(project_path, path_to_prefix))
 
     def prefix_path_with_artella_env_path(self, path_to_prefix):
@@ -298,7 +306,7 @@ class ArtellaFilesManager(object):
         if not artella_var:
             return path_to_prefix
 
-        return path_utils.clean_path(os.path.join(artella_var, path_to_prefix))
+        return path_utils.join_path(artella_var, path_to_prefix)
 
     def sync_files(self, files):
         """
