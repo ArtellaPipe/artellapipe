@@ -274,7 +274,7 @@ class ArtellaShotsManager(object):
 
         status_data = status.get('data')
         if not status_data:
-            LOGGER.error('Impossible to retrieve data from Artella in file: "{}"'.format(shot_path))
+            LOGGER.info('Impossible to retrieve data from Artella in file: "{}"'.format(shot_path))
             return
 
         for name, data in status_data.items():

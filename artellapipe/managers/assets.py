@@ -421,7 +421,7 @@ class ArtellaAssetsManager(object):
 
         status_data = status.get('data')
         if not status_data:
-            LOGGER.error('Impossible to retrieve data from Artella in file: "{}"'.format(asset_path))
+            LOGGER.info('Impossible to retrieve data from Artella in file: "{}"'.format(asset_path))
             return
 
         for name, data in status_data.items():
@@ -470,7 +470,7 @@ class ArtellaAssetsManager(object):
 
         scene_assets = list()
 
-        all_assets = self.find_all_assets()
+        all_assets = self.find_all_assets() or list()
         all_ids = dict()
         for asset in all_assets:
             all_ids[asset.get_id()] = asset

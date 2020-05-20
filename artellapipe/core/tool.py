@@ -156,6 +156,15 @@ class ArtellaToolWidget(base.BaseWidget, object):
             except Exception:
                 self.toolset.attacher.close()
 
+    def show_ok_message(self, msg, msecs=3):
+        """
+        Set a success message to be displayed in the status widget
+        :param msg: str
+        :param msecs: float
+        """
+
+        message.PopupMessage.success(msg, parent=self, duration=msecs, closable=True)
+
     def show_info_message(self, msg, msecs=3):
         """
         Set an info message to be displayed in the status widget
