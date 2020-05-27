@@ -171,12 +171,21 @@
 <span id="artellapipe-register-module"></span><h1>artellapipe.register module<a class="headerlink" href="#module-artellapipe.register" title="Permalink to this headline">¶</a></h1>
 <p>Register module for artellapipe</p>
 <dl class="py function">
+<dt id="artellapipe.register.cleanup">
+<code class="sig-prename descclassname">artellapipe.register.</code><code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.register.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="artellapipe.register.register_class">
-<code class="sig-prename descclassname">artellapipe.register.</code><code class="sig-name descname">register_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls_name</span></em>, <em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">is_unique</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.register.register_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function registers given class
+<code class="sig-prename descclassname">artellapipe.register.</code><code class="sig-name descname">register_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls_name</span></em>, <em class="sig-param"><span class="n">cls</span></em>, <em class="sig-param"><span class="n">is_unique</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">skip_store</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.register.register_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function registers given class into artellapipe module
 :param cls_name: str, name of the class we want to register
 :param cls: class, class we want to register
-:param is_unique: bool, Whether if the class should be updated if new class is registered with the same name</p>
+:param is_unique: bool, Whether if the class should be updated if new class is registered with the same name
+:param skip_store: bool, Whether the registered class should be removed during cleanup operation</p>
+<blockquote>
+<div><p>Useful in scenarios where we want to cleanup registered class manually.</p>
+</div></blockquote>
 </dd></dl>
 
 </div>
