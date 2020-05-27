@@ -29,22 +29,6 @@ else:
     import importlib as loader
 
 
-class LibImporter(importer.Importer, object):
-    def __init__(self, tool_pkg, debug=False):
-
-        self.lib_path = tool_pkg.filename
-
-        super(LibImporter, self).__init__(module_name=tool_pkg.fullname, debug=debug)
-
-    def get_module_path(self):
-        """
-        Returns path where module is located
-        :return: str
-        """
-
-        return self.lib_path
-
-
 class LibsManager(object):
     """
     Class that handles all libs
@@ -150,11 +134,11 @@ class LibsManager(object):
 
         artellapipe.logger.info('Library "{}" registered successfully!'.format(lib_path))
 
-        self.load_library(lib_path=lib_id, do_reload=do_reload)
+        self.load_library(lib_path=lib_id)
 
         return True
 
-    def load_library(self, lib_path, do_reload=False, debug=False):
+    def load_library(self, lib_path):
 
         lib_to_load = None
 
@@ -195,20 +179,11 @@ class LibsManager(object):
             os.makedirs(logger_dir)
         logging.config.fileConfig(
             lib_config.data.get('logging_file', default_logging_config), disable_existing_loggers=False)
-        lib_logger_level = '{}_LOG_LEVEL'.format(pkg_loader.fullname.replace('.', '_').upper())
-        # LOGGER.setLevel(os.environ.get(lib_logger_level, lib_config.data.get('logger_level', 'WARNING')))
 
         # Import library modules
         mod = importlib.import_module(pkg_loader.fullname)
-        lib_importer = LibImporter(pkg_loader, debug=debug)
-        import_order = list()
-        if hasattr(mod, 'import_order'):
-            import_order = mod.import_order
-        skip_modules = ['{}.{}'.format(pkg_loader.fullname, m) for m in
-                        lib_config.data.get('skip_modules', list())]
-        lib_importer.import_packages(order=import_order, only_packages=False, skip_modules=skip_modules)
-        if do_reload:
-            lib_importer.reload_all()
+        skip_modules = ['{}.{}'.format(pkg_loader.fullname, m) for m in lib_config.data.get('skip_modules', list())]
+        importer.init_importer(package=pkg_loader.fullname, skip_modules=skip_modules)
 
         mod.__dict__['config'] = lib_config
 

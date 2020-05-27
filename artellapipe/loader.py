@@ -13,22 +13,29 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
-import inspect
 import logging.config
 
-import tpDcc as tp
-from tpDcc.libs.python import python
+# =================================================================================
+
+PACKAGE = 'artellapipe'
+
+# =================================================================================
 
 
-def init(do_reload=False, import_libs=True, dev=False):
+def init(import_libs=True, dev=False):
     """
     Initializes module
-    :param do_reload: bool, Whether to reload modules or not
+    :param import_libs: bool, Whether to import deps libraries by default or not
     :param dev: bool, Whether artellapipe is initialized in dev mode or not
     """
 
+    import tpDcc
+    import tpDcc.loader as dcc_loader
     from tpDcc.libs.python import importer
     from artellapipe import register
+
+    if dev:
+        register.cleanup()
 
     logger = create_logger()
     register.register_class('logger', logger)
@@ -40,70 +47,23 @@ def init(do_reload=False, import_libs=True, dev=False):
         except (RuntimeError, ImportError):
             sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
 
-    class ArtellaPipe(importer.Importer, object):
-        def __init__(self, debug=False):
-            super(ArtellaPipe, self).__init__(module_name='artellapipe', debug=debug)
-
-        def get_module_path(self):
-            """
-            Returns path where tpNameIt module is stored
-            :return: str
-            """
-
-            try:
-                mod_dir = os.path.dirname(
-                    inspect.getframeinfo(inspect.currentframe()).filename)
-            except Exception:
-                try:
-                    mod_dir = os.path.dirname(__file__)
-                except Exception:
-                    try:
-                        import artellapipe
-                        mod_dir = artellapipe.__path__[0]
-                    except Exception:
-                        return None
-
-            return mod_dir
-
-    packages_order = [
-        'artellapipe.utils',
-        'artellapipe.core',
-        'artellapipe.widgets'
-    ]
-
     if import_libs:
-        import tpDcc.loader
-        tpDcc.loader.init(do_reload=do_reload, dev=dev)
+        dcc_loader.init(dev=dev)
         # import tpNameIt
         # tpNameIt.init(do_reload=do_reload)
 
-    artella_importer = importer.init_importer(importer_class=ArtellaPipe, do_reload=False, debug=dev)
-    artella_importer.import_packages(
-        order=packages_order,
-        only_packages=False)
-    if do_reload:
-        artella_importer.reload_all()
+    skip_modules = ['{}.{}'.format(PACKAGE, name) for name in ['loader', 'dccs', 'libs', 'tools']]
+    importer.init_importer(package=PACKAGE, skip_modules=skip_modules)
 
-    init_dcc(do_reload=do_reload)
+    # Get DCC
+    dcc_mod = tpDcc.loader.get_dcc_loader_module(package='artellapipe.dccs')
+    if dcc_mod:
+        dcc_mod.init(dev=dev)
 
     # When working in production, we use custom exception hook to show message box to user
     if not dev:
         from artellapipe.utils import exceptions
         exceptions.ArtellaExceptionHook()
-
-
-def init_dcc(do_reload=False):
-    """
-    Checks DCC we are working on an initializes proper variables
-    :param do_reload: bool
-    """
-
-    if tp.is_maya():
-        from artellapipe.dccs import maya as maya_dcc
-        maya_dcc.init(do_reload=do_reload)
-    elif tp.is_houdini():
-        from artellapipe.dccs import houdini as houdini_dcc
-        houdini_dcc.init(do_reload=do_reload)
 
 
 def create_logger():
@@ -138,17 +98,6 @@ def get_logging_config():
     return os.path.normpath(os.path.join(os.path.dirname(__file__), '__logging__.ini'))
 
 
-def get_logging_level():
-    """
-    Returns logging level to use
-    :return: str
-    """
-
-    if os.environ.get('ARTELLAPIPE_LOG_LEVEL', None):
-        return os.environ.get('ARTELLAPIPE_LOG_LEVEL')
-
-    return os.environ.get('ARTELLAPIPE_LOG_LEVEL', 'WARNING')
-
 
 def set_project(project_class, do_reload=False):
     """
@@ -178,6 +127,7 @@ def register_configs():
     Registers aretellapipe configuration files
     """
 
+    import tpDcc as tp
     from artellapipe import config
 
     artella_configs_path = os.environ.get('ARTELLA_CONFIGS_PATH', None)
@@ -191,6 +141,8 @@ def register_resources(project):
     """
     Registers artellapipe and project resources
     """
+
+    import tpDcc as tp
 
     project_resources_paths = project.get_resources_paths()
     for resources_key, resources_path in project_resources_paths.items():
@@ -213,6 +165,7 @@ def register_libs(project_inst, do_reload=False):
     """
 
     import artellapipe
+    from tpDcc.libs.python import python
 
     if python.is_python2():
         import pkgutil as loader
@@ -245,19 +198,23 @@ def register_tools(project_inst, dev=False, do_reload=False):
     :param project_inst: ArtellaProject
     """
 
+    import tpDcc as tp
     import artellapipe.toolsets
 
     package_names = ['artellapipe', project_inst.get_clean_name()]
 
     # Tools
     project_name = project_inst.get_clean_name()
-    tools_to_load = project_inst.config_data.get('tools', list())
+    tools_to_register = project_inst.config_data.get('tools', list())
     config_dict = {'project': project_name}
-    tp.ToolsMgr().load_package_tools(
-        package_name='artellapipe', root_package_name=project_name, tools_to_load=tools_to_load,
+    tp.ToolsMgr().register_package_tools(
+        pkg_name=PACKAGE, root_pkg_name=project_name, tools_to_register=tools_to_register,
         config_dict=config_dict, dev=dev)
-    tp.ToolsMgr().load_package_tools(
-        package_name=project_name, tools_to_load=tools_to_load, config_dict=config_dict, dev=dev)
+    tp.ToolsMgr().register_package_tools(
+        pkg_name=project_name, tools_to_register=tools_to_register, config_dict=config_dict, dev=dev)
+
+    tp.ToolsMgr().load_registered_tools(project_name)
+    tp.ToolsMgr().load_registered_tools(PACKAGE)
 
     artellapipe.MenusMgr().create_menus(project_inst.get_clean_name(), project=project_inst)
 
@@ -269,5 +226,4 @@ def register_tools(project_inst, dev=False, do_reload=False):
     for project_toolset_path in project_inst.get_toolsets_paths():
         tp.ToolsetsMgr().register_path(project_inst.get_clean_name(), project_toolset_path)
     for package_name in package_names:
-        tp.ToolsetsMgr().load_registered_toolsets(
-            package_name, tools_to_load=tools_to_load, dev=dev, do_reload=do_reload)
+        tp.ToolsetsMgr().load_registered_toolsets(package_name, tools_to_load=tools_to_register)
