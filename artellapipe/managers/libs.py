@@ -42,7 +42,7 @@ class LibsManager(object):
     def libs(self):
         return self._libs
 
-    def register_lib(self, project, pkg_loader, do_reload=False):
+    def register_lib(self, project, pkg_loader):
         project_name = project.get_clean_name()
         lib_path = pkg_loader.fullname
         if pkg_loader in self._libs:

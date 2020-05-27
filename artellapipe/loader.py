@@ -98,8 +98,7 @@ def get_logging_config():
     return os.path.normpath(os.path.join(os.path.dirname(__file__), '__logging__.ini'))
 
 
-
-def set_project(project_class, do_reload=False):
+def set_project(project_class):
     """
     This functions sets the given class instance as the current Artella project used
     :param project_class: ArtellaProject
@@ -117,8 +116,8 @@ def set_project(project_class, do_reload=False):
     artellapipe.__dict__[project_class.__name__.lower()] = project_inst
 
     register_resources(project_inst)
-    register_libs(project_inst, do_reload=do_reload)
-    register_tools(project_inst, dev=project_inst.get_environment().lower() == 'development', do_reload=do_reload)
+    register_libs(project_inst)
+    register_tools(project_inst, dev=project_inst.get_environment().lower() == 'development')
     project_inst.init()
 
 
@@ -157,11 +156,10 @@ def register_resources(project):
     tp.ResourcesMgr().register_resource(resources_path)
 
 
-def register_libs(project_inst, do_reload=False):
+def register_libs(project_inst):
     """
     Function that registera all available libs for given project
     :param project_inst: ArtellaProject
-    :param do_reload: bool
     """
 
     import artellapipe
@@ -189,13 +187,14 @@ def register_libs(project_inst, do_reload=False):
 
     for pkg_loaders in libs_to_register.values():
         for pkg_loader in pkg_loaders:
-            artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader, do_reload=do_reload)
+            artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader)
 
 
-def register_tools(project_inst, dev=False, do_reload=False):
+def register_tools(project_inst, dev=False):
     """
     Function that register all available tools for given project
     :param project_inst: ArtellaProject
+    :param dev: bool
     """
 
     import tpDcc as tp
