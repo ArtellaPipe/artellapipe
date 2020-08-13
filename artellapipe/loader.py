@@ -15,6 +15,14 @@ __email__ = "tpovedatd@gmail.com"
 import os
 import logging.config
 
+import tpDcc.loader
+
+import artellapipe.register
+from artellapipe.core import asset, node, shot
+from artellapipe.managers import assets, files, names, shaders, shots, sequences, menus, shelf, tools, libs, tracking
+from artellapipe.managers import dependencies, playblasts, ocio
+from artellapipe.widgets import dialog, window, syncdialog
+
 # =================================================================================
 
 PACKAGE = 'artellapipe'
@@ -22,23 +30,19 @@ PACKAGE = 'artellapipe'
 # =================================================================================
 
 
-def init(import_libs=True, dev=False):
+def init(dev=False):
     """
     Initializes module
     :param import_libs: bool, Whether to import deps libraries by default or not
     :param dev: bool, Whether artellapipe is initialized in dev mode or not
     """
 
-    import tpDcc
-    import tpDcc.loader as dcc_loader
-    from tpDcc.libs.python import importer
-    from artellapipe import register
-
     if dev:
-        register.cleanup()
+        artellapipe.register.cleanup()
+        register_classes()
 
     logger = create_logger()
-    register.register_class('logger', logger)
+    artellapipe.register.register_class('logger', logger)
 
     if not dev:
         import sentry_sdk
@@ -46,14 +50,6 @@ def init(import_libs=True, dev=False):
             sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171")
         except (RuntimeError, ImportError):
             sentry_sdk.init("https://eb70c73942e049e4a08f5a01ba788c4b@sentry.io/1771171", default_integrations=False)
-
-    if import_libs:
-        dcc_loader.init(dev=dev)
-        # import tpNameIt
-        # tpNameIt.init(do_reload=do_reload)
-
-    skip_modules = ['{}.{}'.format(PACKAGE, name) for name in ['loader', 'dccs', 'libs', 'tools']]
-    importer.init_importer(package=PACKAGE, skip_modules=skip_modules)
 
     # Get DCC
     dcc_mod = tpDcc.loader.get_dcc_loader_module(package='artellapipe.dccs')
@@ -162,7 +158,6 @@ def register_libs(project_inst):
     :param project_inst: ArtellaProject
     """
 
-    import artellapipe
     from tpDcc.libs.python import python
 
     if python.is_python2():
@@ -170,10 +165,10 @@ def register_libs(project_inst):
     else:
         import importlib as loader
 
-    libs = project_inst.config_data.get('libs', list())
+    libs_found = project_inst.config_data.get('libs', list())
     libs_to_register = dict()
     libs_path = '{}.libs.{}'
-    for lib_name in libs:
+    for lib_name in libs_found:
         for pkg in ['artellapipe', project_inst.get_clean_name()]:
             pkg_path = libs_path.format(pkg, lib_name)
             try:
@@ -187,7 +182,7 @@ def register_libs(project_inst):
 
     for pkg_loaders in libs_to_register.values():
         for pkg_loader in pkg_loaders:
-            artellapipe.LibsMgr().register_lib(project=project_inst, pkg_loader=pkg_loader)
+            libs.LibsManager().register_lib(project=project_inst, pkg_loader=pkg_loader)
 
 
 def register_tools(project_inst, dev=False):
@@ -216,6 +211,7 @@ def register_tools(project_inst, dev=False):
     tp.ToolsMgr().load_registered_tools(PACKAGE)
 
     artellapipe.MenusMgr().create_menus(project_inst.get_clean_name(), project=project_inst)
+    shelf.ArtellaShelfManager().create_shelf(project=project_inst)
 
     # Toolsets
     # NOTE: Project specific toolsets paths MUST be registered in project specific loader
@@ -226,3 +222,29 @@ def register_tools(project_inst, dev=False):
         tp.ToolsetsMgr().register_path(project_inst.get_clean_name(), project_toolset_path)
     for package_name in package_names:
         tp.ToolsetsMgr().load_registered_toolsets(package_name, tools_to_load=tools_to_register)
+
+
+def register_classes():
+    artellapipe.register.register_class('Asset', asset.ArtellaAsset)
+    artellapipe.register.register_class('AssetNode', node.ArtellaAssetNode)
+    artellapipe.register.register_class('Shot', shot.ArtellaShot)
+    artellapipe.register.register_class('Window', window.ArtellaWindow)
+    artellapipe.register.register_class('Dialog', dialog.ArtellaDialog)
+    artellapipe.register.register_class('SyncFileDialog', syncdialog.ArtellaSyncFileDialog)
+    artellapipe.register.register_class('SyncPathDialog', syncdialog.ArtellaSyncPathDialog)
+    artellapipe.register.register_class('AssetsMgr', assets.AssetsManager)
+    artellapipe.register.register_class('FilesMgr', files.FilesManager)
+    artellapipe.register.register_class('NamesMgr', names.NamesManager)
+    artellapipe.register.register_class('ShadersMgr', shaders.ShadersManager)
+    artellapipe.register.register_class('ShotsMgr', shots.ShotsManager)
+    artellapipe.register.register_class('SequencesMgr', sequences.SequencesManager)
+    artellapipe.register.register_class('MenusMgr', menus.MenusManager)
+    artellapipe.register.register_class('LibsMgr', libs.LibsManager)
+    artellapipe.register.register_class('ToolsMgr', tools.ToolsManager)
+    artellapipe.register.register_class('DepsMgr', dependencies.DependenciesManager)
+    artellapipe.register.register_class('Tracker', tracking.TrackingManager)
+    artellapipe.register.register_class('OCIOMgr', ocio.OCIOManager)
+    artellapipe.register.register_class('PlayblastsMgr', playblasts.ArtellaPlayblastsSingleton)
+
+
+register_classes()

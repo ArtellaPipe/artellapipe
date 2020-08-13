@@ -191,8 +191,3 @@ class ArtellaToolWidget(base.BaseWidget, object):
         """
 
         message.PopupMessage.error(msg, parent=self, duration=msecs, closable=True)
-
-
-artellapipe.register.register_class('Tool', ArtellaTool)
-artellapipe.register.register_class('Toolset', ArtellaToolset)
-artellapipe.register.register_class('ToolWidget', ArtellaToolWidget)

@@ -18,9 +18,7 @@ from Qt.QtWidgets import *
 
 from tpDcc.libs.qt.core import base
 
-import artellapipe.register
-
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaTray(base.BaseWidget, object):
@@ -81,6 +79,3 @@ class ArtellaTray(base.BaseWidget, object):
             self._tray.showMessage(title, msg, self._tray_icon)
         except Exception:
             self._tray.showMessage(title, msg)
-
-
-artellapipe.register.register_class('Tray', ArtellaTray)

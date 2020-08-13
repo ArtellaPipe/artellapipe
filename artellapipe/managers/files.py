@@ -19,7 +19,7 @@ import importlib
 import six
 
 import tpDcc as tp
-from tpDcc.libs.python import python, decorators, osplatform, path as path_utils
+from tpDcc.libs.python import python, osplatform, path as path_utils
 from tpDcc.libs.qt.core import qtutils
 
 if python.is_python2():
@@ -28,49 +28,41 @@ else:
     import importlib as loader
 
 import artellapipe
-import artellapipe.register
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
 from artellapipe.libs.naming.core import naminglib
 from artellapipe.utils import exceptions
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
-class ArtellaFilesManager(object):
-    def __init__(self):
-        self._project = None
-        self._config = None
+class FilesManager(python.Singleton, object):
 
-        self._registered_file_classes = dict()
+    _config = None
+    _registered_file_classes = dict()
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tp.ConfigsMgr().get_config(
+                config_name='artellapipe-files',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
+
+        return self.__class__._config
 
     @property
     def files(self):
-        return self._config.get('files', default=dict())
+        return self.config.get('files', default=dict())
 
     @property
     def file_classes(self):
-        return self._registered_file_classes.values()
+        if not self.__class__._registered_file_classes:
+            self._register_file_classes()
 
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-files',
-            package_name=self._project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment()
-        )
-
-        self._register_file_classes()
+        return self.__class__._registered_file_classes
 
     def register_file_class(self, file_type, file_class):
         """
@@ -79,7 +71,7 @@ class ArtellaFilesManager(object):
         :param file_class: class
         """
 
-        self._registered_file_classes[file_type] = file_class
+        self.__class__._registered_file_classes[file_type] = file_class
         return True
 
     def get_file_class(self, file_type_name):
@@ -93,7 +85,7 @@ class ArtellaFilesManager(object):
             LOGGER.warning('File Type with name "{}" not registered!'.format(file_type_name))
             return
 
-        return self._registered_file_classes[file_type_name]
+        return self.__class__._registered_file_classes[file_type_name]
 
     def check_file_type(self, file_type_name):
         """
@@ -102,7 +94,7 @@ class ArtellaFilesManager(object):
         :return: bool
         """
 
-        if file_type_name not in self._registered_file_classes:
+        if file_type_name not in self.file_classes:
             return False
 
         return True
@@ -160,12 +152,12 @@ class ArtellaFilesManager(object):
         :return: list
         """
 
-        asset_files = artellapipe.FilesMgr().files
+        asset_files = self.files
         if not asset_files:
             return None
 
         valid_file_types = list()
-        for file_type_name, file_type_class in self._registered_file_classes.items():
+        for file_type_name, file_type_class in self.file_classes.items():
             if file_type_extension in file_type_class.FILE_EXTENSIONS:
                 valid_file_types.append(file_type_class)
 
@@ -202,7 +194,7 @@ class ArtellaFilesManager(object):
 
         self._check_project()
 
-        project_env_var = self._project.env_var
+        project_env_var = artellapipe.project.env_var
 
         if clean_path:
             path_to_fix = path_utils.clean_path(path_to_fix)
@@ -229,7 +221,7 @@ class ArtellaFilesManager(object):
 
         self._check_project()
 
-        return path_utils.clean_path(os.path.relpath(full_path, self._project.get_path()))
+        return path_utils.clean_path(os.path.relpath(full_path, artellapipe.project.get_path()))
 
     def get_temp_path(self, *args):
         """
@@ -239,7 +231,7 @@ class ArtellaFilesManager(object):
 
         self._check_project()
 
-        temp_path = '{temp}/' + self._project.get_clean_name() + '/pipeline/{user}'
+        temp_path = '{temp}/' + artellapipe.project.get_clean_name() + '/pipeline/{user}'
 
         return path_utils.clean_path(os.path.join(self._format_path(temp_path), *args))
 
@@ -253,12 +245,12 @@ class ArtellaFilesManager(object):
         self._check_project()
 
         path_to_resolve = path_to_resolve.replace('\\', '/')
-        project_var = os.environ.get(self._project.env_var)
+        project_var = os.environ.get(artellapipe.project.env_var)
         if not project_var:
             return path_to_resolve
 
         if path_to_resolve.startswith(project_var):
-            path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(self._project.env_var))
+            path_to_resolve = path_to_resolve.replace(project_var, '${}/'.format(artellapipe.project.env_var))
 
         return path_to_resolve
 
@@ -277,18 +269,19 @@ class ArtellaFilesManager(object):
 
         path_to_prefix = path_utils.clean_path(path_to_prefix)
 
-        production_folder = self._project.get_production_folder()
-        if path_to_prefix.startswith((production_folder, os.sep + production_folder, '/' + production_folder)):
-            return self.prefix_path_with_artella_env_path(path_to_prefix)
+        production_folder = artellapipe.project.get_production_folder()
+        if production_folder:
+            if path_to_prefix.startswith((production_folder, os.sep + production_folder, '/' + production_folder)):
+                return self.prefix_path_with_artella_env_path(path_to_prefix)
 
         if env_var:
-            project_env_var = self._project.env_var
+            project_env_var = artellapipe.project.env_var
             project_var = path_utils.clean_path(os.environ.get(project_env_var))
             if path_to_prefix.startswith(project_var):
                 return path_to_prefix
             return path_utils.clean_path(os.path.join(project_var, path_to_prefix))
         else:
-            project_path = path_utils.clean_path(self._project.get_path())
+            project_path = path_utils.clean_path(artellapipe.project.get_path())
             if path_to_prefix.startswith(project_path):
                 return path_to_prefix
 
@@ -318,7 +311,7 @@ class ArtellaFilesManager(object):
 
         files = python.force_list(files)
 
-        sync_dialog = artellapipe.SyncFileDialog(project=self._project, files=files)
+        sync_dialog = artellapipe.SyncFileDialog(project=artellapipe.project, files=files)
         sync_dialog.sync()
 
     def sync_paths(self, paths, recursive=False):
@@ -331,7 +324,7 @@ class ArtellaFilesManager(object):
 
         paths = python.force_list(paths)
 
-        sync_dialog = artellapipe.SyncPathDialog(project=self._project, paths=paths, recursive=recursive)
+        sync_dialog = artellapipe.SyncPathDialog(project=artellapipe.project, paths=paths, recursive=recursive)
         sync_dialog.sync()
 
     def sync_latest_published_version(self, file_to_sync):
@@ -375,7 +368,7 @@ class ArtellaFilesManager(object):
             return False
 
         if notify:
-            self._project.notify(title='Lock File', msg='File "{}" locked successfully!'.format(file_path))
+            artellapipe.project.notify(title='Lock File', msg='File "{}" locked successfully!'.format(file_path))
 
         return True
 
@@ -412,7 +405,7 @@ class ArtellaFilesManager(object):
 
         artellalib.unlock_file(file_path=file_path)
         if notify:
-            self._project.notify(title='Unlock File', msg='File "{}" unlocked successfully!'.format(file_path))
+            artellapipe.project.notify(title='Unlock File', msg='File "{}" unlocked successfully!'.format(file_path))
 
         return True
 
@@ -504,7 +497,7 @@ class ArtellaFilesManager(object):
         if comment:
             artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving)
             if notify:
-                self._project.notify(
+                artellapipe.project.notify(
                     title='New Working Version',
                     msg='Version {} for file "{}" uploaded to Artella server successfully!'.format(
                         current_version, file_path))
@@ -517,7 +510,7 @@ class ArtellaFilesManager(object):
         Internal function that checks whether or not assets manager has a project set. If not an exception is raised
         """
 
-        if not self._project:
+        if not artellapipe.project:
             raise exceptions.ArtellaProjectUndefinedException('Artella Project is not defined!')
 
         return True
@@ -535,7 +528,7 @@ class ArtellaFilesManager(object):
                 LOGGER.error('File {} is not a valid file project path!'.format(file_path))
                 return False
 
-        if not file_path.startswith(self._project.get_path()):
+        if not file_path.startswith(artellapipe.project.get_path()):
             LOGGER.error(
                 'File "{}" is not a valid project path because it is not located in Project Folder!'.format(file_path))
             return
@@ -596,11 +589,11 @@ class ArtellaFilesManager(object):
         Internal function that registers file classes
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             LOGGER.warning('Impossible to register file classes because Artella project is not defined!')
             return False
 
-        for file_type, file_info in self._config.get('files', default=dict()).items():
+        for file_type, file_info in self.config.get('files', default=dict()).items():
             full_file_class = file_info.get('class', None)
             if not full_file_class:
                 LOGGER.warning('No class defined for File Type "{}". Skipping ...'.format(file_type))
@@ -643,11 +636,27 @@ class ArtellaFilesManager(object):
 
         return True
 
+    def get_asset_file(self, file_type, extension=None):
+        """
+        Returns asset file object class linked to given file type for current project
+        :param file_type: str
+        :param extension: str
+        :return: ArtellaAssetType
+        """
 
-@decorators.Singleton
-class ArtellaFilesManagerSingleton(ArtellaFilesManager, object):
-    def __init__(self):
-        ArtellaFilesManager.__init__(self)
+        self._check_project()
 
+        if not self.is_valid_file_type(file_type):
+            return
 
-artellapipe.register.register_class('FilesMgr', ArtellaFilesManagerSingleton)
+        asset_file_class_found = None
+        for asset_file_class in self.file_classes.values():
+            if asset_file_class.FILE_TYPE == file_type:
+                asset_file_class_found = asset_file_class
+                break
+
+        if not asset_file_class_found:
+            LOGGER.warning('No Asset File Class found for file of type: "{}"'.format(file_type))
+            return
+
+        return asset_file_class_found

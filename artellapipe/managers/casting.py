@@ -14,25 +14,14 @@ __email__ = "tpovedatd@gmail.com"
 
 import logging
 
-from tpDcc.libs.python import decorators
-
 import artellapipe
 from artellapipe.utils import exceptions
+from artellapipe.managers import shots
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaCastingManager(object):
-    def __init__(self):
-        self._project = None
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
 
     def get_ocurrences_of_asset_in_shot(self, asset_name, shot_name, force_update=False):
         """
@@ -50,7 +39,7 @@ class ArtellaCastingManager(object):
             LOGGER.warning('Impossible to return occurrences because asset "{}" does not exists!'.format(asset_name))
             return None
 
-        shot = artellapipe.ShotsMgr().find_shot(shot_name)
+        shot = shots.ShotsManager().find_shot(shot_name)
         if not shot:
             LOGGER.warning('Impossible to return occurrences because shot "{}" does not exists!'.format(shot_name))
             return None
@@ -80,16 +69,7 @@ class ArtellaCastingManager(object):
         Internal function that checks whether or not casting manager has a project set. If not an exception is raised
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             raise exceptions.ArtellaProjectUndefinedException('Artella Project is not defined!')
 
         return True
-
-
-@decorators.Singleton
-class ArtellaCastingManagerSingleton(ArtellaCastingManager, object):
-    def __init__(self):
-        ArtellaCastingManager.__init__(self)
-
-
-artellapipe.register.register_class('CastMgr', ArtellaCastingManagerSingleton)

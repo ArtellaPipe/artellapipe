@@ -13,35 +13,25 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import tpDcc as tp
-from tpDcc.libs.python import decorators
 
-import artellapipe.register
+import artellapipe
 
 
-class ArtellaTagsManager(object):
-    def __init__(self):
-        super(ArtellaTagsManager, self).__init__()
+class TagsManager(object):
 
-        self._project = None
-        self._config = None
+    _config = None
 
     @property
     def config(self):
-        return self._config
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tp.ConfigsMgr().get_config(
+        if not self.__class__._config:
+            self.__class__._config = tp.ConfigsMgr().get_config(
             config_name='artellapipe-tags',
-            package_name=self._project.get_clean_name(),
+            package_name=artellapipe.project.get_clean_name(),
             root_package_name='artellapipe',
-            environment=project.get_environment()
+            environment=artellapipe.project.get_environment()
         )
+
+        return self.__class__._config
 
     # Basic definitions for tag attributes
     class TagDefinitions(object):
@@ -204,12 +194,3 @@ class ArtellaTagsManager(object):
                 tag_info_nodes.append(obj)
 
         return tag_info_nodes
-
-
-@decorators.Singleton
-class ArtellaTagsManagerSingleton(ArtellaTagsManager, object):
-    def __init__(self):
-        ArtellaTagsManager.__init__(self)
-
-
-artellapipe.register.register_class('TagsMgr', ArtellaTagsManagerSingleton)

@@ -13,24 +13,27 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import tpDcc
-from tpDcc.libs.python import decorators, python
+from tpDcc.libs.python import python
 
 import artellapipe
-import artellapipe.register
 from artellapipe.libs.naming.core import naminglib
 
 
-class ArtellaNamesManager(object):
-    def __init__(self):
-        self._project = None
+class NamesManager(object):
 
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
+    _config = None
 
-        self._project = project
+    @property
+    def config(self):
+        if not self.__class__._config:
+            self.__class__._config = tpDcc.ConfigsMgr().get_config(
+            config_name='tpDcc-naming',
+            package_name=artellapipe.project.get_clean_name(),
+            root_package_name='tpDcc',
+            environment=artellapipe.project.get_environment()
+        )
+
+        return self.__class__._config
 
     def check_node_name(self, node_name):
         """
@@ -47,16 +50,10 @@ class ArtellaNamesManager(object):
             if v is None:
                 return False
 
-        naming_config = tpDcc.ConfigsMgr().get_config(
-            config_name='tpDcc-naming',
-            package_name=self._project.get_clean_name(),
-            root_package_name='tpDcc',
-            environment=self._project.get_environment()
-        )
-        auto_suffix = naming_config.get('auto_suffixes', default=dict()) if naming_config else None
+        auto_suffix = self.config.get('auto_suffixes', default=dict()) if self.config else None
         obj_type = self._get_object_type(node_name)
 
-        if naming_config and auto_suffix:
+        if self.config and auto_suffix:
             if obj_type not in auto_suffix:
                 return True if obj_type == parsed_name['node_type'] else False
             else:
@@ -98,18 +95,12 @@ class ArtellaNamesManager(object):
 
         name_lib = naminglib.ArtellaNameLib()
 
-        naming_config = tpDcc.ConfigsMgr().get_config(
-            config_name='tpDcc-naming',
-            package_name=self._project.get_clean_name(),
-            root_package_name='tpDcc',
-            environment=self._project.get_environment()
-        )
-        if not naming_config:
+        if not self.config:
             artellapipe.logger.warning(
                 'Impossible to generate name from node because not naming configuration was found!')
             return None
 
-        auto_suffix = naming_config.get('auto_suffixes', default=dict())
+        auto_suffix = self.config.get('auto_suffixes', default=dict())
         if not auto_suffix:
             artellapipe.logger.warning(
                 'Impossible to launch auto suffix functionality because no auto suffixes are defined!')
@@ -228,12 +219,3 @@ class ArtellaNamesManager(object):
                         break
 
         return obj_type
-
-
-@decorators.Singleton
-class ArtellaNamesManagerSingleton(ArtellaNamesManager, object):
-    def __init__(self):
-        ArtellaNamesManager.__init__(self)
-
-
-artellapipe.register.register_class('NamesMgr', ArtellaNamesManagerSingleton)

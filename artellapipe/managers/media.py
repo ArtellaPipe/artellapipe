@@ -18,11 +18,11 @@ import tempfile
 import mimetypes
 
 import tpDcc
-from tpDcc.libs.python import decorators, yamlio, path as path_utils
+from tpDcc.libs.python import yamlio, path as path_utils
 
 import artellapipe
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class MediaManager(object):
@@ -30,29 +30,19 @@ class MediaManager(object):
     TEMP_PREFIX = 'artella_mediamgr'
     TEMP_SUFFIX = 'tmp'
 
-    def __init__(self):
-        super(MediaManager, self).__init__()
-
-        self._project = None
-        self._config = None
+    _config = None
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tpDcc.ConfigsMgr().get_config(
+                config_name='artellapipe-media',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
 
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tpDcc.ConfigsMgr().get_config(
-            config_name='artellapipe-media',
-            package_name=self._project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment()
-        )
+        return self.__class__._config
 
     def get_media_profiles_paths(self):
         """
@@ -61,13 +51,13 @@ class MediaManager(object):
         """
 
         paths_found = list()
-        media_profile_paths = self._config.get('media_profiles_paths', default=list())
+        media_profile_paths = self.config.get('media_profiles_paths', default=list())
         for media_profile_path in media_profile_paths:
             if os.path.isdir(media_profile_path):
                 if media_profile_path not in paths_found:
                     paths_found.append(media_profile_path)
             else:
-                project_path = path_utils.clean_path(os.path.join(self._project.get_path(), media_profile_path))
+                project_path = path_utils.clean_path(os.path.join(artellapipe.project.get_path(), media_profile_path))
                 if os.path.isdir(project_path) and project_path not in paths_found:
                     paths_found.append(project_path)
 
@@ -79,7 +69,7 @@ class MediaManager(object):
         :return: list(str)
         """
 
-        return self._config.get('media_profiles_extensions', default=['.yml'])
+        return self.config.get('media_profiles_extensions', default=['.yml'])
 
     def get_media_profiles_file_paths(self):
         """
@@ -176,7 +166,7 @@ class MediaManager(object):
         if not suffix.startswith('_'):
             suffix = '_{}'.format(suffix)
 
-        project_temp_folder = self._project.get_temporary_folder()
+        project_temp_folder = artellapipe.project.get_temporary_folder()
         try:
             temp_path = tempfile.mkdtemp(suffix, prefix, project_temp_folder)
         except Exception:
@@ -193,7 +183,7 @@ class MediaManager(object):
             extra_dict = dict()
 
         if not config_dict:
-            default_profile = self._config.get('default_profile', default=None)
+            default_profile = self.config.get('default_profile', default=None)
             if default_profile:
                 config_dict = self.get_media_profile_data(default_profile)
         if config_dict is None:
@@ -225,7 +215,7 @@ class MediaManager(object):
         # res_y = int(source_pixmap.size().height())
         #
         # if not config_dict:
-        #     default_profile = self._config.get('default_profile', default=None)
+        #     default_profile = self.config.get('default_profile', default=None)
         #     if default_profile:
         #         config_dict = self.get_media_profile_data(default_profile)
         #
@@ -233,12 +223,3 @@ class MediaManager(object):
 
     def stamp_image(self, source, output, config_dict=None):
         pass
-
-
-@decorators.Singleton
-class ArtellaMediaManagerSingleton(MediaManager, object):
-    def __init__(self):
-        MediaManager.__init__(self)
-
-
-artellapipe.register.register_class('MediaMgr', ArtellaMediaManagerSingleton)

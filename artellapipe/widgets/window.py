@@ -12,8 +12,6 @@ __license__ = "MIT"
 __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
-import webbrowser
-
 from Qt.QtCore import *
 from Qt.QtWidgets import *
 
@@ -264,4 +262,3 @@ def dock_window(project, window_class, min_width=300):
     return win
 
 
-artellapipe.register.register_class('Window', ArtellaWindow)

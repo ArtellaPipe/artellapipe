@@ -27,57 +27,50 @@ if python.is_python2():
 else:
     import importlib as loader
 
-import artellapipe.register
+import artellapipe
 from artellapipe.utils import exceptions
 from artellapipe.core import defines
-from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
-class ArtellaAssetsManager(object):
-    def __init__(self):
-        self._project = None
-        self._assets = list()
-        self._config = None
-        self._registered_asset_classes = list()
+class AssetsManager(object):
+
+    _assets = list()
+    _config = None
+    _registered_asset_classes = list()
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tp.ConfigsMgr().get_config(
+                config_name='artellapipe-assets',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
+
+        return self.__class__._config
 
     @property
     def asset_classes(self):
-        return self._registered_asset_classes
+        if not self.__class__._registered_asset_classes:
+            self._register_asset_classes()
+
+        return self.__class__._registered_asset_classes
 
     @property
     def asset_types(self):
-        return self._config.get('types', default=dict()).keys()
+        return self.config.get('types', default=dict()).keys()
 
     @property
     def assets(self):
-        return self._assets
+        return self.__class__._assets
 
     @property
     def must_file_types(self):
-        return self._config.get('must_file_types', default=list())
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-assets',
-            package_name=self._project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment()
-        )
-
-        self._register_asset_classes()
+        return self.config.get('must_file_types', default=list())
 
     def register_asset_class(self, asset_class):
         """
@@ -85,12 +78,12 @@ class ArtellaAssetsManager(object):
         :param asset_class: cls
         """
 
-        if asset_class in self._registered_asset_classes:
+        if asset_class in self.__class__._registered_asset_classes:
             LOGGER.warning(
                 'Asset Class: "{}" is already registered. Skipping ...'.format(asset_class))
             return False
 
-        self._registered_asset_classes.append(asset_class)
+        self.__class__._registered_asset_classes.append(asset_class)
         return True
 
     def get_asset_categories(self):
@@ -143,7 +136,7 @@ class ArtellaAssetsManager(object):
         :return: list(str)
         """
 
-        asset_types = self._config.get('types', default={})
+        asset_types = self.config.get('types', default={})
         return asset_types.keys()
 
     def get_asset_type_files(self, asset_type):
@@ -153,7 +146,7 @@ class ArtellaAssetsManager(object):
         :return: list(str)
         """
 
-        asset_types = self._config.get('types', default={})
+        asset_types = self.config.get('types', default={})
         if asset_type not in asset_types:
             return list()
 
@@ -209,10 +202,10 @@ class ArtellaAssetsManager(object):
         :param asset:
         """
 
-        shading_file_type = artellapipe.AssetsMgr().get_shading_file_type()
+        shading_file_type = self.get_shading_file_type()
         file_path = asset.get_file(
             file_type=shading_file_type, status=defines.ArtellaFileStatus.WORKING, fix_path=True)
-        valid_open = self._asset.open_file(file_type=shading_file_type, status=defines.ArtellaFileStatus.WORKING)
+        valid_open = asset.open_file(file_type=shading_file_type, status=defines.ArtellaFileStatus.WORKING)
         if not valid_open:
             LOGGER.warning('Impossible to open Asset Shading File: {}'.format(file_path))
             return None
@@ -225,8 +218,8 @@ class ArtellaAssetsManager(object):
 
         self._check_project()
 
-        assets_folder = self._project.config.get('assets_folder')
-        assets_path = os.path.join(self._project.get_path(), assets_folder)
+        assets_folder = artellapipe.project.config.get('assets_folder')
+        assets_path = os.path.join(artellapipe.project.get_path(), assets_folder)
 
         return assets_path
 
@@ -252,10 +245,10 @@ class ArtellaAssetsManager(object):
 
         self._check_project()
 
-        if self._assets and not force_update:
-            return self._assets
+        if self.__class__._assets and not force_update:
+            return self.__class__._assets
 
-        python.clear_list(self._assets)
+        python.clear_list(self.__class__._assets)
 
         if not artellapipe.Tracker().is_logged() and force_login:
             artellapipe.Tracker().login()
@@ -270,9 +263,9 @@ class ArtellaAssetsManager(object):
             return None
         for asset_data in assets_list:
             new_asset = self.create_asset(asset_data)
-            self._assets.append(new_asset)
+            self.__class__._assets.append(new_asset)
 
-        return self._assets
+        return self.__class__._assets
 
     def find_asset(self, asset_name=None, asset_path=None, allow_multiple_instances=False, force=False):
         """
@@ -319,7 +312,7 @@ class ArtellaAssetsManager(object):
             asset_classes = self.asset_classes
             for asset_class in asset_classes:
                 if asset_class.FILE_TYPE == category:
-                    return asset_class(project=self._project, asset_data=asset_data)
+                    return asset_class(project=artellapipe.project, asset_data=asset_data)
 
     def create_asset_in_artella(self, asset_name, asset_path, folders_to_create=None):
         """
@@ -334,7 +327,7 @@ class ArtellaAssetsManager(object):
             LOGGER.warning('Impossible to create Asset {} in Path: {}!'.format(asset_name, asset_path))
             return
 
-        working_folder = self._project.get_working_folder()
+        working_folder = artellapipe.project.get_working_folder()
 
         if folders_to_create:
             for folder_name in folders_to_create:
@@ -352,31 +345,6 @@ class ArtellaAssetsManager(object):
 
         return asset_type in self.asset_types
 
-    def get_asset_file(self, file_type, extension=None):
-        """
-        Returns asset file object class linked to given file type for current project
-        :param file_type: str
-        :param extension: str
-        :return: ArtellaAssetType
-        """
-
-        self._check_project()
-
-        if not artellapipe.FilesMgr().is_valid_file_type(file_type):
-            return
-
-        asset_file_class_found = None
-        for asset_file_class in artellapipe.FilesMgr().file_classes:
-            if asset_file_class.FILE_TYPE == file_type:
-                asset_file_class_found = asset_file_class
-                break
-
-        if not asset_file_class_found:
-            LOGGER.warning('No Asset File Class found for file of type: "{}"'.format(file_type))
-            return
-
-        return asset_file_class_found
-
     def get_asset_thumbnail_path(self, asset_name, create_folder=True):
         """
         Returns path where asset thumbnail is or should be located
@@ -387,7 +355,7 @@ class ArtellaAssetsManager(object):
 
         self._check_project()
 
-        data_path = self._project.get_data_path()
+        data_path = artellapipe.project.get_data_path()
         thumbnails_cache_folder = os.path.join(data_path, 'asset_thumbs_cache')
         if not os.path.isdir(thumbnails_cache_folder) and create_folder:
             os.makedirs(thumbnails_cache_folder)
@@ -401,8 +369,8 @@ class ArtellaAssetsManager(object):
         :return: str
         """
 
-        filename_attr = self._config.get('data', 'filename')
-        working_folder = self._project.get_working_folder()
+        filename_attr = self.config.get('data', 'filename')
+        working_folder = artellapipe.project.get_working_folder()
         return os.path.join(asset_path, working_folder, filename_attr)
 
     def get_latest_published_versions(self, asset_path, file_type=None):
@@ -414,43 +382,12 @@ class ArtellaAssetsManager(object):
         :return: list(dict), number of version, name of version and version path
         """
 
-        latest_version = list()
+        self._check_project()
 
-        versions = dict()
-        status = artellalib.get_status(asset_path, as_json=True)
-
-        status_data = status.get('data')
-        if not status_data:
-            LOGGER.info('Impossible to retrieve data from Artella in file: "{}"'.format(asset_path))
-            return
-
-        for name, data in status_data.items():
-            if name in ['latest', '_latest']:
-                continue
-            if file_type and file_type not in name:
-                continue
-            version = artellalib.split_version(name)[1]
-            versions[version] = name
-
-        ordered_versions = OrderedDict(sorted(versions.items()))
-
-        current_index = -1
-        valid_version = False
-        version_found = None
-        while not valid_version and current_index >= (len(ordered_versions) * -1):
-            version_found = ordered_versions[ordered_versions.keys()[current_index]]
-            valid_version = self._check_valid_published_version(asset_path, version_found)
-            if not valid_version:
-                current_index -= 1
-        if valid_version and version_found:
-            version_path = path_utils.clean_path(os.path.join(asset_path, '__{}__'.format(version_found)))
-            latest_version.append({
-                'version': ordered_versions.keys()[current_index],
-                'version_name': version_found,
-                'version_path': version_path}
-            )
-
-        return latest_version
+        if artellapipe.project.is_enterprise():
+            return self._get_latest_published_versions_enterprise(asset_path, file_type=file_type)
+        else:
+            return self._get_latest_published_versions_indie(asset_path, file_type=file_type)
 
     @decorators.timestamp
     def get_scene_assets(self, as_nodes=True, allowed_types=None, allowed_tags=None, node_id=None):
@@ -517,7 +454,7 @@ class ArtellaAssetsManager(object):
                 asset_node = all_ids[clean_namespace]
                 if as_nodes:
                     asset_node = artellapipe.AssetNode(
-                        project=self._project, node=root_node, asset=asset_node, id=namespace
+                        project=artellapipe.project, node=root_node, asset=asset_node, id=namespace
                     )
                 else:
                     asset_node = root_node
@@ -606,7 +543,7 @@ class ArtellaAssetsManager(object):
         Internal function that checks whether or not assets manager has a project set. If not an exception is raised
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             raise exceptions.ArtellaProjectUndefinedException('Artella Project is not defined!')
 
         return True
@@ -635,11 +572,11 @@ class ArtellaAssetsManager(object):
         Internal function that  registers project asset classes
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             LOGGER.warning('Impossible to register asset classes because Artella project is not defined!')
             return False
 
-        for asset_type, asset_type_info in self._config.get('types', default={}).items():
+        for asset_type, asset_type_info in self.config.get('types', default={}).items():
             asset_files = asset_type_info.get('files', list())
             full_asset_class = asset_type_info.get('class', None)
             if not full_asset_class:
@@ -675,11 +612,52 @@ class ArtellaAssetsManager(object):
 
         return True
 
+    def _get_latest_published_versions_enterprise(self, asset_path, file_type=None):
+        """
+        Internal function that implements get_latest_published_versions for Artella Indie
+        """
 
-@decorators.Singleton
-class ArtellaAssetsManagerSingleton(ArtellaAssetsManager, object):
-    def __init__(self):
-        ArtellaAssetsManager.__init__(self)
+        latest_version = list()
 
+        return latest_version
 
-artellapipe.register.register_class('AssetsMgr', ArtellaAssetsManagerSingleton)
+    def _get_latest_published_versions_indie(self, asset_path, file_type=None):
+        """
+        Internal function that implements get_latest_published_versions for Artella Indie
+        """
+
+        latest_version = list()
+
+        versions = dict()
+        status = artellalib.artella.get_status(asset_path, as_json=True)
+
+        status_data = status.get('data')
+        if not status_data:
+            LOGGER.info('Impossible to retrieve data from Artella in file: "{}"'.format(asset_path))
+            return
+
+        for name, data in status_data.items():
+            if name in ['latest', '_latest']:
+                continue
+            if file_type and file_type not in name:
+                continue
+            version = artellalib.artella.split_version(name)[1]
+            versions[version] = name
+
+        ordered_versions = OrderedDict(sorted(versions.items()))
+
+        current_index = -1
+        valid_version = False
+        version_found = None
+        while not valid_version and current_index >= (len(ordered_versions) * -1):
+            version_found = ordered_versions[ordered_versions.keys()[current_index]]
+            valid_version = self._check_valid_published_version(asset_path, version_found)
+            if not valid_version:
+                current_index -= 1
+        if valid_version and version_found:
+            version_path = path_utils.clean_path(os.path.join(asset_path, '__{}__'.format(version_found)))
+            latest_version.append({
+                'version': ordered_versions.keys()[current_index],
+                'version_name': version_found,
+                'version_path': version_path}
+            )

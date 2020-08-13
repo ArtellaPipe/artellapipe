@@ -19,40 +19,31 @@ import tempfile
 import tpDcc as tp
 from tpDcc.libs.python import decorators, path as path_utils
 
-import artellapipe.register
+import artellapipe
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class PlayblastsManager(object):
-    def __init__(self):
-        super(PlayblastsManager, self).__init__()
 
-        self._project = None
-        self._config = None
-        self._registered_tokens = dict()
+    _config = None
+    _registered_tokens = dict()
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tp.ConfigsMgr().get_config(
+                config_name='artellapipe-playblasts',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
+
+        return self.__class__._config
 
     @property
     def tokens(self):
-        return self._registered_tokens
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-playblasts',
-            package_name=self._project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment()
-        )
+        return self.__class__._registered_tokens
 
     def get_presets_paths(self):
         """
@@ -62,7 +53,7 @@ class PlayblastsManager(object):
 
         playblasts_paths = self.config.get('presets_paths')
         return [path_utils.clean_path(
-            os.path.join(self._project.get_path(), p)) for p in playblasts_paths]
+            os.path.join(artellapipe.project.get_path(), p)) for p in playblasts_paths]
 
     def list_tokens(self):
         """
@@ -70,7 +61,7 @@ class PlayblastsManager(object):
         :return: list(str)
         """
 
-        return self._registered_tokens.keys()
+        return self.tokens.keys()
 
     def format_tokens(self, token_str, attrs_dict):
         """
@@ -83,7 +74,7 @@ class PlayblastsManager(object):
         if not token_str:
             return token_str
 
-        for token, value in self._registered_tokens.items():
+        for token, value in self.tokens.items():
             if token in token_str:
                 fn = value['fn']
                 token_str = token_str.replace(token, fn(attrs_dict))
@@ -100,7 +91,7 @@ class PlayblastsManager(object):
 
         assert token.startswith('<') and token.endswith('>')
         assert callable(fn)
-        self._registered_tokens[token] = {'fn': fn, 'label': label}
+        self.tokens[token] = {'fn': fn, 'label': label}
 
     def get_camera_token(self, attrs_dict):
         """
@@ -142,7 +133,7 @@ class PlayblastsManager(object):
         :return: str
         """
 
-        return self._project.get_path()
+        return artellapipe.project.get_path()
 
     def get_render_layer_token(self):
         """
@@ -269,9 +260,6 @@ class PlayblastsManager(object):
 
 
 @decorators.Singleton
-class ArtellaPlayblastsManagerSingleton(PlayblastsManager, object):
+class ArtellaPlayblastsSingleton(PlayblastsManager, object):
     def __init__(self):
         PlayblastsManager.__init__(self)
-
-
-artellapipe.register.register_class('PlayblastsMgr', ArtellaPlayblastsManagerSingleton)

@@ -27,50 +27,44 @@ if python.is_python2():
 else:
     import importlib as loader
 
-import artellapipe.register
+import artellapipe
 from artellapipe.utils import exceptions
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
-class ArtellaShotsManager(object):
-    def __init__(self):
-        self._project = None
-        self._shots = list()
-        self._registered_shot_classes = list()
-        self._config = None
+class ShotsManager(object):
+
+    _config = None
+    _shots = list()
+    _registered_shot_classes = list()
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tpDcc.ConfigsMgr().get_config(
+                config_name='artellapipe-shots',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment())
+
+        return self.__class__._config
 
     @property
     def shot_classes(self):
-        return self._registered_shot_classes
+        if not self.__class__._registered_shot_classes:
+            self._register_shot_classes()
+
+        return self.__class__._registered_shot_classes
 
     @property
     def shot_types(self):
-        return self._config.get('types', default=dict()).keys()
+        return self.config.get('types', default=dict()).keys()
 
     @property
     def shots(self):
-        return self._shots
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tpDcc.ConfigsMgr().get_config(
-            config_name='artellapipe-shots',
-            package_name=project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment())
-
-        self._register_shot_classes()
+        return self.__class__._shots
 
     def register_shot_class(self, shot_class):
         """
@@ -78,12 +72,12 @@ class ArtellaShotsManager(object):
         :param shot_class: cls
         """
 
-        if shot_class in self._registered_shot_classes:
+        if shot_class in self.shot_classes:
             LOGGER.warning(
                 'Shot Class: "{}" is already registered. Skipping ...'.format(shot_class))
             return False
 
-        self._registered_shot_classes.append(shot_class)
+        self.__class__._registered_shot_classes.append(shot_class)
 
         return True
 
@@ -98,10 +92,10 @@ class ArtellaShotsManager(object):
 
         self._check_project()
 
-        if self._shots and not force_update:
-            return self._shots
+        if self.shots and not force_update:
+            return self.shots
 
-        python.clear_list(self._shots)
+        python.clear_list(self.__class__._shots)
 
         if not artellapipe.Tracker().is_logged() and force_login:
             artellapipe.Tracker().login()
@@ -117,11 +111,11 @@ class ArtellaShotsManager(object):
 
         for shot_data in shots_list:
             new_shot = self.create_shot(shot_data)
-            self._shots.append(new_shot)
+            self.__class__._shots.append(new_shot)
 
-        self._shots.sort(key=lambda x: x.get_start_frame(), reverse=True)
+        self.__class__._shots.sort(key=lambda x: x.get_start_frame(), reverse=True)
 
-        return self._shots
+        return self.shots
 
     def find_all_shots_in_current_scene(self, force_update=False, force_login=True):
         """
@@ -207,7 +201,7 @@ class ArtellaShotsManager(object):
         :return:
         """
 
-        return artellapipe.Shot(project=self._project, shot_data=shot_data)
+        return artellapipe.Shot(project=artellapipe.project, shot_data=shot_data)
 
     def get_shots_from_sequence(self, sequence_name, force_update=False, force_login=True):
         """
@@ -369,7 +363,7 @@ class ArtellaShotsManager(object):
         Internal function that checks whether or not assets manager has a project set. If not an exception is raised
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             raise exceptions.ArtellaProjectUndefinedException('Artella Project is not defined!')
 
         return True
@@ -398,11 +392,11 @@ class ArtellaShotsManager(object):
         Internal function that registers project shot classes
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             LOGGER.warning('Impossible to register shot classes because Artella project is not defined!')
             return False
 
-        for shot_type, shot_type_info in self._config.get('types', default={}).items():
+        for shot_type, shot_type_info in self.config.get('types', default={}).items():
             shot_files = shot_type_info.get('files', list())
             full_shot_class = shot_type_info.get('class', None)
             if not full_shot_class:
@@ -437,12 +431,3 @@ class ArtellaShotsManager(object):
             self.register_shot_class(obj)
 
         return True
-
-
-@decorators.Singleton
-class ArtellaShotsManagerSingleton(ArtellaShotsManager, object):
-    def __init__(self):
-        ArtellaShotsManager.__init__(self)
-
-
-artellapipe.register.register_class('ShotsMgr', ArtellaShotsManagerSingleton)

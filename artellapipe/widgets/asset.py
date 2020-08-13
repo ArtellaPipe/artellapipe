@@ -24,11 +24,12 @@ from Qt.QtGui import *
 import tpDcc
 from tpDcc.libs.qt.core import base, qtutils, menu
 
-import artellapipe.register
-from artellapipe.core import defines
+import artellapipe
 from artellapipe.utils import worker
+from artellapipe.core import defines
+from artellapipe.widgets import assetinfo
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaAssetButton(QPushButton, object):
@@ -133,7 +134,7 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         :return: AssetInfoWidget
         """
 
-        return artellapipe.AssetInfo(self)
+        return assetinfo.AssetInfoWidget(self)
 
     def get_thumbnail_path(self):
         """
@@ -310,6 +311,3 @@ class ArtellaAssetWidget(base.BaseWidget, object):
         if asset_icon and not asset_icon.isNull():
             self._thumbnail_icon = asset_icon
             self._asset_btn.setIcon(asset_icon)
-
-
-artellapipe.register.register_class('AssetWidget', ArtellaAssetWidget)

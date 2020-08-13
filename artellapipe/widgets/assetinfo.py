@@ -22,7 +22,7 @@ import tpDcc
 from tpDcc.libs.qt.core import base
 from tpDcc.libs.qt.widgets import breadcrumb, stack, dividers, grid
 
-import artellapipe.register
+import artellapipe
 from artellapipe.core import defines
 from artellapipe.libs.artella.core import artellalib
 
@@ -508,6 +508,3 @@ class PublishedAssetInfo(WorkingAssetInfo, object):
 
     def __init__(self, asset_widget, parent=None):
         super(PublishedAssetInfo, self).__init__(asset_widget=asset_widget, parent=parent)
-
-
-artellapipe.register.register_class('AssetInfo', AssetInfoWidget)

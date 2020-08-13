@@ -27,50 +27,44 @@ if python.is_python2():
 else:
     import importlib as loader
 
-import artellapipe.register
+import artellapipe
 from artellapipe.utils import exceptions
 from artellapipe.libs.artella.core import artellalib, artellaclasses
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
-class ArtellaSequencesManager(object):
-    def __init__(self):
-        self._project = None
-        self._sequences = list()
-        self._config = None
-        self._registered_sequence_classes = list()
+class SequencesManager(object):
+
+    _config = None
+    _sequences = list()
+    _registered_sequence_classes = list()
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tpDcc.ConfigsMgr().get_config(
+                config_name='artellapipe-sequences',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment())
+
+        return self.__class__.config
 
     @property
     def sequence_classes(self):
-        return self._registered_sequence_classes
+        if not self.__class__._registered_sequence_classes:
+            self._register_sequence_classes()
+
+        return self.__class__._registered_sequence_classes
 
     @property
     def sequence_types(self):
-        return self._config.get('types', default=dict()).keys()
+        return self.config.get('types', default=dict()).keys()
 
     @property
     def sequences(self):
-        return self._sequences
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tpDcc.ConfigsMgr().get_config(
-            config_name='artellapipe-sequences',
-            package_name=project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment())
-
-        self._register_sequence_classes()
+        return self.__class__._sequences
 
     def register_sequence_class(self, sequence_class):
         """
@@ -78,12 +72,12 @@ class ArtellaSequencesManager(object):
         :param sequence_class: cls
         """
 
-        if sequence_class in self._registered_sequence_classes:
+        if sequence_class in self.sequence_classes:
             LOGGER.warning(
                 'Sequence Class: "{}" is already registered. Skipping ...'.format(sequence_class))
             return False
 
-        self._registered_sequence_classes.append(sequence_class)
+        self.__class__._registered_sequence_classes.append(sequence_class)
 
         return True
 
@@ -98,10 +92,10 @@ class ArtellaSequencesManager(object):
 
         self._check_project()
 
-        if self._sequences and not force_update:
-            return self._sequences
+        if self.sequences and not force_update:
+            return self.sequences
 
-        python.clear_list(self._sequences)
+        python.clear_list(self.__class__._sequences)
 
         if not artellapipe.Tracker().is_logged() and force_login:
             artellapipe.Tracker().login()
@@ -117,9 +111,9 @@ class ArtellaSequencesManager(object):
 
         for sequence_data in sequences_list:
             new_sequence = self.create_sequence(sequence_data)
-            self._sequences.append(new_sequence)
+            self.__class__._sequences.append(new_sequence)
 
-        return self._sequences
+        return self.sequences
 
     def find_sequence(self, sequence_name=None, force_update=False):
         """
@@ -166,7 +160,7 @@ class ArtellaSequencesManager(object):
         :return:
         """
 
-        return artellapipe.Sequence(project=self._project, sequence_data=sequence_data)
+        return artellapipe.Sequence(project=artellapipe.project, sequence_data=sequence_data)
 
     def is_valid_sequence_type(self, sequence_type):
         """
@@ -271,7 +265,7 @@ class ArtellaSequencesManager(object):
         Internal function that checks whether or not assets manager has a project set. If not an exception is raised
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             raise exceptions.ArtellaProjectUndefinedException('Artella Project is not defined!')
 
         return True
@@ -300,11 +294,11 @@ class ArtellaSequencesManager(object):
         Internal function that registers project sequence classes
         """
 
-        if not self._project:
+        if not hasattr(artellapipe, 'project') or not artellapipe.project:
             LOGGER.warning('Impossible to register sequence classes because Artella project is not defined!')
             return False
 
-        for sequence_type, sequence_type_info in self._config.get('types', default={}).items():
+        for sequence_type, sequence_type_info in self.config.get('types', default={}).items():
             sequence_files = sequence_type_info.get('files', list())
             full_sequence_class = sequence_type_info.get('class', None)
             if not full_sequence_class:
@@ -339,12 +333,3 @@ class ArtellaSequencesManager(object):
             self.register_sequence_class(obj)
 
         return True
-
-
-@decorators.Singleton
-class ArtellaSequencesManagerSingleton(ArtellaSequencesManager, object):
-    def __init__(self):
-        ArtellaSequencesManager.__init__(self)
-
-
-artellapipe.register.register_class('SequencesMgr', ArtellaSequencesManagerSingleton)

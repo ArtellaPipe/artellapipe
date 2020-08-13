@@ -16,26 +16,19 @@ from functools import partial
 
 from Qt.QtWidgets import *
 
-from six import string_types
-
 import tpDcc
 from tpDcc.managers import menus
-from tpDcc.libs.python import decorators
-from tpDcc.libs.qt.core import qtutils
+from tpDcc.libs.python import python
 
 import artellapipe
-import artellapipe.register
 
 
-class ArtellaMenusManager(menus.MenusManager, object):
+class MenusManager(menus.MenusManager, object):
     """
     Class that handles all tools
     """
 
-    def __init__(self, parent=None):
-        super(ArtellaMenusManager, self).__init__(parent=parent)
-
-    def create_menus(self, package_name, project):
+    def create_menus(self, package_name, project=None):
         """
         Overrides base ToolsManager create menus function
         :param package_name: str
@@ -43,7 +36,10 @@ class ArtellaMenusManager(menus.MenusManager, object):
         """
 
         if not project:
-            artellapipe.logger.warning('Impossible to create menu becaues project is not defined!')
+            if hasattr(artellapipe, 'project') and artellapipe.project:
+                project = artellapipe.project
+        if not project:
+            artellapipe.logger.warning('Impossible to create menu because project is not defined!')
             return False
 
         self._menu_names[package_name] = project.config.get('menu', 'name')
@@ -73,7 +69,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
             for menu_data in menus_config:
                 for _, data in menu_data.items():
                     for i in iter(data):
-                        if isinstance(i, string_types) and i == 'separator':
+                        if python.is_string(i) and i == 'separator':
                             main_menu.addSeparator()
                             continue
                         self._menu_creator(main_menu, i, project.get_clean_name(), dev=project.is_dev())
@@ -83,7 +79,7 @@ class ArtellaMenusManager(menus.MenusManager, object):
         for pkg_name, menu_data in tools_menu_data.items():
             for tool_path, data in menu_data.items():
                 for i in iter(data):
-                    if isinstance(i, string_types) and i == 'separator':
+                    if python.is_string(i) and i == 'separator':
                         main_menu.addSeparator()
                         continue
                     self._menu_creator(main_menu, i, project.get_clean_name(), dev=project.is_dev())
@@ -93,8 +89,15 @@ class ArtellaMenusManager(menus.MenusManager, object):
 
         return True
 
-    def remove_previous_menus(self, project, package_name=None):
-        super(ArtellaMenusManager, self).remove_previous_menus(package_name=package_name)
+    def remove_previous_menus(self, project=None, package_name=None):
+        super(MenusManager, self).remove_previous_menus(package_name=package_name)
+
+        if not project:
+            if hasattr(artellapipe, 'project') and artellapipe.project:
+                project = artellapipe.project
+        if not project:
+            artellapipe.logger.warning('Impossible to remove menu because project is not defined!')
+            return False
 
         main_win = tpDcc.Dcc.get_main_window()
         parent_menu_bar = main_win.menuBar() if main_win else None
@@ -112,6 +115,13 @@ class ArtellaMenusManager(menus.MenusManager, object):
         Creates project description menu
         :return:
         """
+
+        if not project:
+            if hasattr(artellapipe, 'project') and artellapipe.project:
+                project = artellapipe.project
+        if not project:
+            artellapipe.logger.warning('Impossible to create project description menu because project is not defined!')
+            return False
 
         main_win = tpDcc.Dcc.get_main_window()
         parent_menu_bar = main_win.menuBar() if main_win else None
@@ -155,11 +165,18 @@ class ArtellaMenusManager(menus.MenusManager, object):
         bug_tracker_action.setObjectName(bug_object_action_name)
         bug_tracker_action.triggered.connect(partial(self._launch_tool_by_id, 'artellapipe-tools-bugtracker'))
 
-    def create_tray_menu(self, project):
+    def create_tray_menu(self, project=None):
         """
         Creates project tray action
         :return:
         """
+
+        if not project:
+            if hasattr(artellapipe, 'project') and artellapipe.project:
+                project = artellapipe.project
+        if not project:
+            artellapipe.logger.warning('Impossible to create tray menu because project is not defined!')
+            return False
 
         main_win = tpDcc.Dcc.get_main_window()
         parent_menu_bar = main_win.menuBar() if main_win else None
@@ -221,12 +238,3 @@ class ArtellaMenusManager(menus.MenusManager, object):
         is_dev = project.is_dev()
 
         tpDcc.ToolsMgr().launch_tool_by_id(tool_id, do_reload=is_dev, debug=is_dev, project=project)
-
-
-@decorators.Singleton
-class ArtellaMenusManagerSingleton(ArtellaMenusManager, object):
-    def __init__(self):
-        ArtellaMenusManager.__init__(self)
-
-
-artellapipe.register.register_class('MenusMgr', ArtellaMenusManagerSingleton)

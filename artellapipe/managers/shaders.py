@@ -18,44 +18,34 @@ import logging
 import tpDcc as tp
 from tpDcc.libs.python import decorators, python, path as path_utils
 
-import artellapipe.register
+import artellapipe
 from artellapipe.core import defines
 
 if tp.is_maya():
     import tpDcc.dccs.maya as maya
     from tpDcc.dccs.maya.core import decorators as maya_decorators
-    from tpDcc.dccs.maya.core import attribute as maya_attribute
     UNDO_DECORATOR = maya_decorators.undo_chunk
 else:
     UNDO_DECORATOR = decorators.empty_decorator
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ShadersManager(object):
-    def __init__(self):
-        super(ShadersManager, self).__init__()
 
-        self._project = None
-        self._config = None
+    _config = None
 
     @property
     def config(self):
-        return self._config
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tp.ConfigsMgr().get_config(
+        if not self.__class__._config:
+            self.__class__._config = tp.ConfigsMgr().get_config(
             config_name='artellapipe-shaders',
-            package_name=self._project.get_clean_name(),
+            package_name=artellapipe.project.get_clean_name(),
             root_package_name='artellapipe',
-            environment=project.get_environment()
+            environment=artellapipe.project.get_environment()
         )
+
+        return self.__class__._config
 
     def get_shaders_path_file_type(self):
         """
@@ -183,7 +173,7 @@ class ShadersManager(object):
             #     return
             #
             # for shader_path in shaders_paths:
-            #     shader_file = shader_file_class(self._project, shader_name, file_path=shader_path)
+            #     shader_file = shader_file_class(artellapipe.project, shader_name, file_path=shader_path)
             #     shader_file_paths = shader_file.get_file_paths()
             #     if shader_path:
             #         return shader_file
@@ -263,7 +253,7 @@ class ShadersManager(object):
             if not valid_shaders_paths:
                 LOGGER.debug(
                     '{} Shaders Library folder is not synchronized in your PC. Synchronize it please!'.format(
-                        self._project.name.title()))
+                        artellapipe.project.name.title()))
                 return False
             shader_file = self.get_shader_file(shader_name, shader_path=shader_path)
             if not shader_file:
@@ -465,7 +455,7 @@ class ShadersManager(object):
             asset.load_shaders(status=status, apply_shaders=apply_shaders)
 
     @UNDO_DECORATOR
-    def unload_shaders(self, assets=None):
+    def unload_shaders(self, asset_nodes=None):
         """
         Unload shaders applied to assets loaded in current DCC scene or to given ones
         :param assets:
@@ -475,12 +465,12 @@ class ShadersManager(object):
             LOGGER.warning('Shaders unloading is only supported in Maya!')
             return
 
-        if assets is None:
-            assets = artellapipe.AssetsMgr().get_scene_assets()
-        if not assets:
+        if asset_nodes is None:
+            asset_nodes = artellapipe.AssetsMgr().get_scene_assets()
+        if not asset_nodes:
             LOGGER.warning('Impossible to unload shaders because no shaders found in current scene!')
 
-        for asset in assets:
+        for asset in asset_nodes:
             self.unload_asset_shaders(asset_node=asset)
 
         return True
@@ -714,12 +704,3 @@ class ShadersManager(object):
             exported_shaders.append(exported_shader)
 
         return exported_shaders
-
-
-@decorators.Singleton
-class ArtellaShadersManagerSingleton(ShadersManager, object):
-    def __init__(self):
-        ShadersManager.__init__(self)
-
-
-artellapipe.register.register_class('ShadersMgr', ArtellaShadersManagerSingleton)

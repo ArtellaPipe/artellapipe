@@ -18,22 +18,10 @@ import logging
 import tpDcc as tp
 from tpDcc.libs.python import decorators
 
-import artellapipe.register
-
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
-class ArtellaDependenciesManager(object):
-    def __init__(self):
-        self._project = None
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
+class DependenciesManager(object):
 
     @decorators.abstractmethod
     def get_dependencies(self, file_path, parent_path=None, found_files=None):
@@ -81,12 +69,3 @@ class ArtellaDependenciesManager(object):
 
         raise NotImplementedError(
             'update_dependencies function is not implemented in "{}"'.format(self.__class__.__name__))
-
-
-@decorators.Singleton
-class ArtellaDependenciesManagerSingleton(ArtellaDependenciesManager, object):
-    def __init__(self):
-        ArtellaDependenciesManager.__init__(self)
-
-
-artellapipe.register.register_class('DepsMgr', ArtellaDependenciesManagerSingleton)

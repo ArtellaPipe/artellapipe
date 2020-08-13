@@ -16,40 +16,35 @@ import logging
 import traceback
 
 import tpDcc as tp
-from tpDcc.libs.python import decorators
 
-import artellapipe.register
+import artellapipe
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
-class ArtellaOCIOManager(object):
-    def __init__(self):
-        self._project = None
-        self._config = None
-        self._available_plugins = list()
+class OCIOManager(object):
+
+    _config = None
+    _available_plugins = list()
 
     @property
     def config(self):
-        return self._config
+        if not self.__class__._config:
+            self.__class__._config = tp.ConfigsMgr().get_config(
+                config_name='artellapipe-ocio',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
+
+        return self.__class__._config
 
     @property
     def plugins(self):
-        return self._available_plugins
+        if not self.__class__._available_plugins:
+            self.load_plugins()
 
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        self._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-ocio',
-            package_name=self._project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=project.get_environment()
-        )
+        return self.__class__._available_plugins
 
     def init_ocio(self):
         """
@@ -63,9 +58,9 @@ class ArtellaOCIOManager(object):
         Loads all OCIO related plugins
         """
 
-        ocio_plugins = self._config.get('ocio_plugins', default=dict())
+        ocio_plugins = self.config.get('ocio_plugins', default=dict())
         if not ocio_plugins:
-            LOGGER.warning('No OCIO plugins found in configuration file: "{}"'.format(self._config.get_path()))
+            LOGGER.warning('No OCIO plugins found in configuration file: "{}"'.format(self.config.get_path()))
             return
 
         for ocio_plugin_name, ocio_plugin_info in ocio_plugins.items():
@@ -87,13 +82,4 @@ class ArtellaOCIOManager(object):
                     continue
 
             LOGGER.info('OCIO Plugin "{}" loaded successfully!'.format(plugin_name))
-            self._available_plugins.append(ocio_plugin_name)
-
-
-@decorators.Singleton
-class ArtellaOCIOManagerSingleton(ArtellaOCIOManager, object):
-    def __init__(self):
-        ArtellaOCIOManager.__init__(self)
-
-
-artellapipe.register.register_class('OCIOMgr', ArtellaOCIOManagerSingleton)
+            self.__class__._available_plugins.append(ocio_plugin_name)

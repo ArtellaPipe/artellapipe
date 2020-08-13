@@ -14,24 +14,12 @@ __email__ = "tpovedatd@gmail.com"
 
 import logging
 
-from tpDcc.libs.python import decorators
-
 import artellapipe
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaTasksManager(object):
-    def __init__(self):
-        self._project = None
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
 
     def get_tasks_for_shot(self, shot_name):
         """
@@ -90,12 +78,3 @@ class ArtellaTasksManager(object):
             return
 
         return artellapipe.Tracker().get_task_status(task_found.id)
-
-
-@decorators.Singleton
-class ArtellaTasksManagerSingleton(ArtellaTasksManager, object):
-    def __init__(self):
-        ArtellaTasksManager.__init__(self)
-
-
-artellapipe.register.register_class('TasksMgr', ArtellaTasksManagerSingleton)

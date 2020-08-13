@@ -14,22 +14,12 @@ __email__ = "tpovedatd@gmail.com"
 
 import os
 
-from tpDcc.libs.python import decorators
-
-import artellapipe.register
+import artellapipe
 
 
 class SlackManager(object):
     def __init__(self):
         self._project = None
-
-    def set_project(self, project):
-        """
-        Sets the project this manager belongs to
-        :param project: ArtellaProject
-        """
-
-        self._project = project
 
     def get_slack_token(self):
         """
@@ -37,7 +27,7 @@ class SlackManager(object):
         :return: str
         """
 
-        return os.environ.get('{}_SLACK_API_TOKEN'.format(self._project.get_clean_name().upper()), '')
+        return os.environ.get('{}_SLACK_API_TOKEN'.format(artellapipe.project.get_clean_name().upper()), '')
 
     def get_slack_channel(self):
         """
@@ -45,7 +35,7 @@ class SlackManager(object):
         :return: str
         """
 
-        return os.environ.get('{}_SLACK_CHANNEL'.format(self._project.get_clean_name().upper()), '')
+        return os.environ.get('{}_SLACK_CHANNEL'.format(artellapipe.project.get_clean_name().upper()), '')
 
     def slack_is_available(self):
         """
@@ -88,12 +78,3 @@ class SlackManager(object):
             channel=self.get_slack_channel(),
             text=str(msg),
         )
-
-
-@decorators.Singleton
-class SlackManagerSingleton(SlackManager, object):
-    def __init__(self):
-        SlackManager.__init__(self)
-
-
-artellapipe.register.register_class('SlackMgr', SlackManagerSingleton)

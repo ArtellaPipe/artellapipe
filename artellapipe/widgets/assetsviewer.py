@@ -25,10 +25,10 @@ from tpDcc.libs.qt.core import base, qtutils
 from tpDcc.libs.qt.widgets import grid
 
 import artellapipe
-import artellapipe.register
 from artellapipe.core import defines
+from artellapipe.widgets import asset as asset_widget
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class AssetsViewer(grid.GridWidget, object):
@@ -89,7 +89,7 @@ class AssetsViewer(grid.GridWidget, object):
             return self._cache
 
         python.clear_list(self._cache)
-        self._cache = artellapipe.AssetsMgr().find_all_assets()
+        self._cache = artellapipe.AssetsMgr().find_all_assets() or list()
 
         return self._cache
 
@@ -112,8 +112,8 @@ class AssetsViewer(grid.GridWidget, object):
         for asset in all_assets:
             if not asset:
                 continue
-            asset_widget = artellapipe.AssetWidget(asset)
-            self.add_asset(asset_widget)
+            new_asset_widget = asset_widget.ArtellaAssetWidget(asset)
+            self.add_asset(new_asset_widget)
 
     def update_assets_thumbnails(self, force=False):
         """
@@ -227,7 +227,7 @@ class CategorizedAssetViewer(base.BaseWidget, object):
     def ui(self):
         super(CategorizedAssetViewer, self).ui()
 
-        self._assets_viewer = artellapipe.AssetsViewer(
+        self._assets_viewer = AssetsViewer(
             project=self._project,
             column_count=self._column_count,
             show_context_menu=self._show_context_menu,
@@ -283,6 +283,3 @@ class CategorizedAssetViewer(base.BaseWidget, object):
 
         if flag:
             self._assets_viewer.change_category(category=category)
-
-
-artellapipe.register.register_class('AssetsViewer', AssetsViewer)
