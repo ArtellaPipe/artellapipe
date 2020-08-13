@@ -24,8 +24,9 @@ from tpDcc.libs.qt.core import base, qtutils
 
 import artellapipe
 from artellapipe.core import defines
+from artellapipe.widgets import assetsviewer
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class AssetsWidget(base.BaseWidget, object):
@@ -77,7 +78,7 @@ class AssetsWidget(base.BaseWidget, object):
         asset_splitter = QSplitter(Qt.Horizontal)
         main_categories_menu_layout.addWidget(asset_splitter)
 
-        self._assets_viewer = artellapipe.AssetsViewer(
+        self._assets_viewer = assetsviewer.AssetsViewer(
             project=self._project, column_count=self._column_count,
             show_context_menu=self._show_viewer_menu, parent=self)
         asset_splitter.addWidget(self._assets_viewer)

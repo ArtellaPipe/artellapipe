@@ -18,9 +18,7 @@ from Qt.QtCore import *
 
 from tpDcc.libs.python import decorators
 
-import artellapipe.register
-
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class TrackingManager(QObject, object):
@@ -28,26 +26,9 @@ class TrackingManager(QObject, object):
     logged = Signal()
     unlogged = Signal()
 
-    def __init__(self):
-        super(TrackingManager, self).__init__()
-
-        self._project = None
-        self._data = dict()
-        self._updated = False
-        self._logged = False
-
-    @property
-    def project(self):
-        return self._project
-
-    def set_project(self, project):
-        """
-        Sets the project linked to the tracking manager
-        :param project: ArtellaProject
-        """
-
-        self._project = project
-        # self.update_tracking_info()
+    _data = dict()
+    _updated = False
+    _logged = False
 
     def get_name(self):
         """
@@ -70,14 +51,14 @@ class TrackingManager(QObject, object):
         :return: bool
         """
 
-        return self._logged
+        return self.__class__._logged
 
     def check_update(self):
         """
         Checks if tracking manager has been updated or not. If not, an updating is forced
         """
 
-        if self._updated:
+        if self.__class__._updated:
             return
 
         self.update_tracking_info()
@@ -287,12 +268,3 @@ class TrackingManager(QObject, object):
 
         raise NotImplementedError(
             'get_task_status function for {} is not implemented!'.format(self.__class__.__name__))
-
-
-@decorators.Singleton
-class TrackinManagerSingleton(TrackingManager, object):
-    def __init__(self):
-        TrackingManager.__init__(self)
-
-
-artellapipe.register.register_class('Tracker', TrackinManagerSingleton)

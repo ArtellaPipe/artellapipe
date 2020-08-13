@@ -21,7 +21,7 @@ from tpDcc.libs.python import folder
 import artellapipe
 from artellapipe.core import abstract
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaShot(abstract.AbstractShot, object):
@@ -506,6 +506,3 @@ class ArtellaShot(abstract.AbstractShot, object):
 
         shot_id = self.get_id()
         return artellapipe.AssetsMgr().get_assets_in_shot(shot_id)
-
-
-artellapipe.register.register_class('Shot', ArtellaShot)
