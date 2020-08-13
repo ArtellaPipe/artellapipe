@@ -13,8 +13,8 @@ __maintainer__ = "Tomas Poveda"
 __email__ = "tpovedatd@gmail.com"
 
 import os
+import time
 import logging
-import threading
 import traceback
 
 from Qt.QtCore import *
@@ -22,10 +22,10 @@ from Qt.QtWidgets import *
 
 import tpDcc
 
-import artellapipe.register
+import artellapipe
 from artellapipe.libs.artella.core import artellalib
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaSyncSplash(QSplashScreen, object):
@@ -41,17 +41,32 @@ class ArtellaSyncSplash(QSplashScreen, object):
 
 class ArtellaSyncDialog(QDialog, object):
 
+    doSync = Signal()
     syncFinished = Signal()
 
-    def __init__(self, project, parent=None):
+    def __init__(self, files, project, recursive=False, force_sync_files=False, parent=None):
         super(ArtellaSyncDialog, self).__init__(parent=parent)
 
+        self._files = files
         self._project = project
+        self._recursive = recursive
+        self._force_sync_files = force_sync_files
+
+        self._sync_thread = QThread(self)
+        self._sync_worker = SyncFileWorker()
+        self._sync_worker.moveToThread(self._sync_thread)
+        self._sync_worker.syncStarted.connect(self._on_sync_start)
+        self._sync_worker.syncFinished.connect(self._on_sync_finish)
+        self._sync_worker.syncUpdated.connect(self._on_sync_updated)
+        self._sync_worker.syncFailFile.connect(self._on_sync_file_failed)
+        self._sync_thread.start()
+
+        self._progress_timer = QTimer(self)
+
+        self._progress_timer.timeout.connect(self._on_update_progress_bar)
+        self.doSync.connect(self._sync_worker.run)
 
         self.ui()
-
-        self._timer = QTimer(self)
-        self._timer.timeout.connect(self._on_update_progress_bar)
 
     def ui(self):
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
@@ -94,108 +109,62 @@ class ArtellaSyncDialog(QDialog, object):
         Starts the sync process
         """
 
+        self._sync_worker.set_files(self._files)
+        self._sync_worker.set_assets_path(artellapipe.AssetsMgr().get_assets_path())
+        self._sync_worker.set_recursive(self._recursive)
+        self._sync_worker.set_force_sync_files(self._force_sync_files)
+        self._sync_worker.set_update_progress(artellapipe.project.is_enterprise())
+
         self.raise_()
-        self._timer.start(200)
+
+        self.doSync.emit()
+
+        self.exec_()
+
+    def _on_sync_start(self):
+        if not artellapipe.project.is_enterprise():
+            self._progress_timer.start(200)
+
+    def _on_sync_finish(self, error_msg):
+        self._progress_timer.stop()
+        self.syncFinished.emit()
+
+        if error_msg:
+            LOGGER.error(error_msg)
+
+        self.close()
+
+    def _on_sync_updated(self, text, total_done, total_in_progress, total_operations, total_bytes, bytes_to_download):
+
+        progress_status = '{} > {} of {} KiB downloaded ({} of {} files downloaded)'.format(
+            text, int(total_bytes / 1024), int(bytes_to_download / 1024), total_in_progress, total_operations)
+        self._progress_bar.setValue(total_done)
+        self._progress_text.setText(progress_status)
+
+    def _on_sync_file_failed(self, file_path):
+        LOGGER.warning('Was not possible to synchronize file from Artella server: {}!'.format(file_path))
 
     def _on_update_progress_bar(self):
-
         if self._progress_bar.value() >= self._progress_bar.maximum():
             self._progress_bar.setValue(0)
         self._progress_bar.setValue(self._progress_bar.value() + 1)
 
     def closeEvent(self, event):
         self.syncFinished.emit()
-        self._timer.stop()
+        self._progress_timer.stop()
+        artellalib.artella.pause_synchronization()
         return super(ArtellaSyncDialog, self).closeEvent(event)
 
 
 class ArtellaSyncFileDialog(ArtellaSyncDialog, object):
     def __init__(self, project, files=None):
-
-        self._files = files
-
-        super(ArtellaSyncFileDialog, self).__init__(project=project)
-
-    def _on_update_progress_bar(self):
-        super(ArtellaSyncFileDialog, self)._on_update_progress_bar()
-
-        if self._event.is_set():
-            self._timer.stop()
-            self.close()
-
-    def sync(self):
-        if not self._files:
-            self.close()
-        super(ArtellaSyncFileDialog, self).sync()
-        self._event = threading.Event()
-        try:
-            threading.Thread(target=self.sync_files, args=(self._event,), name='ArtellaSyncFilesThread').start()
-        except Exception as exc:
-            LOGGER.error(str(exc))
-            LOGGER.error(traceback.format_exc())
-            self.close()
-        self.exec_()
-
-    def sync_files(self, event):
-        try:
-            for p in self._files:
-                if not p:
-                    continue
-                file_path = os.path.relpath(p, artellapipe.AssetsMgr().get_assets_path())
-                self._progress_text.setText('Syncing file: {0} ... Please wait!'.format(file_path))
-                valid_sync = artellalib.synchronize_file(p)
-                if valid_sync is None or valid_sync == {}:
-                    event.set()
-                    return
-        except Exception as exc:
-            LOGGER.error(str(exc))
-            LOGGER.error(traceback.format_exc())
-        finally:
-            event.set()
+        super(ArtellaSyncFileDialog, self).__init__(files=files, force_sync_files=True, project=project)
 
 
 class ArtellaSyncPathDialog(ArtellaSyncDialog, object):
     def __init__(self, project, paths=None, recursive=False):
-
-        self._paths = paths
-        self._recursive = recursive
-
-        super(ArtellaSyncPathDialog, self).__init__(project=project)
-
-    def _on_update_progress_bar(self):
-        super(ArtellaSyncPathDialog, self)._on_update_progress_bar()
-
-        if self._event.is_set():
-            self._timer.stop()
-            self.close()
-
-    def closeEvent(self, event):
-        self._timer.stop()
-        super(ArtellaSyncPathDialog, self).closeEvent(event)
-
-    def sync(self):
-        if not self._paths:
-            self.close()
-        super(ArtellaSyncPathDialog, self).sync()
-        self._event = threading.Event()
-        try:
-            threading.Thread(target=self.sync_files, args=(self._event,), name='ArtellaSyncPathsThread').start()
-        except Exception as e:
-            LOGGER.error(str(e))
-            LOGGER.error(traceback.format_exc())
-        self.exec_()
-
-    def sync_files(self, event):
-        for p in self._paths:
-            file_path = os.path.relpath(p, artellapipe.AssetsMgr().get_assets_path())
-            self._progress_text.setText('Syncing files of folder: {0} ... Please wait!'.format(file_path))
-            try:
-                artellalib.synchronize_path_with_folders(p, recursive=self._recursive)
-            except Exception as e:
-                LOGGER.error('Impossible to sync files ... Maybe Artella is down! Try it later ...')
-                LOGGER.error(str(e))
-                event.set()
-        event.set()
+        super(ArtellaSyncPathDialog, self).__init__(
+            files=paths, project=project, force_sync_files=False, recursive=recursive)
 
 
 class ArtellaSyncGetDepsDialog(ArtellaSyncDialog, object):
@@ -227,12 +196,81 @@ class ArtellaSyncGetDepsDialog(ArtellaSyncDialog, object):
             self._event.set()
 
         if self._event.is_set():
-            self._timer.stop()
+            self._progress_timer.stop()
             self.close()
 
     def _cancel_sync(self):
         self._canceled = True
 
 
-artellapipe.register.register_class('SyncFileDialog', ArtellaSyncFileDialog)
-artellapipe.register.register_class('SyncPathDialog', ArtellaSyncPathDialog)
+class SyncFileWorker(QObject, object):
+
+    syncUpdated = Signal(str, int, int, int, int, int)
+    syncStarted = Signal()
+    syncFinished = Signal(str)
+    syncFailFile = Signal(str)
+
+    def __init__(self):
+        super(SyncFileWorker, self).__init__()
+
+        self._files = list()
+        self._assets_path = ''
+        self._recursive = False
+        self._force_sync_file = False
+        self._update_progress = False
+
+    def set_assets_path(self, assets_path):
+        self._assets_path = assets_path
+
+    def set_files(self, files):
+        self._files = files
+
+    def set_recursive(self, flag):
+        self._recursive = flag
+
+    def set_force_sync_files(self, flag):
+        self._force_sync_file = flag
+
+    def set_update_progress(self, flag):
+        self._update_progress = flag
+
+    def run(self):
+        self.syncStarted.emit()
+
+        if not self._files:
+            self.syncFinished.emit('No files to sync')
+            return
+
+        for file_path in self._files:
+            if not file_path:
+                continue
+            try:
+                file_path_to_sync = os.path.relpath(file_path, self._assets_path)
+                msg = '{}'.format(file_path_to_sync)
+                self.syncUpdated.emit(msg, 0, 0, 0, 0, 0)
+                if self._force_sync_file:
+                    valid_sync = artellalib.artella.synchronize_file(file_path)
+                else:
+                    valid_sync = artellalib.artella.synchronize_path_with_folders(file_path, recursive=self._recursive)
+                if not valid_sync:
+                    self.syncFailFile.emit(file_path)
+                    continue
+
+                if self._update_progress:
+
+                    # We force the waiting to a high value, otherwise Artella Drive Client will return that
+                    # no download is being processed
+                    time.sleep(2.0)
+
+                    while True:
+                        progress, fd, ft, bd, bt = artellalib.artella.get_synchronization_progress()
+                        self.syncUpdated.emit(msg, progress, fd, ft, bd, bt)
+                        if progress >= 100 or bd == bt:
+                            break
+            except Exception:
+                self.syncFinished.emit(
+                    'Unexpected error while synchronizing file from Artella server: {} | {}'.format(
+                        file_path, traceback.format_exc()))
+                break
+
+        self.syncFinished.emit('')
