@@ -17,10 +17,10 @@ import logging
 
 import tpDcc
 
-import artellapipe.register
+import artellapipe
 from artellapipe.core import abstract, defines
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaAsset(abstract.AbstractAsset, object):
@@ -215,6 +215,3 @@ class ArtellaAsset(abstract.AbstractAsset, object):
         """
 
         return self._project.solve_name('asset_file', asset_name, **kwargs)
-
-
-artellapipe.register.register_class('Asset', ArtellaAsset)

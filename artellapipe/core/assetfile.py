@@ -21,7 +21,7 @@ from tpDcc.libs.python import osplatform, path as path_utils
 import artellapipe
 from artellapipe.core import defines, file
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaAssetFile(file.ArtellaFile, object):
