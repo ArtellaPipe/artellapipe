@@ -37,17 +37,12 @@ else:
     import importlib as loader
 
 import artellapipe
-from artellapipe.libs import artella as artella_lib
-from artellapipe.libs.artella.core import artellalib
+import artellapipe.libs.artella
 from artellapipe.core import defines
-from artellapipe.utils import exceptions
+from artellapipe.widgets import tray
+from artellapipe.libs.artella.core import artellalib
 
-LOGGER = logging.getLogger()
-
-
-class ArtellaProjectType(object):
-    INDIE = 'indie'
-    ENTERPRISE = 'enterprise'
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaProject(object):
@@ -121,6 +116,16 @@ class ArtellaProject(object):
         """
 
         return self._settings
+
+    @property
+    def id(self):
+        """
+        Returns the ID of the project
+        :return: str
+        """
+
+        project_type = self.get_project_type()
+        return self._config_data['id'][project_type]
 
     @property
     def full_id(self):
@@ -204,23 +209,7 @@ class ArtellaProject(object):
         valid_setup = self.set_environment_variables()
         if not valid_setup:
             LOGGER.warning('Impossible to setup Artella project. Make sure that Artella App is working!')
-        self.create_shelf()
         self._tray = self.create_tray()
-        self.create_names_manager()
-        self.create_files_manager()
-        self.create_assets_manager()
-        self.create_tags_manager()
-        self.create_shaders_manager()
-        self.create_sequences_manager()
-        self.create_shots_manager()
-        self.create_tasks_manager()
-        self.create_media_manager()
-        self.create_playblasts_manager()
-        self.create_pyblish_manager()
-        self.create_dependencies_manager()
-        self.create_casting_manager()
-        self.create_slack_manager()
-        self.create_production_tracker()
         self.update_project()
         self._update_dcc_ui()
 
@@ -243,6 +232,22 @@ class ArtellaProject(object):
 
         current_environment = self.get_environment()
         return not current_environment or current_environment == 'DEVELOPMENT'
+
+    def is_indie(self):
+        """
+        Returns True if current project belongs to Artella Indie
+        :return: bool
+        """
+
+        return self.get_project_type() == artellalib.ArtellaProjectType.INDIE
+
+    def is_enterprise(self):
+        """
+        Returns True if current project belongs to Artella Enterprise
+        :return: bool
+        """
+
+        return self.get_project_type() == artellalib.ArtellaProjectType.ENTERPRISE
 
     def get_toolsets_paths(self):
         """
@@ -275,7 +280,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return self._config.get('project_type', default=ArtellaProjectType.INDIE)
+        return self._config.get('project_type', default=artellalib.ArtellaProjectType.INDIE)
 
     def get_project_path(self):
         """
@@ -446,8 +451,11 @@ class ArtellaProject(object):
         """
 
         # We add Artella Python Scripts folder if it is not already added
-        artella_folder = artellalib.get_artella_python_folder()
-        if artella_folder not in sys.path:
+        if self.get_project_type() != artellalib.ArtellaProjectType.INDIE:
+            return
+
+        artella_folder = artellalib.artella.get_artella_python_folder()
+        if artella_folder and os.path.isdir(artella_folder) and artella_folder not in sys.path:
             sys.path.append(artella_folder)
 
     def set_environment_variables(self):
@@ -467,17 +475,44 @@ class ArtellaProject(object):
             if tp.Dcc.get_name() == tp.Dccs.Unknown:
                 mtime = time.time()
                 date_value = datetime.datetime.fromtimestamp(mtime)
-                artellalib.get_spigot_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
-            valid_metadata = artellalib.update_local_artella_root()
+
+                artellalib.artella.get_artella_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
+            valid_metadata = artellalib.artella.update_local_artella_root()
             if not valid_metadata:
                 return False
-            root_prefix = artella_lib.config.get('app', 'root_prefix')
+            root_prefix = artellapipe.libs.artella.config.get('app', 'root_prefix')
             production_folder = self.get_production_folder()
             artella_var = os.environ.get(root_prefix, None)
             LOGGER.debug('Artella environment variable is set to: {}'.format(artella_var))
             if artella_var and os.path.exists(artella_var):
-                os.environ[self.env_var] = '{}{}/{}/{}/'.format(
-                    artella_var, production_folder, self.id_number, self.id)
+                if self.get_project_type() == artellalib.ArtellaProjectType.INDIE:
+                    os.environ[self.env_var] = '{}{}/{}/{}/'.format(
+                        artella_var, production_folder, self.id_number, self.id)
+                else:
+                    client = artellalib.artella.get_artella_client()
+                    projects = client.get_remote_projects(force_update=True)
+                    local_projects = client.get_local_projects(force_update=True) or dict()
+                    project_found = None
+                    for remote_name, project_data in projects.items():
+                        if self.id in project_data:
+                            project_found = project_data
+                            break
+                    if not project_found:
+                        LOGGER.warning(
+                            'Project ID: {} not found in currently available Artella Enterprise projects. '
+                            'Impossible to set Artella environment variable!'.format(self.id))
+                    else:
+                        project_name = project_found[self.id]['name']
+                        env_var = local_projects.get(project_name, dict()).get('directory', None)
+                        if not env_var:
+                            env_var_path = '{}{}{}'.format(artella_var, os.sep, project_name)
+                            LOGGER.warning(
+                                'Artella Enterprise Local Project {} | {} not found in the user computer. '
+                                'Setting fallback path: {}!'.format(project_name, self.id, env_var_path))
+                        else:
+                            if not env_var.endswith('/'):
+                                env_var = '{}/'.format(env_var)
+                            os.environ[self.env_var] = env_var
             else:
                 LOGGER.warning('Impossible to set Artella environment variable!')
         except Exception as e:
@@ -512,10 +547,7 @@ class ArtellaProject(object):
                 if root in current_paths:
                     continue
                 if tp.is_maya():
-                    if osplatform.is_mac():
-                        os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + ':' + root
-                    else:
-                        os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + ';' + root
+                    os.environ['XBMLANGPATH'] = os.environ.get('XBMLANGPATH') + os.pathsep + root
 
         slack_token = self.config.get('slack_token', '')
         slack_channel = self.config.get('slack_channel', '')
@@ -531,190 +563,6 @@ class ArtellaProject(object):
         LOGGER.debug('\n')
 
         return True
-
-    def create_shelf(self):
-        """
-        Creates Artella Project shelf
-        """
-
-        if tp.Dcc == tp.Dccs.Unknown:
-            return False
-
-        shelf_manager = artellapipe.ShelfMgr()
-        shelf_manager.set_project(self)
-
-        return shelf_manager
-
-    def create_names_manager(self):
-        """
-        Creates instance of the assets manager used by the project
-        :return: ArtellaAssetsManager
-        """
-
-        names_manager = artellapipe.NamesMgr()
-        names_manager.set_project(self)
-
-        return names_manager
-
-    def create_assets_manager(self):
-        """
-        Creates instance of the assets manager used by the project
-        :return: ArtellaAssetsManager
-        """
-
-        if tp.Dcc == tp.Dccs.Unknown:
-            return None
-
-        assets_manager = artellapipe.AssetsMgr()
-        assets_manager.set_project(self)
-
-        return assets_manager
-
-    def create_files_manager(self):
-        """
-        Creates instance of the files manager used by the project
-        :return: ArtellaFilesManager
-        """
-
-        assets_manager = artellapipe.FilesMgr()
-        assets_manager.set_project(self)
-
-        return assets_manager
-
-    def create_tags_manager(self):
-        """
-        Creates instance of the tags manager used by the project
-        :return: ArtellaTagsManager
-        """
-
-        tags_manager = artellapipe.TagsMgr()
-        tags_manager.set_project(self)
-
-        return tags_manager
-
-    def create_shaders_manager(self):
-        """
-        Creates instance of the shaders manager used by the project
-        :return: ArtellaShadersManager
-        """
-
-        shaders_manager = artellapipe.ShadersMgr()
-        shaders_manager.set_project(self)
-
-        return shaders_manager
-
-    def create_sequences_manager(self):
-        """
-        Creates instance of the sequences manager used by the project
-        :return: ArtellaSequencesManager
-        """
-
-        sequences_manager = artellapipe.SequencesMgr()
-        sequences_manager.set_project(self)
-
-        return sequences_manager
-
-    def create_shots_manager(self):
-        """
-        Creates instance of the shots manager used by the project
-        :return: ArtellaShotsManager
-        """
-
-        shots_manager = artellapipe.ShotsMgr()
-        shots_manager.set_project(self)
-
-        return shots_manager
-
-    def create_tasks_manager(self):
-        """
-        Creates instance of the tasks manager used by the project
-        :return: ArtellaShotsManager
-        """
-
-        tasks_manager = artellapipe.TasksMgr()
-        tasks_manager.set_project(self)
-
-        return tasks_manager
-
-    def create_media_manager(self):
-        """
-        Creates instance of hte media manager used by the project
-        :return: ArtellaMediaManager
-        """
-
-        media_manager = artellapipe.MediaMgr()
-        media_manager.set_project(self)
-
-        return media_manager
-
-    def create_playblasts_manager(self):
-        """
-       Creates instance of the playblasts manager used by the project
-       :return: ArtellaPlayblastsManager
-       """
-
-        playblasts_manager = artellapipe.PlayblastsMgr()
-        playblasts_manager.set_project(self)
-
-        return playblasts_manager
-
-    def create_pyblish_manager(self):
-        """
-       Creates instance of the Pyblish plugins manager used by the project
-       :return: ArtellaPyblishPluginsManager
-       """
-
-        pyblish_manager = artellapipe.PyblishMgr()
-        pyblish_manager.set_project(self)
-
-        return pyblish_manager
-
-    def create_dependencies_manager(self):
-        """
-        Crates instance of the dependencies manager used by the project
-        :return: ArtellaDependenciesManager
-        """
-
-        deps_manager = artellapipe.DepsMgr()
-        deps_manager.set_project(self)
-
-        return deps_manager
-
-    def create_casting_manager(self):
-        """
-        Crates instance of the casting manager used by the project
-        :return: ArtellaCastingManager
-        """
-
-        casting_manager = artellapipe.CastMgr()
-        casting_manager.set_project(self)
-
-        return casting_manager
-
-    def create_slack_manager(self):
-        """
-        Crates instance of the slack manager used by the project
-        :return: SlackManager
-        """
-
-        slack_manager = artellapipe.SlackMgr()
-        slack_manager.set_project(self)
-
-        return slack_manager
-
-    def create_production_tracker(self):
-        """
-        Creates instance of the production tracker used by the project
-        :return: ArtellaProductionTracker
-        """
-
-        if tp.Dcc == tp.Dccs.Unknown:
-            return None
-
-        production_tracker = artellapipe.Tracker()
-        production_tracker.set_project(self)
-
-        return production_tracker
 
     def get_folders_to_register(self, full_path=True):
         """
@@ -781,9 +629,9 @@ class ArtellaProject(object):
         """
 
         LOGGER.debug('Creating {} Tools Tray ...'.format(self.name.title()))
-        tray = artellapipe.Tray(project=self)
+        project_tray = tray.ArtellaTray(project=self)
 
-        return tray
+        return project_tray
 
     def open_documentation(self):
         """
@@ -886,7 +734,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return artella_lib.config.get('server', self.get_project_type()).get('working_folder')
+        return artellapipe.libs.artella.config.get('server', self.get_project_type()).get('working_folder')
 
     def get_production_folder_name(self):
         """
@@ -902,7 +750,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return artella_lib.config.get('server', self.get_project_type()).get('production_folder')
+        return artellapipe.libs.artella.config.get('server', self.get_project_type()).get('production_folder')
 
     def get_production_path(self):
         """
@@ -924,7 +772,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        artella_web = artella_lib.config.get('server', self.get_project_type()).get('url')
+        artella_web = artellapipe.libs.artella.config.get('server', self.get_project_type()).get('url')
         return '{}/project/{}/files'.format(artella_web, self.id)
 
     def get_artella_assets_url(self):
