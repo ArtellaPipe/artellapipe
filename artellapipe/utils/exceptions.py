@@ -17,11 +17,8 @@ import sys
 import traceback
 from functools import wraps
 
-from Qt.QtGui import *
-
 import tpDcc as tp
 from tpDcc.libs.python import osplatform
-from tpDcc.libs.qt.widgets import label, buttons, dividers, message
 
 SENTRY_AVAILABLE = True
 try:
@@ -34,9 +31,6 @@ import artellapipe
 
 from Qt.QtCore import *
 from Qt.QtWidgets import *
-
-if tp.is_maya():
-    import tpDcc.dccs.maya as maya
 
 
 # TODO: Move this into a project specific configuration file
@@ -144,8 +138,9 @@ def sentry_exception(function):
 
 
 def show_exception_box(exc_text, exc_trace):
+    from artellapipe.widgets import exceptions
     if QApplication.instance() is not None:
-        error_box = ArtellaExceptionDialog(exc_text, exc_trace)
+        error_box = exceptions.ArtellaExceptionDialog(exc_text, exc_trace)
         error_box.exec_()
 
 
@@ -191,54 +186,6 @@ class FileNotFoundException(Exception):
         super(FileNotFoundException, self).__init__(*args)
 
 
-class ArtellaExceptionDialog(tp.Dialog):
-    def __init__(self, exc_text, exc_trace):
-        self._text = exc_text
-        self._trace = exc_trace
-        super(ArtellaExceptionDialog, self).__init__(title='Artella-Error', show_on_initialize=False)
-
-        self.setWindowIcon(tp.ResourcesMgr().icon('artella'))
-
-    def ui(self):
-        super(ArtellaExceptionDialog, self).ui()
-
-        text_lbl = label.BaseLabel(str(self._text) if self._text else '')
-        self._error_text = QPlainTextEdit(str(self._trace) if self._trace else '')
-        self._error_text.setReadOnly(True)
-        self._error_text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        self.main_layout.addWidget(text_lbl)
-        self.main_layout.addWidget(dividers.Divider())
-        self.main_layout.addWidget(self._error_text)
-
-        buttons_lyt = QHBoxLayout()
-        self._copy_to_clipboard_btn = buttons.BaseButton('Copy to Clipboard')
-        self._hide_details_btn = buttons.BaseButton('Hide Details...')
-        buttons_lyt.addStretch()
-        buttons_lyt.addWidget(self._copy_to_clipboard_btn)
-        buttons_lyt.addWidget(self._hide_details_btn)
-        self.main_layout.addStretch()
-        self.main_layout.addLayout(buttons_lyt)
-
-    def setup_signals(self):
-        self._hide_details_btn.clicked.connect(self._on_toggle_details)
-        self._copy_to_clipboard_btn.clicked.connect(self._on_copy_to_clipboard)
-
-    def _on_toggle_details(self):
-        self._error_text.setVisible(not self._error_text.isVisible())
-        if self._error_text.isVisible():
-            self._hide_details_btn.setText('Hide Error Trace')
-        else:
-            self._hide_details_btn.setText('Show Error Trace')
-
-    def _on_copy_to_clipboard(self):
-        clipboard = QApplication.clipboard()
-        clipboard.setText(self._error_text.toPlainText(), QClipboard.Clipboard)
-        if clipboard.supportsSelection():
-            clipboard.setText(self._error_text.toPlainText(), QClipboard.Selection)
-        message.PopupMessage.success(text='Error message copied to clipboard!.', parent=self)
-
-
 class ArtellaExceptionHook(QObject):
     _exception_caught = Signal(object, object)
 
@@ -249,6 +196,7 @@ class ArtellaExceptionHook(QObject):
         sys.excepthook = self.exception_hook
 
         if tp.is_maya():
+            import tpDcc.dccs.maya as maya
             maya.utils.formatGuiException = self.exception_hook
 
         # connect signal to execute the message box function always on main thread
@@ -276,6 +224,7 @@ class ArtellaExceptionHook(QObject):
                 self._exception_caught.emit(exc_value, log_msg)
 
             if tp.is_maya():
+                import tpDcc.dccs.maya as maya
                 return maya.utils._formatGuiException(exc_type, exc_value, exc_traceback, detail)
 
     def _should_skip_exception_box(self, exc_value, log_msg):
