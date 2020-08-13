@@ -47,13 +47,6 @@ class ArtellaWindow(tpDcc.Window, object):
             **kwargs
         )
 
-        # if self.parent():
-        #     for widget in self.parent().findChildren(QMainWindow):
-        #         if widget is not self:
-        #             if widget.objectName() == self.objectName():
-        #                 widget.close()
-
-        # We define icon after window frameless mode is set
         window_icon = self._get_icon()
         self.setWindowIcon(window_icon)
 
@@ -96,13 +89,6 @@ class ArtellaWindow(tpDcc.Window, object):
         if logo_pixmap and not logo_pixmap.isNull():
             win_logo = self._logo_scene.addPixmap(logo_pixmap)
             win_logo.setOffset(910, 0)
-
-        # self._status_bar.set_project(self._project)
-        # self._status_bar.set_tool(self._tool)
-        # if not self._status_bar.has_url():
-        #     self._status_bar.hide_info()
-        # if not self._status_bar.has_tool():
-        #     self._status_bar.hide_bug()
 
         if self._project.is_dev():
             int_colors = self._project.dev_color0.split(',')
@@ -163,22 +149,6 @@ class ArtellaWindow(tpDcc.Window, object):
 
         win_logo = self._logo_scene.addPixmap(logo_pixmap)
         win_logo.setOffset(offset_x, offset_y)
-
-    def set_info_url(self, url):
-        """
-        Sets the info URL of the current window
-        :param url: str
-        """
-
-        if not url:
-            return
-
-        self._status_bar.set_info_url(url)
-
-        if not self._status_bar.has_url():
-            self._status_bar.hide_info()
-        else:
-            self._status_bar.show_info()
 
     def _get_logo(self):
         """
