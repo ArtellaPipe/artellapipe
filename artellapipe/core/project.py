@@ -454,7 +454,7 @@ class ArtellaProject(object):
         if self.get_project_type() != artellalib.ArtellaProjectType.INDIE:
             return
 
-        artella_folder = artellalib.artella.get_artella_python_folder()
+        artella_folder = artellalib.get_artella_python_folder()
         if artella_folder and os.path.isdir(artella_folder) and artella_folder not in sys.path:
             sys.path.append(artella_folder)
 
@@ -476,8 +476,8 @@ class ArtellaProject(object):
                 mtime = time.time()
                 date_value = datetime.datetime.fromtimestamp(mtime)
 
-                artellalib.artella.get_artella_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
-            valid_metadata = artellalib.artella.update_local_artella_root()
+                artellalib.get_artella_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
+            valid_metadata = artellalib.update_local_artella_root()
             if not valid_metadata:
                 return False
             root_prefix = artellapipe.libs.artella.config.get('app', 'root_prefix')
@@ -489,7 +489,7 @@ class ArtellaProject(object):
                     os.environ[self.env_var] = '{}{}/{}/{}/'.format(
                         artella_var, production_folder, self.id_number, self.id)
                 else:
-                    client = artellalib.artella.get_artella_client()
+                    client = artellalib.get_artella_client()
                     projects = client.get_remote_projects(force_update=True)
                     local_projects = client.get_local_projects(force_update=True) or dict()
                     project_found = None
@@ -772,8 +772,7 @@ class ArtellaProject(object):
         :return: str
         """
 
-        artella_web = artellapipe.libs.artella.config.get('server', self.get_project_type()).get('url')
-        return '{}/project/{}/files'.format(artella_web, self.id)
+        return artellalib.get_artella_project_url(self.id)
 
     def get_artella_assets_url(self):
         """
