@@ -629,7 +629,7 @@ class AssetsManager(object):
         latest_version = list()
 
         versions = dict()
-        status = artellalib.artella.get_status(asset_path, as_json=True)
+        status = artellalib.get_status(asset_path, as_json=True)
 
         status_data = status.get('data')
         if not status_data:
@@ -641,7 +641,7 @@ class AssetsManager(object):
                 continue
             if file_type and file_type not in name:
                 continue
-            version = artellalib.artella.split_version(name)[1]
+            version = artellalib.split_version(name)[1]
             versions[version] = name
 
         ordered_versions = OrderedDict(sorted(versions.items()))

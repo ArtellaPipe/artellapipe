@@ -152,7 +152,7 @@ class ArtellaSyncDialog(QDialog, object):
     def closeEvent(self, event):
         self.syncFinished.emit()
         self._progress_timer.stop()
-        artellalib.artella.pause_synchronization()
+        artellalib.pause_synchronization()
         return super(ArtellaSyncDialog, self).closeEvent(event)
 
 
@@ -249,9 +249,9 @@ class SyncFileWorker(QObject, object):
                 msg = '{}'.format(file_path_to_sync)
                 self.syncUpdated.emit(msg, 0, 0, 0, 0, 0)
                 if self._force_sync_file:
-                    valid_sync = artellalib.artella.synchronize_file(file_path)
+                    valid_sync = artellalib.synchronize_file(file_path)
                 else:
-                    valid_sync = artellalib.artella.synchronize_path_with_folders(file_path, recursive=self._recursive)
+                    valid_sync = artellalib.synchronize_path_with_folders(file_path, recursive=self._recursive)
                 if not valid_sync:
                     self.syncFailFile.emit(file_path)
                     continue
@@ -263,7 +263,7 @@ class SyncFileWorker(QObject, object):
                     time.sleep(2.0)
 
                     while True:
-                        progress, fd, ft, bd, bt = artellalib.artella.get_synchronization_progress()
+                        progress, fd, ft, bd, bt = artellalib.get_synchronization_progress()
                         self.syncUpdated.emit(msg, progress, fd, ft, bd, bt)
                         if progress >= 100 or bd == bt:
                             break
