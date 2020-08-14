@@ -306,8 +306,6 @@ class ArtellaProject(object):
         except ImportError:
             pkg_loader = loader.find_loader('artellapipe.config')
 
-        print(pkg_loader.filename)
-
         return path_utils.clean_path(os.path.dirname(pkg_loader.filename))
 
     def get_changelog_path(self):
