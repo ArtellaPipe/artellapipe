@@ -18,7 +18,7 @@ import logging.config
 import tpDcc.loader
 
 import artellapipe.register
-from artellapipe.core import asset, node, shot
+from artellapipe.core import asset, node, shot, sequence
 from artellapipe.managers import assets, files, names, shaders, shots, sequences, menus, shelf, tools, libs, tracking
 from artellapipe.managers import dependencies, playblasts, ocio
 from artellapipe.widgets import dialog, window, syncdialog
@@ -228,6 +228,7 @@ def register_classes():
     artellapipe.register.register_class('Asset', asset.ArtellaAsset)
     artellapipe.register.register_class('AssetNode', node.ArtellaAssetNode)
     artellapipe.register.register_class('Shot', shot.ArtellaShot)
+    artellapipe.register.register_class('Sequence', sequence.ArtellaSequence)
     artellapipe.register.register_class('Window', window.ArtellaWindow)
     artellapipe.register.register_class('Dialog', dialog.ArtellaDialog)
     artellapipe.register.register_class('SyncFileDialog', syncdialog.ArtellaSyncFileDialog)

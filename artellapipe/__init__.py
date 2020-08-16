@@ -14,7 +14,7 @@ __email__ = "tpovedatd@gmail.com"
 
 # For autocompletion
 if False:
-    from artellapipe.core import asset as core_asset, node, shot
+    from artellapipe.core import asset as core_asset, node, shot, sequence
     from artellapipe.managers import assets, files, names, shaders, shots, sequences, menus, shelf, tools, libs
     from artellapipe.managers import tracking, dependencies, playblasts, ocio
     from artellapipe.widgets import dialog, window, syncdialog
@@ -22,6 +22,7 @@ if False:
     Asset = core_asset.ArtellaAsset
     AssetNode = node.ArtellaAssetNode
     Shot = shot.ArtellaShot
+    Sequence = sequence.ArtellaSequence
     Window = window.ArtellaWindow
     Dialog = dialog.ArtellaDialog
     SyncFileDialog = syncdialog.ArtellaSyncFileDialog
