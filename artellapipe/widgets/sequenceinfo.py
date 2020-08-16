@@ -513,6 +513,3 @@ class PublishedSequenceInfo(base.BaseWidget, object):
         super(PublishedSequenceInfo, self).ui()
 
         self.main_layout.addWidget(QPushButton('TEST'))
-
-
-artellapipe.register.register_class('SequenceInfo', SequenceInfoWidget)

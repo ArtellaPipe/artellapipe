@@ -26,8 +26,9 @@ from tpDcc.libs.qt.core import base, menu
 
 import artellapipe.register
 from artellapipe.utils import worker
+from artellapipe.widgets import shotinfo, sequenceinfo
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ArtellaShotWidget(base.BaseWidget, object):
@@ -242,11 +243,8 @@ class ShotSequenceInfo(base.BaseWidget, object):
         sequence_name = self._shot_widget.shot.get_sequence()
         sequence = artellapipe.SequencesMgr().find_sequence(sequence_name)
 
-        self._sequence_info = artellapipe.SequenceInfo(sequence)
-        self._shot_info = artellapipe.ShotInfo(self._shot_widget)
+        self._sequence_info = sequenceinfo.SequenceInfoWidget(sequence)
+        self._shot_info = shotinfo.ShotInfoWidget(self._shot_widget)
 
         tab.addTab(self._shot_info, 'Shot')
         tab.addTab(self._sequence_info, 'Sequence')
-
-
-artellapipe.register.register_class('ShotWidget', ArtellaShotWidget)

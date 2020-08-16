@@ -478,6 +478,3 @@ class PublishedShotInfo(base.BaseWidget, object):
         super(PublishedShotInfo, self).ui()
 
         self.main_layout.addWidget(QPushButton('TEST'))
-
-
-artellapipe.register.register_class('ShotInfo', ShotInfoWidget)

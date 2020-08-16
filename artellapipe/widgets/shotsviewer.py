@@ -25,6 +25,7 @@ from tpDcc.libs.qt.core import base, qtutils
 from tpDcc.libs.qt.widgets import grid
 
 import artellapipe
+from artellapipe.widgets import shot as shot
 
 LOGGER = logging.getLogger()
 
@@ -212,10 +213,10 @@ class ShotsGrid(grid.GridWidget, object):
         if not all_shots:
             return
 
-        for shot in all_shots:
-            if not shot:
+        for found_shot in all_shots:
+            if not found_shot:
                 continue
-            shot_widget = artellapipe.ShotWidget(shot)
+            shot_widget = shot.ArtellaShotWidget(found_shot)
             self.add_shot(shot_widget)
 
     def clear_shots(self):
@@ -295,6 +296,3 @@ class ShotsGrid(grid.GridWidget, object):
         new_menu = QMenu(self)
 
         return new_menu
-
-
-artellapipe.register.register_class('ShotsViewer', ShotsViewer)
