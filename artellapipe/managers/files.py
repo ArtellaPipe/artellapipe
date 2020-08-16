@@ -476,23 +476,29 @@ class FilesManager(python.Singleton, object):
 
         short_path = file_path.replace(artellapipe.AssetsMgr().get_assets_path(), '')[1:]
 
-        history = artellalib.get_file_history(file_path)
-        file_versions = history.versions
-        if not file_versions:
-            current_version = -1
+        if artellapipe.project.is_enterprise():
+            current_version = artellalib.get_current_version(file_path)
+            if current_version == -1:
+                current_version = 0
+            new_version = current_version + 1
         else:
-            current_version = 0
-            for v in file_versions:
-                if int(v[0]) > current_version:
-                    current_version = int(v[0])
-        current_version += 1
+            history = artellalib.get_file_history(file_path)
+            file_versions = history.versions
+            if not file_versions:
+                current_version = -1
+            else:
+                current_version = 0
+                for v in file_versions:
+                    if int(v[0]) > current_version:
+                        current_version = int(v[0])
+            new_version = current_version + 1
 
         if comment:
             comment = str(comment)
         else:
             comment = qtutils.get_comment(
                 text_message='Make New Version ({}) : {}'.format(
-                    current_version, short_path), title='Comment', parent=tp.Dcc.get_main_window())
+                    new_version, short_path), title='Comment', parent=tp.Dcc.get_main_window())
 
         if comment:
             artellalib.upload_new_asset_version(file_path=file_path, comment=comment, skip_saving=skip_saving)
@@ -500,7 +506,7 @@ class FilesManager(python.Singleton, object):
                 artellapipe.project.notify(
                     title='New Working Version',
                     msg='Version {} for file "{}" uploaded to Artella server successfully!'.format(
-                        current_version, file_path))
+                        new_version, file_path))
             return True
 
         return False
