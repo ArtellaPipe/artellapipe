@@ -49,7 +49,7 @@ class SequencesManager(object):
                 root_package_name='artellapipe',
                 environment=artellapipe.project.get_environment())
 
-        return self.__class__.config
+        return self.__class__._config
 
     @property
     def sequence_classes(self):
