@@ -259,6 +259,3 @@ class ShadersViewer(layouts.FlowLayout, object):
         """
 
         self.load_shader(shader_name=shader_name)
-
-
-artellapipe.register.register_class('ShadersViewer', ShadersViewer)
