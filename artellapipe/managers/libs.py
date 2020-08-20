@@ -182,8 +182,8 @@ class LibsManager(object):
 
         # Import library modules
         mod = importlib.import_module(pkg_loader.fullname)
-        skip_modules = ['{}.{}'.format(pkg_loader.fullname, m) for m in lib_config.data.get('skip_modules', list())]
-        importer.init_importer(package=pkg_loader.fullname, skip_modules=skip_modules)
+        # skip_modules = ['{}.{}'.format(pkg_loader.fullname, m) for m in lib_config.data.get('skip_modules', list())]
+        # importer.init_importer(package=pkg_loader.fullname, skip_modules=skip_modules)
 
         mod.__dict__['config'] = lib_config
 
