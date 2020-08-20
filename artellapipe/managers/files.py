@@ -15,6 +15,7 @@ import logging
 import inspect
 import tempfile
 import importlib
+import webbrowser
 
 import six
 
@@ -666,3 +667,28 @@ class FilesManager(python.Singleton, object):
             return
 
         return asset_file_class_found
+
+    def get_artella_url(self, file_path=None, open=False):
+        """
+        Opens URL path of the given path
+        :param file_path: str
+        :param open: bool
+        """
+
+        self._check_project()
+
+        if not file_path:
+            file_path = tp.Dcc.scene_name()
+        if not file_path:
+            return
+
+        if os.path.isfile(file_path):
+            file_path = os.path.dirname(file_path)
+
+        relative_path = os.path.relpath(file_path, artellapipe.project.get_path())
+        artella_url = '{}/{}'.format(artellapipe.project.get_artella_url(), relative_path)
+
+        if open:
+            webbrowser.open(artella_url)
+
+        return artella_url
