@@ -263,6 +263,8 @@ class AssetsManager(object):
             return None
         for asset_data in assets_list:
             new_asset = self.create_asset(asset_data)
+            if not new_asset:
+                continue
             self.__class__._assets.append(new_asset)
 
         return self.__class__._assets
@@ -521,8 +523,15 @@ class AssetsManager(object):
 
         renderable_shapes = list()
 
+        node_name = asset.get_name()
+        if not tp.Dcc.object_exists(node_name):
+            LOGGER.warning(
+                'Impossible to get renderable shapes because node {} does not exists in current scene!'.format(
+                    node_name))
+            return renderable_shapes
+
         transform_relatives = tp.Dcc.list_relatives(
-            node=asset.get_name(), all_hierarchy=True, full_path=full_path, relative_type='transform',
+            node=node_name, all_hierarchy=True, full_path=full_path, relative_type='transform',
             shapes=False, intermediate_shapes=False)
 
         for obj in transform_relatives:
