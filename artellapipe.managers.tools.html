@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="artellapipe.managers.tracking module" href="artellapipe.managers.tracking.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> artellapipe
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> artellapipe
           
 
           
@@ -77,6 +78,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -110,6 +112,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -148,7 +151,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">artellapipe</a> &raquo;</li>
         
@@ -180,12 +183,12 @@
 <span id="artellapipe-managers-tools-module"></span><h1>artellapipe.managers.tools module<a class="headerlink" href="#module-artellapipe.managers.tools" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager that handles Artella Tools</p>
 <dl class="py class">
-<dt id="artellapipe.managers.tools.ArtellaToolsManager">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ArtellaToolsManager</code><a class="headerlink" href="#artellapipe.managers.tools.ArtellaToolsManager" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.tools.ToolsManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ToolsManager</code><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="artellapipe.managers.tools.ArtellaToolsManager.run_tool">
-<code class="sig-name descname">run_tool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tool_id</span></em>, <em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">project</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ArtellaToolsManager.run_tool" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.tools.ToolsManager.run_tool">
+<code class="sig-name descname">run_tool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tool_id</span></em>, <em class="sig-param"><span class="n">do_reload</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">project</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.tools.ToolsManager.run_tool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Launches artellapipe tool
 :param tool_id: str
 :param do_reload: bool
@@ -193,12 +196,6 @@
 :param project: ArtellaProject or None</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py class">
-<dt id="artellapipe.managers.tools.ArtellaToolsManagerSingleton">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.tools.</code><code class="sig-name descname">ArtellaToolsManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.tools.ArtellaToolsManagerSingleton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.tools.ArtellaToolsManager" title="artellapipe.managers.tools.ArtellaToolsManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.tools.ArtellaToolsManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
@@ -227,11 +224,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Tomas Poveda
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -242,7 +247,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

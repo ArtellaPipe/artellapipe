@@ -13,6 +13,7 @@ Submodules
    artellapipe.widgets.assetswidget
    artellapipe.widgets.button
    artellapipe.widgets.dialog
+   artellapipe.widgets.exceptions
    artellapipe.widgets.label
    artellapipe.widgets.progressbar
    artellapipe.widgets.sequence

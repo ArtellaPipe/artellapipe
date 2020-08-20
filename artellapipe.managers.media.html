@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="artellapipe.managers.menus module" href="artellapipe.managers.menus.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> artellapipe
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> artellapipe
           
 
           
@@ -77,6 +78,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -110,6 +112,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -148,7 +151,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">artellapipe</a> &raquo;</li>
         
@@ -179,12 +182,6 @@
   <div class="section" id="module-artellapipe.managers.media">
 <span id="artellapipe-managers-media-module"></span><h1>artellapipe.managers.media module<a class="headerlink" href="#module-artellapipe.managers.media" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager to Media related operations</p>
-<dl class="py class">
-<dt id="artellapipe.managers.media.ArtellaMediaManagerSingleton">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.media.</code><code class="sig-name descname">ArtellaMediaManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.media.ArtellaMediaManagerSingleton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.media.MediaManager" title="artellapipe.managers.media.MediaManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.media.MediaManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
 <dl class="py class">
 <dt id="artellapipe.managers.media.MediaManager">
 <em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.media.</code><code class="sig-name descname">MediaManager</code><a class="headerlink" href="#artellapipe.managers.media.MediaManager" title="Permalink to this definition">¶</a></dt>
@@ -251,13 +248,6 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="artellapipe.managers.media.MediaManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.set_project" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the project this manager belongs to
-:param project: ArtellaProject</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="artellapipe.managers.media.MediaManager.stamp">
 <code class="sig-name descname">stamp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">output</span></em>, <em class="sig-param"><span class="n">config_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extra_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.media.MediaManager.stamp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -300,11 +290,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Tomas Poveda
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -315,7 +313,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

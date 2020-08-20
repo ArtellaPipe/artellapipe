@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="artellapipe.managers.files module" href="artellapipe.managers.files.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> artellapipe
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> artellapipe
           
 
           
@@ -77,6 +78,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -110,6 +112,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -148,7 +151,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">artellapipe</a> &raquo;</li>
         
@@ -180,26 +183,26 @@
 <span id="artellapipe-managers-dependencies-module"></span><h1>artellapipe.managers.dependencies module<a class="headerlink" href="#module-artellapipe.managers.dependencies" title="Permalink to this headline">¶</a></h1>
 <p>Module that contains manager for DCC dependencies</p>
 <dl class="py class">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManager</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.dependencies.DependenciesManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">DependenciesManager</code><a class="headerlink" href="#artellapipe.managers.dependencies.DependenciesManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths">
-<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.dependencies.DependenciesManager.fix_dependencies_paths">
+<code class="sig-name descname">fix_dependencies_paths</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.DependenciesManager.fix_dependencies_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tries to fix paths that are not valid in the given file
 :param file_path: str, file path we want to fix paths of</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies">
-<code class="sig-name descname">get_current_scene_dependencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_current_scene_dependencies" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.dependencies.DependenciesManager.get_current_scene_dependencies">
+<code class="sig-name descname">get_current_scene_dependencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.DependenciesManager.get_current_scene_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all dependencies that are currently loaded in current scene
 :return: list(str)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies">
-<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em>, <em class="sig-param"><span class="n">parent_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">found_files</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.dependencies.DependenciesManager.get_dependencies">
+<code class="sig-name descname">get_dependencies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em>, <em class="sig-param"><span class="n">parent_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">found_files</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.DependenciesManager.get_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all dependencies that are currently loaded in the given file
 :param file_path: str, file path we want to get dependencies of
 :param parent_path: str
@@ -209,25 +212,12 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project">
-<code class="sig-name descname">set_project</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">project</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.set_project" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the project this manager belongs to
-:param project: ArtellaProject</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies">
-<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
+<dt id="artellapipe.managers.dependencies.DependenciesManager.update_dependencies">
+<code class="sig-name descname">update_dependencies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.dependencies.DependenciesManager.update_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates all the dependencies of the given file path
 :param file_path: str</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py class">
-<dt id="artellapipe.managers.dependencies.ArtellaDependenciesManagerSingleton">
-<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.dependencies.</code><code class="sig-name descname">ArtellaDependenciesManagerSingleton</code><a class="headerlink" href="#artellapipe.managers.dependencies.ArtellaDependenciesManagerSingleton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#artellapipe.managers.dependencies.ArtellaDependenciesManager" title="artellapipe.managers.dependencies.ArtellaDependenciesManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">artellapipe.managers.dependencies.ArtellaDependenciesManager</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
@@ -256,11 +246,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Tomas Poveda
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -271,7 +269,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
