@@ -230,5 +230,3 @@ def dock_window(project, window_class, min_width=300):
     win.show()
 
     return win
-
-

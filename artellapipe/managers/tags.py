@@ -25,11 +25,11 @@ class TagsManager(object):
     def config(self):
         if not self.__class__._config:
             self.__class__._config = tp.ConfigsMgr().get_config(
-            config_name='artellapipe-tags',
-            package_name=artellapipe.project.get_clean_name(),
-            root_package_name='artellapipe',
-            environment=artellapipe.project.get_environment()
-        )
+                config_name='artellapipe-tags',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
 
         return self.__class__._config
 

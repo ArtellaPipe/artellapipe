@@ -27,11 +27,11 @@ class NamesManager(object):
     def config(self):
         if not self.__class__._config:
             self.__class__._config = tpDcc.ConfigsMgr().get_config(
-            config_name='tpDcc-naming',
-            package_name=artellapipe.project.get_clean_name(),
-            root_package_name='tpDcc',
-            environment=artellapipe.project.get_environment()
-        )
+                config_name='tpDcc-naming',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='tpDcc',
+                environment=artellapipe.project.get_environment()
+            )
 
         return self.__class__._config
 
