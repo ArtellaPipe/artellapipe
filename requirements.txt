@@ -8,16 +8,9 @@ psutil
 tpDcc-libs-python
 tpDcc-core
 tpDcc-libs-qt
-# tpNameIt
 pyblish-base
 pyblish-lite
 lucidity
-pytest
-pytest-cov
-coveralls==1.8.2; python_version>='3.6'
-coveralls==1.9.2; python_version<'3.6'
-sphinx
-sphinx_rtd_theme
 python-json-logger
 sentry-sdk
 pyyaml
