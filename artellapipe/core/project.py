@@ -27,6 +27,7 @@ from Qt.QtCore import *
 from Qt.QtWidgets import *
 
 import tpDcc as tp
+from tpDcc.libs.qt.core import qtutils
 from tpDcc.libs.python import python, osplatform, fileio, path as path_utils, folder as folder_utils
 
 if python.is_python2():
@@ -208,7 +209,11 @@ class ArtellaProject(object):
         self.update_paths()
         valid_setup = self.set_environment_variables()
         if not valid_setup:
-            LOGGER.warning('Impossible to setup Artella project. Make sure that Artella App is working!')
+            msg = 'Impossible to setup Artella project. Make sure that Artella ' \
+                  'Drive is working and connected to Artella Drive. After that, restart {}!'.format(tp.Dcc.get_name())
+            LOGGER.warning(msg)
+            qtutils.show_warning(None, 'Artella Project Setup', msg)
+
         self._tray = self.create_tray()
         self.update_project()
         self._update_dcc_ui()
