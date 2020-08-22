@@ -31,7 +31,6 @@ else:
 import artellapipe
 from artellapipe.libs import artella as artella_lib
 from artellapipe.libs.artella.core import artellalib
-from artellapipe.libs.naming.core import naminglib
 from artellapipe.utils import exceptions
 
 LOGGER = logging.getLogger('artellapipe')
@@ -171,16 +170,22 @@ class FilesManager(python.Singleton, object):
         :return: Template
         """
 
-        template = naminglib.ArtellaNameLib().get_template(template_name)
+        template = artellapipe.NamesMgr().naming_lib.get_template(template_name)
         if not template:
             LOGGER.warning('No Template found with name: "{}"'.format(template_name))
 
         return template
 
     def parse_path(self, path):
-        all_templates = naminglib.ArtellaNameLib().templates
+        """
+        Parse paths and returns the tokens path is generated from
+        :param path: str
+        :return: list(str)
+        """
+
+        all_templates = artellapipe.NamesMgr().naming_lib.templates
         for template in all_templates:
-            path_dict = naminglib.ArtellaNameLib().parse_template(template.name, path)
+            path_dict = artellapipe.NamesMgr().naming_lib.parse_template(template.name, path)
             if not path_dict:
                 continue
             return path_dict

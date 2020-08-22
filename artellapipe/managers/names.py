@@ -14,14 +14,16 @@ __email__ = "tpovedatd@gmail.com"
 
 import tpDcc
 from tpDcc.libs.python import python
+from tpDcc.libs.nameit.core import namelib
 
 import artellapipe
-from artellapipe.libs.naming.core import naminglib
 
 
 class NamesManager(object):
 
     _config = None
+    _naming_config = None
+    _naming_lib = None
 
     @property
     def config(self):
@@ -34,6 +36,26 @@ class NamesManager(object):
             )
 
         return self.__class__._config
+
+    @property
+    def naming_config(self):
+        if not self.__class__._naming_config:
+            self.__class__._naming_config = tpDcc.ConfigsMgr().get_config(
+                config_name='artellapipe-naming',
+                package_name=artellapipe.project.get_clean_name(),
+                root_package_name='artellapipe',
+                environment=artellapipe.project.get_environment()
+            )
+
+        return self.__class__._naming_config
+
+    @property
+    def naming_lib(self):
+        if not self.__class__._naming_lib:
+            naming_config = self.naming_config
+            self.__class__._naming_lib = namelib.NameLib(naming_file=naming_config.get_path())
+
+        return self.__class__._naming_lib
 
     def check_node_name(self, node_name):
         """
@@ -72,7 +94,7 @@ class NamesManager(object):
             artellapipe.logger.warning('Parse Node Name by type functionality is only supported in Maya!')
             return None
 
-        name_lib = naminglib.ArtellaNameLib()
+        name_lib = self.naming_lib
         name_lib.set_active_rule('node')
 
         return name_lib.parse(node_name)
@@ -93,7 +115,7 @@ class NamesManager(object):
         import tpDcc.dccs.maya as maya
         from tpDcc.dccs.maya.core import name
 
-        name_lib = naminglib.ArtellaNameLib()
+        name_lib = self.naming_lib
 
         if not self.config:
             artellapipe.logger.warning(
@@ -166,7 +188,7 @@ class NamesManager(object):
         :param kwargs: dict
         """
 
-        name_lib = naminglib.ArtellaNameLib()
+        name_lib = self.naming_lib
 
         if not rule_name or not name_lib.has_rule(rule_name):
             artellapipe.logger.warning(
