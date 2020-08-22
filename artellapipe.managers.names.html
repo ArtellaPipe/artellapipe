@@ -179,8 +179,65 @@
 
            <div itemprop="articleBody">
             
-  <div class="section" id="artellapipe-managers-names-module">
-<h1>artellapipe.managers.names module<a class="headerlink" href="#artellapipe-managers-names-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-artellapipe.managers.names">
+<span id="artellapipe-managers-names-module"></span><h1>artellapipe.managers.names module<a class="headerlink" href="#module-artellapipe.managers.names" title="Permalink to this headline">¶</a></h1>
+<p>Module that contains manager for Artella Nomenclature</p>
+<dl class="py class">
+<dt id="artellapipe.managers.names.NamesManager">
+<em class="property">class </em><code class="sig-prename descclassname">artellapipe.managers.names.</code><code class="sig-name descname">NamesManager</code><a class="headerlink" href="#artellapipe.managers.names.NamesManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.check_node_name">
+<code class="sig-name descname">check_node_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.names.NamesManager.check_node_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether or not given node corresponds to a valid node name taking into consideration node type
+:param node_name: str
+:return: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.config">
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#artellapipe.managers.names.NamesManager.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.naming_config">
+<em class="property">property </em><code class="sig-name descname">naming_config</code><a class="headerlink" href="#artellapipe.managers.names.NamesManager.naming_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.naming_lib">
+<em class="property">property </em><code class="sig-name descname">naming_lib</code><a class="headerlink" href="#artellapipe.managers.names.NamesManager.naming_lib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.parse_node_name">
+<code class="sig-name descname">parse_node_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.names.NamesManager.parse_node_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses given node name
+:param node_name: str
+:return: list(str)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.solve_name">
+<code class="sig-name descname">solve_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rule_name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.names.NamesManager.solve_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolves name with given rule and attributes
+:param rule_name: str
+:param args: list
+:param kwargs: dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="artellapipe.managers.names.NamesManager.solve_node_name_by_type">
+<code class="sig-name descname">solve_node_name_by_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#artellapipe.managers.names.NamesManager.solve_node_name_by_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolves node name taking into account its type
+In this case, the type of the node will be used to retrieve an an automatic rule
+The rule name will be retrieved using auto_suffix dict from tpDcc-naming configuration file
+:param node_names: str or list, name of the node we want to take name of
+:return: str</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
