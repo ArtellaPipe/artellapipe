@@ -209,7 +209,8 @@ class FilesManager(python.Singleton, object):
         if not project_var:
             return path_to_fix
 
-        root_prefix = artella_lib.config.get('app', 'root_prefix')
+        project_type = artellapipe.project.get_project_type()
+        root_prefix = artellapipe.libs.artella.config.get('app', project_type).get('root_prefix', 'ART_LOCAL_ROOT')
 
         if path_to_fix.startswith('${}/'.format(project_env_var)):
             path_to_fix = path_to_fix.replace('${}/'.format(project_env_var), project_var)
@@ -300,7 +301,8 @@ class FilesManager(python.Singleton, object):
         :return: str
         """
 
-        root_prefix = artella_lib.config.get('app', 'root_prefix')
+        project_type = artellapipe.project.get_project_type()
+        root_prefix = artellapipe.libs.artella.config.get('app', project_type).get('root_prefix', 'ART_LOCAL_ROOT')
         artella_var = os.environ.get(root_prefix, None)
         if not artella_var:
             return path_to_prefix
@@ -400,7 +402,7 @@ class FilesManager(python.Singleton, object):
             LOGGER.warning('File Path "{}" is not valid!'.format(valid_path))
             return False
 
-        if warn_user:
+        if warn_user and artellapipe.project.is_indie():
             msg = 'If changes in file: \n\n{}\n\n are not submitted to Artella yet, submit them before ' \
                   'unlocking the file please. \n\n Do you want to continue?'.format(file_path)
             res = tp.Dcc.confirm_dialog(
