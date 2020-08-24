@@ -209,10 +209,10 @@ class ArtellaProject(object):
         self.update_paths()
         valid_setup = self.set_environment_variables()
         if not valid_setup:
+            artellalib.launch_artella_app()
             msg = 'Impossible to setup Artella project. Make sure that Artella ' \
                   'Drive is working and connected to Artella Drive. After that, restart {}!'.format(tp.Dcc.get_name())
             LOGGER.warning(msg)
-            qtutils.show_warning(None, 'Artella Project Setup', msg)
 
         self._tray = self.create_tray()
         self.update_project()
@@ -476,12 +476,13 @@ class ArtellaProject(object):
             if tp.Dcc.get_name() == tp.Dccs.Unknown:
                 mtime = time.time()
                 date_value = datetime.datetime.fromtimestamp(mtime)
-
                 artellalib.get_artella_client(app_identifier='{}.{}'.format(self.name.title(), date_value.year))
+
             valid_metadata = artellalib.update_local_artella_root()
             if not valid_metadata:
                 return False
-            root_prefix = artellapipe.libs.artella.config.get('app', 'root_prefix')
+            project_type = self.get_project_type()
+            root_prefix = artellapipe.libs.artella.config.get('app', project_type).get('root_prefix', 'ART_LOCAL_ROOT')
             production_folder = self.get_production_folder()
             artella_var = os.environ.get(root_prefix, None)
             LOGGER.debug('Artella environment variable is set to: {}'.format(artella_var))
@@ -491,29 +492,30 @@ class ArtellaProject(object):
                         artella_var, production_folder, self.id_number, self.id)
                 else:
                     client = artellalib.get_artella_client()
-                    projects = client.get_remote_projects(force_update=True)
-                    local_projects = client.get_local_projects(force_update=True) or dict()
-                    project_found = None
-                    for remote_name, project_data in projects.items():
-                        if self.id in project_data:
-                            project_found = project_data
-                            break
-                    if not project_found:
-                        LOGGER.warning(
-                            'Project ID: {} not found in currently available Artella Enterprise projects. '
-                            'Impossible to set Artella environment variable!'.format(self.id))
-                    else:
-                        project_name = project_found[self.id]['name']
-                        env_var = local_projects.get(project_name, dict()).get('directory', None)
-                        if not env_var:
-                            env_var_path = '{}{}{}'.format(artella_var, os.sep, project_name)
+                    if client:
+                        projects = client.get_remote_projects(force_update=True)
+                        local_projects = client.get_local_projects(force_update=True) or dict()
+                        project_found = None
+                        for remote_name, project_data in projects.items():
+                            if self.id in project_data:
+                                project_found = project_data
+                                break
+                        if not project_found:
                             LOGGER.warning(
-                                'Artella Enterprise Local Project {} | {} not found in the user computer. '
-                                'Setting fallback path: {}!'.format(project_name, self.id, env_var_path))
+                                'Project ID: {} not found in currently available Artella Enterprise projects. '
+                                'Impossible to set Artella environment variable!'.format(self.id))
                         else:
-                            if not env_var.endswith('/'):
-                                env_var = '{}/'.format(env_var)
-                            os.environ[self.env_var] = env_var
+                            project_name = project_found[self.id]['name']
+                            env_var = local_projects.get(project_name, dict()).get('directory', None)
+                            if not env_var:
+                                env_var_path = '{}{}{}'.format(artella_var, os.sep, project_name)
+                                LOGGER.warning(
+                                    'Artella Enterprise Local Project {} | {} not found in the user computer. '
+                                    'Setting fallback path: {}!'.format(project_name, self.id, env_var_path))
+                            else:
+                                if not env_var.endswith('/'):
+                                    env_var = '{}/'.format(env_var)
+                                os.environ[self.env_var] = env_var
             else:
                 LOGGER.warning('Impossible to set Artella environment variable!')
         except Exception as e:
@@ -773,7 +775,12 @@ class ArtellaProject(object):
         :return: str
         """
 
-        return artellalib.get_artella_project_url(self.id)
+        # First we check if the project defines its URL in its config file
+        artella_url = self._config.get('artella_url', '')
+        if not artella_url:
+            artella_url = artellalib.get_artella_project_url(self.id)
+
+        return artella_url
 
     def get_artella_assets_url(self):
         """
