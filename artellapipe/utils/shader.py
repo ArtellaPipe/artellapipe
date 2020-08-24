@@ -33,7 +33,7 @@ if tp.is_maya():
     IGNORE_SHADERS = ['particleCloud1', 'shaderGlow1', 'defaultColorMgtGlobals', 'lambert1']
     IGNORE_ATTRS = ['computedFileTextureNamePattern']
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ShadingNetwork(object):

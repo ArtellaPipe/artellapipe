@@ -27,7 +27,7 @@ from tpDcc.libs.qt.widgets import grid
 import artellapipe
 from artellapipe.widgets import shot as shot
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class ShotsViewer(base.BaseWidget, object):

@@ -27,7 +27,7 @@ import artellapipe.register
 from artellapipe.core import defines
 from artellapipe.libs.artella.core import artellalib
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe')
 
 
 class SequenceInfoWidget(base.BaseWidget, object):
