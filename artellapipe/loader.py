@@ -57,9 +57,9 @@ def init(dev=False):
         dcc_mod.init(dev=dev)
 
     # When working in production, we use custom exception hook to show message box to user
-    if not dev:
-        from artellapipe.utils import exceptions
-        exceptions.ArtellaExceptionHook()
+    # if not dev:
+    #     from artellapipe.utils import exceptions
+    #     exceptions.ArtellaExceptionHook()
 
 
 def create_logger():
