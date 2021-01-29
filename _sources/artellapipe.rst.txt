@@ -23,7 +23,6 @@ Submodules
    :maxdepth: 4
 
    artellapipe.loader
-   artellapipe.register
 
 Module contents
 ---------------

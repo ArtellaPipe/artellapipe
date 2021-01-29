@@ -10,6 +10,7 @@ Submodules
    artellapipe.core.abstract
    artellapipe.core.asset
    artellapipe.core.assetfile
+   artellapipe.core.consts
    artellapipe.core.defines
    artellapipe.core.file
    artellapipe.core.node
